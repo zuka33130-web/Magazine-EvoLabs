@@ -1,0 +1,253 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: 'Epilogue', sans-serif;
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #0c0d10;
+    color: #e4e4e7;
+  }
+}
+
+.font-display {
+  font-family: 'Epilogue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.font-mono-tech {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.font-sans-editorial {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Subtle editorial technical grid overlay */
+.bg-tech-grid {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-tech-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Custom fine scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0c0d10;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Laboratory environmental animations */
+@keyframes evo-fan-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-evo-fan {
+  animation: evo-fan-spin 3.5s linear infinite;
+}
+
+.animate-evo-fan-slow {
+  animation: evo-fan-spin 8s linear infinite;
+}
+
+@keyframes evo-cable-pulse {
+  0% {
+    stroke-dashoffset: 60;
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.3;
+  }
+}
+
+.animate-evo-pulse-line {
+  stroke-dasharray: 8, 8;
+  animation: evo-cable-pulse 3s linear infinite;
+}
+
+@keyframes evo-crt-flicker {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.98; }
+  85% { opacity: 0.75; }
+}
+
+.animate-evo-flicker {
+  animation: evo-crt-flicker 4s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   EVO LABS MAGAZINE — A4 EDITORIAL SYSTEM & PDF PRINT STYLES
+   ========================================================================== */
+
+.magazine-dropcap::first-letter {
+  font-family: var(--font-display);
+  float: left;
+  font-size: 3.5rem;
+  line-height: 0.85;
+  padding-top: 4px;
+  padding-right: 10px;
+  padding-bottom: 2px;
+  font-weight: 900;
+  color: #eab308;
+}
+
+/* Authentic editorial column rules */
+.editorial-column-rule {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Screen representation of A4 page */
+.a4-magazine-page {
+  width: 100%;
+  max-width: 820px;
+  min-height: 1160px;
+  aspect-ratio: 1 / 1.4142;
+  position: relative;
+  box-sizing: border-box;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  /* Enforce exact color rendering and background graphics */
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html, body {
+    background-color: #090A0E !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* Exclude all interactive web chrome, bars, buttons, scrollbars and navigation */
+  .no-print,
+  header.no-print,
+  nav,
+  button,
+  input,
+  select,
+  .magazine-header-bar,
+  .magazine-quick-help-bar,
+  .print\:hidden,
+  ::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Structural containers flow seamlessly without viewport scroll constraints */
+  #root,
+  .magazine-view-wrapper,
+  .magazine-scroll-container {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    background: transparent !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Page print wrapper ignores intermediate flex constraints */
+  .page-print-wrapper {
+    display: contents !important;
+  }
+
+  /* Exact A4 Vertical Dimensions per Page: 210mm x 297mm */
+  .a4-magazine-page {
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    max-width: 210mm !important;
+    box-sizing: border-box !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Avoid phantom trailing empty page after the back cover */
+  .a4-magazine-page:last-child {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  /* Prevent awkward breaks inside critical editorial elements */
+  img,
+  table,
+  pre,
+  code,
+  h1, h2, h3, h4, h5, h6,
+  .break-inside-avoid,
+  .lab-command-block,
+  .internet-dice-block,
+  .technical-callout,
+  .editorial-card,
+  .ficha-evo-card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Preserve pure editorial dark backgrounds across rendering engines */
+  .bg-\[\#090A0E\],
+  .bg-\[\#060709\],
+  .bg-\[\#050608\],
+  .bg-\[\#0A0C10\],
+  .bg-\[\#0e1118\],
+  .bg-\[\#0b0d13\],
+  .bg-\[\#081216\],
+  .bg-\[\#12151d\] {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
