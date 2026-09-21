@@ -5,9 +5,9 @@ import { ChapterHeroOpener } from './ChapterHeroOpener';
 export const Page11Chapter02Opener: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-11"
-      pageNumber={11}
-      totalPages={41}
+      pageId="magazine-page-15"
+      pageNumber={15}
+      totalPages={46}
       sectionTitle="CAPÍTULO 02"
       subSlug="INTERCONEXIÓN // SISTEMA INTEGRADO"
       accentColor="#F59E0B"

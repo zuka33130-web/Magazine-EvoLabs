@@ -6,9 +6,9 @@ import { ShieldCheck, HardDrive } from 'lucide-react';
 export const Page37Chapter06Mito07: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-37"
-      pageNumber={37}
-      totalPages={41}
+      pageId="magazine-page-41"
+      pageNumber={41}
+      totalPages={46}
       sectionTitle="DESCUBRIMIENTO METROLÓGICO"
       subSlug="EXPEDIENTE MITO-07 // MANTENIMIENTO DE CONTROLADORES"
       accentColor="#10B981"

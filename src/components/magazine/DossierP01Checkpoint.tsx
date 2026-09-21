@@ -6,9 +6,9 @@ import { Activity, HardDrive, Cpu, Clock, ShieldAlert, CheckCircle, ArrowRight }
 export const DossierP01Checkpoint: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-23"
-      pageNumber={23}
-      totalPages={41}
+      pageId="magazine-page-27"
+      pageNumber={27}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 01 // EL CHECKPOINT INICIAL"
       accentColor="#EAB308"

@@ -6,9 +6,9 @@ import { Wind, Volume2, ShieldCheck } from 'lucide-react';
 export const Page19Chapter04Mito05: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-19"
-      pageNumber={19}
-      totalPages={41}
+      pageId="magazine-page-23"
+      pageNumber={23}
+      totalPages={46}
       sectionTitle="DESCUBRIMIENTO METROLÓGICO"
       subSlug="EXPEDIENTE MITO-05 // GESTIÓN ACÚSTICA & TÉRMICA"
       accentColor="#F97316"

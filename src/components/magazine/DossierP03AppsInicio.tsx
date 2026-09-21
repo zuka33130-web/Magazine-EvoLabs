@@ -73,9 +73,9 @@ const APPS_INICIO: StartupAppItem[] = [
 export const DossierP03AppsInicio: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-25"
-      pageNumber={25}
-      totalPages={41}
+      pageId="magazine-page-29"
+      pageNumber={29}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 03 // APPS DE INICIO"
       accentColor="#EAB308"

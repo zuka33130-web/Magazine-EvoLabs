@@ -6,9 +6,9 @@ import { AlertTriangle, Cpu, ShieldAlert } from 'lucide-react';
 export const Page09Chapter01Mito02: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-09"
-      pageNumber={9}
-      totalPages={41}
+      pageId="magazine-page-13"
+      pageNumber={13}
+      totalPages={46}
       sectionTitle="DESCUBRIMIENTO METROLÓGICO"
       subSlug="EXPEDIENTE MITO-02 // GESTIÓN DE NÚCLEOS DE CPU"
       accentColor="#EAB308"

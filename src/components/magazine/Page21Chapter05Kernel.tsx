@@ -5,9 +5,9 @@ import { ShieldAlert, Cpu, Activity, Clock, Layers, ArrowRight } from 'lucide-re
 export const Page21Chapter05Kernel: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-21"
-      pageNumber={21}
-      totalPages={41}
+      pageId="magazine-page-25"
+      pageNumber={25}
+      totalPages={46}
       sectionTitle="CAPÍTULO 05"
       subSlug="ARQUITECTURA // ANILLOS DE SEGURIDAD DEL CPU"
       accentColor="#3B82F6"

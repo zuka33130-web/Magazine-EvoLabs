@@ -6,9 +6,9 @@ import { Activity, Gauge, MousePointer, ShieldCheck } from 'lucide-react';
 export const Page15Chapter03Frametime: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-15"
-      pageNumber={15}
-      totalPages={41}
+      pageId="magazine-page-19"
+      pageNumber={19}
+      totalPages={46}
       sectionTitle="CAPÍTULO 03"
       subSlug="TELEMETRÍA // LA COLA DE RENDERIZADO"
       accentColor="#EF4444"

@@ -5,9 +5,9 @@ import { Cpu, Zap, HardDrive, ShieldCheck, ArrowRight } from 'lucide-react';
 export const Page04Topology: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-04"
-      pageNumber={4}
-      totalPages={41}
+      pageId="magazine-page-08"
+      pageNumber={8}
+      totalPages={46}
       sectionTitle="INFOGRAFÍA PERICIAL"
       subSlug="TOPOLOGÍA DE SILICIO // RUTAS DE ALTA VELOCIDAD"
       accentColor="#EAB308"

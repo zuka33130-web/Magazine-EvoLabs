@@ -5,9 +5,9 @@ import { ChapterHeroOpener } from './ChapterHeroOpener';
 export const Page17Chapter04Opener: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-17"
-      pageNumber={17}
-      totalPages={41}
+      pageId="magazine-page-21"
+      pageNumber={21}
+      totalPages={46}
       sectionTitle="CAPÍTULO 04"
       subSlug="FÍSICA APLICADA // TERMODINÁMICA & ENERGÍA"
       accentColor="#F97316"

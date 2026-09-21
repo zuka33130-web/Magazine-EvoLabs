@@ -5,9 +5,9 @@ import { ChapterHeroOpener } from './ChapterHeroOpener';
 export const Page06Chapter01Opener: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-06"
-      pageNumber={6}
-      totalPages={41}
+      pageId="magazine-page-10"
+      pageNumber={10}
+      totalPages={46}
       sectionTitle="CAPÍTULO 01"
       subSlug="PERITAJE FORENSE // AUDITORÍA DE COMPONENTES"
       accentColor="#EAB308"

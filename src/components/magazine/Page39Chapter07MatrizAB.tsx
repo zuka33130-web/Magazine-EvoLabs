@@ -5,9 +5,9 @@ import { Beaker, CheckCircle2, ShieldCheck, Scale, Flame } from 'lucide-react';
 export const Page39Chapter07MatrizAB: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-39"
-      pageNumber={39}
-      totalPages={41}
+      pageId="magazine-page-43"
+      pageNumber={43}
+      totalPages={46}
       sectionTitle="CAPÍTULO 07"
       subSlug="PROTOCOLO EXPERIMENTAL // METROLOGÍA A/B"
       accentColor="#06B6D4"

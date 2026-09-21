@@ -5,9 +5,9 @@ import { Folder, Key, Calendar, Cpu, Bell, RefreshCw, ArrowRight, ShieldCheck } 
 export const DossierP02PuertasArranque: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-24"
-      pageNumber={24}
-      totalPages={41}
+      pageId="magazine-page-28"
+      pageNumber={28}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 02 // INFOGRAFÍA TÉCNICA"
       accentColor="#EAB308"

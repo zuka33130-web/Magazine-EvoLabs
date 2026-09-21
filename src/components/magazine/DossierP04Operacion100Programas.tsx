@@ -5,9 +5,9 @@ import { CheckSquare, ShieldBan, Trash2, Search, Zap, AlertTriangle, Layers } fr
 export const DossierP04Operacion100Programas: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-26"
-      pageNumber={26}
-      totalPages={41}
+      pageId="magazine-page-30"
+      pageNumber={30}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 04 // OPERACIÓN 100 PROGRAMAS"
       accentColor="#EAB308"

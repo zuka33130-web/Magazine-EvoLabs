@@ -5,9 +5,9 @@ import { Flame, Zap, ShieldAlert, Wind, ArrowRight } from 'lucide-react';
 export const Page18Chapter04MurosTermicos: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-18"
-      pageNumber={18}
-      totalPages={41}
+      pageId="magazine-page-22"
+      pageNumber={22}
+      totalPages={46}
       sectionTitle="CAPÍTULO 04"
       subSlug="TERMODINÁMICA // LÍMITES FÍSICOS DEL SILICIO"
       accentColor="#F97316"

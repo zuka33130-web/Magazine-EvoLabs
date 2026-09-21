@@ -5,9 +5,9 @@ import { AlertOctagon, Terminal, HardDrive, ShieldAlert, CheckCircle, Info, Data
 export const DossierP10LimpiezaProfunda: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-32"
-      pageNumber={32}
-      totalPages={41}
+      pageId="magazine-page-36"
+      pageNumber={36}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 10 // CIRUGÍA DEL SISTEMA"
       accentColor="#EAB308"

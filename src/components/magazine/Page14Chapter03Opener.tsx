@@ -5,9 +5,9 @@ import { ChapterHeroOpener } from './ChapterHeroOpener';
 export const Page14Chapter03Opener: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-14"
-      pageNumber={14}
-      totalPages={41}
+      pageId="magazine-page-18"
+      pageNumber={18}
+      totalPages={46}
       sectionTitle="CAPÍTULO 03"
       subSlug="TELEMETRÍA FORENSE // FRAMETIME & CONSISTENCIA"
       accentColor="#EF4444"

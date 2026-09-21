@@ -5,9 +5,9 @@ import { Sliders, RotateCcw, Check, Clock, Eye, AlertCircle, Zap, Gamepad2, Batt
 export const DossierP11MicroTweaks: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-33"
-      pageNumber={33}
-      totalPages={41}
+      pageId="magazine-page-37"
+      pageNumber={37}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 11 // AJUSTES Y RENDIMIENTO"
       accentColor="#EAB308"

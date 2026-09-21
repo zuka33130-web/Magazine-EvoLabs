@@ -6,9 +6,9 @@ import { AlertCircle, Waves, CheckCircle2 } from 'lucide-react';
 export const Page05Mito01Ram: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-05"
-      pageNumber={5}
-      totalPages={41}
+      pageId="magazine-page-09"
+      pageNumber={9}
+      totalPages={46}
       sectionTitle="DESCUBRIMIENTO METROLÓGICO"
       subSlug="EXPEDIENTE MITO-01 // TOPOLOGÍA DE MEMORIA RAM"
       accentColor="#EAB308"

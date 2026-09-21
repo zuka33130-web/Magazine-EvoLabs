@@ -5,9 +5,9 @@ import { Calendar, Terminal, ShieldCheck, AlertCircle, Clock, Copy, ArrowRight, 
 export const DossierP08TareasProgramadas: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-30"
-      pageNumber={30}
-      totalPages={41}
+      pageId="magazine-page-34"
+      pageNumber={34}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 08 // TAREAS PROGRAMADAS"
       accentColor="#EAB308"

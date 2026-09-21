@@ -5,9 +5,9 @@ import { CheckCircle2, RotateCcw, FileText, ClipboardCheck, ArrowRight, ShieldCh
 export const DossierP12FinalCheckpoint: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-34"
-      pageNumber={34}
-      totalPages={41}
+      pageId="magazine-page-38"
+      pageNumber={38}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 12 // BALANCE Y CHECKPOINT B"
       accentColor="#EAB308"
@@ -29,7 +29,7 @@ export const DossierP12FinalCheckpoint: React.FC = () => {
 
       {/* Narrative Lead */}
       <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed mb-2">
-        Llegó el momento del reinicio general. Con las apps de inicio auditadas, servicios innecesarios en Manual, tareas programadas bajo control y temporales depurados, reiniciá tu equipo. Esperá 3 a 5 minutos en el escritorio para que el sistema estabilice su reposo y completá tu <strong>Checkpoint B</strong> frente a los datos que anotaste en la Página 10.
+        Llegó el momento del reinicio general. Con las apps de inicio auditadas, servicios innecesarios en Manual, tareas programadas bajo control y temporales depurados, reiniciá tu equipo. Esperá 3 a 5 minutos en el escritorio para que el sistema estabilice su reposo y completá tu <strong>Checkpoint B</strong> frente a los datos basales que registraste en la Página 14.
       </p>
 
       {/* Checkpoint A vs Checkpoint B Interactive Reader Matrix */}

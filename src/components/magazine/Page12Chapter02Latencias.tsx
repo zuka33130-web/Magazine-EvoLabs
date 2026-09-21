@@ -5,9 +5,9 @@ import { Clock, Zap, ArrowRight, Gauge, Cpu } from 'lucide-react';
 export const Page12Chapter02Latencias: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-12"
-      pageNumber={12}
-      totalPages={41}
+      pageId="magazine-page-16"
+      pageNumber={16}
+      totalPages={46}
       sectionTitle="CAPÍTULO 02"
       subSlug="METROLOGÍA DE BUSES // LATENCIA VS ANCHO DE BANDA"
       accentColor="#F59E0B"

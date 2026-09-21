@@ -6,9 +6,9 @@ import { Cpu, ShieldAlert, CheckCircle, XCircle, AlertTriangle, Filter, Info } f
 export const DossierP06ServiciosWindows: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-28"
-      pageNumber={28}
-      totalPages={41}
+      pageId="magazine-page-32"
+      pageNumber={32}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 06 // SERVICIOS DE WINDOWS"
       accentColor="#EAB308"

@@ -6,9 +6,9 @@ import { Gauge, ShieldAlert } from 'lucide-react';
 export const Page13Chapter02Mito03: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-13"
-      pageNumber={13}
-      totalPages={41}
+      pageId="magazine-page-17"
+      pageNumber={17}
+      totalPages={46}
       sectionTitle="DESCUBRIMIENTO METROLÓGICO"
       subSlug="EXPEDIENTE MITO-03 // ARQUITECTURA PCIE & VRAM"
       accentColor="#F59E0B"

@@ -6,9 +6,9 @@ import { HardDrive, AlertTriangle, ShieldCheck, Trash, Sparkles, FolderX, Info }
 export const DossierP09TemporalesLimpieza: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-31"
-      pageNumber={31}
-      totalPages={41}
+      pageId="magazine-page-35"
+      pageNumber={35}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 09 // HIGIENE DEL ALMACENAMIENTO"
       accentColor="#EAB308"

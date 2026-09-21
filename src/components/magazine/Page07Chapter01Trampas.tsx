@@ -5,9 +5,9 @@ import { AlertTriangle, Layers, Zap, Gauge } from 'lucide-react';
 export const Page07Chapter01Trampas: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-07"
-      pageNumber={7}
-      totalPages={41}
+      pageId="magazine-page-11"
+      pageNumber={11}
+      totalPages={46}
       sectionTitle="CAPÍTULO 01"
       subSlug="TRAMPAS COMERCIALES // LA FICHA TÉCNICA REAL"
       accentColor="#EAB308"

@@ -5,9 +5,9 @@ import { HardDrive, Cpu, FlaskConical, ArrowLeftRight, CheckCircle2, RotateCcw, 
 export const DossierP07SysMainExperimento: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-29"
-      pageNumber={29}
-      totalPages={41}
+      pageId="magazine-page-33"
+      pageNumber={33}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 07 // ENSAYO A/B SYSMAIN"
       accentColor="#EAB308"

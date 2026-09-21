@@ -6,9 +6,9 @@ import { Zap, ShieldCheck } from 'lucide-react';
 export const Page40Chapter07Mito08: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-40"
-      pageNumber={40}
-      totalPages={41}
+      pageId="magazine-page-44"
+      pageNumber={44}
+      totalPages={46}
       sectionTitle="DESCUBRIMIENTO METROLÓGICO"
       subSlug="EXPEDIENTE MITO-08 // PLANES DE ENERGÍA DE WINDOWS"
       accentColor="#06B6D4"

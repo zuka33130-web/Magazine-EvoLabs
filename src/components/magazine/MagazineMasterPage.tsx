@@ -15,7 +15,7 @@ interface MagazineMasterPageProps {
 
 export const MagazineMasterPage: React.FC<MagazineMasterPageProps> = ({
   pageNumber,
-  totalPages = 41,
+  totalPages = 46,
   sectionTitle = 'INFORME PERICIAL',
   subSlug = 'HARDWARE & ARQUITECTURA DE SILICIO',
   accentColor = '#EAB308',
@@ -25,8 +25,6 @@ export const MagazineMasterPage: React.FC<MagazineMasterPageProps> = ({
   children,
   pageId,
 }) => {
-  const isOdd = pageNumber % 2 !== 0;
-
   return (
     <article
       id={pageId}
@@ -40,12 +38,12 @@ export const MagazineMasterPage: React.FC<MagazineMasterPageProps> = ({
       {/* Background Micro Grid for Technical Print Texture */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.035] bg-tech-grid" />
 
-      {/* Registration Marks / Print Alignment Crosshairs (Screen only) */}
+      {/* Registration Marks / Print Alignment (Screen only) */}
       <div className="absolute top-2 left-2 text-[8px] font-mono-tech text-zinc-700 select-none pointer-events-none hidden sm:block print:hidden">
-        + 210x297mm // A4 PORTRAIT
+        + 210×297mm // A4 PORTRAIT
       </div>
       <div className="absolute top-2 right-2 text-[8px] font-mono-tech text-zinc-700 select-none pointer-events-none hidden sm:block print:hidden">
-        EVO LABS PUB // 300DPI +
+        EVO LABS EDITORIAL // 300 DPI +
       </div>
 
       {!hideHeaderFooter && (
@@ -104,27 +102,18 @@ export const MagazineMasterPage: React.FC<MagazineMasterPageProps> = ({
                 {String(totalPages).padStart(2, '0')}
               </span>
               <span className="text-zinc-700 hidden sm:inline">|</span>
-              <span className="text-zinc-500 tracking-wider hidden sm:inline text-[9px]">
-                ISSN 2953-4828 // EDICIÓN OFICIAL DE METROLOGÍA
+              <span className="text-zinc-400 tracking-wider hidden sm:inline text-[9px] uppercase font-semibold">
+                COLECCIÓN PERICIAL // TOMO 01
               </span>
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-zinc-400 text-[9px] uppercase tracking-widest hidden md:inline">
-                "Hacemos milagros, pero los medimos"
+              <span className="text-yellow-400/90 text-[9.5px] uppercase tracking-widest font-mono-tech hidden sm:inline">
+                "HACEMOS MILAGROS, PERO LOS MEDIMOS."
               </span>
-              <div
-                className="flex items-center gap-[2px] h-3.5 opacity-60"
-                title="EAN-13 METROLOGY ID"
-              >
-                {[2, 1, 3, 1, 2, 4, 1, 2, 1, 3, 2, 1, 3, 1, 2, 1, 4, 2].map((w, i) => (
-                  <span
-                    key={i}
-                    className="bg-zinc-400 h-full inline-block"
-                    style={{ width: `${w}px` }}
-                  />
-                ))}
-              </div>
+              <span className="text-zinc-600 text-[9px] uppercase tracking-widest hidden lg:inline">
+                A4 PORTRAIT • 210×297 MM
+              </span>
             </div>
           </footer>
         )}

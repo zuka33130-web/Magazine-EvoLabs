@@ -6,9 +6,9 @@ import { ShieldAlert, Terminal } from 'lucide-react';
 export const Page22Chapter05Mito06: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-22"
-      pageNumber={22}
-      totalPages={41}
+      pageId="magazine-page-26"
+      pageNumber={26}
+      totalPages={46}
       sectionTitle="DESCUBRIMIENTO METROLÓGICO"
       subSlug="EXPEDIENTE MITO-06 // OPTIMIZACIÓN DE SISTEMA OPERATIVO"
       accentColor="#3B82F6"

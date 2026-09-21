@@ -6,9 +6,9 @@ import { ShieldCheck, Terminal, HelpCircle } from 'lucide-react';
 export const Page08Chapter01PowerShell: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-08"
-      pageNumber={8}
-      totalPages={41}
+      pageId="magazine-page-12"
+      pageNumber={12}
+      totalPages={46}
       sectionTitle="LABORATORIO PRÁCTICO"
       subSlug="PROBALO EN TU PC // AUDITORÍA DIRECTA DE SILICIO"
       accentColor="#EAB308"

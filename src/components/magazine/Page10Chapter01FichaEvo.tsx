@@ -5,9 +5,9 @@ import { ClipboardCheck, Cpu, HardDrive, Monitor, Layers, CheckSquare } from 'lu
 export const Page10Chapter01FichaEvo: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-10"
-      pageNumber={10}
-      totalPages={41}
+      pageId="magazine-page-14"
+      pageNumber={14}
+      totalPages={46}
       sectionTitle="FICHA DE REGISTRO PERICIAL"
       subSlug="AUDITORÍA BASAL // CAPÍTULO 01"
       accentColor="#EAB308"

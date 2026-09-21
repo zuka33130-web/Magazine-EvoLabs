@@ -10,8 +10,12 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { Page01Cover } from './Page01Cover';
-import { Page02Welcome } from './Page02Welcome';
-import { Page03Index } from './Page03Index';
+import { Page02Manifesto } from './Page02Manifesto';
+import { Page03PactoLector } from './Page03PactoLector';
+import { Page04MetodoEvo } from './Page04MetodoEvo';
+import { Page05PruebaCero } from './Page05PruebaCero';
+import { Page06SistemaEvo } from './Page06SistemaEvo';
+import { Page07Index } from './Page07Index';
 import { Page04Topology } from './Page04Topology';
 import { Page05Mito01Ram } from './Page05Mito01Ram';
 import { Page06Chapter01Opener } from './Page06Chapter01Opener';
@@ -49,7 +53,8 @@ import { Page37Chapter06Mito07 } from './Page37Chapter06Mito07';
 import { Page38Chapter07Opener } from './Page38Chapter07Opener';
 import { Page39Chapter07MatrizAB } from './Page39Chapter07MatrizAB';
 import { Page40Chapter07Mito08 } from './Page40Chapter07Mito08';
-import { Page12BackCover } from './Page12BackCover';
+import { Page45FuentesTecnicas } from './Page45FuentesTecnicas';
+import { Page46BackCover } from './Page46BackCover';
 
 interface EvoMagazineViewProps {
   onBackToApp?: () => void;
@@ -67,7 +72,7 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
   const [isPreparingPrint, setIsPreparingPrint] = useState<boolean>(false);
   const [showConfigHelper, setShowConfigHelper] = useState<boolean>(false);
 
-  const totalPages = 41;
+  const totalPages = 46;
 
   // Keyboard navigation
   useEffect(() => {
@@ -93,13 +98,17 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
 
   const pageComponents = [
     { num: 1, title: 'Portada // Edición Coleccionable 2026', comp: <Page01Cover key="p1" /> },
-    { num: 2, title: 'Carta del Director & Manifiesto', comp: <Page02Welcome key="p2" /> },
+    { num: 2, title: 'Manifiesto EVO Labs // No adivines. Comprobalo.', comp: <Page02Manifesto key="p2" /> },
+    { num: 3, title: 'Pacto con el Lector // Una ruta, dos velocidades', comp: <Page03PactoLector key="p3" /> },
+    { num: 4, title: 'El Método EVO // Los 7 Pasos de la Verdad', comp: <Page04MetodoEvo key="p4" /> },
+    { num: 5, title: 'Prueba Cero EVO // Baseline Inmutable', comp: <Page05PruebaCero key="p5" /> },
+    { num: 6, title: 'Cómo Leer Este Tomo // Archivo & Soberanía', comp: <Page06SistemaEvo key="p6" /> },
     {
-      num: 3,
-      title: 'Índice Visual // Sumario',
+      num: 7,
+      title: 'Índice Visual // Sumario Completo',
       comp: (
-        <Page03Index
-          key="p3"
+        <Page07Index
+          key="p7"
           onSelectPage={(pageNum) => {
             setCurrentPage(pageNum + 1);
             if (viewMode === 'continuous') {
@@ -110,44 +119,45 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
         />
       ),
     },
-    { num: 4, title: 'Topología // Anatomía del Silicio', comp: <Page04Topology key="p4" /> },
-    { num: 5, title: 'Expediente Mito-01 // Slots de RAM', comp: <Page05Mito01Ram key="p5" /> },
-    { num: 6, title: 'Capítulo 01 // ¿Qué PC tenés realmente?', comp: <Page06Chapter01Opener key="p6" /> },
-    { num: 7, title: 'Capítulo 01 // Las Trampas Comerciales', comp: <Page07Chapter01Trampas key="p7" /> },
-    { num: 8, title: 'Capítulo 01 // Probalo en tu PC: PowerShell', comp: <Page08Chapter01PowerShell key="p8" /> },
-    { num: 9, title: 'Expediente Mito-02 // Núcleos en MSConfig', comp: <Page09Chapter01Mito02 key="p9" /> },
-    { num: 10, title: 'Capítulo 01 // Ficha Forense EVO', comp: <Page10Chapter01FichaEvo key="p10" /> },
-    { num: 11, title: 'Capítulo 02 // Cómo trabajan juntos', comp: <Page11Chapter02Opener key="p11" /> },
-    { num: 12, title: 'Capítulo 02 // Jerarquía de Latencias vs Ancho de Banda', comp: <Page12Chapter02Latencias key="p12" /> },
-    { num: 13, title: 'Expediente Mito-03 // Resizable BAR / SAM', comp: <Page13Chapter02Mito03 key="p13" /> },
-    { num: 14, title: 'Capítulo 03 // Cuando los FPS mienten', comp: <Page14Chapter03Opener key="p14" /> },
-    { num: 15, title: 'Capítulo 03 // La Cola de Renderizado al 99%', comp: <Page15Chapter03Frametime key="p15" /> },
-    { num: 16, title: 'Expediente Mito-04 // V-Sync & FPS Ilimitados', comp: <Page16Chapter03Mito04 key="p16" /> },
-    { num: 17, title: 'Capítulo 04 // Encontrá el límite', comp: <Page17Chapter04Opener key="p17" /> },
-    { num: 18, title: 'Capítulo 04 // Los Tres Muros del Silicio', comp: <Page18Chapter04MurosTermicos key="p18" /> },
-    { num: 19, title: 'Expediente Mito-05 // Ventiladores al 100%', comp: <Page19Chapter04Mito05 key="p19" /> },
-    { num: 20, title: 'Capítulo 05 // Windows también es hardware', comp: <Page20Chapter05Opener key="p20" /> },
-    { num: 21, title: 'Capítulo 05 // Ring 0 vs Ring 3 & DPC Latency', comp: <Page21Chapter05Kernel key="p21" /> },
-    { num: 22, title: 'Expediente Mito-06 // Scripts Debloater', comp: <Page22Chapter05Mito06 key="p22" /> },
-    { num: 23, title: 'Dossier 01 // El Checkpoint Basal', comp: <DossierP01Checkpoint key="p23" /> },
-    { num: 24, title: 'Dossier 02 // Las Puertas del Arranque', comp: <DossierP02PuertasArranque key="p24" /> },
-    { num: 25, title: 'Dossier 03 // Apps de Inicio', comp: <DossierP03AppsInicio key="p25" /> },
-    { num: 26, title: 'Dossier 04 // Operación 100 Programas', comp: <DossierP04Operacion100Programas key="p26" /> },
-    { num: 27, title: 'Dossier 05 // Segundo Plano y Bandeja', comp: <DossierP05SegundoPlano key="p27" /> },
-    { num: 28, title: 'Dossier 06 // Servicios: Criterio Real', comp: <DossierP06ServiciosWindows key="p28" /> },
-    { num: 29, title: 'Dossier 07 // Ensayo A/B SysMain', comp: <DossierP07SysMainExperimento key="p29" /> },
-    { num: 30, title: 'Dossier 08 // Tareas Programadas', comp: <DossierP08TareasProgramadas key="p30" /> },
-    { num: 31, title: 'Dossier 09 // Higiene de Temporales', comp: <DossierP09TemporalesLimpieza key="p31" /> },
-    { num: 32, title: 'Dossier 10 // Limpieza Profunda: WinSxS', comp: <DossierP10LimpiezaProfunda key="p32" /> },
-    { num: 33, title: 'Dossier 11 // Micro-Tweaks Validados', comp: <DossierP11MicroTweaks key="p33" /> },
-    { num: 34, title: 'Dossier 12 // Checkpoint Final B', comp: <DossierP12FinalCheckpoint key="p34" /> },
-    { num: 35, title: 'Capítulo 06 // El Método Deductivo', comp: <Page35Chapter06Opener key="p35" /> },
-    { num: 36, title: 'Capítulo 06 // Árbol Forense de Aislamiento', comp: <Page36Chapter06ArbolForense key="p36" /> },
-    { num: 37, title: 'Expediente Mito-07 // Pasar DDU de Rutina', comp: <Page37Chapter06Mito07 key="p37" /> },
-    { num: 38, title: 'Capítulo 07 // El Método Científico en tu PC', comp: <Page38Chapter07Opener key="p38" /> },
-    { num: 39, title: 'Capítulo 07 // Los Tres Mandamientos del Ensayo A/B', comp: <Page39Chapter07MatrizAB key="p39" /> },
-    { num: 40, title: 'Expediente Mito-08 // Plan Máximo Rendimiento', comp: <Page40Chapter07Mito08 key="p40" /> },
-    { num: 41, title: 'Contratapa // Manifiesto Final', comp: <Page12BackCover key="p41" /> },
+    { num: 8, title: 'Topología // Anatomía del Silicio', comp: <Page04Topology key="p8" /> },
+    { num: 9, title: 'Expediente Mito-01 // Slots de RAM', comp: <Page05Mito01Ram key="p9" /> },
+    { num: 10, title: 'Capítulo 01 // ¿Qué PC tenés realmente?', comp: <Page06Chapter01Opener key="p10" /> },
+    { num: 11, title: 'Capítulo 01 // Las Trampas Comerciales', comp: <Page07Chapter01Trampas key="p11" /> },
+    { num: 12, title: 'Capítulo 01 // Probalo en tu PC: PowerShell', comp: <Page08Chapter01PowerShell key="p12" /> },
+    { num: 13, title: 'Expediente Mito-02 // Núcleos en MSConfig', comp: <Page09Chapter01Mito02 key="p13" /> },
+    { num: 14, title: 'Capítulo 01 // Ficha Forense EVO', comp: <Page10Chapter01FichaEvo key="p14" /> },
+    { num: 15, title: 'Capítulo 02 // Cómo trabajan juntos', comp: <Page11Chapter02Opener key="p15" /> },
+    { num: 16, title: 'Capítulo 02 // Jerarquía de Latencias vs Ancho de Banda', comp: <Page12Chapter02Latencias key="p16" /> },
+    { num: 17, title: 'Expediente Mito-03 // Resizable BAR / SAM', comp: <Page13Chapter02Mito03 key="p17" /> },
+    { num: 18, title: 'Capítulo 03 // Cuando los FPS mienten', comp: <Page14Chapter03Opener key="p18" /> },
+    { num: 19, title: 'Capítulo 03 // La Cola de Renderizado al 99%', comp: <Page15Chapter03Frametime key="p19" /> },
+    { num: 20, title: 'Expediente Mito-04 // V-Sync & FPS Ilimitados', comp: <Page16Chapter03Mito04 key="p20" /> },
+    { num: 21, title: 'Capítulo 04 // Encontrá el límite', comp: <Page17Chapter04Opener key="p21" /> },
+    { num: 22, title: 'Capítulo 04 // Los Tres Muros del Silicio', comp: <Page18Chapter04MurosTermicos key="p22" /> },
+    { num: 23, title: 'Expediente Mito-05 // Ventiladores al 100%', comp: <Page19Chapter04Mito05 key="p23" /> },
+    { num: 24, title: 'Capítulo 05 // Windows también es hardware', comp: <Page20Chapter05Opener key="p24" /> },
+    { num: 25, title: 'Capítulo 05 // Ring 0 vs Ring 3 & DPC Latency', comp: <Page21Chapter05Kernel key="p25" /> },
+    { num: 26, title: 'Expediente Mito-06 // Scripts Debloater', comp: <Page22Chapter05Mito06 key="p26" /> },
+    { num: 27, title: 'Dossier 01 // El Checkpoint Basal', comp: <DossierP01Checkpoint key="p27" /> },
+    { num: 28, title: 'Dossier 02 // Las Puertas del Arranque', comp: <DossierP02PuertasArranque key="p28" /> },
+    { num: 29, title: 'Dossier 03 // Apps de Inicio', comp: <DossierP03AppsInicio key="p29" /> },
+    { num: 30, title: 'Dossier 04 // Operación 100 Programas', comp: <DossierP04Operacion100Programas key="p30" /> },
+    { num: 31, title: 'Dossier 05 // Segundo Plano y Bandeja', comp: <DossierP05SegundoPlano key="p31" /> },
+    { num: 32, title: 'Dossier 06 // Servicios: Criterio Real', comp: <DossierP06ServiciosWindows key="p32" /> },
+    { num: 33, title: 'Dossier 07 // Ensayo A/B SysMain', comp: <DossierP07SysMainExperimento key="p33" /> },
+    { num: 34, title: 'Dossier 08 // Tareas Programadas', comp: <DossierP08TareasProgramadas key="p34" /> },
+    { num: 35, title: 'Dossier 09 // Higiene de Temporales', comp: <DossierP09TemporalesLimpieza key="p35" /> },
+    { num: 36, title: 'Dossier 10 // Limpieza Profunda: WinSxS', comp: <DossierP10LimpiezaProfunda key="p36" /> },
+    { num: 37, title: 'Dossier 11 // Micro-Tweaks Validados', comp: <DossierP11MicroTweaks key="p37" /> },
+    { num: 38, title: 'Dossier 12 // Checkpoint Final B', comp: <DossierP12FinalCheckpoint key="p38" /> },
+    { num: 39, title: 'Capítulo 06 // El Método Deductivo', comp: <Page35Chapter06Opener key="p39" /> },
+    { num: 40, title: 'Capítulo 06 // Árbol Forense de Aislamiento', comp: <Page36Chapter06ArbolForense key="p40" /> },
+    { num: 41, title: 'Expediente Mito-07 // Pasar DDU de Rutina', comp: <Page37Chapter06Mito07 key="p41" /> },
+    { num: 42, title: 'Capítulo 07 // El Método Científico en tu PC', comp: <Page38Chapter07Opener key="p42" /> },
+    { num: 43, title: 'Capítulo 07 // Los Tres Mandamientos del Ensayo A/B', comp: <Page39Chapter07MatrizAB key="p43" /> },
+    { num: 44, title: 'Expediente Mito-08 // Plan Máximo Rendimiento', comp: <Page40Chapter07Mito08 key="p44" /> },
+    { num: 45, title: 'Fuentes & Documentación Técnica Oficial', comp: <Page45FuentesTecnicas key="p45" /> },
+    { num: 46, title: 'Contratapa // Manifiesto Final', comp: <Page46BackCover key="p46" /> },
   ];
 
   /**
@@ -194,7 +204,7 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
           </div>
           <span className="hidden md:inline text-zinc-600">|</span>
           <span className="hidden md:inline text-zinc-400 text-[11px] uppercase tracking-wider">
-            TOMO 01: CONOCÉ TU PC (41 PÁGINAS A4)
+            TOMO 01: CONOCÉ TU PC (46 PÁGINAS A4)
           </span>
         </div>
 
@@ -321,7 +331,7 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
             onClick={handleDownloadPdf}
             disabled={isPreparingPrint}
             className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-black font-mono-tech font-black text-xs uppercase tracking-wider rounded shadow-[0_0_16px_rgba(234,179,8,0.45)] hover:shadow-[0_0_24px_rgba(234,179,8,0.7)] transition-all cursor-pointer border border-yellow-300 disabled:opacity-50"
-            title="Descargar EVO LABS MAGAZINE en PDF (41 páginas A4)"
+            title="Descargar EVO LABS MAGAZINE en PDF (46 páginas A4)"
           >
             <Download className="w-4 h-4 text-black stroke-[2.5]" />
             <span>{isPreparingPrint ? 'PREPARANDO A4...' : 'DESCARGAR PDF'}</span>
@@ -400,7 +410,7 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
                   GUÍA DE EXPORTACIÓN A PDF // A4
                 </h3>
                 <p className="text-zinc-400 text-[10px]">
-                  EVO LABS MAGAZINE // TOMO 01 (41 PÁGINAS EDITORIALES)
+                  EVO LABS MAGAZINE // TOMO 01 (46 PÁGINAS EDITORIALES)
                 </p>
               </div>
             </div>
@@ -513,7 +523,7 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
                 type="button"
                 onClick={handleDownloadPdf}
                 className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-400 hover:bg-yellow-300 text-black font-bold text-[11px] rounded-full transition-colors cursor-pointer"
-                title="Descargar PDF Completo (41 páginas)"
+                title="Descargar PDF Completo (46 páginas)"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>DESCARGAR PDF</span>
@@ -530,10 +540,10 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
               <div className="w-full max-w-[820px] flex justify-center">
                 {pageComponents[0].comp}
               </div>
-            ) : currentPage === 41 ? (
+            ) : currentPage === 46 ? (
               // Back cover alone
               <div className="w-full max-w-[820px] flex justify-center">
-                {pageComponents[40].comp}
+                {pageComponents[45].comp}
               </div>
             ) : (
               // Two pages spread
@@ -575,7 +585,7 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
                 type="button"
                 onClick={handleDownloadPdf}
                 className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-400 hover:bg-yellow-300 text-black font-bold text-[11px] rounded-full transition-colors cursor-pointer"
-                title="Descargar PDF Completo (41 páginas)"
+                title="Descargar PDF Completo (46 páginas)"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>DESCARGAR PDF</span>

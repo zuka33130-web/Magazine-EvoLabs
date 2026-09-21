@@ -5,9 +5,9 @@ import { GitBranch, AlertOctagon, Terminal, Search, CheckCircle2 } from 'lucide-
 export const Page36Chapter06ArbolForense: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-36"
-      pageNumber={36}
-      totalPages={41}
+      pageId="magazine-page-40"
+      pageNumber={40}
+      totalPages={46}
       sectionTitle="CAPÍTULO 06"
       subSlug="PROTOCOLO PERICIAL // ÁRBOL DE AISLAMIENTO"
       accentColor="#10B981"

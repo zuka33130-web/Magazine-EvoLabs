@@ -5,9 +5,9 @@ import { ChapterHeroOpener } from './ChapterHeroOpener';
 export const Page20Chapter05Opener: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-20"
-      pageNumber={20}
-      totalPages={41}
+      pageId="magazine-page-24"
+      pageNumber={24}
+      totalPages={46}
       sectionTitle="CAPÍTULO 05"
       subSlug="INGENIERÍA DE SISTEMAS // KERNEL & CONTROLADORES"
       accentColor="#3B82F6"

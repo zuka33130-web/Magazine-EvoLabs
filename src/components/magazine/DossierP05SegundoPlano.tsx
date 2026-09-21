@@ -5,9 +5,9 @@ import { AppWindow, Cpu, HardDrive, Bell, Settings, XCircle, ArrowRight, Eye, In
 export const DossierP05SegundoPlano: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-27"
-      pageNumber={27}
-      totalPages={41}
+      pageId="magazine-page-31"
+      pageNumber={31}
+      totalPages={46}
       sectionTitle="DOSSIER CENTRAL // PUESTA A PUNTO"
       subSlug="PARTE 05 // SEGUNDO PLANO Y BANDEJA"
       accentColor="#EAB308"

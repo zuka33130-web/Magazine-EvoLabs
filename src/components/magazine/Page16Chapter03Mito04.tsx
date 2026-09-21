@@ -6,9 +6,9 @@ import { MousePointer, ShieldAlert, Monitor } from 'lucide-react';
 export const Page16Chapter03Mito04: React.FC = () => {
   return (
     <MagazineMasterPage
-      pageId="magazine-page-16"
-      pageNumber={16}
-      totalPages={41}
+      pageId="magazine-page-20"
+      pageNumber={20}
+      totalPages={46}
       sectionTitle="DESCUBRIMIENTO METROLÓGICO"
       subSlug="EXPEDIENTE MITO-04 // LATENCIA & SINCRONIZACIÓN"
       accentColor="#EF4444"
