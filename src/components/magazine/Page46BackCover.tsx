@@ -148,21 +148,21 @@ export const Page46BackCover: React.FC = () => {
         {/* ========================================================================= */}
         <div className="relative z-10 p-3 bg-[#0a0d14] border border-zinc-800 rounded-lg">
           <span className="text-[9.5px] font-mono-tech font-bold text-zinc-400 uppercase tracking-wider block mb-2">
-            LA COLECCIÓN CONTINÚA // PRÓXIMAS INVESTIGACIONES DE LABORATORIO
+            LA COLECCIÓN CONTINÚA // PRÓXIMAS ENTREGAS EDITORIALES
           </span>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] font-mono-tech">
-            <div className="p-2 bg-black/60 rounded border border-zinc-800/80">
-              <span className="text-yellow-400 font-bold block text-[9.5px]">TOMO 02 // WINDOWS AL LÍMITE</span>
-              <p className="text-zinc-400 font-sans-editorial text-[9.5px] mt-0.5">Ring 0, temporizadores HPET, DPC ISR profunda y aislamiento de procesos.</p>
+            <div className="p-2 bg-black/60 rounded border border-zinc-800/80 flex flex-col justify-between">
+              <span className="text-yellow-400 font-bold block text-[9.5px]">TOMO 02 // LA BIBLIA NEGRA DE WINDOWS</span>
+              <p className="text-zinc-300 font-sans-editorial text-[9.5px] mt-1">“Lo usás todos los días. Ahora descubrí qué hace cuando no estás mirando.”</p>
             </div>
-            <div className="p-2 bg-black/60 rounded border border-zinc-800/80">
-              <span className="text-yellow-400 font-bold block text-[9.5px]">TOMO 03 // HERRAMIENTAS DE LAB</span>
-              <p className="text-zinc-400 font-sans-editorial text-[9.5px] mt-0.5">Process Explorer, CapFrameX, PresentMon y análisis de trazas de memoria.</p>
+            <div className="p-2 bg-black/60 rounded border border-zinc-800/80 flex flex-col justify-between">
+              <span className="text-yellow-400 font-bold block text-[9.5px]">TOMO 03 // REPARÁ TU PC</span>
+              <p className="text-zinc-300 font-sans-editorial text-[9.5px] mt-1">“La Biblia del reparador de PC de escritorio. Síntoma → medición → descarte → solución.”</p>
             </div>
-            <div className="p-2 bg-black/60 rounded border border-zinc-800/80">
-              <span className="text-yellow-400 font-bold block text-[9.5px]">TOMO 04 // BANCO DE PRUEBAS</span>
-              <p className="text-zinc-400 font-sans-editorial text-[9.5px] mt-0.5">Estabilidad bajo estrés, curvas de ventilación térmica y peritajes de overclock.</p>
+            <div className="p-2 bg-black/60 rounded border border-zinc-800/80 flex flex-col justify-between">
+              <span className="text-yellow-400 font-bold block text-[9.5px]">TOMO 04 // REPARÁ TU NOTEBOOK</span>
+              <p className="text-zinc-300 font-sans-editorial text-[9.5px] mt-1">“Diagnóstico y reparación de portátiles, desde el cargador hasta la placa madre.”</p>
             </div>
           </div>
         </div>

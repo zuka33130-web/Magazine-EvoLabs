@@ -19,13 +19,13 @@ export const Page13Chapter02Mito03: React.FC = () => {
           idMito="MITO-03"
           consejoPopular="Forzá 'Resizable BAR' (ReBAR / Smart Access Memory) en todos tus videojuegos mediante NVIDIA Profile Inspector o en el BIOS: ganarás un 15% de FPS gratis en cualquier título del mercado."
           fuentePopular="Guías de 'optimización competitiva' en foros de GPU y YouTube"
-          realidadTecnica="El estándar PCIe tradicional limitaba los accesos de la CPU a la memoria gráfica (VRAM) a bloques de 256 MB. ReBAR permite al procesador mapear todo el búfer de video en un único espacio continuo. Sin embargo, en motores DirectX 9 o DirectX 11 antiguos sin perfil validado, forzar ReBAR inunda el bus PCIe con miles de pedidos pequeños y desordenados, generando congestión de cola de tráfico y micro-tirones severos (micro-stuttering)."
-          experimento="Ensayo pericial con CapFrameX en dos escenarios extremos: A) Cyberpunk 2077 (motor DirectX 12 moderno con perfil oficial validado) y B) Dishonored 2 (motor DirectX 11 sin soporte oficial)."
-          herramientaMedicion="CapFrameX v1.7.2 + MSI Afterburner Frame Tracking"
+          realidadTecnica="El estándar PCIe base dividía históricamente los accesos de la CPU a la memoria gráfica (VRAM) en ventanas de 256 MB. Resizable BAR (y AMD Smart Access Memory) permite al procesador negociar bloques de asignación mucho mayores de la memoria de video. Sin embargo, su impacto real depende de la combinación de GPU, CPU, versión del controlador, motor gráfico y firmware. En juegos con perfiles validados por los fabricantes de GPUs puede mejorar la fluidez y la consistencia de fotogramas, mientras que en otros títulos puede no mostrar variación o incluso generar regresiones en el 1% Low si el motor no gestiona eficientemente las transferencias directas."
+          experimento="Protocolo EVO: medición comparativa de frametime y percentiles 1% Low con ReBAR activo frente a configuración base del controlador en diferentes motores y perfiles de juego."
+          herramientaMedicion="Monitor de frametime por hardware/API (CapFrameX o PresentMon) + telemetría de GPU"
           resultado="condicional"
-          resultadoDetalle="En Cyberpunk 2077: +9.4% en 1% Lows (Mejora comprobada). En Dishonored 2: -16.2% en 1% Lows con picos erráticos de frametime de hasta 28 ms (Empeoramiento notable). No es un interruptor mágico universal."
-          riesgo="Inestabilidad de cuadros por segundo, latencia de entrada fluctuante y tirones bruscos en títulos heredados o no testeados por el fabricante."
-          comoRevertirlo="Dejar ReBAR en 'Driver Profile Default' en el panel de control o activarlo exclusivamente en los juegos donde el fabricante del driver validó el perfil de compatibilidad."
+          resultadoDetalle="Comportamiento condicional por título: títulos con perfiles validados muestran estabilidad o ganancias en percentiles mínimos, mientras que forzar ReBAR en títulos sin certificación oficial del driver puede arrojar pérdidas de consistencia o variaciones negativas en el frametime."
+          riesgo="Posibles regresiones de fluidez, fluctuaciones de frametime o inestabilidad si se fuerza ReBAR de manera global en juegos no soportados por el perfil del controlador."
+          comoRevertirlo="Mantener la gestión de ReBAR según el perfil oficial del controlador de la GPU (o desactivar la bandera forzada en herramientas externas), dejando la función activa en UEFI pero gobernada por el driver oficial."
           fullPage={true}
         />
 

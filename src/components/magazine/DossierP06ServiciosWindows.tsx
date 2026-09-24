@@ -32,10 +32,10 @@ export const DossierP06ServiciosWindows: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 text-xs text-zinc-300 font-sans-editorial leading-relaxed mb-2">
         <div className="md:col-span-8 space-y-1.5">
           <p className="magazine-dropcap text-zinc-200">
-            Internet abunda en guías que prometen "50 servicios de Windows que debés apagar para ganar 40 FPS". En una PC moderna (con procesadores de 6 u 8+ núcleos y 16+ GB de RAM), el impacto en juegos de apagar servicios en reposo es <strong className="text-white">marginal o prácticamente nulo</strong> (fluctuaciones dentro del margen de error de ±0 a 1%). El beneficio real es orden del sistema y menor actividad en segundo plano, no un milagro de cuadros por segundo.
+            Internet abunda en guías que prometen '50 servicios de Windows que debés apagar para ganar 40 FPS'. En una PC moderna, el impacto en juegos de apagar servicios del sistema en reposo es <strong className="text-white">marginal o prácticamente nulo</strong> (fluctuaciones dentro del margen de variabilidad normal). Deshabilitar servicios a ciegas suele romper dependencias esenciales más de lo que 'optimiza'. El beneficio real de auditar servicios radica en el orden del sistema, evitar procesos huérfanos de fondo y diagnóstico, nunca en un aumento milagroso de fotogramas.
           </p>
           <p className="text-zinc-400 text-[10px]">
-            La regla de oro de la revista: <strong>preferí el modo MANUAL</strong> antes que Deshabilitado. En Manual, el servicio permanece apagado y Windows solo lo convoca si abrís la función específica.
+            La regla de oro EVO: <strong>preferí el modo MANUAL o NO TOCAR</strong> antes que la deshabilitación masiva. En Manual, el servicio permanece inactivo hasta que el sistema o una app lo convoca de manera explícita.
           </p>
         </div>
 

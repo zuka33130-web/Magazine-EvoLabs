@@ -28,7 +28,7 @@ export const MagazineMasterPage: React.FC<MagazineMasterPageProps> = ({
   return (
     <article
       id={pageId}
-      className={`a4-magazine-page relative mx-auto bg-[#090A0E] text-zinc-100 overflow-hidden shadow-2xl transition-all duration-200 border border-zinc-800/60 print:border-none print:shadow-none print:m-0 print:p-0 ${
+      className={`a4-magazine-page relative mx-auto bg-[#090A0E] text-zinc-100 overflow-hidden shadow-2xl transition-all duration-200 border border-zinc-800/60 print:border-none print:shadow-none print:m-0 print:p-0 flex flex-col ${
         isCover ? 'bg-[#060709]' : isBackCover ? 'bg-[#050608]' : 'bg-[#0A0C10]'
       }`}
       style={{
@@ -47,77 +47,76 @@ export const MagazineMasterPage: React.FC<MagazineMasterPageProps> = ({
       </div>
 
       {!hideHeaderFooter && (
-        <>
-          {/* Running Editorial Header */}
-          <header className="relative z-20 px-8 pt-6 pb-3 border-b border-zinc-800/70 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-zinc-400 select-none">
-            <div className="flex items-center gap-2.5">
-              <span
-                className="w-1.5 h-1.5 inline-block"
-                style={{ backgroundColor: accentColor }}
-              />
-              <span className="font-bold text-white tracking-widest uppercase">
-                EVO LABS MAGAZINE
-              </span>
-              <span className="text-zinc-600">|</span>
-              <span className="text-zinc-400 hidden sm:inline uppercase tracking-widest">
-                TOMO 01 // CONOCÉ TU PC
-              </span>
-            </div>
+        <header className="relative z-20 shrink-0 px-[14mm] pt-[10mm] pb-[2.5mm] border-b border-zinc-800/70 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-zinc-400 select-none">
+          <div className="flex items-center gap-2.5">
+            <span
+              className="w-1.5 h-1.5 inline-block"
+              style={{ backgroundColor: accentColor }}
+            />
+            <span className="font-bold text-white tracking-widest uppercase">
+              EVO LABS MAGAZINE
+            </span>
+            <span className="text-zinc-600">|</span>
+            <span className="text-zinc-400 hidden sm:inline uppercase tracking-widest">
+              TOMO 01 // CONOCÉ TU PC
+            </span>
+          </div>
 
-            <div className="flex items-center gap-3">
-              <span className="text-zinc-500 uppercase tracking-widest text-[9px] hidden md:inline">
-                {subSlug}
-              </span>
-              <span
-                className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest"
-                style={{
-                  backgroundColor: `${accentColor}1A`,
-                  color: accentColor,
-                  border: `1px solid ${accentColor}33`,
-                }}
-              >
-                {sectionTitle}
-              </span>
-            </div>
-          </header>
-        </>
+          <div className="flex items-center gap-3">
+            <span className="text-zinc-500 uppercase tracking-widest text-[9px] hidden md:inline">
+              {subSlug}
+            </span>
+            <span
+              className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest"
+              style={{
+                backgroundColor: `${accentColor}1A`,
+                color: accentColor,
+                border: `1px solid ${accentColor}33`,
+              }}
+            >
+              {sectionTitle}
+            </span>
+          </div>
+        </header>
       )}
 
       {/* Main Page Editorial Body */}
-      <div
-        className={`relative z-10 w-full flex flex-col justify-between ${
-          hideHeaderFooter ? 'h-full p-0' : 'h-[calc(100%-78px)] px-7 sm:px-9 py-5'
-        }`}
-      >
-        <div className="flex-1 w-full flex flex-col">{children}</div>
+      {hideHeaderFooter ? (
+        <div className="relative z-10 w-full h-full flex flex-col">
+          {children}
+        </div>
+      ) : (
+        <div className="relative z-10 w-full flex-1 min-h-0 px-[14mm] py-[3.5mm] flex flex-col">
+          <div className="flex-1 w-full flex flex-col justify-between">{children}</div>
+        </div>
+      )}
 
-        {!hideHeaderFooter && (
-          <footer className="mt-auto pt-3.5 border-t border-zinc-800/70 flex items-center justify-between text-[10px] font-mono-tech text-zinc-500 select-none">
-            <div className="flex items-center gap-3">
-              <span className="font-bold text-zinc-200">
-                PÁG. {String(pageNumber).padStart(2, '0')}
-              </span>
-              <span className="text-zinc-700">/</span>
-              <span className="text-zinc-500">
-                {String(totalPages).padStart(2, '0')}
-              </span>
-              <span className="text-zinc-700 hidden sm:inline">|</span>
-              <span className="text-zinc-400 tracking-wider hidden sm:inline text-[9px] uppercase font-semibold">
-                COLECCIÓN PERICIAL // TOMO 01
-              </span>
-            </div>
+      {!hideHeaderFooter && (
+        <footer className="relative z-20 shrink-0 px-[14mm] pt-[2.5mm] pb-[10mm] border-t border-zinc-800/70 flex items-center justify-between text-[10px] font-mono-tech text-zinc-500 select-none">
+          <div className="flex items-center gap-3">
+            <span className="font-bold text-zinc-200">
+              PÁG. {String(pageNumber).padStart(2, '0')}
+            </span>
+            <span className="text-zinc-700">/</span>
+            <span className="text-zinc-500">
+              {String(totalPages).padStart(2, '0')}
+            </span>
+            <span className="text-zinc-700 hidden sm:inline">|</span>
+            <span className="text-zinc-400 tracking-wider hidden sm:inline text-[9px] uppercase font-semibold">
+              COLECCIÓN PERICIAL // TOMO 01
+            </span>
+          </div>
 
-            <div className="flex items-center gap-4">
-              <span className="text-yellow-400/90 text-[9.5px] uppercase tracking-widest font-mono-tech hidden sm:inline">
-                "HACEMOS MILAGROS, PERO LOS MEDIMOS."
-              </span>
-              <span className="text-zinc-600 text-[9px] uppercase tracking-widest hidden lg:inline">
-                A4 PORTRAIT • 210×297 MM
-              </span>
-            </div>
-          </footer>
-        )}
-      </div>
+          <div className="flex items-center gap-4">
+            <span className="text-yellow-400/90 text-[9.5px] uppercase tracking-widest font-mono-tech hidden sm:inline">
+              "HACEMOS MILAGROS, PERO LOS MEDIMOS."
+            </span>
+            <span className="text-zinc-600 text-[9px] uppercase tracking-widest hidden lg:inline">
+              A4 PORTRAIT • 210×297 MM
+            </span>
+          </div>
+        </footer>
+      )}
     </article>
   );
 };

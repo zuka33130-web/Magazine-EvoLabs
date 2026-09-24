@@ -32,49 +32,49 @@ export const Page15Chapter03Frametime: React.FC = () => {
         {/* Narrative Context */}
         <div className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed max-w-3xl">
           <p>
-            Existe un dogma popular que afirma que la tarjeta gráfica debe operar siempre al 99% o 100% de uso para 'aprovecharla al máximo'. Lo que la mayoría ignora es que, al saturar la GPU al 99%, el controlador de video acumula entre 1 y 3 fotogramas completos en una cola intermedia (buffer de pre-renderizado). Cada cuadro retenido retrasa la respuesta de tu mouse en la pantalla.
+            Existe la creencia de que la tarjeta gráfica debe operar obligatoriamente al 99% o 100% de carga continua para rendir al máximo. Sin embargo, en situaciones GPU-bound (donde la tarjeta es el cuello de botella), el pipeline gráfico puede acumular cuadros en el búfer del controlador. Esta cola de renderizado puede elevar la latencia entre el clic del mouse y la imagen visible. Tecnologías como NVIDIA Reflex, AMD Anti-Lag, limitadores de cuadros y monitores VRR permiten coordinar la entrega de fotogramas para mitigar este retraso.
           </p>
         </div>
 
         {/* Signature EVO LABS Before / After Comparison */}
         <div className="flex-1 flex flex-col justify-center">
           <AntesDespuesCompare
-            title="ENSAYO DE BANCO // COLA DE RENDERIZADO SATURADA VS. HOLGURA CONTROLADA"
-            subtitle="PRUEBA CONTROLADA CON SENSOR FÍSICO NVIDIA LDAT V2"
-            testCase="Apex Legends / Warzone en monitor de 144 Hz (GPU RTX 4070 / Ryzen 7)"
-            beforeLabel="ESTADO ANTERIOR // FPS ILIMITADOS (GPU AL 99%)"
-            afterLabel="OPTIMIZACIÓN EVO // CAP 141 FPS + LOW LATENCY REFLEX"
+            title="ESCENARIO ILUSTRATIVO // COLA DE RENDERIZADO SATURADA VS. HOLGURA CONTROLADA"
+            subtitle="ANÁLISIS CONCEPTUAL DE LATENCIA DE ENTRADA Y CONSISTENCIA DE CUADRO"
+            testCase="Ejemplo ilustrativo de título competitivo en monitor VRR de 144 Hz (GPU dedicada)"
+            beforeLabel="ESCENARIO A // FPS ILIMITADOS (GPU EN SATURACIÓN COMPLETA)"
+            afterLabel="ESCENARIO B // CONTROL DE COLA (VRR + LOW LATENCY / CAP)"
             metrics={[
               {
-                label: 'Uso de GPU',
+                label: 'Carga de GPU',
                 beforeVal: '99% saturado',
-                afterVal: '92% holgura',
-                delta: '-7% carga',
+                afterVal: 'Holgura dinámica',
+                delta: 'Menor retención en búfer',
                 type: 'positive',
               },
               {
                 label: 'Latencia Click-to-Photon',
-                beforeVal: '44.8 ms',
-                afterVal: '18.4 ms',
-                delta: '-59% de demora',
+                beforeVal: 'Elevada por cola',
+                afterVal: 'Reducida y predecible',
+                delta: 'Mayor inmediatez motriz',
                 type: 'positive',
               },
               {
-                label: 'Percentil 1% Low',
-                beforeVal: '88 FPS',
-                afterVal: '138 FPS',
-                delta: '+56% estabilidad',
+                label: 'Consistencia de Frametime',
+                beforeVal: 'Fluctuaciones en picos',
+                afterVal: 'Línea de tiempo plana',
+                delta: 'Mayor estabilidad de 1% Low',
                 type: 'positive',
               },
             ]}
-            verdictNote="Al evitar que la GPU sature su búfer interno al 99%, la cola del controlador se vacía instantáneamente. El clic del mouse se dibuja en el fotograma inmediato sin esperar en fila."
+            verdictNote="Al evitar la acumulación excesiva de fotogramas pendientes en el búfer del controlador, la cola de renderizado se mantiene ágil. El fotograma que contiene la acción del periférico se procesa con menor retraso acumulado."
           />
         </div>
 
         {/* Bottom Metrological Rule */}
         <div className="p-3 bg-[#130f14] border-l-3 border-red-500 rounded-r text-xs text-zinc-300 font-mono-tech flex items-center justify-between">
           <span>
-            <strong className="text-red-400 font-bold">REGLA DE FLUIDEZ EVO:</strong> Un 1% Low estable a 138 FPS ofrece una experiencia infinitamente más competitiva y precisa que picos de 220 FPS que caen abruptamente a 70 ms.
+            <strong className="text-red-400 font-bold">REGLA DE FLUIDEZ EVO:</strong> La estabilidad del tiempo entre cuadros (frametime) y un percentil 1% Low consistente determinan la fluidez real de juego más que cifras promedio de FPS infladas con micro-tirones intermitentes.
           </span>
           <span className="text-zinc-500 text-[10px] uppercase hidden sm:inline shrink-0">
             SIGUIENTE: MITO 04 // V-SYNC & FPS ILIMITADOS →

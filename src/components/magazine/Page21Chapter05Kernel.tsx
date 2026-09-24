@@ -45,18 +45,18 @@ export const Page21Chapter05Kernel: React.FC = () => {
                 <span className="text-zinc-400 font-mono-tech">PRIVILEGIO TOTAL</span>
               </div>
               <h4 className="font-display font-black text-base text-white uppercase tracking-wide mb-1">
-                ntoskrnl.exe + Drivers (.sys)
+                ntoskrnl.exe + Drivers KMDF (.sys)
               </h4>
               <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
-                Controladores de placa gráfica (nvlddmkm.sys), tarjetas de red (ndis.sys), controladores de audio y firmware de placa madre. Si una sola línea de código comete una violación de memoria aquí, la CPU no puede recuperarse: se genera una pantalla azul (BSOD) inmediata.
+                Controladores en modo kernel (KMDF): subsistemas gráficos de bajo nivel (nvlddmkm.sys), red (ndis.sys), almacenamiento y bus. Una excepción no controlada en este nivel genera un fallo de detención (BugCheck / BSOD) para preservar la integridad del hardware. No todo driver corre aquí: periféricos secundarios y software moderno emplean controladores en modo usuario (UMDF).
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-zinc-800/80 bg-black/40 -mx-4 -mb-4 p-3 rounded-b-xl">
               <span className="text-[10px] font-mono-tech text-blue-400 uppercase font-bold block mb-0.5">
-                IMPACTO CRÍTICO:
+                PRIORIDAD TEMPORAL:
               </span>
               <p className="text-[11px] font-mono-tech text-zinc-300 leading-tight">
-                Cualquier demora en una rutina ISR/DPC congela la ejecución del resto del equipo.
+                Rutinas ISR y DPC prolongadas pueden postergar el procesamiento de audio o cuadros gráficos.
               </p>
             </div>
           </div>
@@ -69,18 +69,18 @@ export const Page21Chapter05Kernel: React.FC = () => {
                 <span className="text-zinc-500 font-mono-tech">ESPACIO AISLADO</span>
               </div>
               <h4 className="font-display font-black text-base text-white uppercase tracking-wide mb-1">
-                Juegos, Discord, Chrome, Office
+                Juegos, Navegadores, Apps, UMDF
               </h4>
               <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
-                Toda aplicación común se ejecuta aquí en una caja de arena (sandbox) de memoria virtual. No pueden comunicarse directamente con los puertos ni con el silicio: deben solicitarle respetuosamente al kernel que realice la operación mediante una llamada al sistema (syscall).
+                Aplicaciones de usuario y servicios no privilegiados. Se ejecutan en espacios de memoria virtual aislados mediante llamadas al sistema (syscalls). Un cuelgue en Ring 3 normalmente cierra el proceso sin colapsar el sistema operativo, aunque procesos mal optimizados pueden saturar CPU, disco o memoria y degradar el rendimiento general.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-zinc-800/80 bg-black/40 -mx-4 -mb-4 p-3 rounded-b-xl">
               <span className="text-[10px] font-mono-tech text-zinc-400 uppercase font-bold block mb-0.5">
-                AISLAMIENTO DE FALLOS:
+                AISLAMIENTO Y GESTIÓN:
               </span>
               <p className="text-[11px] font-mono-tech text-zinc-300 leading-tight">
-                Si un juego colapsa, Windows cierra el proceso y el resto del sistema sigue operando sin inmutarse.
+                Si una app falla, el kernel puede terminar su hilo sin comprometer la estabilidad del equipo.
               </p>
             </div>
           </div>

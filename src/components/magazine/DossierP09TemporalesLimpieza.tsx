@@ -30,7 +30,7 @@ export const DossierP09TemporalesLimpieza: React.FC = () => {
 
       {/* Narrative Lead: Reality of disk space */}
       <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed mb-2.5">
-        No necesitás instalar limpiadores de terceros que prometen milagros o tocan el registro. Windows cuenta con <strong className="text-white">herramientas nativas confiables</strong>. La ganancia real de espacio no es fija: <strong className="text-yellow-400">depende de cuánto tiempo lleva instalado Windows, si tuviste actualizaciones de versión recientes (como Windows.old) y el tamaño de tus unidades</strong>.
+        No necesitás instalar limpiadores de terceros que prometen acelerar la PC o tocan el registro. Windows cuenta con <strong className="text-white">herramientas nativas de almacenamiento</strong>. Recuperar espacio en disco <strong className="text-yellow-400">no equivale a ganar velocidad de procesamiento en la CPU o GPU</strong>: su verdadero beneficio es evitar la saturación de la unidad (crucial para el funcionamiento de SSDs y archivos de paginación) y eliminar restos obsoletos tras parches mayores del sistema operativo.
       </p>
 
       {/* Comparison Grid: Storage Settings vs Cleanmgr vs %TEMP% */}
@@ -107,8 +107,8 @@ export const DossierP09TemporalesLimpieza: React.FC = () => {
             <FolderX className="w-3.5 h-3.5" />
             EL MITO DESMONTADO: ¿BORRAR LA CARPETA PREFETCH HACE MÁS RÁPIDA LA PC?
           </span>
-          <span className="text-rose-400 text-[9px] bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/30 font-bold">
-            NO BORRAR NUNCA
+            <span className="text-rose-400 text-[9px] bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/30 font-bold">
+            NO BORRAR POR RUTINA
           </span>
         </div>
 
@@ -116,25 +116,25 @@ export const DossierP09TemporalesLimpieza: React.FC = () => {
           <div>
             <strong className="text-white text-[11px] block">QUÉ DICE EL MITO POPULAR:</strong>
             <p className="text-[10px] text-zinc-300 font-sans-editorial mt-1 leading-relaxed">
-              Cientos de videos recomiendan entrar a <code className="text-purple-300 font-mono-tech">C:\Windows\Prefetch</code> y vaciar su contenido para "limpiar basura y acelerar el boot". <strong>Es un error conceptual grave</strong>.
+              Cientos de videos recomiendan entrar a <code className="text-purple-300 font-mono-tech">C:\Windows\Prefetch</code> y vaciar su contenido para "limpiar basura y acelerar el arranque". <strong>Es un error conceptual</strong>.
             </p>
             <p className="text-[10px] text-zinc-400 font-sans-editorial mt-1 leading-relaxed">
-              Prefetch no es basura: es una caché inteligente donde Windows registra qué librerías necesita cada programa. Esto permite que el kernel las cargue de manera contigua y secuencial al iniciar, reduciendo las lecturas aleatorias.
+              Prefetch no es basura acumulada: es una caché de metadatos donde el kernel de Windows analiza qué páginas de memoria y librerías necesita cada programa. Esto permite que el sistema las organice y cargue de forma eficiente y contigua al iniciar, reduciendo accesos redundantes.
             </p>
           </div>
 
           <div className="p-2 bg-black/40 rounded border border-zinc-800 flex flex-col justify-between">
             <div>
-              <span className="text-yellow-400 font-bold text-[10px] block">EJEMPLO DIDÁCTICO DEL COMPORTAMIENTO:</span>
+              <span className="text-yellow-400 font-bold text-[10px] block">EFECTO DE UN BORRADO MANUAL:</span>
               <p className="text-[9px] text-zinc-300 font-sans-editorial mt-0.5 leading-tight">
-                Si vaciás Prefetch, obligás a la caché a "arranque en frío": la primera apertura de tus programas habituales será perceptiblemente más lenta porque Windows debe reconstruir los índices de cero.
+                Borrar la carpeta libera una cantidad insignificante de megabytes y fuerza un "arranque en frío": la primera apertura de tus aplicaciones habituales demorará más tiempo mientras el subsistema SysMain recompila los patrones de precarga.
               </p>
               <div className="mt-1.5 p-1 bg-[#1a1322] border border-purple-500/20 rounded text-[8.5px] text-purple-200">
-                <span>Comportamiento: Caché fría → Apertura inicial retrasada mientras el kernel recompila los patrones de precarga.</span>
+                <span>Comportamiento: Mayor tiempo de primer lanzamiento y escrituras adicionales innecesarias para regenerar la caché.</span>
               </div>
             </div>
             <span className="text-[8px] text-zinc-400 mt-1 pt-1 border-t border-zinc-800/80 block">
-              Veredicto EVO: La carpeta Prefetch se auto-regula sola (límite de 128 archivos). No la toques.
+              Veredicto EVO: Windows administra de manera autónoma el directorio Prefetch. No requiere borrado manual periódico.
             </span>
           </div>
         </div>

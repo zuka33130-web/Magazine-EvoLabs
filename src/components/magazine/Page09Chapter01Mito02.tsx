@@ -19,13 +19,13 @@ export const Page09Chapter01Mito02: React.FC = () => {
           idMito="MITO-02"
           consejoPopular="Entrá a MSConfig > Arranque > Opciones avanzadas, tildá la casilla 'Número de procesadores' y seleccioná el número máximo (8, 16 o 32) para obligar a Windows a usar todos los núcleos al 100% de potencia."
           fuentePopular="Tutoriales virales de 'optimización extrema' en YouTube y TikTok"
-          realidadTecnica="Windows Internals (Mark Russinovich) lo confirma fehacientemente: por arquitectura de diseño, Windows SIEMPRE utiliza todos los núcleos e hilos lógicos del CPU de forma nativa. El parámetro NUMPROC del Boot Configuration Data (BCD) fue creado por Microsoft exclusivamente para desarrolladores que necesitan emular fallos y limitar artificialmente la CPU a 1 o 2 núcleos. Tildar la casilla fija el valor: si luego cambiás de CPU, Windows queda bloqueado con núcleos apagados, y en arquitecturas híbridas (Intel 12ª a 14ª Gen) rompe la asignación del Thread Director desactivando los E-Cores."
-          experimento="Ensayo pericial controlado en Cinebench R23 Multi-Core (3 corridas continuas bajo misma temperatura de encapsulado) con casilla desmarcada (por defecto) vs. casilla forzada en 16 núcleos."
-          herramientaMedicion="Cinebench R23 + Windows Performance Monitor + HWiNFO64"
+          realidadTecnica="Por arquitectura de diseño, el kernel de Windows detecta y utiliza de forma predeterminada todos los procesadores lógicos disponibles reportados por el firmware (ACPI MADT). El modificador numproc en los datos de configuración de arranque (BCD) está concebido como mecanismo de diagnóstico para desarrolladores y soporte técnico que requieren simular entornos con menos núcleos. Marcar esta casilla no desbloquea potencia oculta ni aumenta los FPS; por el contrario, fija un valor rígido que puede restringir la CPU si se cambia de procesador o interferir con la topología de núcleos de rendimiento y eficiencia."
+          experimento="Protocolo EVO: comparación de rendimiento en benchmark multi-hilo (Cinebench) con la configuración predeterminada (casilla desmarcada) frente a casilla marcada manualmente con el número total de hilos."
+          herramientaMedicion="Herramienta de estrés de CPU (Cinebench) + Administrador de tareas / Monitor de recursos"
           resultado="no-cambio"
-          resultadoDetalle="Por defecto de fábrica: 14.820 pts. Casilla forzada en msconfig: 14.815 pts (Delta: -0.03%, margen de error despreciable). Cero ganancia de velocidad y alto riesgo de conflicto al actualizar hardware."
-          riesgo="Si por error tildás la casilla contigua 'Cantidad máxima de memoria', Windows limitará la RAM a 256 MB provocando un bucle de pantalla azul (BSOD) irreversible al reiniciar."
-          comoRevertirlo="Abrir msconfig > pestaña Arranque > Opciones avanzadas y desmarcar por completo la casilla 'Número de procesadores' para que quede en blanco, permitiendo que el kernel autodetecte la topología completa."
+          resultadoDetalle="Marcar manualmente 'Número de procesadores' no desbloquea rendimiento adicional: Windows ya utiliza de forma predeterminada los procesadores lógicos disponibles. La comparación debe realizarse en el equipo del lector si se desea comprobar el comportamiento."
+          riesgo="Configurar límites de memoria o CPU en este panel puede restringir los recursos del sistema en el siguiente arranque, ocasionando fallos de inicio o pérdida de rendimiento. Si se modificó por error, debe restaurarse la configuración predeterminada."
+          comoRevertirlo="Abrir msconfig > pestaña Arranque > Opciones avanzadas y desmarcar 'Número de procesadores' y 'Cantidad máxima de memoria'. Aceptar y reiniciar para que Windows vuelva a detectar la totalidad del hardware disponible."
           fullPage={true}
         />
 

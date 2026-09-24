@@ -760,6 +760,8 @@ export interface Tome01DossierSummary {
 
 export type EvoNarrativeProfile = 'investigador' | 'constructor' | 'explorador' | 'tecnico';
 
+export type EvoLabOperatingMode = 'esencial' | 'pericial';
+
 export interface EvoProfileDetail {
   id: EvoNarrativeProfile;
   title: string;
@@ -782,9 +784,19 @@ export type EvoZoneId =
 
 export interface UserHardwarePassport {
   cpuModel?: string;
+  cpuCores?: string;
+  cores?: number;
+  threads?: number;
   ramCapacityGb?: number;
+  ramSizeGb?: number;
+  ramSpeedMhz?: number;
+  ramType?: string;
   gpuModel?: string;
+  vramGb?: number;
+  storageType?: string;
   storageModel?: string;
+  displayHz?: number;
+  capturedAt?: string;
   osVersion?: string;
   isVerified?: boolean;
 }

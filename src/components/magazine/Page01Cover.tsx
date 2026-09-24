@@ -98,7 +98,7 @@ export const Page01Cover: React.FC = () => {
             </span>
 
             <span className="hidden sm:inline-block font-mono-tech text-[9.5px] text-zinc-300 bg-black/70 px-2.5 py-1 rounded border border-zinc-800">
-              BANCO DE ENSAYOS // TELEMETRÍA REAL
+              PROTOCOLOS DE MEDICIÓN // ANÁLISIS GUIADO
             </span>
           </div>
 
@@ -161,7 +161,7 @@ export const Page01Cover: React.FC = () => {
               INTERNET DICE // EVO MIDE
             </span>
             <p className="text-[10px] text-zinc-300 font-sans-editorial mt-1 leading-snug">
-              8 mitos populares enfrentados a instrumental y gráficas reales.
+              8 mitos populares analizados bajo protocolos metrológicos y análisis técnico.
             </p>
           </div>
 

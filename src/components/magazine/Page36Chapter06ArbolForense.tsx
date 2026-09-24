@@ -42,18 +42,18 @@ export const Page36Chapter06ArbolForense: React.FC = () => {
           <div className="p-4 bg-[#0a1310] border border-emerald-500/30 rounded-xl flex flex-col justify-between shadow-lg">
             <div>
               <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2.5">
-                <span className="font-mono-tech font-bold text-xs text-emerald-400 uppercase">PASO 01 // SOFTWARE O HARDWARE</span>
-                <span className="text-[10px] font-mono-tech text-zinc-500">BOOT LIMPIO</span>
+                <span className="font-mono-tech font-bold text-xs text-emerald-400 uppercase">PASO 01 // ENTORNO DE PRUEBA</span>
+                <span className="text-[10px] font-mono-tech text-zinc-500">AISLAMIENTO</span>
               </div>
               <h4 className="font-display font-bold text-sm text-white uppercase mb-1">
                 Aislamiento por Entorno Seguro
               </h4>
               <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
-                Iniciá Windows en Modo Seguro o cargá un Live USB de Ubuntu. Si la anomalía desaparece por completo en este entorno, tu silicio y tu fuente están físicamente sanos: la causa es un driver, servicio o software en conflicto.
+                Iniciá Windows en Modo Seguro o probá un entorno limpio. Si el fallo desaparece en Modo Seguro o en otro entorno, aumenta la sospecha sobre drivers, servicios o software, pero esto NO descarta completamente una falla de hardware.
               </p>
             </div>
             <div className="mt-3 pt-2 border-t border-zinc-800 text-[10px] font-mono-tech text-emerald-400 font-semibold">
-              REGLA: DESCARTA EL HARDWARE EN 5 MINUTOS.
+              REGLA: EL ENTORNO REDUCE EL RANGO DE VARIABLES.
             </div>
           </div>
 
@@ -61,18 +61,18 @@ export const Page36Chapter06ArbolForense: React.FC = () => {
           <div className="p-4 bg-[#0a1310] border border-zinc-800 rounded-xl flex flex-col justify-between shadow-lg">
             <div>
               <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2.5">
-                <span className="font-mono-tech font-bold text-xs text-zinc-400 uppercase">PASO 02 // FIRMA DEL COLAPSO</span>
+                <span className="font-mono-tech font-bold text-xs text-zinc-400 uppercase">PASO 02 // ANÁLISIS DE FALLO</span>
                 <span className="text-[10px] font-mono-tech text-zinc-500">ANÁLISIS DE DUMP</span>
               </div>
               <h4 className="font-display font-bold text-sm text-white uppercase mb-1">
                 Decodificación de Pantalla Azul
               </h4>
               <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
-                Abrí la herramienta gratuita <strong className="text-white">WhoCrashed</strong> o <strong className="text-white">BlueScreenView</strong>. Identificá el código de bugcheck: <code className="text-yellow-400">WHEA_UNCORRECTABLE_ERROR</code> indica inestabilidad de voltaje o CPU; <code className="text-sky-400">MEMORY_MANAGEMENT</code> apunta a timings de RAM o slots; <code className="text-emerald-400">DPC_WATCHDOG_VIOLATION</code> apunta a drivers de SSD o GPU.
+                Los bugchecks son pistas. Cada código puede tener múltiples causas. Se debe analizar el archivo dump (minidump), los módulos implicados (.sys), los registros de eventos de Windows y el contexto operativo en el momento exacto de la falla.
               </p>
             </div>
             <div className="mt-3 pt-2 border-t border-zinc-800 text-[10px] font-mono-tech text-zinc-400 font-semibold">
-              REGLA: EL CÓDIGO TE DICE EL SUBSISTEMA EXACTO.
+              REGLA: EL CÓDIGO REDUCE EL CAMPO DE INVESTIGACIÓN; NO CONFIRMA POR SÍ SOLO LA CAUSA.
             </div>
           </div>
 
@@ -81,17 +81,17 @@ export const Page36Chapter06ArbolForense: React.FC = () => {
             <div>
               <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2.5">
                 <span className="font-mono-tech font-bold text-xs text-zinc-400 uppercase">PASO 03 // CARGA SINTÉTICA AISLADA</span>
-                <span className="text-[10px] font-mono-tech text-zinc-500">ESTRÉS SEPARADO</span>
+                <span className="text-[10px] font-mono-tech text-zinc-500">ESTRÉS CONTROLADO</span>
               </div>
               <h4 className="font-display font-bold text-sm text-white uppercase mb-1">
-                Tortura por Componente
+                Estrés Específico por Componente
               </h4>
               <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
-                No uses un juego para diagnosticar: los juegos usan todo a la vez. Ejecutá <strong className="text-white">Prime95 Small FFTs</strong> durante 20 minutos (estrés 100% CPU/VRM). Si es estable, pasá a <strong className="text-white">MemTest86</strong> (RAM). Luego a <strong className="text-white">FurMark</strong> (GPU pura). En el momento en que se caiga, habrás aislado el culpable.
+                Aplicá pruebas de carga focalizadas (CPU, memoria o GPU por separado). Una caída bajo una carga concreta aumenta la sospecha sobre ese subsistema, pero NO demuestra automáticamente que una única pieza sea culpable sin contrastar temperaturas, voltajes y estabilidad del bus.
               </p>
             </div>
             <div className="mt-3 pt-2 border-t border-zinc-800 text-[10px] font-mono-tech text-zinc-400 font-semibold">
-              REGLA: UNA SOLA PIEZA BAJO CARGA A LA VEZ.
+              REGLA: UNA CARGA AISLADA PERMITE MEDIR RESPUESTAS FOCALIZADAS.
             </div>
           </div>
 
@@ -99,18 +99,18 @@ export const Page36Chapter06ArbolForense: React.FC = () => {
           <div className="p-4 bg-[#0a1310] border border-zinc-800 rounded-xl flex flex-col justify-between shadow-lg">
             <div>
               <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2.5">
-                <span className="font-mono-tech font-bold text-xs text-zinc-400 uppercase">PASO 04 // REINICIO EN SECO</span>
-                <span className="text-[10px] font-mono-tech text-zinc-500">EVENTO ID 41</span>
+                <span className="font-mono-tech font-bold text-xs text-zinc-400 uppercase">PASO 04 // EVENT ID 41</span>
+                <span className="text-[10px] font-mono-tech text-zinc-500">KERNEL-POWER</span>
               </div>
               <h4 className="font-display font-bold text-sm text-white uppercase mb-1">
-                Diagnóstico de Fuente de Poder
+                Event ID 41 / Reinicio Inesperado
               </h4>
               <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
-                Si la computadora se apaga o reinicia instantáneamente en negro sin pantalla azul (como si le hubieran quitado el cable de repente), se activó la protección OCP/OPP de la fuente de poder ante un transitorio de la GPU, o las temperaturas de la CPU cruzaron los 105°C de corte térmico directo.
+                Kernel-Power 41 indica que Windows detectó que el apagado o reinicio anterior no fue limpio. NO identifica la causa por sí mismo. Puede aparecer por pérdida de alimentación, PSU, reset manual, bugcheck previo, bloqueo, sobretemperatura, hardware, software u otros escenarios. Revisar además: BugcheckCode, eventos anteriores, dump, temperaturas, alimentación y condiciones en las que ocurrió.
               </p>
             </div>
             <div className="mt-3 pt-2 border-t border-zinc-800 text-[10px] font-mono-tech text-zinc-400 font-semibold">
-              REGLA: CORTE TOTAL = SUMINISTRO O TEMPERATURA CRÍTICA.
+              REGLA: EVENT ID 41 REGISTRA EL SÍNTOMA; LA CAUSA REQUIERE CORRELACIÓN.
             </div>
           </div>
 

@@ -32,23 +32,23 @@ export const Page08Chapter01PowerShell: React.FC = () => {
         {/* Narrative Context */}
         <div className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed max-w-3xl">
           <p>
-            No necesitás instalar aplicaciones desconocidas ni ejecutables dudosos para auditar las tripas de tu hardware. Windows incluye subsistemas WMI y CIM que consultan directamente las tablas SMBIOS de la placa madre. Con un único comando de PowerShell podés auditar si tu memoria RAM está rindiendo al 100% de lo que pagaste o si funciona a velocidad de fábrica reducida.
+            No necesitás instalar aplicaciones desconocidas para una primera inspección del hardware. Windows incluye subsistemas WMI y CIM que consultan las tablas SMBIOS proporcionadas por la placa madre. Con este comando de PowerShell podés consultar los parámetros reportados por el firmware (capacidad, frecuencia declarada, fabricante y código de parte) para verificar si la velocidad configurada coincide con el perfil esperado o si opera en valores base de seguridad.
           </p>
         </div>
 
         {/* Lab Command Feature Component */}
         <div className="flex-1">
           <LabEvoCommand
-            title="AUDITORÍA DE BANCOS Y RELOJ DE MEMORIA"
-            subtitle="CONSULTA A LA TABLA SMBIOS MEDIANTE CIMINSTANCE"
+            title="INSPECCIÓN DE DATOS REPORTADOS POR SMBIOS"
+            subtitle="CONSULTA A LA CLASE WIN32_PHYSICALMEMORY MEDIANTE CIM"
             shellType="POWERSHELL"
-            command="Get-CimInstance Win32_PhysicalMemory | Select BankLabel, Capacity, Speed, Manufacturer, PartNumber"
-            queHace="Interroga directamente al firmware del sistema operativo para obtener la telemetría grabada en el módulo SPD de cada banco de memoria física instalado."
-            queDevuelve="Una tabla con tantas filas como ranuras pobladas tengas en tu placa madre, indicando capacidad en bytes, frecuencia de reloj en MHz y fabricante real del silicio."
-            queDatoMirar="Prestá especial atención a la columna 'Speed': si compraste memorias de 3200 o 6000 MT/s pero aquí figura 2133 o 4800, tu perfil XMP/EXPO está apagado en el BIOS."
-            queSignifica="La memoria funciona a velocidad JEDEC de arranque seguro. Perdiste entre un 20% y un 35% de ancho de banda efectivo hasta que actives el perfil en el menú de la placa."
-            outputSample="BankLabel: BANK 0 | Speed: 6000 | Manufacturer: 04CD (Corsair) | PartNumber: CMK32GX5M2B6000C30"
-            tip="Si ves BANK 0 y BANK 1 pero tenés cuatro zócalos, verificá si están en ranuras contiguas o alternadas A2/B2."
+            command="Get-CimInstance Win32_PhysicalMemory | Select-Object DeviceLocator, Capacity, Speed, ConfiguredClockSpeed, Manufacturer, PartNumber"
+            queHace="Interroga a la interfaz CIM/SMBIOS del sistema operativo para leer los parámetros identificatorios y de frecuencia reportados por los módulos de memoria instalados."
+            queDevuelve="Una tabla con los módulos detectados, indicando el zócalo reportado, capacidad en bytes, frecuencia nominal (Speed), frecuencia en uso (ConfiguredClockSpeed) y número de parte."
+            queDatoMirar="Compará 'ConfiguredClockSpeed' (o 'Speed' según versión): si tus memorias fueron adquiridas para 3200 o 6000 MT/s pero aquí reportan 2133 o 4800, el perfil XMP/EXPO no está aplicado en el firmware UEFI."
+            queSignifica="La memoria opera con los parámetros base JEDEC de arranque seguro. El ancho de banda potencial queda desaprovechado respecto al perfil comercial hasta configurarlo en la BIOS. Nota pericial: este comando muestra datos declarados; para confirmar canal activo (Single/Dual Channel), timings o tasa de transferencia real, consultá el BIOS o herramientas de medición dedicada."
+            outputSample="DeviceLocator: DIMM_A2 | Speed: 6000 | ConfiguredClockSpeed: 6000 | Manufacturer: Corsair | PartNumber: CMK32GX5M2B6000C30"
+            tip="Si tenés dos módulos en una placa de 4 ranuras, revisá en DeviceLocator qué zócalos figuran poblados frente al manual de la placa."
           />
         </div>
 

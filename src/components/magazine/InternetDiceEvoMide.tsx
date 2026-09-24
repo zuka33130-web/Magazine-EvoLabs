@@ -79,11 +79,11 @@ export const InternetDiceEvoMide: React.FC<InternetDiceEvoMideProps> = ({
 
   if (fullPage) {
     return (
-      <div className="flex-1 flex flex-col justify-between space-y-4 py-2 font-sans-editorial">
+      <div className="flex-1 min-h-0 flex flex-col justify-between space-y-2 sm:space-y-2.5 py-1 font-sans-editorial">
         {/* Full-Page Dedicated Header */}
-        <div className="border-b border-zinc-800 pb-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <span className="w-3 h-3 bg-yellow-400 inline-block shadow-[0_0_10px_#facc15]" />
+        <div className="border-b border-zinc-800 pb-2 flex flex-wrap items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 bg-yellow-400 inline-block shadow-[0_0_10px_#facc15]" />
             <h2 className="font-mono-tech font-black text-sm sm:text-base text-white uppercase tracking-wider">
               INTERNET DICE // EVO MIDE
             </h2>
@@ -92,66 +92,66 @@ export const InternetDiceEvoMide: React.FC<InternetDiceEvoMideProps> = ({
             </span>
           </div>
 
-          <div className="text-[11px] font-mono-tech text-zinc-500 uppercase tracking-wider">
+          <div className="text-[10px] font-mono-tech text-zinc-500 uppercase tracking-wider">
             METROLOGÍA PERICIAL INDEPENDIENTE
           </div>
         </div>
 
         {/* Step 1: Internet Dice (El Consejo Popular) */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <div className="flex items-center justify-between text-xs font-mono-tech text-zinc-400">
-            <span className="text-yellow-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+            <span className="text-yellow-400 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
               <span>01.</span> EL CONSEJO POPULAR EN LA RED
             </span>
-            <span className="text-[10px] text-zinc-500 italic">{fuentePopular}</span>
+            <span className="text-[9.5px] text-zinc-500 italic">{fuentePopular}</span>
           </div>
-          <div className="p-4 bg-[#10131c] border-l-4 border-yellow-400 rounded-r shadow-md">
-            <p className="text-white text-sm sm:text-base leading-snug font-medium italic">
+          <div className="p-2.5 sm:p-3 bg-[#10131c] border-l-4 border-yellow-400 rounded-r shadow-md">
+            <p className="text-white text-xs sm:text-sm leading-snug font-medium italic">
               "{consejoPopular}"
             </p>
           </div>
         </div>
 
         {/* Arrow Sequence */}
-        <div className="flex justify-center text-zinc-600">
-          <ArrowDown className="w-5 h-5 animate-bounce" />
+        <div className="flex justify-center text-zinc-600 my-0.5">
+          <ArrowDown className="w-4 h-4" />
         </div>
 
         {/* Step 2: Qué Pasa Realmente (Arquitectura de Silicio / OS) */}
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2 text-xs font-mono-tech text-sky-400 font-bold uppercase tracking-wider">
-            <Cpu className="w-4 h-4" />
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5 text-[11px] font-mono-tech text-sky-400 font-bold uppercase tracking-wider">
+            <Cpu className="w-3.5 h-3.5 shrink-0" />
             <span>02. QUÉ PASA REALMENTE EN EL HARDWARE Y EN EL KERNEL</span>
           </div>
-          <div className="p-4 bg-[#0a101b] border-l-4 border-sky-400 rounded-r text-zinc-200 text-xs sm:text-[13px] leading-relaxed">
+          <div className="p-2.5 sm:p-3 bg-[#0a101b] border-l-4 border-sky-400 rounded-r text-zinc-200 text-xs leading-relaxed">
             {realidadTecnica}
           </div>
         </div>
 
         {/* Arrow Sequence */}
-        <div className="flex justify-center text-zinc-600">
-          <ArrowDown className="w-5 h-5" />
+        <div className="flex justify-center text-zinc-600 my-0.5">
+          <ArrowDown className="w-4 h-4" />
         </div>
 
         {/* Step 3: El Experimento & Medición A/B */}
-        <div className="space-y-1.5">
-          <span className="text-xs font-mono-tech text-zinc-400 font-bold uppercase tracking-wider block">
+        <div className="space-y-1">
+          <span className="text-[11px] font-mono-tech text-zinc-400 font-bold uppercase tracking-wider block">
             03. EL PROTOCOLO DE MEDICIÓN A/B
           </span>
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 text-xs font-mono-tech">
-            <div className="md:col-span-7 p-3 bg-[#0d0f17] border border-zinc-800 rounded">
-              <span className="text-zinc-500 uppercase block text-[9px] mb-1">ENSAYO METROLÓGICO (1 VARIABLE AISLADA):</span>
-              <p className="text-zinc-200 font-sans-editorial text-xs leading-relaxed">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-2 text-xs font-mono-tech">
+            <div className="md:col-span-7 p-2.5 bg-[#0d0f17] border border-zinc-800 rounded">
+              <span className="text-zinc-500 uppercase block text-[8.5px] mb-0.5">ENSAYO METROLÓGICO (1 VARIABLE AISLADA):</span>
+              <p className="text-zinc-200 font-sans-editorial text-[11.5px] leading-relaxed">
                 {experimento}
               </p>
             </div>
-            <div className="md:col-span-5 p-3 bg-[#0d0f17] border border-zinc-800 rounded flex flex-col justify-between">
+            <div className="md:col-span-5 p-2.5 bg-[#0d0f17] border border-zinc-800 rounded flex flex-col justify-between">
               <div>
-                <span className="text-yellow-400 uppercase block text-[9px] mb-1">HERRAMIENTA FORENSE:</span>
-                <span className="text-white font-bold block">{herramientaMedicion}</span>
+                <span className="text-yellow-400 uppercase block text-[8.5px] mb-0.5">HERRAMIENTA FORENSE:</span>
+                <span className="text-white font-bold block text-xs">{herramientaMedicion}</span>
               </div>
-              <div className="mt-2 pt-2 border-t border-zinc-800">
-                <span className="text-zinc-500 uppercase block text-[9px]">RESULTADO NUMÉRICO:</span>
+              <div className="mt-1.5 pt-1.5 border-t border-zinc-800">
+                <span className="text-zinc-500 uppercase block text-[8.5px]">RESULTADO NUMÉRICO:</span>
                 <span className="text-zinc-200 font-bold text-xs">{resultadoDetalle}</span>
               </div>
             </div>
@@ -159,16 +159,16 @@ export const InternetDiceEvoMide: React.FC<InternetDiceEvoMideProps> = ({
         </div>
 
         {/* Step 4: Veredicto Oficial EVO */}
-        <div className={`p-4 rounded-lg border-2 ${verdict.bg} shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3`}>
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-black/40 rounded mt-0.5 sm:mt-0">
+        <div className={`p-2.5 sm:p-3 rounded-lg border-2 ${verdict.bg} shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5`}>
+          <div className="flex items-start gap-2.5">
+            <div className="p-1.5 bg-black/40 rounded mt-0.5 sm:mt-0 shrink-0">
               {verdict.icon}
             </div>
             <div>
               <h4 className="font-mono-tech font-black text-xs sm:text-sm uppercase tracking-wider text-white">
                 {verdict.title}
               </h4>
-              <p className="text-xs font-sans-editorial text-zinc-200 mt-0.5 leading-snug">
+              <p className="text-[11.5px] font-sans-editorial text-zinc-200 mt-0.5 leading-snug">
                 {verdict.summary}
               </p>
             </div>
@@ -176,20 +176,20 @@ export const InternetDiceEvoMide: React.FC<InternetDiceEvoMideProps> = ({
         </div>
 
         {/* Safety & Rollback Strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-[11px] font-mono-tech border-t border-zinc-800">
-          <div className="flex items-start gap-2 text-rose-400">
-            <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[10.5px] font-mono-tech border-t border-zinc-800 shrink-0">
+          <div className="flex items-start gap-1.5 text-rose-400">
+            <ShieldAlert className="w-3.5 h-3.5 shrink-0 mt-0.5" />
             <div>
-              <strong className="block text-[10px] uppercase text-rose-300">RIESGO LATENTE:</strong>
-              <span className="text-zinc-400 font-sans-editorial">{riesgo}</span>
+              <strong className="block text-[9.5px] uppercase text-rose-300">RIESGO LATENTE:</strong>
+              <span className="text-zinc-400 font-sans-editorial text-[10.5px] leading-tight">{riesgo}</span>
             </div>
           </div>
 
-          <div className="flex items-start gap-2 text-yellow-400">
-            <RotateCcw className="w-4 h-4 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-1.5 text-yellow-400">
+            <RotateCcw className="w-3.5 h-3.5 shrink-0 mt-0.5" />
             <div>
-              <strong className="block text-[10px] uppercase text-yellow-300">CÓMO VOLVER ATRÁS:</strong>
-              <span className="text-zinc-300 font-sans-editorial">{comoRevertirlo}</span>
+              <strong className="block text-[9.5px] uppercase text-yellow-300">CÓMO VOLVER ATRÁS:</strong>
+              <span className="text-zinc-300 font-sans-editorial text-[10.5px] leading-tight">{comoRevertirlo}</span>
             </div>
           </div>
         </div>

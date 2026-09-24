@@ -96,7 +96,7 @@ export const Page04Topology: React.FC = () => {
                 </p>
               </div>
               <span className="text-[9px] font-mono-tech text-yellow-300/90 bg-yellow-400/10 border border-yellow-400/30 px-2 py-1 rounded mt-2 inline-block">
-                SLOTS REQUERIDOS: A2 / B2 (2 Y 4)
+                HABITUAL (2 MÓDULOS): A2 / B2 (VER MANUAL)
               </span>
             </div>
 

@@ -15,6 +15,9 @@ import {
 interface EvoArchiveEntranceProps {
   onEnterTome01: () => void;
   onEnterMagazine?: () => void;
+  onEnterTome02?: () => void;
+  onEnterTome03?: () => void;
+  onEnterTome04?: () => void;
   onBackToMap: () => void;
   dossierSummary: Tome01DossierSummary;
 }
@@ -22,6 +25,9 @@ interface EvoArchiveEntranceProps {
 export const EvoArchiveEntrance: React.FC<EvoArchiveEntranceProps> = ({
   onEnterTome01,
   onEnterMagazine,
+  onEnterTome02,
+  onEnterTome03,
+  onEnterTome04,
   onBackToMap,
   dossierSummary,
 }) => {
@@ -179,30 +185,84 @@ export const EvoArchiveEntrance: React.FC<EvoArchiveEntranceProps> = ({
           </div>
         </div>
 
-        {/* Future Tomes Shelf Preview */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-          <div className="p-5 rounded-xl border border-zinc-900 bg-zinc-950/40 opacity-60">
-            <div className="font-mono-tech text-[10px] text-zinc-500 uppercase mb-1">
-              TOMO 02 // EN REDACCIÓN TÉCNICA
+        {/* Active Volumes Shelf: Tomo 02, Tomo 03, Tomo 04 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+          {/* TOMO 02 */}
+          <div className="p-5 rounded-xl border border-cyan-500/30 bg-zinc-950/80 hover:border-cyan-400 transition-all flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center justify-between font-mono-tech text-[10px] text-cyan-400 uppercase mb-1">
+                <span className="font-bold">TOMO 02 // DISPONIBLE</span>
+                <span className="px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-800 text-[9px]">40 PÁGINAS A4</span>
+              </div>
+              <div className="font-display font-bold text-lg text-white">
+                LA BIBLIA NEGRA DE WINDOWS
+              </div>
+              <p className="font-sans-editorial text-xs text-zinc-400 mt-1 leading-relaxed">
+                30 cirugías sin reinstalar el sistema: BSODs, registro, telemetría, DPC latency y kernel.
+              </p>
             </div>
-            <div className="font-display font-bold text-base text-zinc-300">
-              Redes, Latencia Real y el Camino del Paquete
-            </div>
-            <p className="font-sans-editorial text-xs text-zinc-500 mt-2">
-              Auditoría de bufferbloat, congestión de routers y medición de pérdida de paquetes a nivel de socket.
-            </p>
+            {onEnterTome02 && (
+              <button
+                type="button"
+                onClick={onEnterTome02}
+                className="w-full py-2 px-3 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(6,182,212,0.3)]"
+              >
+                <span>ABRIR TOMO 02</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
-          <div className="p-5 rounded-xl border border-zinc-900 bg-zinc-950/40 opacity-60">
-            <div className="font-mono-tech text-[10px] text-zinc-500 uppercase mb-1">
-              TOMO 03 // EN INVESTIGACIÓN FORENSE
+          {/* TOMO 03 */}
+          <div className="p-5 rounded-xl border border-emerald-500/30 bg-zinc-950/80 hover:border-emerald-400 transition-all flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center justify-between font-mono-tech text-[10px] text-emerald-400 uppercase mb-1">
+                <span className="font-bold">TOMO 03 // DISPONIBLE</span>
+                <span className="px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-[9px]">48 PÁGINAS A4</span>
+              </div>
+              <div className="font-display font-bold text-lg text-white">
+                REPARÁ TU PC // BANCO
+              </div>
+              <p className="font-sans-editorial text-xs text-zinc-400 mt-1 leading-relaxed">
+                32 módulos de banco: fuentes ATX, multímetro pericial, Q-LEDs, bucles de reinicio y VRMs.
+              </p>
             </div>
-            <div className="font-display font-bold text-base text-zinc-300">
-              Firmware, BIOS, Microcódigo y Rieles de Energía
+            {onEnterTome03 && (
+              <button
+                type="button"
+                onClick={onEnterTome03}
+                className="w-full py-2 px-3 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-black font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+              >
+                <span>ABRIR TOMO 03</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* TOMO 04 */}
+          <div className="p-5 rounded-xl border border-purple-500/30 bg-zinc-950/80 hover:border-purple-400 transition-all flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center justify-between font-mono-tech text-[10px] text-purple-400 uppercase mb-1">
+                <span className="font-bold">TOMO 04 // DISPONIBLE</span>
+                <span className="px-1.5 py-0.5 rounded bg-purple-950 border border-purple-800 text-[9px]">50 PÁGINAS A4</span>
+              </div>
+              <div className="font-display font-bold text-lg text-white">
+                REPARÁ TU NOTEBOOK
+              </div>
+              <p className="font-sans-editorial text-xs text-zinc-400 mt-1 leading-relaxed">
+                33 módulos portátiles: micromecánica, cargadores, DC Jack, baterías Li-Po, flex eDP y térmico.
+              </p>
             </div>
-            <p className="font-sans-editorial text-xs text-zinc-500 mt-2">
-              Curvas V/F (voltaje/frecuencia), transitorios de carga y estabilidad física de silicio.
-            </p>
+            {onEnterTome04 && (
+              <button
+                type="button"
+                onClick={onEnterTome04}
+                className="w-full py-2 px-3 rounded-lg bg-purple-400 hover:bg-purple-300 text-black font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(168,85,247,0.3)]"
+              >
+                <span>ABRIR TOMO 04</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
       </div>

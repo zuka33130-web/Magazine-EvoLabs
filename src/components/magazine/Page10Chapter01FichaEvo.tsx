@@ -171,7 +171,7 @@ export const Page10Chapter01FichaEvo: React.FC = () => {
         {/* Checkpoint Validation Strip */}
         <div className="p-3 bg-[#111520] border-l-3 border-yellow-400 rounded-r text-xs text-zinc-300 font-mono-tech flex items-center justify-between">
           <span>
-            <strong className="text-yellow-400 font-bold">CHECKPOINT FORENSE SUPERADO:</strong> Con estos datos anotados, ya conocés tu hardware real con mayor profundidad que el 90% de los usuarios.
+            <strong className="text-yellow-400 font-bold">CHECKPOINT FORENSE SUPERADO:</strong> Con estos datos anotados, ya conocés tu hardware real con mucha más profundidad que leyendo solamente la caja o la ficha comercial.
           </span>
           <span className="text-zinc-500 text-[10px] uppercase hidden sm:inline shrink-0">
             SIGUIENTE: CAPÍTULO 02 // CÓMO TRABAJAN JUNTOS →

@@ -19,13 +19,13 @@ export const Page40Chapter07Mito08: React.FC = () => {
           idMito="MITO-08"
           consejoPopular="Desbloqueá el plan oculto 'Máximo Rendimiento' (Ultimate Performance) mediante un comando en CMD: tu procesador funcionará siempre a su máxima frecuencia de GHz sin bajar jamás, eliminando el lag."
           fuentePopular="Videos virales de 'desbloquear trucos secretos de Windows'"
-          realidadTecnica="El plan Ultimate Performance fue creado por Microsoft exclusivamente para servidores sin baterías o estaciones de trabajo donde los microsegundos de conmutación de estado de energía (P-States) son inaceptables. En una PC moderna, este plan bloquea los núcleos de la CPU al 100% de frecuencia incluso cuando estás leyendo un PDF o con la máquina bloqueada. Esto desactiva los estados de reposo profundo (C-States, como C6 y C7), provocando que la CPU consuma 40-50W adicionales en reposo, eleve las temperaturas basales 10°C-15°C y agote el presupuesto térmico (TDP headroom) antes de que abras un juego, reduciendo los picos de frecuencia turbo máxima cuando realmente los necesitás."
-          experimento="Medición pericial con vatímetro en toma de pared y HWiNFO64 en reposo y bajo carga: A) Plan 'Equilibrado' (Balanced por defecto) vs. B) Plan 'Máximo Rendimiento' forzado."
-          herramientaMedicion="Vatímetro digital de pared de precisión + HWiNFO64 Package Power"
+          realidadTecnica="El plan Ultimate Performance fue creado por Microsoft para servidores o estaciones de trabajo donde los microsegundos de conmutación de estados de energía (P-States) son inaceptables. Desactivar estados de ahorro y mantener frecuencias altas en reposo eleva el consumo y las temperaturas sin traducirse necesariamente en una mejora apreciable durante cargas reales."
+          experimento="PROTOCOLOS DE MEDICIÓN EVO: Compará Equilibrado contra Alto Rendimiento o Ultimate Performance usando HWiNFO64 para registrar consumo (Package Power) y temperaturas en reposo; Cinebench o 3DMark para evaluar rendimiento real sostenido; y CapFrameX o PresentMon para analizar si los percentiles 1% y 0.1% low muestran cambios."
+          herramientaMedicion="HWiNFO64 (Package Power & temps) + Cinebench / 3DMark + CapFrameX / PresentMon"
           resultado="empeoro"
-          resultadoDetalle="Consumo en reposo en la pared: sube de 14 Watts a 68 Watts (+385% de gasto eléctrico inútil). Temperatura en reposo: sube de 38°C a 52°C. Rendimiento en juegos y benchmarks 3D: 0.0% de ganancia en FPS promedio y 1% Lows idénticos."
-          riesgo="Mayor degradación por electromigración en el silicio, mayor calentamiento del ambiente y ventiladores girando a mayor velocidad sin motivo alguno."
-          comoRevertirlo="Seleccionar en Opciones de energía de Windows el plan 'Equilibrado' (recomendado). La conmutación de frecuencias por hardware (Speed Shift en Intel / CPPC2 en AMD) responde en menos de 1 milisegundo ante cualquier carga de trabajo."
+          resultadoDetalle="Desactivar estados de ahorro y mantener frecuencias altas en reposo eleva el consumo y las temperaturas basales sin traducirse necesariamente en una mejora apreciable durante cargas de trabajo reales."
+          riesgo="Mayor consumo energético continuo, temperaturas basales innecesariamente más altas y ventiladores girando a mayor régimen en reposo."
+          comoRevertirlo="Seleccionar en Opciones de energía de Windows el plan 'Equilibrado' (recomendado). La conmutación de frecuencias nativa por hardware (Speed Shift en Intel / CPPC2 en AMD) responde en milisegundos ante cualquier demanda de carga."
           fullPage={true}
         />
 

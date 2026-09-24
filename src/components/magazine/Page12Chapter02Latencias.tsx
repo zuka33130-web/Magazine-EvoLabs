@@ -31,15 +31,15 @@ export const Page12Chapter02Latencias: React.FC = () => {
         {/* Narrative Context */}
         <div className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed max-w-3xl">
           <p>
-            El marketing de la memoria suele vender una sola cifra: megatransferencias por segundo (MT/s o erróneamente "MHz"). Pero en el mundo real del gaming y las aplicaciones interactivas, la latencia de acceso aleatorio (el tiempo en nanosegundos que tarda el primer byte en llegar al procesador) es infinitamente más crítica que el ancho de banda secuencial continuo.
+            El marketing de la memoria suele destacar una sola métrica: megatransferencias por segundo (MT/s). Sin embargo, ancho de banda y latencia afectan cargas de trabajo distintas. Mientras que el ancho de banda beneficia la transferencia secuencial de grandes volúmenes de datos, la latencia de acceso aleatorio resulta crucial para motores interactivos y juegos. Ambas variables deben evaluarse en equilibrio según el procesador, la plataforma y el perfil de uso.
           </p>
         </div>
 
         {/* The Comparison Graphic: Why CL30 beats High MT/s */}
         <div className="bg-[#0b0e15] border-2 border-zinc-800 rounded-xl p-4 sm:p-5 shadow-2xl">
           <div className="flex items-center justify-between text-xs font-mono-tech text-zinc-400 border-b border-zinc-800 pb-2 mb-3">
-            <span className="text-amber-400 font-bold uppercase">CASO DE ESTUDIO: DDR5 6000 CL30 VS. DDR5 6800 CL40</span>
-            <span className="text-zinc-500">FÓRMULA: (CL × 2000) / MT/s = LATENCIA (ns)</span>
+            <span className="text-amber-400 font-bold uppercase">EJEMPLO DIDÁCTICO: DDR5 6000 CL30 VS. DDR5 6800 CL40</span>
+            <span className="text-zinc-500">FÓRMULA CAS: (CL × 2000) / MT/s = LATENCIA CAS TEÓRICA (ns)</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans-editorial">
@@ -47,17 +47,17 @@ export const Page12Chapter02Latencias: React.FC = () => {
               <div>
                 <div className="flex justify-between items-baseline mb-1">
                   <span className="font-mono-tech font-bold text-white text-xs">DDR5 6000 MT/s // CL30</span>
-                  <span className="text-emerald-400 font-mono-tech font-bold text-sm">10.00 ns LATENCIA REAL</span>
+                  <span className="text-emerald-400 font-mono-tech font-bold text-sm">10.00 ns CAS TEÓRICA</span>
                 </div>
                 <div className="w-full bg-black/60 h-2 rounded-full overflow-hidden my-2">
                   <div className="bg-emerald-400 h-full rounded-full" style={{ width: '85%' }} />
                 </div>
                 <p className="text-zinc-300 text-xs leading-relaxed mt-2">
-                  <strong>El punto óptimo para gaming:</strong> El controlador de memoria interno del procesador (IMC) trabaja en sincronía perfecta 1:1 con el reloj de bus (UCLK). Cero penalización por desincronización de divisores.
+                  <strong>Relación equilibrada:</strong> En arquitecturas donde el controlador de memoria (IMC) opera en sincronía directa 1:1 con el reloj de bus (UCLK), mantener latencias CAS bajas preserva un tiempo de respuesta óptimo en accesos aleatorios.
                 </p>
               </div>
               <span className="text-[10px] font-mono-tech text-emerald-300 bg-emerald-500/10 px-2 py-1 rounded mt-3 inline-block">
-                RESULTADO: 1% LOWS ESTABLES Y FLUIDEZ MÁXIMA
+                CONSISTENCIA DE RESPUESTA EN ACCESOS ALEATORIOS
               </span>
             </div>
 
@@ -65,19 +65,22 @@ export const Page12Chapter02Latencias: React.FC = () => {
               <div>
                 <div className="flex justify-between items-baseline mb-1">
                   <span className="font-mono-tech font-bold text-white text-xs">DDR5 6800 MT/s // CL40</span>
-                  <span className="text-amber-400 font-mono-tech font-bold text-sm">11.76 ns LATENCIA REAL</span>
+                  <span className="text-amber-400 font-mono-tech font-bold text-sm">11.76 ns CAS TEÓRICA</span>
                 </div>
                 <div className="w-full bg-black/60 h-2 rounded-full overflow-hidden my-2">
                   <div className="bg-amber-400 h-full rounded-full" style={{ width: '68%' }} />
                 </div>
                 <p className="text-zinc-300 text-xs leading-relaxed mt-2">
-                  <strong>La trampa del folleto:</strong> Mayor tasa de transferencia en papel, pero un 17% más lenta para responder ante pedidos aleatorios del motor gráfico, obligando al IMC a conmutar al divisor 1:2 (UCLK a la mitad).
+                  <strong>Mayor ancho, mayor tiempo CAS:</strong> Ofrece mayor ancho de banda secuencial, pero con mayor latencia CAS teórica. Si la plataforma conmuta a divisor 1:2 (UCLK a la mitad), el impacto en latencia total dependerá de si la frecuencia extra compensa el divisor.
                 </p>
               </div>
               <span className="text-[10px] font-mono-tech text-amber-300 bg-amber-500/10 px-2 py-1 rounded mt-3 inline-block">
-                RESULTADO: MAYOR BENCHMARK CONTINUO, PEOR 1% LOW
+                MAYOR TASA SECUENCIAL // VERIFICAR IMPACTO EN LATENCIA
               </span>
             </div>
+          </div>
+          <div className="mt-3 pt-2 border-t border-zinc-800/80 text-[10px] font-mono-tech text-zinc-400">
+            * NOTA METROLÓGICA: La fórmula CAS estima el tiempo de acceso de la primera palabra; la latencia total real del subsistema incluye timings secundarios, terciarios, arquitectura del IMC y topología del sistema.
           </div>
         </div>
 

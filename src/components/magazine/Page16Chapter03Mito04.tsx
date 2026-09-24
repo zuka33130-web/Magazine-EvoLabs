@@ -19,13 +19,13 @@ export const Page16Chapter03Mito04: React.FC = () => {
           idMito="MITO-04"
           consejoPopular="Desactivá por completo V-Sync, apagá G-Sync o FreeSync y dejá los FPS totalmente ilimitados: tener 240 FPS en un monitor de 144 Hz te dará la menor latencia de entrada posible."
           fuentePopular="Mito canónico repetido en canales de shooters competitivos y esports"
-          realidadTecnica="En DirectX 11 y 12, si la GPU corre al 99-100% sin límite, el controlador de pantalla acumula de 1 a 3 fotogramas en cola para mantener saturados los núcleos de cómputo. Esa acumulación genera un búfer que retiene el input de tu mouse entre 20 y 40 milisegundos. Además, superar la tasa de refresco del monitor produce 'screen tearing' (cortes horizontales de imagen) y una varianza de fotogramas errática que perjudica la memoria muscular de puntería."
-          experimento="Comparativa en banco de pruebas pericial: A) FPS desbloqueados con GPU al 99% vs. B) G-Sync activado + V-Sync forzado en el panel de control del driver + Cap de FPS a 3 cuadros por debajo del refresco (o NVIDIA Reflex / AMD Anti-Lag)."
-          herramientaMedicion="NVIDIA LDAT v2 (Hardware Mouse Sensor) + CapFrameX"
+          realidadTecnica="En escenarios donde la GPU opera al límite máximo de utilización (GPU-bound), el pipeline gráfico puede acumular cuadros pendientes en la cola del controlador, aumentando la latencia de entrada entre el mouse y la pantalla. Por otra parte, dejar los FPS completamente desincronizados por encima de la frecuencia de refresco puede producir desgarro de imagen (screen tearing) e irregularidades en la entrega de cuadros. Sin embargo, no existe una cifra universal de cuadros en cola o de milisegundos fijos: la implementación de tecnologías de baja latencia (como NVIDIA Reflex o AMD Anti-Lag), limitadores de fotogramas y monitores con refresco variable (VRR: G-Sync / FreeSync) modifican sustancialmente la respuesta del sistema."
+          experimento="Protocolo EVO: evaluación comparativa de latencia de entrada y consistencia de frametime entre fotogramas ilimitados en saturación completa de GPU frente a sincronización VRR combinada con limitación de cuadros o tecnologías de baja latencia."
+          herramientaMedicion="Monitor de latencia y consistencia de cuadros (PresentMon o CapFrameX)"
           resultado="mejoro"
-          resultadoDetalle="La latencia del clic cae de 44.8 ms a 18.4 ms (-59% de tiempo de respuesta). El 1% Low sube de 88 a 138 FPS. Fluidez absoluta y cero cortes de pantalla."
-          riesgo="Si limitás los FPS con un limitador externo de baja calidad (sin CPU busy-sleep), podés introducir varianza adicional. Usar siempre el limitador in-game o RTSS."
-          comoRevertirlo="Activar NVIDIA Reflex (Low Latency / On+Boost) en el menú del juego, o fijar el límite en RTSS (RivaTuner) exactamente a tu tasa de refresco menos 3 cuadros (ej: 141 FPS en 144 Hz, 237 FPS en 240 Hz)."
+          resultadoDetalle="Al evitar que la GPU acumule fotogramas en cola mediante tecnologías de baja latencia o limitadores adecuados, la respuesta de entrada se vuelve más predecible y se eliminan artefactos de desgarro de imagen sin penalizaciones de retardo."
+          riesgo="Usar limitadores de fotogramas externos con temporización deficiente puede introducir fluctuaciones de frametime adicionales. Es preferible emplear limitadores integrados en el motor del juego o herramientas de bajo nivel reconocidas."
+          comoRevertirlo="Habilitar tecnologías de baja latencia soportadas por el juego (como NVIDIA Reflex o AMD Anti-Lag). Si se cuenta con monitor VRR (G-Sync o FreeSync), limitar ligeramente por debajo del techo del refresco puede resultar útil en varios sistemas para evitar rebasar el rango de sincronización variable. Medir siempre el comportamiento en cada juego."
           fullPage={true}
         />
 

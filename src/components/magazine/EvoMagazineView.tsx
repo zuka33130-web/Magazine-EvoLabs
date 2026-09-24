@@ -8,6 +8,11 @@ import {
   HelpCircle,
   X,
   CheckCircle2,
+  ExternalLink,
+  FileDown,
+  Copy,
+  Sparkles,
+  Layers,
 } from 'lucide-react';
 import { Page01Cover } from './Page01Cover';
 import { Page02Manifesto } from './Page02Manifesto';
@@ -71,8 +76,31 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
   const [viewMode, setViewMode] = useState<ViewMode>('continuous');
   const [isPreparingPrint, setIsPreparingPrint] = useState<boolean>(false);
   const [showConfigHelper, setShowConfigHelper] = useState<boolean>(false);
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
+  const [copiedUrl, setCopiedUrl] = useState<boolean>(false);
+  const [isPrintTriggerActive, setIsPrintTriggerActive] = useState<boolean>(false);
 
   const totalPages = 46;
+
+  // Environment check: whether running embedded inside an iframe (like AI Studio preview)
+  const isInIframe = (() => {
+    try {
+      return typeof window !== 'undefined' && window.self !== window.top;
+    } catch {
+      return true;
+    }
+  })();
+
+  const getStandalonePrintUrl = () => {
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.set('mode', 'magazine');
+      u.searchParams.set('print', 'true');
+      return u.toString();
+    } catch {
+      return window.location.href;
+    }
+  };
 
   // Keyboard navigation
   useEffect(() => {
@@ -94,6 +122,39 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
     };
     window.addEventListener('beforeprint', handleBeforePrint);
     return () => window.removeEventListener('beforeprint', handleBeforePrint);
+  }, []);
+
+  // Listen for direct URL print parameter (?print=true) to auto-invoke native print
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('print') === 'true' || params.get('pdf') === 'true') {
+        setIsPrintTriggerActive(true);
+        setViewMode('continuous');
+
+        const triggerAutoPrint = async () => {
+          try {
+            if (document.fonts?.ready) {
+              await document.fonts.ready;
+            }
+          } catch {
+            // ignore
+          }
+
+          setTimeout(() => {
+            try {
+              window.print();
+            } catch (err) {
+              console.warn('Auto-print falló o requiere interacción del usuario:', err);
+            }
+          }, 800);
+        };
+
+        triggerAutoPrint();
+      }
+    } catch {
+      // ignore
+    }
   }, []);
 
   const pageComponents = [
@@ -163,29 +224,149 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
   /**
    * Primary action to generate & download native A4 PDF
    */
-  const handleDownloadPdf = () => {
+  const handleDownloadPdf = async () => {
     setIsPreparingPrint(true);
-    
-    // Switch to continuous mode so all 41 pages are synchronously mounted in DOM
     setViewMode('continuous');
-    
-    // Set document title so the browser automatically suggests a clean filename
+
+    const standaloneUrl = getStandalonePrintUrl();
+
+    // In an iframe (like AI Studio preview), window.print() is blocked by browser sandbox policy.
+    if (isInIframe) {
+      try {
+        const opened = window.open(standaloneUrl, '_blank');
+        if (opened) {
+          setIsPreparingPrint(false);
+          setShowExportModal(true);
+          return;
+        }
+      } catch (err) {
+        console.warn('window.open blocked:', err);
+      }
+
+      // If popup blocker intervened, show export modal with unblockable direct link
+      setIsPreparingPrint(false);
+      setShowExportModal(true);
+      return;
+    }
+
+    // Top-level window (not in iframe):
     const originalTitle = document.title;
     document.title = 'EVO_LABS_MAGAZINE_TOMO_01_CONOCE_TU_PC_A4';
 
-    // Allow DOM to settle, then open native print dialog
+    try {
+      if (document.fonts?.ready) {
+        await document.fonts.ready;
+      }
+    } catch {
+      // ignore
+    }
+
     setTimeout(() => {
       try {
         window.print();
       } catch (err) {
-        console.error('Error al invocar impresión:', err);
+        console.warn('Error al invocar window.print():', err);
+        setShowExportModal(true);
       } finally {
         setIsPreparingPrint(false);
         setTimeout(() => {
           document.title = originalTitle;
-        }, 1500);
+        }, 2000);
       }
-    }, 250);
+    }, 450);
+  };
+
+  /**
+   * Direct trigger for window.print() (forces print inside current window)
+   */
+  const handleForcePrintInWindow = async () => {
+    setViewMode('continuous');
+    setIsPreparingPrint(true);
+    const originalTitle = document.title;
+    document.title = 'EVO_LABS_MAGAZINE_TOMO_01_CONOCE_TU_PC_A4';
+
+    try {
+      if (document.fonts?.ready) {
+        await document.fonts.ready;
+      }
+    } catch {
+      // ignore
+    }
+
+    setTimeout(() => {
+      try {
+        window.print();
+      } catch (err) {
+        console.warn('Error en impresión forzada:', err);
+      } finally {
+        setIsPreparingPrint(false);
+        setTimeout(() => {
+          document.title = originalTitle;
+        }, 2000);
+      }
+    }, 400);
+  };
+
+  /**
+   * Generates a self-contained offline HTML bundle for physical printing / local archive
+   */
+  const handleDownloadOfflineHtml = () => {
+    try {
+      const container = document.getElementById('magazine-continuous-stack');
+      if (!container) return;
+
+      let styles = '';
+      const styleElements = document.querySelectorAll('style, link[rel="stylesheet"]');
+      styleElements.forEach((el) => {
+        styles += el.outerHTML + '\n';
+      });
+
+      const fullHtml = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVO_LABS_MAGAZINE_TOMO_01_CONOCE_TU_PC_A4</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  ${styles}
+  <style>
+    @page { size: A4 portrait; margin: 0; }
+    body { background-color: #090A0E; color: #fff; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .no-print { display: none !important; }
+    .a4-magazine-page { width: 210mm !important; height: 297mm !important; break-after: page !important; page-break-after: always !important; }
+  </style>
+</head>
+<body style="background:#090A0E; margin:0; padding:0;">
+  <div style="width:210mm; margin:0 auto;">
+    ${container.innerHTML}
+  </div>
+</body>
+</html>`;
+
+      const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'EVO_LABS_MAGAZINE_TOMO_01_CONOCE_TU_PC_A4.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error al generar archivo offline:', err);
+    }
+  };
+
+  const handleCopyLink = () => {
+    try {
+      navigator.clipboard.writeText(getStandalonePrintUrl());
+      setCopiedUrl(true);
+      setTimeout(() => setCopiedUrl(false), 2500);
+    } catch {
+      // ignore
+    }
   };
 
   return (
@@ -315,9 +496,9 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
           {/* Quick Info / Config Recommended Toggle Button */}
           <button
             type="button"
-            onClick={() => setShowConfigHelper(!showConfigHelper)}
+            onClick={() => setShowExportModal(true)}
             className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#12151d] hover:bg-[#1a2030] text-zinc-300 hover:text-yellow-400 border border-zinc-700/80 rounded font-mono-tech text-[11px] transition-colors cursor-pointer"
-            title="Ver configuración recomendada para exportar en PDF"
+            title="Opciones de exportación y configuración A4"
           >
             <HelpCircle className="w-3.5 h-3.5 text-yellow-400" />
             <span className="hidden xl:inline">Configuración</span>
@@ -351,6 +532,34 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
           )}
         </div>
       </header>
+
+      {/* Sticky Print Notice when launched with ?print=true */}
+      {isPrintTriggerActive && (
+        <div className="no-print bg-yellow-400 text-black px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs font-mono-tech font-bold border-b border-yellow-500 shadow-xl z-50 sticky top-0">
+          <div className="flex items-center gap-2">
+            <Printer className="w-4 h-4 animate-bounce text-black stroke-[2.5]" />
+            <span>MODO IMPRESIÓN A4 ACTIVO // TOMO 01 (46 PÁGINAS EDITORIALES)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="px-3 py-1 bg-black hover:bg-zinc-800 text-yellow-400 text-xs font-bold rounded uppercase flex items-center gap-1.5 cursor-pointer shadow"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Abrir diálogo Guardar como PDF</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsPrintTriggerActive(false)}
+              className="p-1 hover:bg-yellow-500 rounded text-black cursor-pointer"
+              title="Cerrar aviso"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Persistent Technical Config Banner: Exactly matches recommended print settings */}
       <div className="no-print bg-[#090b10] border-b border-zinc-800/80 px-3 sm:px-6 py-2 text-[10px] sm:text-[11px] font-mono-tech flex flex-wrap items-center justify-between gap-2 shadow-inner magazine-quick-help-bar">
@@ -389,82 +598,132 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
         </div>
       </div>
 
-      {/* Modal / Detailed Guidance for PDF Export */}
-      {showConfigHelper && (
-        <div className="no-print fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0b0e15] border-2 border-yellow-400/60 rounded-xl max-w-lg w-full p-6 shadow-2xl relative font-mono-tech">
+      {/* Modal / Advanced Guidance & Actions for PDF Export */}
+      {(showExportModal || showConfigHelper) && (
+        <div className="no-print fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#0b0e15] border-2 border-yellow-400/80 rounded-xl max-w-xl w-full p-5 sm:p-6 shadow-2xl relative font-mono-tech my-auto">
             <button
               type="button"
-              onClick={() => setShowConfigHelper(false)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 cursor-pointer"
+              onClick={() => {
+                setShowExportModal(false);
+                setShowConfigHelper(false);
+              }}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 cursor-pointer bg-zinc-900 rounded border border-zinc-800"
+              title="Cerrar ventana"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-4 border-b border-zinc-800 pb-3">
-              <div className="w-8 h-8 rounded bg-yellow-400/15 border border-yellow-400/40 flex items-center justify-center text-yellow-400">
-                <Printer className="w-4 h-4" />
+              <div className="w-9 h-9 rounded bg-yellow-400/15 border border-yellow-400/40 flex items-center justify-center text-yellow-400">
+                <Printer className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-white font-bold text-sm tracking-wider uppercase">
-                  GUÍA DE EXPORTACIÓN A PDF // A4
+                <h3 className="text-white font-bold text-sm tracking-wider uppercase flex items-center gap-2">
+                  <span>DESCARGAR PDF EDITORIAL // A4</span>
+                  <span className="px-1.5 py-0.2 bg-yellow-400/20 text-yellow-400 text-[10px] font-bold rounded border border-yellow-400/40">
+                    46 PÁGINAS
+                  </span>
                 </h3>
-                <p className="text-zinc-400 text-[10px]">
-                  EVO LABS MAGAZINE // TOMO 01 (46 PÁGINAS EDITORIALES)
+                <p className="text-zinc-400 text-[11px]">
+                  EVO LABS MAGAZINE // TOMO 01 // CONOCÉ TU PC
                 </p>
               </div>
             </div>
 
-            <p className="text-zinc-300 text-xs leading-relaxed mb-4 font-sans-editorial">
-              Para generar un PDF editorial de alta fidelidad, listo para guardar, compartir o imprimir físicamente, configurá los siguientes parámetros en el cuadro de impresión de tu navegador:
-            </p>
+            {isInIframe && (
+              <div className="mb-4 p-3 bg-yellow-400/10 border border-yellow-400/40 rounded-lg text-xs text-yellow-300 flex items-start gap-2.5">
+                <ExternalLink className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
+                <div className="leading-relaxed">
+                  <span className="font-bold">Aviso de Entorno Seguro:</span> Al visualizar la app en un recuadro integrado (iFrame), los navegadores restringen la apertura del cuadro de impresión directo. Para generar el PDF con máxima resolución vectorial y las 46 páginas en orden exacto, abrí el documento en pestaña completa:
+                </div>
+              </div>
+            )}
 
-            <div className="space-y-2 bg-[#06070a] border border-zinc-800 p-3 rounded-lg text-xs mb-5">
-              <div className="flex items-center justify-between border-b border-zinc-900 pb-1.5">
-                <span className="text-zinc-400">Destino:</span>
-                <span className="text-yellow-400 font-bold">Guardar como PDF</span>
+            {/* ACTION 1: OPEN IN CLEAN FULLSCREEN TAB (RECOMMENDED & UNBLOCKABLE) */}
+            <div className="space-y-3 mb-5">
+              <a
+                href={getStandalonePrintUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  setShowExportModal(false);
+                  setShowConfigHelper(false);
+                }}
+                className="w-full py-3.5 px-4 bg-yellow-400 hover:bg-yellow-300 active:scale-[0.99] text-black font-black text-xs sm:text-sm uppercase tracking-wider rounded-lg text-center transition-all cursor-pointer flex items-center justify-center gap-2.5 shadow-[0_0_20px_rgba(234,179,8,0.45)] border border-yellow-300"
+              >
+                <Download className="w-4 h-4 stroke-[2.5]" />
+                <span>ABRIR EN PESTAÑA COMPLETA Y GUARDAR PDF</span>
+                <ExternalLink className="w-4 h-4 opacity-80" />
+              </a>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {/* ACTION 2: FORCE PRINT IN CURRENT WINDOW */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowExportModal(false);
+                    setShowConfigHelper(false);
+                    handleForcePrintInWindow();
+                  }}
+                  className="py-2.5 px-3 bg-[#161a25] hover:bg-[#202738] text-zinc-200 hover:text-white border border-zinc-700/80 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Printer className="w-3.5 h-3.5 text-yellow-400" />
+                  <span>Imprimir en esta ventana</span>
+                </button>
+
+                {/* ACTION 3: DOWNLOAD COMPLETE OFFLINE HTML */}
+                <button
+                  type="button"
+                  onClick={handleDownloadOfflineHtml}
+                  className="py-2.5 px-3 bg-[#161a25] hover:bg-[#202738] text-zinc-200 hover:text-white border border-zinc-700/80 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-2"
+                  title="Descargar archivo .html completo con todas las 46 páginas para abrir y guardar offline"
+                >
+                  <FileDown className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Descargar Copia Offline (.html)</span>
+                </button>
               </div>
-              <div className="flex items-center justify-between border-b border-zinc-900 pb-1.5">
-                <span className="text-zinc-400">Tamaño de papel:</span>
-                <span className="text-yellow-400 font-bold">A4 (210 × 297 mm)</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-zinc-900 pb-1.5">
-                <span className="text-zinc-400">Orientación:</span>
-                <span className="text-yellow-400 font-bold">Vertical (Portrait)</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-zinc-900 pb-1.5">
-                <span className="text-zinc-400">Márgenes:</span>
-                <span className="text-yellow-400 font-bold">Ninguno</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-zinc-900 pb-1.5">
-                <span className="text-zinc-400">Escala:</span>
-                <span className="text-yellow-400 font-bold">100%</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-zinc-400">Gráficos de fondo:</span>
-                <span className="text-emerald-400 font-bold">ACTIVADOS (Casilla marcada)</span>
-              </div>
+
+              {/* ACTION 4: COPY DIRECT LINK */}
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="w-full py-2 px-3 bg-[#0d1017] hover:bg-[#141824] text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[11px] transition-colors cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Copy className="w-3 h-3 text-yellow-400" />
+                <span>{copiedUrl ? '¡Enlace copiado al portapapeles!' : 'Copiar enlace directo de exportación'}</span>
+              </button>
             </div>
 
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowConfigHelper(false);
-                  handleDownloadPdf();
-                }}
-                className="flex-1 py-2.5 bg-yellow-400 hover:bg-yellow-300 text-black font-black text-xs uppercase tracking-wider rounded text-center transition-colors cursor-pointer flex items-center justify-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                ABRIR DIÁLOGO Y DESCARGAR PDF
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowConfigHelper(false)}
-                className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded transition-colors cursor-pointer"
-              >
-                Entendido
-              </button>
+            {/* RECOMMENDED TECHNICAL PARAMETERS */}
+            <div className="border-t border-zinc-800 pt-3">
+              <div className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Parámetros obligatorios en el diálogo de impresión:</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 bg-[#06070a] border border-zinc-800/90 p-3 rounded-lg text-xs">
+                <div className="flex flex-col">
+                  <span className="text-zinc-500 text-[10px]">Destino</span>
+                  <span className="text-yellow-400 font-bold">Guardar como PDF</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-zinc-500 text-[10px]">Tamaño de Papel</span>
+                  <span className="text-yellow-400 font-bold">A4 (210 × 297 mm)</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-zinc-500 text-[10px]">Márgenes</span>
+                  <span className="text-yellow-400 font-bold">Ninguno (None)</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-zinc-500 text-[10px]">Escala</span>
+                  <span className="text-yellow-400 font-bold">100% / Ajustar</span>
+                </div>
+                <div className="col-span-2 flex items-center justify-between border-t border-zinc-900 pt-1.5 mt-0.5">
+                  <span className="text-zinc-400">Gráficos de fondo:</span>
+                  <span className="text-emerald-400 font-bold">ACTIVADOS (Casilla marcada)</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -473,10 +732,12 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
       {/* Main Magazine Canvas / Reading Desk Area */}
       <main className="magazine-scroll-container flex-1 py-8 sm:py-12 px-2 sm:px-6 flex flex-col items-center justify-start overflow-y-auto">
         
-        {/* CONTINUOUS EDITORIAL STACK (Contains all 41 pages in order: TAPA -> P41 CONTRATAPA)
+        {/* CONTINUOUS EDITORIAL STACK (Contains all 46 pages in order: TAPA -> P46 CONTRATAPA)
             CRITICAL: When printing, this element is ALWAYS visible (hidden print:block if single/spread) */}
         <div
-          className={`w-full max-w-[820px] flex flex-col gap-8 sm:gap-14 print:gap-0 print:m-0 print:p-0 ${
+          id="magazine-continuous-stack"
+          data-print-container="true"
+          className={`continuous-editorial-stack w-full max-w-[820px] flex flex-col gap-8 sm:gap-14 print:gap-0 print:m-0 print:p-0 ${
             viewMode === 'continuous' ? 'flex' : 'hidden print:block'
           }`}
         >

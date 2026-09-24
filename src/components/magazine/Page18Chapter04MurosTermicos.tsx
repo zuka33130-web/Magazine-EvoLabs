@@ -49,7 +49,7 @@ export const Page18Chapter04MurosTermicos: React.FC = () => {
                 Thermal Throttling
               </h4>
               <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
-                Mecanismo de protección intrínseco del silicio. Al alcanzar la temperatura máxima de unión (TjMax), el micro saltea ciclos de reloj y recorta el voltaje de forma drástica para evitar la degradación de los transistores.
+                Mecanismo de protección intrínseco del silicio. Al alcanzar la temperatura máxima de unión (TjMax definida por el fabricante de la CPU), el procesador modula dinámicamente frecuencias y voltajes para evitar superar el límite térmico seguro.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-zinc-800/80 bg-black/40 -mx-4 -mb-4 p-3 rounded-b-xl">
@@ -57,7 +57,7 @@ export const Page18Chapter04MurosTermicos: React.FC = () => {
                 SÍNTOMA VISIBLE:
               </span>
               <p className="text-[11px] font-mono-tech text-zinc-300 leading-tight">
-                Caída abrupta de frecuencia de reloj (ej. de 5.2 GHz a 3.1 GHz).
+                Reducción progresiva o escalonada de las frecuencias boost bajo carga pesada.
               </p>
             </div>
           </div>
@@ -67,13 +67,13 @@ export const Page18Chapter04MurosTermicos: React.FC = () => {
             <div>
               <div className="flex justify-between items-center text-xs font-mono-tech mb-2 border-b border-zinc-800/80 pb-2">
                 <span className="text-zinc-400 font-bold uppercase">MURO 02</span>
-                <span className="text-zinc-500">PL1 / PL2 / TDP</span>
+                <span className="text-zinc-500">PL1 / PL2 / TDP / PPT</span>
               </div>
               <h4 className="font-display font-black text-base text-white uppercase tracking-wide mb-1">
                 Power Limit Throttling
               </h4>
               <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
-                Incluso con el procesador a fríos 62°C bajo un cooler masivo, el CPU se frena si agota su ventana temporal (Tau) de consumo energético autorizada por el fabricante o por el BIOS de la placa madre.
+                Incluso con temperaturas bajas bajo un disipador eficiente, el procesador ajusta su reloj si alcanza el límite de potencia asignado (PL1/PL2 en Intel, PPT/EDC en AMD) o expira la ventana temporal (Tau) configurada en UEFI.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-zinc-800/80 bg-black/40 -mx-4 -mb-4 p-3 rounded-b-xl">
@@ -81,7 +81,7 @@ export const Page18Chapter04MurosTermicos: React.FC = () => {
                 SÍNTOMA VISIBLE:
               </span>
               <p className="text-[11px] font-mono-tech text-zinc-300 leading-tight">
-                Frecuencia estancada en un techo fijo pese a tener margen térmico.
+                Frecuencia estabilizada en el límite de potencia pese a disponer de margen térmico.
               </p>
             </div>
           </div>
@@ -91,13 +91,13 @@ export const Page18Chapter04MurosTermicos: React.FC = () => {
             <div>
               <div className="flex justify-between items-center text-xs font-mono-tech mb-2 border-b border-zinc-800/80 pb-2">
                 <span className="text-zinc-400 font-bold uppercase">MURO 03</span>
-                <span className="text-zinc-500">VRM &gt; 110°C</span>
+                <span className="text-zinc-500">LÍMITES DE VRM / MOBO</span>
               </div>
               <h4 className="font-display font-black text-base text-white uppercase tracking-wide mb-1">
                 VRM Thermal Throttling
               </h4>
               <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
-                Los MOSFETs de la placa madre hierven. Aunque tengas un circuito de refrigeración líquida impecable, si el disipador de las fases no recibe aire fresco, la placa madre frena la CPU a 800 MHz para no quemarse.
+                Las etapas de potencia (MOSFETs/Power Stages) poseen sus propios límites térmicos. Si carecen de ventilación adecuada o se exige una CPU demandante en una placa base básica, el circuito activa alertas (como PROCHOT externo) forzando al procesador a frecuencias mínimas de resguardo.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-zinc-800/80 bg-black/40 -mx-4 -mb-4 p-3 rounded-b-xl">
@@ -105,7 +105,7 @@ export const Page18Chapter04MurosTermicos: React.FC = () => {
                 SÍNTOMA VISIBLE:
               </span>
               <p className="text-[11px] font-mono-tech text-zinc-300 leading-tight">
-                Congelamiento total momentáneo o frenada brutal del micro a 0.8 GHz.
+                Caída severa de la frecuencia de CPU con pérdida marcada de fluidez bajo carga.
               </p>
             </div>
           </div>
@@ -120,10 +120,10 @@ export const Page18Chapter04MurosTermicos: React.FC = () => {
             </div>
             <div>
               <h5 className="font-mono-tech font-bold text-xs sm:text-sm uppercase text-white">
-                PRESIÓN POSITIVA EN EL GABINETE (EL ESTÁNDAR DE LABORATORIO)
+                FLUJO DE AIRE EQUILIBRADO EN EL GABINETE
               </h5>
               <p className="text-xs font-sans-editorial text-zinc-400 mt-0.5 max-w-2xl leading-relaxed">
-                Mayor caudal de aire ingresando filtrado por el frente que saliendo por atrás y arriba. Esto fuerza al polvo a ser expulsado por las ranuras del chasis y asegura aire fresco continuo sobre las fases VRM y el SSD M.2 primario.
+                Configurar una presión ligeramente positiva con entradas filtradas ayuda a mantener aire fresco continuo hacia el disipador de la CPU, las etapas VRM y las unidades M.2, reduciendo a la vez el ingreso pasivo de polvo por intersticios.
               </p>
             </div>
           </div>
@@ -132,7 +132,7 @@ export const Page18Chapter04MurosTermicos: React.FC = () => {
         {/* Bottom Rule */}
         <div className="p-3 bg-[#140f0c] border-l-3 border-orange-500 rounded-r text-xs text-zinc-300 font-mono-tech flex items-center justify-between">
           <span>
-            <strong className="text-orange-400 font-bold">REGLA TERMODINÁMICA:</strong> El silicio a 80°C continuo es perfectamente seguro; el verdadero veneno son las oscilaciones térmicas bruscas de 40°C a 90°C en ciclos constantes.
+            <strong className="text-orange-400 font-bold">REGLA TERMODINÁMICA:</strong> Cada componente tiene sus propios límites de ingeniería: el TjMax de la CPU no equivale a la temperatura de unión de la VRAM ni a los umbrales de las etapas VRM.
           </span>
           <span className="text-zinc-500 text-[10px] uppercase hidden sm:inline shrink-0">
             SIGUIENTE: MITO 05 // VENTILADORES AL 100% →

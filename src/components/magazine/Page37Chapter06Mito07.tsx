@@ -19,13 +19,13 @@ export const Page37Chapter06Mito07: React.FC = () => {
           idMito="MITO-07"
           consejoPopular="Cada vez que salga una nueva versión de drivers de tu placa de video, reiniciá obligatoriamente en Modo Seguro, pasá DDU para borrar todo rastro del sistema y reinstalá de cero: de lo contrario tendrás caídas de FPS y corrupción de texturas."
           fuentePopular="Recomendación omnipresente en comunidades de soporte técnico y foros"
-          realidadTecnica="Los instaladores oficiales modernos de NVIDIA y AMD gestionan el reemplazo atómico de binarios y claves del registro de forma completamente limpia mediante la opción nativa 'Instalación limpia' (Clean Install). DDU borra de cuajo la caché compilada de sombreadores (DirectX Shader Cache), los perfiles de color ICC calibrados y las configuraciones específicas del panel. Al pasar DDU innecesariamente, la próxima vez que abras tus juegos sufrirás intensos micro-tirones (stuttering de compilación de shaders en tiempo real) durante las primeras horas de juego."
-          experimento="Ensayo comparativo pericial durante 6 meses de actualizaciones continuas: A) Actualización estándar sobre el driver existente marcando 'Instalación limpia' vs. B) Pasada agresiva de DDU en Modo Seguro antes de cada versión."
-          herramientaMedicion="CapFrameX Frametime Logger + 3DMark Time Spy Graphics Score"
+          realidadTecnica="Los instaladores oficiales de NVIDIA, AMD e Intel realizan habitualmente la sustitución de binarios y registros de forma ordenada sin requerir utilidades externas. DDU (Display Driver Uninstaller) es una herramienta excelente y muy útil para diagnóstico, resolución de conflictos graves o al realizar un cambio de fabricante de GPU. Sin embargo, utilizarla de manera obligatoria y rutinaria en cada actualización común es innecesario: elimina configuraciones personalizadas y borra cachés de sombreadores que luego deberán reconstruirse temporalmente. Para el mantenimiento habitual, la actualización oficial (o la opción de instalación limpia del propio instalador) resulta plenamente adecuada."
+          experimento="Protocolo EVO: comparativa entre actualización estándar del controlador oficial frente a desinstalación profunda con DDU en Modo Seguro en actualizaciones consecutivas sobre el mismo hardware."
+          herramientaMedicion="Herramienta de análisis de frametime (CapFrameX) + benchmark gráfico"
           resultado="no-cambio"
-          resultadoDetalle="Puntaje de 3DMark idéntico (18.450 vs 18.442 pts). Cero diferencia en rendimiento final. Sin embargo, el sistema sometido a DDU experimentó tartamudeos severos durante los primeros 15 minutos en cada juego mientras reconstruía la caché de shaders en disco."
-          riesgo="Pérdida de calibraciones de pantalla, desconfiguración de perfiles de G-Sync y micro-stuttering por recompilación continua de sombreadores."
-          comoRevertirlo="Usar DDU exclusivamente como herramienta de emergencia cuando cambiaste físicamente de fabricante de GPU (ej. de NVIDIA a AMD o viceversa) o si sufrís una pantalla azul atribuible directamente a nvlddmkm.sys o amdkmdag.sys que persiste tras reiniciar."
+          resultadoDetalle="En un sistema sano, utilizar DDU de rutina no implica por sí mismo una mejora de rendimiento. Reservalo para escenarios donde exista una razón técnica para una desinstalación profunda."
+          riesgo="Reinicio redundante en modo seguro, pérdida de perfiles de color o configuraciones personalizadas del panel de control y posibles tirones transitorios mientras se recompilan sombreadores."
+          comoRevertirlo="Reservar el uso de DDU para situaciones justificadas: cambio de fabricante de tarjeta gráfica, resolución de fallos persistentes de pantalla azul o cuando una actualización falló y dejó registros corruptos. Para el día a día, emplear el instalador oficial."
           fullPage={true}
         />
 
