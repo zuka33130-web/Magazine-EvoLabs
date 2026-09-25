@@ -21,6 +21,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { UserHardwarePassport } from '../../types';
+import { HardwareSensorService } from '../evoLabCore/services/hardwareSensorService';
 
 interface EvoAutoDetectPcModalProps {
   isOpen: boolean;
@@ -46,12 +47,63 @@ export const EvoAutoDetectPcModal: React.FC<EvoAutoDetectPcModalProps> = ({
     VRAM_GB?: number;
     RAM_GB?: number;
     RAM_Speed?: number;
+    RAM_Spd_Speed?: number;
+    Provenance?: string;
   } | null>(null);
   const [successNotice, setSuccessNotice] = useState(false);
+  const [isSamplingLive, setIsSamplingLive] = useState(false);
+
+  const handleLiveBrowserDetect = async () => {
+    setIsSamplingLive(true);
+    setParseError(null);
+    try {
+      const { report, machine } = await HardwareSensorService.sampleLiveSilicon();
+      const newPassport: UserHardwarePassport = {
+        cpuModel: report.cpu.inferredModel,
+        cpuCores: `${report.cpu.estimatedCores}c / ${report.cpu.logicalCores}t`,
+        ramSizeGb: report.memory.deviceMemoryGb,
+        ramSpeedMhz: report.memory.estimatedSpeedMts,
+        ramSpdSpeedMhz: report.memory.estimatedSpeedMts,
+        ramType: report.memory.type === 'UNKNOWN' ? 'DDR4' : report.memory.type,
+        gpuModel: report.gpu.cleanModel,
+        vramGb: report.gpu.estimatedVramGb,
+        storageType: 'NVMe M.2 SSD',
+        displayHz: report.display.refreshHz,
+        capturedAt: new Date().toISOString(),
+        provenance: 'DETECTED',
+      };
+
+      setParsedData({
+        CPU: report.cpu.inferredModel,
+        Cores: report.cpu.estimatedCores,
+        Threads: report.cpu.logicalCores,
+        GPU: report.gpu.cleanModel,
+        VRAM_GB: report.gpu.estimatedVramGb,
+        RAM_GB: report.memory.deviceMemoryGb,
+        RAM_Speed: report.memory.estimatedSpeedMts,
+        Provenance: 'DETECTED',
+      });
+
+      localStorage.setItem('evo_c01_specs', JSON.stringify(newPassport));
+      localStorage.setItem('evo_lab_core_active_machine_v1', JSON.stringify(machine));
+      localStorage.setItem('evo_autodetected_hardware', JSON.stringify(newPassport));
+      window.dispatchEvent(new Event('evo_hardware_updated'));
+
+      if (onHardwareDetected) {
+        onHardwareDetected(newPassport);
+      }
+      setSuccessNotice(true);
+    } catch (err: any) {
+      console.error('Error auto-detecting hardware:', err);
+      setParseError('No se pudo completar la telemetría en vivo del navegador. Podés utilizar el script PowerShell abajo.');
+    } finally {
+      setIsSamplingLive(false);
+    }
+  };
 
   if (!isOpen) return null;
 
-  const powershellCommand = `powershell -NoProfile -ExecutionPolicy Bypass -Command "$c=Get-CimInstance Win32_Processor | Select-Object -First 1; $v=Get-CimInstance Win32_VideoController | Select-Object -First 1; $m=Get-CimInstance Win32_PhysicalMemory; [PSCustomObject]@{CPU=$c.Name; Cores=$c.NumberOfCores; Threads=$c.NumberOfLogicalProcessors; GPU=$v.Name; VRAM_GB=if($v.AdapterRAM){[math]::Round($v.AdapterRAM/1GB,1)}else{0}; RAM_GB=[math]::Round(($m | Measure-Object Capacity -Sum).Sum/1GB,1); RAM_Speed=($m | Select-Object -First 1).Speed} | ConvertTo-Json -Compress | Set-Clipboard"`;
+  const powershellCommand = `powershell -NoProfile -ExecutionPolicy Bypass -Command "$c=Get-CimInstance Win32_Processor | Select-Object -First 1; $v=Get-CimInstance Win32_VideoController | Select-Object -First 1; $m=Get-CimInstance Win32_PhysicalMemory; $firstMem=$m | Select-Object -First 1; $cfgSpeed=if($firstMem.ConfiguredClockSpeed){$firstMem.ConfiguredClockSpeed}else{$firstMem.Speed}; [PSCustomObject]@{CPU=$c.Name; Cores=$c.NumberOfCores; Threads=$c.NumberOfLogicalProcessors; GPU=$v.Name; VRAM_GB=if($v.AdapterRAM){[math]::Round($v.AdapterRAM/1GB,1)}else{0}; RAM_GB=[math]::Round(($m | Measure-Object Capacity -Sum).Sum/1GB,1); RAM_Speed=$cfgSpeed; RAM_Spd_Speed=$firstMem.Speed; Provenance='SYSTEM_REPORTED'} | ConvertTo-Json -Compress | Set-Clipboard"`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(powershellCommand);
@@ -65,11 +117,11 @@ export const EvoAutoDetectPcModal: React.FC<EvoAutoDetectPcModalProps> = ({
       const zip = new JSZip();
 
       const cmdScriptContent = `@echo off
-title EVO LABS // TELEMETRIA NATIVA
+title EVO LABS // TELEMETRIA NATIVA DE SILICIO
 echo ===================================================
 echo [EVO LABS] Analizando hardware desde el silicio...
 echo ===================================================
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$c=Get-CimInstance Win32_Processor | Select-Object -First 1; $v=Get-CimInstance Win32_VideoController | Select-Object -First 1; $m=Get-CimInstance Win32_PhysicalMemory; [PSCustomObject]@{CPU=$c.Name; Cores=$c.NumberOfCores; Threads=$c.NumberOfLogicalProcessors; GPU=$v.Name; VRAM_GB=if($v.AdapterRAM){[math]::Round($v.AdapterRAM/1GB,1)}else{0}; RAM_GB=[math]::Round(($m | Measure-Object Capacity -Sum).Sum/1GB,1); RAM_Speed=($m | Select-Object -First 1).Speed} | ConvertTo-Json -Compress | Set-Clipboard"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$c=Get-CimInstance Win32_Processor | Select-Object -First 1; $v=Get-CimInstance Win32_VideoController | Select-Object -First 1; $m=Get-CimInstance Win32_PhysicalMemory; $firstMem=$m | Select-Object -First 1; $cfgSpeed=if($firstMem.ConfiguredClockSpeed){$firstMem.ConfiguredClockSpeed}else{$firstMem.Speed}; [PSCustomObject]@{CPU=$c.Name; Cores=$c.NumberOfCores; Threads=$c.NumberOfLogicalProcessors; GPU=$v.Name; VRAM_GB=if($v.AdapterRAM){[math]::Round($v.AdapterRAM/1GB,1)}else{0}; RAM_GB=[math]::Round(($m | Measure-Object Capacity -Sum).Sum/1GB,1); RAM_Speed=$cfgSpeed; RAM_Spd_Speed=$firstMem.Speed; Provenance='SYSTEM_REPORTED'} | ConvertTo-Json -Compress | Set-Clipboard"
 echo.
 echo [OK] Telemetria pericial copiada al portapapeles con exito.
 echo Volve a la web de EVO LABS y pega el resultado (Ctrl+V) en el cajon.
@@ -133,12 +185,14 @@ timeout /t 4 >nul
         cpuCores: parsed.Cores ? `${parsed.Cores}c / ${parsed.Threads || parsed.Cores}t` : 'Multi-Core',
         ramSizeGb: parsed.RAM_GB ? Math.round(parsed.RAM_GB) : 16,
         ramSpeedMhz: parsed.RAM_Speed ? parsed.RAM_Speed : 3200,
+        ramSpdSpeedMhz: parsed.RAM_Spd_Speed ? parsed.RAM_Spd_Speed : parsed.RAM_Speed || 3200,
         ramType: parsed.RAM_Speed && parsed.RAM_Speed > 4400 ? 'DDR5' : 'DDR4',
         gpuModel: parsed.GPU || 'GPU Desconocida',
         vramGb: parsed.VRAM_GB ? Math.round(parsed.VRAM_GB) : 8,
         storageType: 'NVMe M.2 SSD',
         displayHz: 144,
         capturedAt: new Date().toISOString(),
+        provenance: 'SYSTEM_REPORTED',
       };
 
       // Save to localStorage
@@ -206,7 +260,60 @@ timeout /t 4 >nul
 
         {/* Scrollable Content */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-6 text-xs text-zinc-300">
-          
+          {/* OPTION 1: INSTANT LIVE BROWSER SILICON SENSOR (1-CLICK) */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-cyan-950/30 to-[#0e1219] border border-emerald-500/50 shadow-xl space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                  <Zap className="w-4 h-4 fill-current" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
+                    OPCIÓN INMEDIATA // EN VIVO (1 CLIC)
+                  </span>
+                  <h3 className="font-display font-black text-sm sm:text-base text-white uppercase">
+                    DETECTAR SILICIO EN ESTE NAVEGADOR
+                  </h3>
+                </div>
+              </div>
+
+              <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                100% CERO COMANDOS
+              </span>
+            </div>
+
+            <p className="text-[11px] text-zinc-300 font-sans-editorial leading-relaxed">
+              Lee directamente la GPU física via WebGL (<code className="text-emerald-300 font-mono">WEBGL_debug_renderer_info</code>), núcleos concurrentes de la CPU (<code className="text-emerald-300 font-mono">hardwareConcurrency</code>), memoria, resolución y tasa real de refresco de pantalla.
+            </p>
+
+            <button
+              type="button"
+              onClick={handleLiveBrowserDetect}
+              disabled={isSamplingLive}
+              className="w-full py-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.3)] disabled:opacity-50"
+            >
+              {isSamplingLive ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>SONDEANDO SILICIO FÍSICO...</span>
+                </>
+              ) : (
+                <>
+                  <Zap className="w-4 h-4 fill-current" />
+                  <span>DETECTAR HARDWARE EN VIVO AHORA</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-zinc-800" />
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              O SI QUERÉS TELEMETRÍA PROFUNDA WMI/POWERSHELL (PLACAS BASE Y SPD)
+            </span>
+            <div className="h-px flex-1 bg-zinc-800" />
+          </div>
+
           {/* Aerospace Security Assurance Banner */}
           <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30 flex items-start gap-3">
             <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />

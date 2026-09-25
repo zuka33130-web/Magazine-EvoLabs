@@ -188,7 +188,6 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
               passport={passport}
               activeOverlay={activeOverlay}
               setActiveOverlay={setActiveOverlay}
-              onSelectComponent={(id, name, detail) => setInspectedComponent({ id, name, detail })}
             />
 
             {/* Quick launch cards below the schematic */}

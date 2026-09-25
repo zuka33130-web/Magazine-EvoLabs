@@ -29,13 +29,14 @@ import { Tomo03MagazineView } from './components/tomo03/Tomo03MagazineView';
 import { Tomo04MagazineView } from './components/tomo04/Tomo04MagazineView';
 import { EvoMasterLabSuite } from './components/world/labs/EvoMasterLabSuite';
 import { EvoWindowsMatrixLab } from './components/world/labs/windowsMatrix/EvoWindowsMatrixLab';
+import { EvoLabCore } from './components/evoLabCore/EvoLabCore';
 import { ForensicBenchTarget } from './components/common/EvoTomoDossierModal';
 import { CheckCircle2, X } from 'lucide-react';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<
-    'magazine' | 'tomo-02' | 'tomo-03' | 'tomo-04' | 'world-map' | 'archivo' | 'cover' | 'index' | 'chapter-01' | 'chapter-02' | 'chapter-03' | 'chapter-04' | 'chapter-05' | 'chapter-06' | 'chapter-07' | 'hotswap-lab' | 'windows-matrix-lab'
-  >('hotswap-lab');
+    'magazine' | 'tomo-02' | 'tomo-03' | 'tomo-04' | 'world-map' | 'archivo' | 'cover' | 'index' | 'chapter-01' | 'chapter-02' | 'chapter-03' | 'chapter-04' | 'chapter-05' | 'chapter-06' | 'chapter-07' | 'hotswap-lab' | 'windows-matrix-lab' | 'lab-core'
+  >('lab-core');
   const [matrixInitialScenario, setMatrixInitialScenario] = useState<string | undefined>(undefined);
   const [isIntroActive, setIsIntroActive] = useState<boolean>(false);
   const [activeProfile, setActiveProfile] = useState<EvoNarrativeProfile>('investigador');
@@ -54,7 +55,17 @@ export default function App() {
     try {
       const url = new URL(window.location.href);
       const vol = url.searchParams.get('volume');
-      if (vol === '02') {
+      const viewParam = url.searchParams.get('view');
+      if (viewParam === 'hotswap') {
+        setCurrentView('hotswap-lab');
+        setIsIntroActive(false);
+      } else if (viewParam === 'matrix') {
+        setCurrentView('windows-matrix-lab');
+        setIsIntroActive(false);
+      } else if (viewParam === 'core' || viewParam === 'lab-core') {
+        setCurrentView('lab-core');
+        setIsIntroActive(false);
+      } else if (vol === '02') {
         setCurrentView('tomo-02');
         setIsIntroActive(false);
       } else if (vol === '03') {
@@ -795,6 +806,10 @@ export default function App() {
         onNavigateTomo04={handleNavigateTomo04}
         onNavigateMagazine={() => setCurrentView('magazine')}
         onNavigateHotSwapLab={() => setCurrentView('hotswap-lab')}
+        onNavigateLabCore={() => {
+          setCurrentView('lab-core');
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        }}
         onNavigateWindowsMatrixLab={() => {
           setMatrixInitialScenario(undefined);
           setCurrentView('windows-matrix-lab');
@@ -807,6 +822,18 @@ export default function App() {
 
       {/* Main View Container */}
       <main className="flex-1 w-full">
+        {currentView === 'lab-core' && (
+          <EvoLabCore
+            onNavigateToTomo={handleNavigateTomo}
+            onOpenGlobalAutoDetectModal={() => {
+              // Can open auto detect modal or trigger update
+              const event = new CustomEvent('evo_open_autodetect');
+              window.dispatchEvent(event);
+            }}
+            onExitToWorld={handleNavigateHome}
+          />
+        )}
+
         {currentView === 'windows-matrix-lab' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-6">
             <EvoWindowsMatrixLab

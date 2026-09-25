@@ -790,6 +790,7 @@ export interface UserHardwarePassport {
   ramCapacityGb?: number;
   ramSizeGb?: number;
   ramSpeedMhz?: number;
+  ramSpdSpeedMhz?: number;
   ramType?: string;
   gpuModel?: string;
   vramGb?: number;
@@ -799,6 +800,7 @@ export interface UserHardwarePassport {
   capturedAt?: string;
   osVersion?: string;
   isVerified?: boolean;
+  provenance?: 'MEASURED' | 'SYSTEM_REPORTED' | 'DETECTED' | 'ESTIMATED' | 'SIMULATED';
 }
 
 export interface EvoLabZone {

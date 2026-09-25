@@ -19,6 +19,7 @@ interface HeaderProps {
   onNavigateMagazine?: () => void;
   onNavigateHotSwapLab?: () => void;
   onNavigateWindowsMatrixLab?: () => void;
+  onNavigateLabCore?: () => void;
   onOpenForensicBench?: (target: ForensicBenchTarget) => void;
   activeProfile?: EvoNarrativeProfile;
   onReplayIntro?: () => void;
@@ -38,6 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigateMagazine,
   onNavigateHotSwapLab,
   onNavigateWindowsMatrixLab,
+  onNavigateLabCore,
   onOpenForensicBench,
   activeProfile = 'investigador',
   onReplayIntro,
@@ -285,6 +287,23 @@ export const Header: React.FC<HeaderProps> = ({
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
                   <span className="hidden sm:inline">SIMULADOR & LAB</span>
                   <span className="sm:hidden">SIMULADOR</span>
+                </button>
+              )}
+
+              {onNavigateLabCore && (
+                <button
+                  type="button"
+                  onClick={onNavigateLabCore}
+                  className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ml-1 font-bold ${
+                    currentView === 'lab-core'
+                      ? 'bg-gradient-to-r from-amber-400 via-emerald-400 to-cyan-400 text-black shadow-[0_0_18px_rgba(251,191,36,0.5)] border border-amber-300'
+                      : 'bg-gradient-to-r from-amber-500/20 to-cyan-500/20 hover:from-amber-400 hover:to-cyan-300 text-amber-300 hover:text-black border border-amber-400/50 shadow-[0_0_12px_rgba(251,191,36,0.2)]'
+                  }`}
+                  title="Abrir EVO LABS CORE V1 — Nuevo Laboratorio Digital Unificado"
+                >
+                  <Zap className="w-3.5 h-3.5 text-amber-400 group-hover:text-black fill-current" />
+                  <span className="hidden sm:inline">NUEVO LABORATORIO</span>
+                  <span className="sm:hidden">LAB CORE</span>
                 </button>
               )}
 
