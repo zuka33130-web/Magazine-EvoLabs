@@ -106,7 +106,7 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
   // Subsystem selection & interactive highlight state
   const [selectedSubsystem, setSelectedSubsystem] = useState<SubsystemIdentifier>('CPU');
   const [highlightedSubsystem, setHighlightedSubsystem] = useState<string | null>(null);
-  const [activeTelemetryTab, setActiveTelemetryTab] = useState<'LOADS' | 'THERMAL_CLOCKS' | 'POWER_FPS' | 'BOTTLENECK'>('LOADS');
+  const [activeTelemetryTab, setActiveTelemetryTab] = useState<'ALL_METRICS' | 'LOADS' | 'THERMAL_CLOCKS' | 'POWER_FPS' | 'BOTTLENECK'>('ALL_METRICS');
 
   // Upgrade Comparison State
   const [upgradeGpuModel, setUpgradeGpuModel] = useState<string>('NVIDIA GeForce RTX 4070 Ti SUPER 16GB');
@@ -900,8 +900,9 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
             </div>
 
             {/* Tabs for Telemetry Views */}
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-900 border border-zinc-800 text-xs">
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-900 border border-zinc-800 text-xs overflow-x-auto">
               {[
+                { id: 'ALL_METRICS', label: 'Todos los Sensores (11 Canales)' },
                 { id: 'LOADS', label: 'Cargas & Memoria' },
                 { id: 'THERMAL_CLOCKS', label: 'Térmico & Frecuencias' },
                 { id: 'POWER_FPS', label: 'PSU & Rendimiento FPS' },
@@ -911,7 +912,7 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTelemetryTab(tab.id as any)}
-                  className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer text-[11px] ${
+                  className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer text-[11px] whitespace-nowrap ${
                     activeTelemetryTab === tab.id
                       ? 'bg-cyan-400 text-black font-black shadow-sm'
                       : 'text-zinc-400 hover:text-white'
@@ -922,6 +923,263 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
               ))}
             </div>
           </div>
+
+          {/* TELEMETRY CHART TAB 0: ALL SENSORS (11 MULTI-TRACK SIGNALS) */}
+          {activeTelemetryTab === 'ALL_METRICS' && (
+            <div className="space-y-4">
+              {/* Live Signal Badges Strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-11 gap-1.5 text-center text-[10px]">
+                <div className="p-1.5 rounded-lg bg-black/60 border border-zinc-800">
+                  <div className="text-[8px] text-zinc-500 font-bold">CPU LOAD</div>
+                  <div className="font-mono font-black text-amber-400">{currentFrame.cpu.loadPct}%</div>
+                </div>
+                <div className="p-1.5 rounded-lg bg-black/60 border border-zinc-800">
+                  <div className="text-[8px] text-zinc-500 font-bold">GPU LOAD</div>
+                  <div className="font-mono font-black text-emerald-400">{currentFrame.gpu.loadPct}%</div>
+                </div>
+                <div className="p-1.5 rounded-lg bg-black/60 border border-zinc-800">
+                  <div className="text-[8px] text-zinc-500 font-bold">RAM USO</div>
+                  <div className="font-mono font-black text-cyan-400">{currentFrame.ram.usedGb}G</div>
+                </div>
+                <div className="p-1.5 rounded-lg bg-black/60 border border-zinc-800">
+                  <div className="text-[8px] text-zinc-500 font-bold">VRAM USO</div>
+                  <div className="font-mono font-black text-purple-400">{currentFrame.gpu.vramUsedGb}G</div>
+                </div>
+                <div className="p-1.5 rounded-lg bg-black/60 border border-zinc-800">
+                  <div className="text-[8px] text-zinc-500 font-bold">CPU TEMP</div>
+                  <div className="font-mono font-black text-rose-400">{currentFrame.cpu.temperatureC}°C</div>
+                </div>
+                <div className="p-1.5 rounded-lg bg-black/60 border border-zinc-800">
+                  <div className="text-[8px] text-zinc-500 font-bold">GPU TEMP</div>
+                  <div className="font-mono font-black text-emerald-400">{currentFrame.gpu.temperatureC}°C</div>
+                </div>
+                <div className="p-1.5 rounded-lg bg-black/60 border border-zinc-800">
+                  <div className="text-[8px] text-zinc-500 font-bold">CPU CLOCK</div>
+                  <div className="font-mono font-black text-amber-300">{(currentFrame.cpu.effectiveClockMhz / 1000).toFixed(2)}G</div>
+                </div>
+                <div className="p-1.5 rounded-lg bg-black/60 border border-zinc-800">
+                  <div className="text-[8px] text-zinc-500 font-bold">GPU CLOCK</div>
+                  <div className="font-mono font-black text-cyan-300">{currentFrame.gpu.effectiveClockMhz}M</div>
+                </div>
+                <div className="p-1.5 rounded-lg bg-black/60 border border-zinc-800">
+                  <div className="text-[8px] text-zinc-500 font-bold">PSU POWER</div>
+                  <div className="font-mono font-black text-yellow-400">{currentFrame.psu.estimatedLoadW}W</div>
+                </div>
+                <div className="p-1.5 rounded-lg bg-black/60 border border-zinc-800">
+                  <div className="text-[8px] text-zinc-500 font-bold">FPS ESTIMADO</div>
+                  <div className="font-mono font-black text-emerald-400">{currentFrame.fpsEstimate.averageFps}</div>
+                </div>
+                <div className="p-1.5 rounded-lg bg-black/60 border border-zinc-800 col-span-2 sm:col-span-1">
+                  <div className="text-[8px] text-zinc-500 font-bold">BOTTLENECK</div>
+                  <div className="font-mono font-black text-amber-400 truncate text-[9px]">
+                    {currentFrame.limitingFactor.split('_')[0]}
+                  </div>
+                </div>
+              </div>
+
+              {/* Dual Graphs: Loads & Clocks with Scrub Support */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Graph 1: Cargas & Memoria (CPU / GPU / RAM / VRAM) */}
+                <div className="p-3 rounded-xl bg-[#04060a] border border-zinc-850 space-y-2">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-bold text-white flex items-center gap-1.5">
+                      <Activity className="w-3.5 h-3.5 text-cyan-400" />
+                      CARGAS (%) & PRESIÓN DE MEMORIA
+                    </span>
+                    <span className="text-[10px] text-zinc-500 font-mono">0-100%</span>
+                  </div>
+
+                  <div
+                    className="h-36 w-full relative overflow-hidden cursor-crosshair"
+                    onClick={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                      handleScrubTimeline(Math.round(pct * Math.max(1, framesHistory.length - 1)));
+                    }}
+                  >
+                    {/* Gridlines */}
+                    <div className="absolute inset-0 flex flex-col justify-between p-2 pointer-events-none opacity-20">
+                      <div className="border-b border-zinc-600 w-full" />
+                      <div className="border-b border-zinc-600 w-full" />
+                      <div className="border-b border-zinc-600 w-full" />
+                    </div>
+
+                    {framesHistory.length >= 2 ? (
+                      <svg className="w-full h-full relative z-10" viewBox="0 0 800 140" preserveAspectRatio="none">
+                        {/* CPU */}
+                        <path
+                          d={`M ${framesHistory.map((f, idx, arr) => `${(idx / (arr.length - 1)) * 800},${140 - (f.cpu.loadPct / 100) * 130}`).join(' L ')}`}
+                          fill="none"
+                          stroke="#f59e0b"
+                          strokeWidth="2.2"
+                        />
+                        {/* GPU */}
+                        <path
+                          d={`M ${framesHistory.map((f, idx, arr) => `${(idx / (arr.length - 1)) * 800},${140 - (f.gpu.loadPct / 100) * 130}`).join(' L ')}`}
+                          fill="none"
+                          stroke="#10b981"
+                          strokeWidth="2.2"
+                        />
+                        {/* RAM */}
+                        <path
+                          d={`M ${framesHistory.map((f, idx, arr) => `${(idx / (arr.length - 1)) * 800},${140 - (f.ram.pressurePct / 100) * 130}`).join(' L ')}`}
+                          fill="none"
+                          stroke="#06b6d4"
+                          strokeWidth="1.8"
+                          strokeDasharray="4 3"
+                        />
+                        {/* VRAM */}
+                        <path
+                          d={`M ${framesHistory.map((f, idx, arr) => `${(idx / (arr.length - 1)) * 800},${140 - (f.gpu.vramPressurePct / 100) * 130}`).join(' L ')}`}
+                          fill="none"
+                          stroke="#a855f7"
+                          strokeWidth="1.8"
+                          strokeDasharray="2 2"
+                        />
+                        {/* Cursor line for current simulated second */}
+                        <line
+                          x1={(simulatedSecond / Math.max(1, framesHistory.length - 1)) * 800}
+                          y1="0"
+                          x2={(simulatedSecond / Math.max(1, framesHistory.length - 1)) * 800}
+                          y2="140"
+                          stroke="#ffffff"
+                          strokeWidth="1.5"
+                          strokeDasharray="3 3"
+                        />
+                      </svg>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-xs text-zinc-500 font-mono">
+                        Muestreando señales...
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between text-[9px] pt-1 border-t border-zinc-850 font-mono">
+                    <span className="text-amber-400 font-bold">CPU {currentFrame.cpu.loadPct}%</span>
+                    <span className="text-emerald-400 font-bold">GPU {currentFrame.gpu.loadPct}%</span>
+                    <span className="text-cyan-400">RAM {currentFrame.ram.pressurePct}%</span>
+                    <span className="text-purple-400">VRAM {currentFrame.gpu.vramPressurePct}%</span>
+                  </div>
+                </div>
+
+                {/* Graph 2: Térmica & Frecuencias (CPU Temp / GPU Temp / Clocks) */}
+                <div className="p-3 rounded-xl bg-[#04060a] border border-zinc-850 space-y-2">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-bold text-white flex items-center gap-1.5">
+                      <Thermometer className="w-3.5 h-3.5 text-rose-400" />
+                      TEMPERATURAS (°C) & CLOCKS
+                    </span>
+                    <span className="text-[10px] text-zinc-500 font-mono">Curvas térmicas</span>
+                  </div>
+
+                  <div
+                    className="h-36 w-full relative overflow-hidden cursor-crosshair"
+                    onClick={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                      handleScrubTimeline(Math.round(pct * Math.max(1, framesHistory.length - 1)));
+                    }}
+                  >
+                    <div className="absolute inset-0 flex flex-col justify-between p-2 pointer-events-none opacity-20">
+                      <div className="border-b border-zinc-600 w-full" />
+                      <div className="border-b border-zinc-600 w-full" />
+                      <div className="border-b border-zinc-600 w-full" />
+                    </div>
+
+                    {framesHistory.length >= 2 ? (
+                      <svg className="w-full h-full relative z-10" viewBox="0 0 800 140" preserveAspectRatio="none">
+                        {/* CPU Temp */}
+                        <path
+                          d={`M ${framesHistory.map((f, idx, arr) => `${(idx / (arr.length - 1)) * 800},${140 - (f.cpu.temperatureC / 105) * 130}`).join(' L ')}`}
+                          fill="none"
+                          stroke="#f43f5e"
+                          strokeWidth="2.2"
+                        />
+                        {/* GPU Temp */}
+                        <path
+                          d={`M ${framesHistory.map((f, idx, arr) => `${(idx / (arr.length - 1)) * 800},${140 - (f.gpu.temperatureC / 105) * 130}`).join(' L ')}`}
+                          fill="none"
+                          stroke="#10b981"
+                          strokeWidth="2.2"
+                        />
+                        {/* CPU Clock normalized */}
+                        <path
+                          d={`M ${framesHistory.map((f, idx, arr) => `${(idx / (arr.length - 1)) * 800},${140 - (f.cpu.effectiveClockMhz / 5800) * 130}`).join(' L ')}`}
+                          fill="none"
+                          stroke="#f59e0b"
+                          strokeWidth="1.5"
+                          strokeDasharray="4 3"
+                        />
+                        {/* Cursor line */}
+                        <line
+                          x1={(simulatedSecond / Math.max(1, framesHistory.length - 1)) * 800}
+                          y1="0"
+                          x2={(simulatedSecond / Math.max(1, framesHistory.length - 1)) * 800}
+                          y2="140"
+                          stroke="#ffffff"
+                          strokeWidth="1.5"
+                          strokeDasharray="3 3"
+                        />
+                      </svg>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-xs text-zinc-500 font-mono">
+                        Muestreando señales...
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between text-[9px] pt-1 border-t border-zinc-850 font-mono">
+                    <span className="text-rose-400 font-bold">CPU {currentFrame.cpu.temperatureC}°C</span>
+                    <span className="text-emerald-400 font-bold">GPU {currentFrame.gpu.temperatureC}°C</span>
+                    <span className="text-amber-300">{(currentFrame.cpu.effectiveClockMhz / 1000).toFixed(2)} GHz</span>
+                    <span className="text-cyan-300">{currentFrame.gpu.effectiveClockMhz} MHz</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Strip: Dynamic Bottleneck Over Time Ribbon */}
+              <div className="space-y-1.5 pt-1">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="font-bold text-white flex items-center gap-1.5">
+                    <Activity className="w-3.5 h-3.5 text-amber-400" />
+                    EVOLUCIÓN TEMPORAL DEL CUELLO DE BOTELLA
+                  </span>
+                  <span className="text-[10px] text-zinc-400 font-mono">
+                    {DynamicBottleneckEngine.getFactorLabel(currentFrame.limitingFactor)} ({currentFrame.limitingFactorReasonEs})
+                  </span>
+                </div>
+
+                <div className="w-full h-7 rounded-xl overflow-hidden flex bg-zinc-950 border border-zinc-800 p-0.5">
+                  {framesHistory.map((f, idx) => {
+                    const factor = f.limitingFactor;
+                    const bg =
+                      factor === 'HEALTHY_GPU_BOUND'
+                        ? 'bg-emerald-500'
+                        : factor.includes('THERMAL')
+                        ? 'bg-rose-500'
+                        : factor.includes('VRAM')
+                        ? 'bg-purple-500'
+                        : factor.includes('CPU')
+                        ? 'bg-cyan-500'
+                        : factor.includes('PSU')
+                        ? 'bg-yellow-500'
+                        : 'bg-zinc-600';
+
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => handleScrubTimeline(idx)}
+                        title={`${f.timeFormatted}: ${DynamicBottleneckEngine.getFactorLabel(factor)}`}
+                        className={`flex-1 h-full ${bg} hover:opacity-100 cursor-pointer transition-opacity ${
+                          idx === simulatedSecond ? 'ring-2 ring-white scale-105 z-10' : 'opacity-80'
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* TELEMETRY CHART TAB 1: LOADS & MEMORY */}
           {activeTelemetryTab === 'LOADS' && (
@@ -945,7 +1203,14 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
               </div>
 
               {/* Multi-series SVG Graph */}
-              <div className="h-44 w-full rounded-xl bg-[#04060a] border border-zinc-850 p-2 relative overflow-hidden flex flex-col justify-between">
+              <div
+                className="h-44 w-full rounded-xl bg-[#04060a] border border-zinc-850 p-2 relative overflow-hidden flex flex-col justify-between cursor-crosshair"
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                  handleScrubTimeline(Math.round(pct * Math.max(1, framesHistory.length - 1)));
+                }}
+              >
                 {/* Horizontal Gridlines */}
                 <div className="absolute inset-0 flex flex-col justify-between p-3 pointer-events-none opacity-20">
                   <div className="border-b border-zinc-600 w-full" />
@@ -978,7 +1243,7 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
                       fill="none"
                       stroke="#06b6d4"
                       strokeWidth="2"
-                      strokeDasharray="4,4"
+                      strokeDasharray="4 4"
                       strokeLinecap="round"
                     />
                     {/* VRAM Line */}
@@ -987,8 +1252,17 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
                       fill="none"
                       stroke="#a855f7"
                       strokeWidth="2"
-                      strokeDasharray="2,2"
+                      strokeDasharray="2 2"
                       strokeLinecap="round"
+                    />
+                    <line
+                      x1={(simulatedSecond / Math.max(1, framesHistory.length - 1)) * 800}
+                      y1="0"
+                      x2={(simulatedSecond / Math.max(1, framesHistory.length - 1)) * 800}
+                      y2="160"
+                      stroke="#ffffff"
+                      strokeWidth="1.5"
+                      strokeDasharray="3 3"
                     />
                   </svg>
                 ) : (
@@ -1021,7 +1295,14 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
                 <span className="text-[10px] text-zinc-500 font-mono">Térmica & Frecuencia Efectiva</span>
               </div>
 
-              <div className="h-44 w-full rounded-xl bg-[#04060a] border border-zinc-850 p-2 relative overflow-hidden flex flex-col justify-between">
+              <div
+                className="h-44 w-full rounded-xl bg-[#04060a] border border-zinc-850 p-2 relative overflow-hidden flex flex-col justify-between cursor-crosshair"
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                  handleScrubTimeline(Math.round(pct * Math.max(1, framesHistory.length - 1)));
+                }}
+              >
                 <div className="absolute inset-0 flex flex-col justify-between p-3 pointer-events-none opacity-20">
                   <div className="border-b border-zinc-600 w-full" />
                   <div className="border-b border-zinc-600 w-full" />
@@ -1053,7 +1334,16 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
                       fill="none"
                       stroke="#f59e0b"
                       strokeWidth="1.8"
-                      strokeDasharray="4,4"
+                      strokeDasharray="4 4"
+                    />
+                    <line
+                      x1={(simulatedSecond / Math.max(1, framesHistory.length - 1)) * 800}
+                      y1="0"
+                      x2={(simulatedSecond / Math.max(1, framesHistory.length - 1)) * 800}
+                      y2="160"
+                      stroke="#ffffff"
+                      strokeWidth="1.5"
+                      strokeDasharray="3 3"
                     />
                   </svg>
                 ) : (
@@ -1083,7 +1373,14 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
                 <span className="text-[10px] text-zinc-500 font-mono">Entrega de Potencia DC & Framerate</span>
               </div>
 
-              <div className="h-44 w-full rounded-xl bg-[#04060a] border border-zinc-850 p-2 relative overflow-hidden flex flex-col justify-between">
+              <div
+                className="h-44 w-full rounded-xl bg-[#04060a] border border-zinc-850 p-2 relative overflow-hidden flex flex-col justify-between cursor-crosshair"
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                  handleScrubTimeline(Math.round(pct * Math.max(1, framesHistory.length - 1)));
+                }}
+              >
                 <div className="absolute inset-0 flex flex-col justify-between p-3 pointer-events-none opacity-20">
                   <div className="border-b border-zinc-600 w-full" />
                   <div className="border-b border-zinc-600 w-full" />
@@ -1115,7 +1412,16 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
                       fill="none"
                       stroke="#06b6d4"
                       strokeWidth="2"
-                      strokeDasharray="4,4"
+                      strokeDasharray="4 4"
+                    />
+                    <line
+                      x1={(simulatedSecond / Math.max(1, framesHistory.length - 1)) * 800}
+                      y1="0"
+                      x2={(simulatedSecond / Math.max(1, framesHistory.length - 1)) * 800}
+                      y2="160"
+                      stroke="#ffffff"
+                      strokeWidth="1.5"
+                      strokeDasharray="3 3"
                     />
                   </svg>
                 ) : (

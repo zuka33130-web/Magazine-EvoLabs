@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { UserHardwarePassport } from '../../types';
 import { HardwareSensorService } from '../evoLabCore/services/hardwareSensorService';
+import { WindowsDetectionService } from '../evoLabCore/services/windowsDetectionService';
 
 interface EvoAutoDetectPcModalProps {
   isOpen: boolean;
@@ -103,7 +104,7 @@ export const EvoAutoDetectPcModal: React.FC<EvoAutoDetectPcModalProps> = ({
 
   if (!isOpen) return null;
 
-  const powershellCommand = `powershell -NoProfile -ExecutionPolicy Bypass -Command "$c=Get-CimInstance Win32_Processor | Select-Object -First 1; $v=Get-CimInstance Win32_VideoController | Select-Object -First 1; $m=Get-CimInstance Win32_PhysicalMemory; $firstMem=$m | Select-Object -First 1; $cfgSpeed=if($firstMem.ConfiguredClockSpeed){$firstMem.ConfiguredClockSpeed}else{$firstMem.Speed}; [PSCustomObject]@{CPU=$c.Name; Cores=$c.NumberOfCores; Threads=$c.NumberOfLogicalProcessors; GPU=$v.Name; VRAM_GB=if($v.AdapterRAM){[math]::Round($v.AdapterRAM/1GB,1)}else{0}; RAM_GB=[math]::Round(($m | Measure-Object Capacity -Sum).Sum/1GB,1); RAM_Speed=$cfgSpeed; RAM_Spd_Speed=$firstMem.Speed; Provenance='SYSTEM_REPORTED'} | ConvertTo-Json -Compress | Set-Clipboard"`;
+  const powershellCommand = WindowsDetectionService.POWERSHELL_COMMAND;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(powershellCommand);
@@ -116,18 +117,7 @@ export const EvoAutoDetectPcModal: React.FC<EvoAutoDetectPcModalProps> = ({
       setIsDownloadingZip(true);
       const zip = new JSZip();
 
-      const cmdScriptContent = `@echo off
-title EVO LABS // TELEMETRIA NATIVA DE SILICIO
-echo ===================================================
-echo [EVO LABS] Analizando hardware desde el silicio...
-echo ===================================================
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$c=Get-CimInstance Win32_Processor | Select-Object -First 1; $v=Get-CimInstance Win32_VideoController | Select-Object -First 1; $m=Get-CimInstance Win32_PhysicalMemory; $firstMem=$m | Select-Object -First 1; $cfgSpeed=if($firstMem.ConfiguredClockSpeed){$firstMem.ConfiguredClockSpeed}else{$firstMem.Speed}; [PSCustomObject]@{CPU=$c.Name; Cores=$c.NumberOfCores; Threads=$c.NumberOfLogicalProcessors; GPU=$v.Name; VRAM_GB=if($v.AdapterRAM){[math]::Round($v.AdapterRAM/1GB,1)}else{0}; RAM_GB=[math]::Round(($m | Measure-Object Capacity -Sum).Sum/1GB,1); RAM_Speed=$cfgSpeed; RAM_Spd_Speed=$firstMem.Speed; Provenance='SYSTEM_REPORTED'} | ConvertTo-Json -Compress | Set-Clipboard"
-echo.
-echo [OK] Telemetria pericial copiada al portapapeles con exito.
-echo Volve a la web de EVO LABS y pega el resultado (Ctrl+V) en el cajon.
-echo.
-timeout /t 4 >nul
-`;
+      const cmdScriptContent = WindowsDetectionService.generateBatchScript();
 
       zip.file('EVO_Telemetria.cmd', cmdScriptContent);
       const blobContent = await zip.generateAsync({
@@ -162,35 +152,28 @@ timeout /t 4 >nul
     }
 
     try {
-      // Find json in text if user pasted extra text
-      const cleanInput = jsonInput.trim();
-      const firstBrace = cleanInput.indexOf('{');
-      const lastBrace = cleanInput.lastIndexOf('}');
-      if (firstBrace === -1 || lastBrace === -1) {
-        throw new Error('No se encontró un bloque JSON válido {...} en el texto pegado.');
-      }
+      const parsed = WindowsDetectionService.parsePayload(jsonInput);
+      setParsedData(parsed as any);
 
-      const jsonSub = cleanInput.substring(firstBrace, lastBrace + 1);
-      const parsed = JSON.parse(jsonSub);
+      // Construct legitimate Machine with zero fake defaults
+      const machine = WindowsDetectionService.buildMachineFromTelemetry(parsed);
 
-      if (!parsed.CPU && !parsed.GPU && !parsed.RAM_GB) {
-        throw new Error('El JSON no contiene campos reconocibles de hardware (CPU, GPU o RAM_GB).');
-      }
-
-      setParsedData(parsed);
-
-      // Create hardware passport
+      // Create hardware passport matching detected machine exactly
       const newPassport: UserHardwarePassport = {
-        cpuModel: parsed.CPU || 'CPU Desconocida',
-        cpuCores: parsed.Cores ? `${parsed.Cores}c / ${parsed.Threads || parsed.Cores}t` : 'Multi-Core',
-        ramSizeGb: parsed.RAM_GB ? Math.round(parsed.RAM_GB) : 16,
-        ramSpeedMhz: parsed.RAM_Speed ? parsed.RAM_Speed : 3200,
-        ramSpdSpeedMhz: parsed.RAM_Spd_Speed ? parsed.RAM_Spd_Speed : parsed.RAM_Speed || 3200,
-        ramType: parsed.RAM_Speed && parsed.RAM_Speed > 4400 ? 'DDR5' : 'DDR4',
-        gpuModel: parsed.GPU || 'GPU Desconocida',
-        vramGb: parsed.VRAM_GB ? Math.round(parsed.VRAM_GB) : 8,
-        storageType: 'NVMe M.2 SSD',
-        displayHz: 144,
+        cpuModel: machine.cpu.model,
+        cpuCores: `${machine.cpu.cores}c / ${machine.cpu.threads}t`,
+        cores: machine.cpu.cores,
+        threads: machine.cpu.threads,
+        ramCapacityGb: machine.ram.sizeGb,
+        ramSizeGb: machine.ram.sizeGb,
+        ramSpeedMhz: machine.ram.configuredSpeedMts,
+        ramSpdSpeedMhz: machine.ram.spdSpeedMts,
+        ramType: machine.ram.type,
+        gpuModel: machine.gpu.model,
+        vramGb: machine.gpu.vramGb > 0 ? machine.gpu.vramGb : undefined,
+        storageType: machine.storage.type !== 'UNKNOWN' ? machine.storage.type : undefined,
+        storageModel: machine.storage.model !== 'UNKNOWN' ? machine.storage.model : undefined,
+        displayHz: machine.display?.refreshHz && machine.display.refreshHz > 0 ? machine.display.refreshHz : undefined,
         capturedAt: new Date().toISOString(),
         provenance: 'SYSTEM_REPORTED',
       };
@@ -199,6 +182,7 @@ timeout /t 4 >nul
       try {
         localStorage.setItem('evo_c01_specs', JSON.stringify(newPassport));
         localStorage.setItem('evo_autodetected_hardware', JSON.stringify(parsed));
+        localStorage.setItem('evo_lab_core_active_machine_v1', JSON.stringify(machine));
         // Dispatch storage event so other components update live
         window.dispatchEvent(new Event('evo_hardware_updated'));
       } catch (err) {

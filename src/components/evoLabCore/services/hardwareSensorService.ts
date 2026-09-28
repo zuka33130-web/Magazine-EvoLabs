@@ -268,53 +268,64 @@ export class HardwareSensorService {
       isDetected: true,
       detectedAt: new Date().toISOString(),
       overallProvenance: 'DETECTED',
-      notes: `Telemetría física en vivo: ${logicalCores} hilos CPU, ${deviceMem}GB RAM, ${cleanGpuModel} (${rawRenderer}), pantalla ${screenWidth}x${screenHeight}@${refreshHz}Hz.`,
+      notes: `Telemetría física en navegador: ${logicalCores} hilos CPU, ${deviceMem}GB RAM, ${cleanGpuModel} (${rawRenderer}), pantalla ${screenWidth}x${screenHeight}@${refreshHz}Hz. Componentes internos sin telemetría web marcados estrictamente como UNKNOWN.`,
       motherboard: {
-        model: 'Placa Base en Banco de Pruebas (WMI / Live)',
-        socket: isWindows ? 'LGA1700 / AM5' : 'UNKNOWN',
-        ramSlots: 4,
-        ramType: 'DDR4',
-        pcieGen: 'PCIe 4.0',
-        formFactor: 'ATX',
-        provenance: 'ESTIMATED',
+        model: 'UNKNOWN',
+        socket: 'UNKNOWN',
+        ramSlots: 0,
+        ramType: 'UNKNOWN',
+        pcieGen: 'UNKNOWN',
+        formFactor: 'UNKNOWN',
+        provenance: 'UNKNOWN',
       },
       cpu: {
         model: report.cpu.inferredModel,
         socket: 'UNKNOWN',
         cores: estimatedCores,
         threads: logicalCores,
-        tdpW: isDedicatedGpu ? 65 : 45,
+        tdpW: 0, // UNKNOWN sin telemetría WMI/CIM directa
         hasIGPU: !isDedicatedGpu,
-        provenance: 'SYSTEM_REPORTED',
+        provenance: 'DETECTED',
       },
       ram: {
         sizeGb: deviceMem,
-        configuredSpeedMts: 3200,
-        type: 'DDR4',
-        channels: 2,
-        provenance: 'SYSTEM_REPORTED',
+        configuredSpeedMts: 0, // UNKNOWN en navegador
+        type: 'UNKNOWN',
+        channels: 0, // Regla 4: No derivar canales
+        provenance: 'DETECTED',
       },
       gpu: {
         model: cleanGpuModel,
-        vramGb: estimatedVram,
+        vramGb: 0, // Regla crítica: WebGL no reporta VRAM confiable -> UNKNOWN
         isDedicated: isDedicatedGpu,
-        powerW: isDedicatedGpu ? 160 : 25,
+        powerW: 0, // UNKNOWN sin ficha técnica verificada
         provenance: 'DETECTED',
       },
       storage: {
-        type: 'NVMe M.2',
-        capacityGb: 1000,
-        provenance: 'ESTIMATED',
+        model: 'UNKNOWN',
+        type: 'UNKNOWN',
+        capacityGb: 0,
+        provenance: 'UNKNOWN', // No enumerable por APIs de navegador
       },
       psu: {
-        wattageW: isDedicatedGpu ? 650 : 450,
-        rating: '80+ Certified',
-        provenance: 'ESTIMATED',
+        wattageW: 0,
+        rating: 'UNKNOWN',
+        provenance: 'UNKNOWN', // Regla 3: PSU no detectable por software
       },
       cooling: {
-        type: 'Air Tower',
-        tdpCapacityW: 120,
-        provenance: 'ESTIMATED',
+        type: 'UNKNOWN',
+        tdpCapacityW: 0,
+        provenance: 'UNKNOWN', // Regla 3: Cooler no detectable por software
+      },
+      chassis: {
+        model: 'UNKNOWN',
+        formFactor: 'UNKNOWN',
+        provenance: 'UNKNOWN',
+      },
+      fans: {
+        count: 0,
+        sizeMm: 0,
+        provenance: 'UNKNOWN',
       },
       display: {
         resolution: `${screenWidth}x${screenHeight}`,
