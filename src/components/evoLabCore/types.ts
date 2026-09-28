@@ -7,6 +7,7 @@ export type EpistemicProvenance =
   | 'MEASURED'        // Medición física directa durante sesión (sensores/WMI/ETW/PresentMon/contadores)
   | 'SYSTEM_REPORTED' // Reportado por el sistema operativo o SMBIOS/APIs del sistema (cores, RAM instalada, specs)
   | 'DETECTED'        // Detectado automáticamente por SO o APIs del navegador
+  | 'BROWSER_REPORTED'// Telemetría extraída de APIs del navegador (ej: window.screen)
   | 'DERIVED'         // Calculado matemáticamente a partir de datos medidos
   | 'CALIBRATED'      // Datos empíricos contrastados con muestras empíricas verificadas y telemetría
   | 'ESTIMATED'       // Modelo analítico o proyección empírica
@@ -50,7 +51,7 @@ export interface MachineMotherboard {
   socket: string;
   chipset?: string;
   ramSlots: number;
-  ramType: 'DDR4' | 'DDR5' | 'UNKNOWN';
+  ramType: 'DDR4' | 'DDR5' | 'DDR3' | 'UNKNOWN';
   pcieGen: string; // ej: "PCIe 4.0", "PCIe 5.0"
   formFactor: 'ATX' | 'Micro-ATX' | 'Mini-ITX' | 'Laptop' | 'UNKNOWN';
   provenance: EpistemicProvenance;
@@ -76,7 +77,7 @@ export interface MachineRAM {
   sizeGb: number;
   configuredSpeedMts: number;
   spdSpeedMts?: number;
-  type: 'DDR4' | 'DDR5' | 'UNKNOWN';
+  type: 'DDR4' | 'DDR5' | 'DDR3' | 'UNKNOWN';
   channels: number; // 0 = UNKNOWN, 1 = Single, 2 = Dual
   slotsUsed?: number;
   totalSlots?: number;

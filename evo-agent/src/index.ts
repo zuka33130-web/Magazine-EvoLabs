@@ -48,21 +48,46 @@ const server = http.createServer(async (req, res) => {
   // 2. Path Sanitization & Route Matching
   const cleanPath = security.sanitizePath(url);
 
-  // 3. Security Token Check (Optional on /health & /v1/capabilities, validated if provided)
-  if (!security.validateToken(req)) {
-    res.writeHead(401, { 'Content-Type': 'application/json' });
+  // Prohibited commands / Arbitrary execution prevention
+  if (
+    cleanPath.includes('/exec') ||
+    cleanPath.includes('/shell') ||
+    cleanPath.includes('/cmd') ||
+    cleanPath.includes('/run') ||
+    cleanPath.includes('/eval')
+  ) {
+    console.warn(`[SECURITY ALERT] Blocked prohibited arbitrary execution attempt on ${cleanPath}`);
+    res.writeHead(403, { 'Content-Type': 'application/json' });
     res.end(
       JSON.stringify({
-        error: 'UNAUTHORIZED_TOKEN',
-        message: 'Token de sesión local no válido. Consultá GET /health para sincronizar.',
+        error: 'ACTION_PROHIBITED',
+        message:
+          'La ejecución remota de comandos o shells está terminantemente prohibida en EVO Local Agent.',
+        status: 403,
       })
     );
     return;
   }
 
+  // 3. Security Token Check for Protected Endpoints:
+  // GET /v1/machine, GET /v1/telemetry, POST /v1/telemetry/start, POST /v1/telemetry/stop
+  // Require valid token. Without token -> 401.
+  if (security.isProtectedEndpoint(method, cleanPath)) {
+    if (!security.validateToken(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(
+        JSON.stringify({
+          error: 'UNAUTHORIZED_TOKEN',
+          message: 'Token de sesión local no válido o ausente. Consultá GET /health para sincronizar.',
+        })
+      );
+      return;
+    }
+  }
+
   // 4. Allowed Endpoints Router
   try {
-    if (method === 'GET' && cleanPath === '/health') {
+    if ((method === 'GET' || method === 'POST') && (cleanPath === '/health' || cleanPath === '/health/handshake' || cleanPath === '/v1/handshake')) {
       const payload: AgentHealthResponse = {
         status: 'OK',
         agent: 'EVO_LOCAL_AGENT',

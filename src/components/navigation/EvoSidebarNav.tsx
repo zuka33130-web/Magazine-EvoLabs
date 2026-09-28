@@ -144,8 +144,8 @@ export const EvoSidebarNav: React.FC<EvoSidebarNavProps> = ({
   const softwareItems: NavItemConfig[] = [
     {
       id: 'evo-core',
-      label: 'EVO CORE',
-      tooltip: 'Digital Computer Lab & Diagnóstico',
+      label: 'Laboratorio Central de PC',
+      tooltip: 'Diagnóstico, compatibilidad, telemetría y pruebas de carga.',
       icon: Cpu,
       accentColor: '#fbbf24',
       isActive:
@@ -160,8 +160,8 @@ export const EvoSidebarNav: React.FC<EvoSidebarNavProps> = ({
     },
     {
       id: 'evo-scanner',
-      label: 'EVO Scanner',
-      tooltip: 'Auditoría de Silicio CIM / WMI',
+      label: 'Escáner EVO',
+      tooltip: 'Auditoría rápida de hardware, sistema y configuración.',
       icon: Zap,
       accentColor: '#fbbf24',
       isActive: false,
@@ -172,8 +172,8 @@ export const EvoSidebarNav: React.FC<EvoSidebarNavProps> = ({
     },
     {
       id: 'evo-competitive',
-      label: 'EVO Competitive',
-      tooltip: 'DPC µs & Precisión de Timers',
+      label: 'Laboratorio de Rendimiento Competitivo',
+      tooltip: 'FPS, frametime, latencia, estabilidad y respuesta.',
       icon: Gauge,
       accentColor: '#22d3ee',
       isActive: currentView === 'hotswap-lab' && activeLabPanel === 'software',
@@ -182,8 +182,8 @@ export const EvoSidebarNav: React.FC<EvoSidebarNavProps> = ({
     },
     {
       id: 'evomax-pc',
-      label: 'EvoMax PC Builder',
-      tooltip: 'Constructor Universal de Silicio',
+      label: 'Constructor Inteligente de PC',
+      tooltip: 'Compatibilidad, equilibrio, upgrades y selección de hardware.',
       icon: Wrench,
       accentColor: '#c084fc',
       isActive: currentView === 'lab-core' && activeLabPanel === 'BUILD_PC',
@@ -195,8 +195,8 @@ export const EvoSidebarNav: React.FC<EvoSidebarNavProps> = ({
   const labItems: NavItemConfig[] = [
     {
       id: 'simulador-lab',
-      label: 'Simulador & Lab',
-      tooltip: 'Ultimate Silicon Sandbox',
+      label: 'Laboratorio de Silicio',
+      tooltip: 'Simulación de CPU, GPU, RAM, cargas y comportamiento del sistema.',
       icon: Sparkles,
       accentColor: '#fbbf24',
       isActive: currentView === 'hotswap-lab' && activeLabPanel === 'sandbox',
@@ -205,8 +205,8 @@ export const EvoSidebarNav: React.FC<EvoSidebarNavProps> = ({
     },
     {
       id: 'nuevo-lab',
-      label: 'Nuevo Laboratorio',
-      tooltip: 'EVO Core Metrology V1',
+      label: 'Laboratorio de Metrología',
+      tooltip: 'Medición precisa de latencias, buses, memoria y rendimiento.',
       icon: Zap,
       accentColor: '#34d399',
       isActive: currentView === 'lab-core' && activeLabPanel !== 'BUILD_PC',
@@ -214,8 +214,8 @@ export const EvoSidebarNav: React.FC<EvoSidebarNavProps> = ({
     },
     {
       id: 'taller-metrologico',
-      label: 'Taller Metrológico',
-      tooltip: 'Suite Metrológica Integral',
+      label: 'Laboratorio Metrológico Integral',
+      tooltip: 'Medición precisa de latencias, buses, memoria y rendimiento.',
       icon: Sliders,
       accentColor: '#34d399',
       isActive: currentView === 'hotswap-lab' && activeLabPanel === 'all',
@@ -223,8 +223,8 @@ export const EvoSidebarNav: React.FC<EvoSidebarNavProps> = ({
     },
     {
       id: 'hotswap-hw',
-      label: 'Hot-Swap Hardware',
-      tooltip: 'Banco de Buses PCIe & Latencias RAM',
+      label: 'Laboratorio de Hardware',
+      tooltip: 'Compará componentes y evaluá cambios antes de comprar.',
       icon: Cpu,
       accentColor: '#fbbf24',
       isActive: currentView === 'hotswap-lab' && activeLabPanel === 'hardware',
@@ -233,8 +233,8 @@ export const EvoSidebarNav: React.FC<EvoSidebarNavProps> = ({
     },
     {
       id: 'hotswap-sw',
-      label: 'Hot-Swap Software',
-      tooltip: 'Interrupciones & Latencias DPC µs',
+      label: 'Laboratorio de Software y Kernel',
+      tooltip: 'Drivers, DPC, temporizadores, mitigaciones y comportamiento de Windows.',
       icon: Terminal,
       accentColor: '#22d3ee',
       isActive: currentView === 'hotswap-lab' && activeLabPanel === 'software',
@@ -243,8 +243,8 @@ export const EvoSidebarNav: React.FC<EvoSidebarNavProps> = ({
     },
     {
       id: 'parser-telemetria',
-      label: 'Parser Telemetría',
-      tooltip: 'Ingesta Live PowerShell WMI',
+      label: 'Laboratorio de Telemetría',
+      tooltip: 'Captura, lectura e interpretación de datos reales del sistema.',
       icon: Activity,
       accentColor: '#34d399',
       isActive: currentView === 'hotswap-lab' && activeLabPanel === 'telemetry',
@@ -382,8 +382,8 @@ export const EvoSidebarNav: React.FC<EvoSidebarNavProps> = ({
     },
     {
       id: 'matriz-versiones',
-      label: 'Matriz de Versiones',
-      tooltip: 'Línea de Tiempo de Kernel NT',
+      label: 'Laboratorio de Windows y Kernel',
+      tooltip: 'Versiones, scheduler, memoria, servicios y latencia.',
       icon: Activity,
       accentColor: '#22d3ee',
       isActive: currentView === 'windows-matrix-lab',

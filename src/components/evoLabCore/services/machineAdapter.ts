@@ -209,26 +209,34 @@ export class MachineAdapter {
               SpeedMhz: m.speedMhz ?? m.configuredClockSpeedMhz,
               DeviceLocator: m.deviceLocator,
               BankLabel: m.bankLabel,
+              SMBIOSMemoryType: m.smbiosMemoryType ?? m.SMBIOSMemoryType,
             }))
           : [],
       },
       GPU: Array.isArray(raw.gpu)
-        ? raw.gpu.map((g: any) => ({
-            Model: g.name || g.model,
-            DriverVersion: g.driverVersion,
-            AdapterRAM_GB: g.adapterRAM_GB ?? g.vramGb ?? (g.adapterRAMBytes ? g.adapterRAMBytes / (1024 * 1024 * 1024) : null),
-            Resolution:
-              g.currentHorizontalResolution && g.currentVerticalResolution
-                ? `${g.currentHorizontalResolution}x${g.currentVerticalResolution}`
-                : g.resolution,
-            RefreshRate: g.currentRefreshRate ?? g.refreshHz,
-          }))
+        ? raw.gpu.map((g: any) => {
+            const isDedicated = g.isDedicated ?? WindowsDetectionService.isDedicatedGpu(g.name || g.model || '');
+            return {
+              Model: g.name || g.model,
+              DriverVersion: g.driverVersion,
+              AdapterRAM_GB: isDedicated
+                ? (g.adapterRAM_GB ?? g.vramGb ?? (g.adapterRAMBytes ? g.adapterRAMBytes / (1024 * 1024 * 1024) : null))
+                : null,
+              Resolution:
+                g.currentHorizontalResolution && g.currentVerticalResolution
+                  ? `${g.currentHorizontalResolution}x${g.currentVerticalResolution}`
+                  : g.resolution,
+              RefreshRate: g.currentRefreshRate ?? g.refreshHz,
+            };
+          })
         : raw.primaryGpu
         ? [
             {
               Model: raw.primaryGpu.name || raw.primaryGpu.model,
               DriverVersion: raw.primaryGpu.driverVersion,
-              AdapterRAM_GB: raw.primaryGpu.adapterRAM_GB ?? raw.primaryGpu.vramGb,
+              AdapterRAM_GB: (raw.primaryGpu.isDedicated ?? WindowsDetectionService.isDedicatedGpu(raw.primaryGpu.name || raw.primaryGpu.model || ''))
+                ? (raw.primaryGpu.adapterRAM_GB ?? raw.primaryGpu.vramGb)
+                : null,
               Resolution:
                 raw.primaryGpu.currentHorizontalResolution && raw.primaryGpu.currentVerticalResolution
                   ? `${raw.primaryGpu.currentHorizontalResolution}x${raw.primaryGpu.currentVerticalResolution}`
@@ -281,6 +289,9 @@ export class MachineAdapter {
    * Saves active machine to persistent storage and notifies the system
    */
   static saveActiveMachine(machine: Machine): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
     try {
       localStorage.setItem('evo_lab_core_active_machine_v1', JSON.stringify(machine));
       localStorage.setItem('evo_autodetected_hardware', JSON.stringify(machine));
@@ -301,7 +312,7 @@ export class MachineAdapter {
         window.dispatchEvent(new CustomEvent('evo_hardware_updated', { detail: machine }));
       }
     } catch (err) {
-      console.warn('[MachineAdapter] Error saving active machine:', err);
+      console.warn('[MachineAdapter] Error saving active machine (non-fatal):', err);
     }
   }
 
@@ -311,6 +322,9 @@ export class MachineAdapter {
    * Returns a blank incomplete machine with status UNKNOWN.
    */
   static loadExistingMachine(): Machine {
+    if (typeof localStorage === 'undefined') {
+      return this.createBlankMachine('PC Sin Detectar (Pendiente de Detección)');
+    }
     try {
       const active = localStorage.getItem('evo_lab_core_active_machine_v1');
       if (active) {

@@ -57,6 +57,10 @@ export const EvoMasterLabSuite: React.FC<EvoMasterLabSuiteProps> = ({
   const isElite = true;
   const [activePanel, setActivePanel] = useState<'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>(initialPanel);
 
+  useEffect(() => {
+    setActivePanel(initialPanel);
+  }, [initialPanel]);
+
   // Print & PDF Export State
   const [showPrintModal, setShowPrintModal] = useState<boolean>(false);
   const [copiedHash, setCopiedHash] = useState<boolean>(false);

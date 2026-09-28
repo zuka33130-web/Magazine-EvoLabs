@@ -8,19 +8,10 @@ import http from 'http';
 
 export class AgentSecurityManager {
   private sessionToken: string;
-  private allowedOrigins: Set<string>;
 
   constructor() {
     // Generate a high-entropy 256-bit cryptographic token on agent startup
     this.sessionToken = crypto.randomBytes(32).toString('hex');
-
-    // Allowed web origins that EVO CORE might run on
-    this.allowedOrigins = new Set([
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-      'http://localhost:5173',
-      'http://127.0.0.1:5173',
-    ]);
   }
 
   public getSessionToken(): string {
@@ -28,45 +19,58 @@ export class AgentSecurityManager {
   }
 
   /**
-   * Applies CORS headers and validates that the request is authorized
+   * Verifies if an origin is permitted:
+   * Permitted: localhost, 127.0.0.1, or verified EVO/AI Studio cloud domains.
+   * Prohibited: open or reflective CORS for any arbitrary web origin.
+   */
+  public isOriginAllowed(originHeader: string | undefined): { allowed: boolean; originBase?: string } {
+    if (!originHeader) {
+      // Local processes, CLI tools, tests without Origin header
+      return { allowed: true };
+    }
+
+    try {
+      const parsed = new URL(originHeader);
+      const originBase = `${parsed.protocol}//${parsed.host}`;
+      const hostname = parsed.hostname.toLowerCase();
+
+      const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
+      const isAiStudio =
+        hostname.endsWith('.run.app') ||
+        hostname.endsWith('.google.com') ||
+        hostname.endsWith('.aistudio.google');
+
+      if (isLocalHost || isAiStudio) {
+        return { allowed: true, originBase };
+      }
+
+      return { allowed: false };
+    } catch {
+      return { allowed: false };
+    }
+  }
+
+  /**
+   * Applies CORS headers and validates that the request origin is authorized.
+   * NO reflective CORS, NO open wildcard CORS (*).
    */
   public handleCorsAndSecurity(
     req: http.IncomingMessage,
     res: http.ServerResponse
   ): { isPreflight: boolean; isAllowed: boolean; error?: string } {
-    const origin = req.headers.origin || req.headers.referer;
+    const origin = req.headers.origin;
+    const { allowed, originBase } = this.isOriginAllowed(origin);
 
-    // Set CORS headers
-    // If an origin is provided, we inspect and reflect or permit local dev origins
-    if (origin) {
-      try {
-        const parsed = new URL(origin);
-        const originBase = `${parsed.protocol}//${parsed.host}`;
-
-        // Permitted origins: localhost, 127.0.0.1, AI Studio domains, or local tooling
-        const isLocalHost = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
-        const isAiStudio =
-          parsed.hostname.endsWith('.run.app') ||
-          parsed.hostname.endsWith('.google.com') ||
-          parsed.hostname.endsWith('.aistudio.google');
-
-        if (isLocalHost || isAiStudio) {
-          res.setHeader('Access-Control-Allow-Origin', originBase);
-        } else {
-          // Allow reflective CORS for user browser on local agent during testing
-          res.setHeader('Access-Control-Allow-Origin', originBase);
-        }
-      } catch {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-      }
-    } else {
-      res.setHeader('Access-Control-Allow-Origin', '*');
+    if (!allowed) {
+      return { isPreflight: false, isAllowed: false, error: 'FORBIDDEN_ORIGIN' };
     }
 
-    res.setHeader(
-      'Access-Control-Allow-Methods',
-      'GET, POST, OPTIONS'
-    );
+    // Set CORS headers strictly for permitted origins
+    if (originBase) {
+      res.setHeader('Access-Control-Allow-Origin', originBase);
+    }
+
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader(
       'Access-Control-Allow-Headers',
       'Content-Type, Authorization, X-Evo-Agent-Token, X-Requested-With'
@@ -86,24 +90,44 @@ export class AgentSecurityManager {
   }
 
   /**
-   * Validates request token if provided in header
+   * Identifies endpoints that strictly require a valid session token
+   */
+  public isProtectedEndpoint(method: string, cleanPath: string): boolean {
+    const m = (method || 'GET').toUpperCase();
+    if (m === 'GET' && cleanPath === '/v1/machine') return true;
+    if (m === 'GET' && cleanPath === '/v1/telemetry') return true;
+    if (m === 'POST' && cleanPath === '/v1/telemetry/start') return true;
+    if (m === 'POST' && cleanPath === '/v1/telemetry/stop') return true;
+    return false;
+  }
+
+  /**
+   * Validates request token against agent's session token.
+   * Missing or invalid token returns false.
    */
   public validateToken(req: http.IncomingMessage): boolean {
     const headerToken = req.headers['x-evo-agent-token'] || req.headers['authorization'];
     if (!headerToken) {
-      // First handshake (/health or /v1/capabilities) establishes token
-      return true;
+      return false;
     }
 
-    const cleanToken = Array.isArray(headerToken)
-      ? headerToken[0]
-      : headerToken.replace(/^Bearer\s+/i, '').trim();
+    const rawToken = Array.isArray(headerToken) ? headerToken[0] : headerToken;
+    const cleanToken = rawToken.replace(/^Bearer\s+/i, '').trim();
 
-    return cleanToken === this.sessionToken;
+    if (!cleanToken) {
+      return false;
+    }
+
+    // Constant-time comparison to prevent timing attacks
+    if (cleanToken.length !== this.sessionToken.length) {
+      return false;
+    }
+
+    return crypto.timingSafeEqual(Buffer.from(cleanToken), Buffer.from(this.sessionToken));
   }
 
   /**
-   * Enforces strict endpoint whitelist and forbids arbitrary commands
+   * Enforces strict endpoint path format and forbids traversal
    */
   public sanitizePath(urlPath: string): string {
     const parsed = new URL(urlPath, 'http://127.0.0.1:43921');

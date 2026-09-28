@@ -330,7 +330,7 @@ export class EvoDigitalTwinEngine {
       // Event detection
       if (s === 0 && stack.primary) {
         events.push({
-          id: `ev-start-${s}`,
+          id: `ev-start-${s}-${events.length}`,
           timestampSeconds: s,
           timeFormatted: frame.timeFormatted,
           type: 'WORKLOAD_ADDED',
@@ -343,7 +343,7 @@ export class EvoDigitalTwinEngine {
 
       if (frame.limitingFactor !== prevBottleneck && s > 0) {
         events.push({
-          id: `ev-bottle-${s}`,
+          id: `ev-bottle-${s}-${events.length}`,
           timestampSeconds: s,
           timeFormatted: frame.timeFormatted,
           type: 'BOTTLENECK_CHANGED',
@@ -357,7 +357,7 @@ export class EvoDigitalTwinEngine {
 
       if (frame.gpu.isThermalLimiting && !events.some((e) => e.type === 'THERMAL_LIMIT' && s - e.timestampSeconds < 60)) {
         events.push({
-          id: `ev-therm-gpu-${s}`,
+          id: `ev-therm-gpu-${s}-${events.length}`,
           timestampSeconds: s,
           timeFormatted: frame.timeFormatted,
           type: 'THERMAL_LIMIT',
@@ -370,7 +370,7 @@ export class EvoDigitalTwinEngine {
 
       if (frame.gpu.clockDropMhz > 150 && !events.some((e) => e.type === 'CLOCK_DROP' && s - e.timestampSeconds < 60)) {
         events.push({
-          id: `ev-clock-drop-${s}`,
+          id: `ev-clock-drop-${s}-${events.length}`,
           timestampSeconds: s,
           timeFormatted: frame.timeFormatted,
           type: 'CLOCK_DROP',
@@ -383,7 +383,7 @@ export class EvoDigitalTwinEngine {
 
       if (frame.gpu.vramPressurePct >= 96 && !events.some((e) => e.type === 'VRAM_PRESSURE' && s - e.timestampSeconds < 60)) {
         events.push({
-          id: `ev-vram-press-${s}`,
+          id: `ev-vram-press-${s}-${events.length}`,
           timestampSeconds: s,
           timeFormatted: frame.timeFormatted,
           type: 'VRAM_PRESSURE',

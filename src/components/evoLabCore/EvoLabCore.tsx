@@ -122,7 +122,7 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
   };
 
   const handleApplyIntegrityMachine = () => {
-    if (liveScanResult) {
+    if (liveScanResult && liveScanResult.machine) {
       handleUpdateMachine(liveScanResult.machine);
       setShowIntegrityModal(false);
       setCorePhase('BUILD_PC');

@@ -19,38 +19,146 @@ export interface DiscrepancyItem {
 }
 
 export interface LiveScanIntegrityResult {
-  machine: Machine;
+  machine: Machine | null;
+  status: 'SUCCESS' | 'UNAVAILABLE' | 'AUTODETECTION_FAILED';
   discrepancies: DiscrepancyItem[];
   integrityScore: number; // 0 to 100%
   timestamp: string;
   sourceEndpoint: string;
   rawPayload: any;
+  error?: string;
+  message?: string;
 }
 
 export class TelemetryIntegrityService {
   /**
    * Fetches telemetry from '/api/telemetry/live-scan' and strictly evaluates
    * each field against the verified catalog of allowed components.
+   * If live-scan returns 503 or AUTODETECTION_FAILED:
+   * Returns UNAVAILABLE / UNKNOWN with machine: null. Zero fabricated hardware.
    */
   static async scanAndValidateLiveEndpoint(): Promise<LiveScanIntegrityResult> {
-    const endpoint = '/api/telemetry/live-scan';
+    const endpoint =
+      typeof window !== 'undefined' && window.location?.origin
+        ? '/api/telemetry/live-scan'
+        : 'http://localhost:3000/api/telemetry/live-scan';
     let rawPayload: any = null;
 
     try {
       const response = await fetch(endpoint);
       if (!response.ok) {
-        throw new Error(`HTTP error ${response.status} from ${endpoint}`);
+        let errorData: any = null;
+        try {
+          errorData = await response.json();
+        } catch {
+          // not json
+        }
+        return {
+          machine: null,
+          status: 'AUTODETECTION_FAILED',
+          discrepancies: [
+            {
+              subsystem: 'CPU',
+              field: 'model',
+              detectedValue: 'UNAVAILABLE',
+              status: 'ABSENT_MARKED_UNKNOWN',
+              reason: 'Autodetección falló o no está disponible en este host (AUTODETECTION_FAILED).',
+            },
+            {
+              subsystem: 'GPU',
+              field: 'model',
+              detectedValue: 'UNAVAILABLE',
+              status: 'ABSENT_MARKED_UNKNOWN',
+              reason: 'Sin GPU informada por el endpoint.',
+            },
+            {
+              subsystem: 'RAM',
+              field: 'sizeGb',
+              detectedValue: '0 GB (UNAVAILABLE)',
+              status: 'ABSENT_MARKED_UNKNOWN',
+              reason: 'Sin memoria RAM informada por el endpoint.',
+            },
+          ],
+          integrityScore: 0,
+          timestamp: new Date().toISOString(),
+          sourceEndpoint: endpoint,
+          rawPayload: errorData || { error: 'AUTODETECTION_FAILED', status: response.status },
+          error: 'AUTODETECTION_FAILED',
+          message: errorData?.message || 'Autodetección de hardware en vivo no disponible.',
+        };
       }
+
       rawPayload = await response.json();
-    } catch (err) {
+      if (rawPayload && rawPayload.error === 'AUTODETECTION_FAILED') {
+        return {
+          machine: null,
+          status: 'AUTODETECTION_FAILED',
+          discrepancies: [
+            {
+              subsystem: 'CPU',
+              field: 'model',
+              detectedValue: 'UNAVAILABLE',
+              status: 'ABSENT_MARKED_UNKNOWN',
+              reason: 'Autodetección falló o no está disponible en este host (AUTODETECTION_FAILED).',
+            },
+            {
+              subsystem: 'GPU',
+              field: 'model',
+              detectedValue: 'UNAVAILABLE',
+              status: 'ABSENT_MARKED_UNKNOWN',
+              reason: 'Sin GPU informada por el endpoint.',
+            },
+            {
+              subsystem: 'RAM',
+              field: 'sizeGb',
+              detectedValue: '0 GB (UNAVAILABLE)',
+              status: 'ABSENT_MARKED_UNKNOWN',
+              reason: 'Sin memoria RAM informada por el endpoint.',
+            },
+          ],
+          integrityScore: 0,
+          timestamp: new Date().toISOString(),
+          sourceEndpoint: endpoint,
+          rawPayload,
+          error: 'AUTODETECTION_FAILED',
+          message: rawPayload.message || 'Autodetección de hardware en vivo no disponible.',
+        };
+      }
+    } catch (err: any) {
       console.warn(`[TelemetryIntegrityService] Could not reach ${endpoint}:`, err);
-      // Fallback empty scan if endpoint unreachable
-      rawPayload = {
-        CPU: 'UNKNOWN',
-        GPU: 'UNKNOWN',
-        RAM_GB: 0,
-        RAM_Speed: 0,
-        Provenance: 'UNKNOWN',
+      // NO crear Machine. NO aplicar fallback.
+      return {
+        machine: null,
+        status: 'UNAVAILABLE',
+        discrepancies: [
+          {
+            subsystem: 'CPU',
+            field: 'model',
+            detectedValue: 'UNAVAILABLE',
+            status: 'ABSENT_MARKED_UNKNOWN',
+            reason: 'Endpoint de telemetría inalcanzable. Hardware marcado como UNKNOWN.',
+          },
+          {
+            subsystem: 'GPU',
+            field: 'model',
+            detectedValue: 'UNAVAILABLE',
+            status: 'ABSENT_MARKED_UNKNOWN',
+            reason: 'Endpoint de telemetría inalcanzable. Hardware marcado como UNKNOWN.',
+          },
+          {
+            subsystem: 'RAM',
+            field: 'sizeGb',
+            detectedValue: '0 GB (UNAVAILABLE)',
+            status: 'ABSENT_MARKED_UNKNOWN',
+            reason: 'Endpoint de telemetría inalcanzable. Hardware marcado como UNKNOWN.',
+          },
+        ],
+        integrityScore: 0,
+        timestamp: new Date().toISOString(),
+        sourceEndpoint: endpoint,
+        rawPayload: { error: 'AUTODETECTION_FAILED', details: err?.message || 'Endpoint unreachable' },
+        error: 'AUTODETECTION_FAILED',
+        message: 'Endpoint de telemetría inalcanzable. Hardware no disponible (UNAVAILABLE / UNKNOWN).',
       };
     }
 
@@ -60,11 +168,48 @@ export class TelemetryIntegrityService {
   /**
    * Compares raw detected telemetry against allowed components.
    * Any discrepancy, unverified silicon or missing field is marked 'UNKNOWN'.
+   * If rawPayload indicates AUTODETECTION_FAILED, strictly returns machine: null.
    */
   static evaluateTelemetryIntegrity(
     rawPayload: any,
     endpoint = '/api/telemetry/live-scan'
   ): LiveScanIntegrityResult {
+    if (!rawPayload || rawPayload.error === 'AUTODETECTION_FAILED') {
+      return {
+        machine: null,
+        status: 'AUTODETECTION_FAILED',
+        discrepancies: [
+          {
+            subsystem: 'CPU',
+            field: 'model',
+            detectedValue: 'UNAVAILABLE',
+            status: 'ABSENT_MARKED_UNKNOWN',
+            reason: 'Autodetección no disponible (AUTODETECTION_FAILED). Host no compatible o WMI ausente.',
+          },
+          {
+            subsystem: 'GPU',
+            field: 'model',
+            detectedValue: 'UNAVAILABLE',
+            status: 'ABSENT_MARKED_UNKNOWN',
+            reason: 'Autodetección no disponible (AUTODETECTION_FAILED). Sin hardware detectado.',
+          },
+          {
+            subsystem: 'RAM',
+            field: 'sizeGb',
+            detectedValue: '0 GB (UNAVAILABLE)',
+            status: 'ABSENT_MARKED_UNKNOWN',
+            reason: 'Autodetección no disponible (AUTODETECTION_FAILED). Sin hardware detectado.',
+          },
+        ],
+        integrityScore: 0,
+        timestamp: new Date().toISOString(),
+        sourceEndpoint: endpoint,
+        rawPayload: rawPayload || { error: 'AUTODETECTION_FAILED' },
+        error: 'AUTODETECTION_FAILED',
+        message: rawPayload?.message || 'AUTODETECTION_FAILED: No se detectó hardware del usuario.',
+      };
+    }
+
     const discrepancies: DiscrepancyItem[] = [];
     const allCatalog = HardwareCatalogProvider.getAllComponents();
     const catalogCpus = allCatalog.filter((c) => c.category === 'cpu');
@@ -97,7 +242,7 @@ export class TelemetryIntegrityService {
       finalCpuThreads = rawPayload.Threads || cpuMatch.specifications?.threads || 0;
       finalCpuTdp = cpuMatch.specifications?.tdpW || 65;
       finalCpuIGPU = cpuMatch.specifications?.hasIGPU ?? false;
-      finalCpuProv = 'MEASURED';
+      finalCpuProv = 'SYSTEM_REPORTED';
 
       discrepancies.push({
         subsystem: 'CPU',
@@ -144,10 +289,11 @@ export class TelemetryIntegrityService {
 
     if (rawGpuName && gpuMatch) {
       finalGpuModel = gpuMatch.model;
-      finalGpuVram = Number(rawPayload.VRAM_GB) || gpuMatch.specifications?.vramGb || 0;
       finalGpuDedicated = gpuMatch.specifications?.isDedicated ?? (!normGpu.toLowerCase().includes('uhd') && !normGpu.toLowerCase().includes('graphics'));
+      // Para gráfica integrada: VRAM dedicada = UNKNOWN (0). NO calcular VRAM = RAM/2.
+      finalGpuVram = finalGpuDedicated ? (Number(rawPayload.VRAM_GB) || gpuMatch.specifications?.vramGb || 0) : 0;
       finalGpuPowerW = gpuMatch.specifications?.powerW || (finalGpuDedicated ? 150 : 15);
-      finalGpuProv = 'MEASURED';
+      finalGpuProv = 'SYSTEM_REPORTED';
 
       discrepancies.push({
         subsystem: 'GPU',
@@ -191,9 +337,10 @@ export class TelemetryIntegrityService {
     if (rawRamGb > 0 && isSizeAllowed) {
       finalRamSize = Math.round(rawRamGb);
       finalRamSpeed = isSpeedAllowed ? rawRamSpeed : 0;
-      finalRamType = finalRamSpeed >= 4800 ? 'DDR5' : finalRamSpeed >= 2133 ? 'DDR4' : 'UNKNOWN';
-      finalRamChannels = rawPayload.RAM_Channels || (finalRamSize >= 16 ? 2 : 1);
-      finalRamProv = 'MEASURED';
+      // NO inferir DDR por velocidad. NO asumir Dual Channel por cantidad de módulos o capacidad.
+      finalRamType = 'UNKNOWN';
+      finalRamChannels = 0; // 0 = UNKNOWN
+      finalRamProv = 'SYSTEM_REPORTED';
 
       discrepancies.push({
         subsystem: 'RAM',
@@ -231,7 +378,7 @@ export class TelemetryIntegrityService {
       if (moboMatch) {
         finalMoboModel = moboMatch.model;
         finalMoboSocket = moboMatch.specifications?.socket || finalMoboSocket;
-        finalMoboProv = 'MEASURED';
+        finalMoboProv = 'SYSTEM_REPORTED';
         discrepancies.push({
           subsystem: 'MOTHERBOARD',
           field: 'model',
@@ -272,7 +419,7 @@ export class TelemetryIntegrityService {
         finalStorageModel = storageMatch.model;
         finalStorageType = (storageMatch.specifications?.type as any) || 'NVMe M.2';
         finalStorageCap = storageMatch.specifications?.capacityGb || 1000;
-        finalStorageProv = 'MEASURED';
+        finalStorageProv = 'SYSTEM_REPORTED';
         discrepancies.push({
           subsystem: 'STORAGE',
           field: 'model',
@@ -342,16 +489,16 @@ export class TelemetryIntegrityService {
       id: `MCH-SCAN-${Date.now()}`,
       alias: isFullyDetected ? `${finalCpuModel} // Live Verified` : 'PC Telemetría En Vivo (Parcial)',
       isDetected: true,
-      overallProvenance: isFullyDetected ? 'MEASURED' : 'UNKNOWN',
+      overallProvenance: isFullyDetected ? 'SYSTEM_REPORTED' : 'UNKNOWN',
       readyState: isFullyDetected ? 'READY' : 'INCOMPLETE',
       notes: `Escaneo e integridad procesados desde ${endpoint}. Discrepancias marcadas con UNKNOWN para asegurar fidelidad técnica.`,
       motherboard: {
         model: finalMoboModel,
         socket: finalMoboSocket,
-        ramSlots: 4,
-        ramType: finalRamType !== 'UNKNOWN' ? finalRamType : 'DDR4',
-        pcieGen: 'PCIe 4.0',
-        formFactor: 'ATX',
+        ramSlots: 0, // NO inventar slots físicos
+        ramType: finalRamType,
+        pcieGen: 'UNKNOWN',
+        formFactor: 'UNKNOWN',
         provenance: finalMoboProv,
       },
       cpu: {
@@ -406,12 +553,13 @@ export class TelemetryIntegrityService {
       display: {
         resolution: typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : '1920x1080',
         refreshHz: 60,
-        provenance: 'MEASURED',
+        provenance: 'BROWSER_REPORTED',
       },
     };
 
     return {
       machine: validatedMachine,
+      status: 'SUCCESS',
       discrepancies,
       integrityScore,
       timestamp: new Date().toISOString(),

@@ -7,6 +7,9 @@
 export type EpistemicProvenance =
   | 'SYSTEM_REPORTED'
   | 'MEASURED'
+  | 'DETECTED'
+  | 'BROWSER_REPORTED'
+  | 'DERIVED'
   | 'USER_ENTERED'
   | 'ESTIMATED'
   | 'REFERENCE'
@@ -82,6 +85,8 @@ export interface WindowsPhysicalMemoryModule {
   speedMhz?: number;
   deviceLocator?: string;
   bankLabel?: string;
+  smbiosMemoryType?: number;
+  memoryTypeStr?: 'DDR5' | 'DDR4' | 'DDR3' | 'DDR2' | 'LPDDR5' | 'LPDDR4' | 'UNKNOWN';
   provenance: EpistemicProvenance;
 }
 

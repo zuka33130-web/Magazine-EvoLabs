@@ -37,14 +37,14 @@ export class AgentTelemetryManager {
       cpu: {
         utilizationPercent: this.currentCpuUtilization,
         clockSpeedMhz: os.cpus()[0]?.speed || undefined,
-        provenance: 'MEASURED',
+        provenance: 'DERIVED',
       },
       memory: {
         totalBytes: totalMem,
         usedBytes: usedMem,
         freeBytes: freeMem,
         utilizationPercent: memUtilization,
-        provenance: 'MEASURED',
+        provenance: 'SYSTEM_REPORTED',
       },
       process: {
         agentRssBytes: memUsage.rss,

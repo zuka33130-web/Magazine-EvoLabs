@@ -14,6 +14,7 @@ export interface WindowsRawModuleRam {
   SpeedMhz?: number;
   DeviceLocator?: string;
   BankLabel?: string;
+  SMBIOSMemoryType?: number;
 }
 
 export interface WindowsRawGpu {
@@ -231,24 +232,27 @@ exit /b 0
     const biosVer = p.BIOS?.Version?.trim();
     const biosDate = p.BIOS?.ReleaseDate?.trim();
 
-    // 3. RAM Modules & Capacity
+    // 3. RAM Modules & Capacity: Total RAM = suma exacta de módulos reportados
     const rawRamModules: WindowsRawModuleRam[] = Array.isArray(p.RAM?.Modules)
       ? p.RAM.Modules
       : [];
-    const totalRamGb = p.RAM?.TotalGB ?? p.RAM_GB ?? (rawRamModules.reduce((acc, m) => acc + (m.CapacityGB || 0), 0) || 0);
+    const totalRamGb = rawRamModules.length > 0
+      ? Number(rawRamModules.reduce((acc, m) => acc + (m.CapacityGB || 0), 0).toFixed(2))
+      : (p.RAM?.TotalGB ?? p.RAM_GB ?? 0);
 
     // Configured clock
     const firstConfiguredClock = rawRamModules.find((m) => m.ConfiguredClockMhz && m.ConfiguredClockMhz > 0)?.ConfiguredClockMhz;
     const firstSpeed = rawRamModules.find((m) => m.SpeedMhz && m.SpeedMhz > 0)?.SpeedMhz;
     const ramSpeed = firstConfiguredClock || firstSpeed || p.RAM_Speed || 0;
 
-    // RAM Type
-    let ramType: 'DDR4' | 'DDR5' | 'UNKNOWN' = 'UNKNOWN';
-    if (ramSpeed > 4400) ramType = 'DDR5';
-    else if (ramSpeed > 1800) ramType = 'DDR4';
+    // RAM Type: usar SMBIOSMemoryType cuando exista. NO inferir DDR por velocidad.
+    let ramType: 'DDR4' | 'DDR5' | 'DDR3' | 'UNKNOWN' = 'UNKNOWN';
+    const smbiosType = rawRamModules.find((m) => m.SMBIOSMemoryType !== undefined)?.SMBIOSMemoryType;
+    if (smbiosType === 34) ramType = 'DDR5';
+    else if (smbiosType === 26) ramType = 'DDR4';
+    else if (smbiosType === 24) ramType = 'DDR3';
 
-    // Channels: RULE 4: PROHIBITED TO DERIVE CHANNELS FROM MODULE COUNT!
-    // Must remain 0 / UNKNOWN unless explicitly determined by hardware architecture
+    // Channels: NO asumir Dual Channel por cantidad de módulos -> estrictamente 0 (UNKNOWN)
     const ramChannels = 0; // 0 = UNKNOWN without explicit multichannel reporting
 
     // 4. GPUs
@@ -270,11 +274,17 @@ exit /b 0
     const gpuModel = primaryGpu.Model || 'UNKNOWN';
     const isDedicated = this.isDedicatedGpu(gpuModel);
 
-    // VRAM: RULE: Only include reported memory if source is trustworthy (>0 and <64GB).
-    // If unreliable, 0 or null -> STRICTLY UNKNOWN (vramGb: 0, provenance: 'UNKNOWN')
-    const rawVram = primaryGpu.AdapterRAM_GB ?? p.VRAM_GB;
-    const isVramReliable = Boolean(rawVram && typeof rawVram === 'number' && rawVram > 0.4 && rawVram <= 64);
-    const vramGb = isVramReliable ? Number(rawVram.toFixed(1)) : 0;
+    // VRAM: RULE 3: NO interpretar AdapterRAM como VRAM real en una iGPU.
+    // Para gráfica integrada: VRAM dedicada = UNKNOWN (0 / null) salvo provider fiable. NO calcular VRAM = RAM/2.
+    const rawVram = isDedicated ? (primaryGpu.AdapterRAM_GB ?? p.VRAM_GB) : null;
+    const isVramReliable = Boolean(
+      isDedicated &&
+      rawVram &&
+      typeof rawVram === 'number' &&
+      rawVram > 0.4 &&
+      rawVram <= 64
+    );
+    const vramGb = isVramReliable ? Number((rawVram as number).toFixed(1)) : 0;
     const vramProvenance: EpistemicProvenance = isVramReliable ? 'SYSTEM_REPORTED' : 'UNKNOWN';
 
     // 5. Storage
@@ -348,7 +358,7 @@ exit /b 0
         model: hasMb ? `${mbManufacturer ? `${mbManufacturer} ` : ''}${mbModel}` : 'UNKNOWN',
         socket: 'UNKNOWN',
         chipset: undefined,
-        ramSlots: rawRamModules.length > 0 ? rawRamModules.length : 0,
+        ramSlots: 0, // NO inventar slots físicos
         ramType,
         pcieGen: 'UNKNOWN',
         formFactor: 'UNKNOWN',

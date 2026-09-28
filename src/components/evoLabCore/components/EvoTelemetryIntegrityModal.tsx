@@ -76,17 +76,40 @@ export const EvoTelemetryIntegrityModal: React.FC<EvoTelemetryIntegrityModalProp
             </div>
           ) : integrityResult ? (
             <>
+              {/* Alert banner when autodetection failed */}
+              {(!integrityResult.machine || integrityResult.status === 'AUTODETECTION_FAILED' || integrityResult.error === 'AUTODETECTION_FAILED') && (
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="font-bold text-amber-300 uppercase tracking-wide">
+                      AUTODETECCIÓN NO DISPONIBLE — HARDWARE UNAVAILABLE / UNKNOWN
+                    </p>
+                    <p className="text-zinc-300 text-[11px] font-sans-editorial leading-relaxed">
+                      {integrityResult.message || 'La autodetección de hardware en vivo no está disponible en este entorno o el host no es Windows nativo. No se creó ninguna Machine ficticia ni se utilizó hardware del host servidor. Para detectar tu hardware real de forma pericial, iniciá el EVO Local Agent en 127.0.0.1:43921.'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Score banner */}
               <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="space-y-1 text-center sm:text-left">
                   <div className="flex items-center justify-center sm:justify-start gap-2">
                     <span className="text-xs text-zinc-400 uppercase">RESULTADO DEL ANÁLISIS:</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                      INTEGRIDAD {integrityResult.integrityScore}%
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                        integrityResult.machine
+                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                          : 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+                      }`}
+                    >
+                      {integrityResult.machine
+                        ? `INTEGRIDAD ${integrityResult.integrityScore}%`
+                        : 'UNAVAILABLE / UNKNOWN'}
                     </span>
                   </div>
                   <h3 className="font-display font-bold text-white text-sm">
-                    {integrityResult.machine.alias}
+                    {integrityResult.machine ? integrityResult.machine.alias : 'HARDWARE NO DISPONIBLE (UNKNOWN)'}
                   </h3>
                 </div>
 
@@ -102,10 +125,15 @@ export const EvoTelemetryIntegrityModal: React.FC<EvoTelemetryIntegrityModalProp
                   <button
                     type="button"
                     onClick={onApplyMachine}
-                    className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                    disabled={!integrityResult.machine}
+                    className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+                      integrityResult.machine
+                        ? 'bg-emerald-500 hover:bg-emerald-400 text-black cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                        : 'bg-zinc-800/80 text-zinc-500 cursor-not-allowed border border-zinc-700/60'
+                    }`}
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>APLICAR A MÁQUINA ACTIVA</span>
+                    <span>{integrityResult.machine ? 'APLICAR A MÁQUINA ACTIVA' : 'MÁQUINA NO DISPONIBLE'}</span>
                   </button>
                 </div>
               </div>

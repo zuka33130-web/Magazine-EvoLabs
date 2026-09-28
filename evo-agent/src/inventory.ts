@@ -75,6 +75,7 @@ $os = Get-CimInstance Win32_OperatingSystem | Select-Object -First 1
       Speed = $_.Speed
       DeviceLocator = $_.DeviceLocator
       BankLabel = $_.BankLabel
+      SMBIOSMemoryType = $_.SMBIOSMemoryType
     }
   })
 
@@ -249,6 +250,19 @@ $os = Get-CimInstance Win32_OperatingSystem | Select-Object -First 1
       totalCapacityBytes += capBytes;
       const capGB = Number((capBytes / (1024 * 1024 * 1024)).toFixed(2));
 
+      const rawSmbios = m.SMBIOSMemoryType !== undefined && m.SMBIOSMemoryType !== null ? m.SMBIOSMemoryType : undefined;
+      const smbiosType = typeof rawSmbios === 'number' ? rawSmbios : (rawSmbios ? parseInt(rawSmbios, 10) : undefined);
+
+      // Tipo DDR: usar SMBIOSMemoryType cuando exista. NO inferir DDR por velocidad.
+      // Standard DMTF SMBIOS: 26=DDR4, 34=DDR5, 24=DDR3, 21/22=DDR2, 35=LPDDR5, 32=LPDDR4
+      let moduleTypeStr: 'DDR5' | 'DDR4' | 'DDR3' | 'DDR2' | 'LPDDR5' | 'LPDDR4' | 'UNKNOWN' = 'UNKNOWN';
+      if (smbiosType === 34) moduleTypeStr = 'DDR5';
+      else if (smbiosType === 26) moduleTypeStr = 'DDR4';
+      else if (smbiosType === 24) moduleTypeStr = 'DDR3';
+      else if (smbiosType === 21 || smbiosType === 22) moduleTypeStr = 'DDR2';
+      else if (smbiosType === 35) moduleTypeStr = 'LPDDR5';
+      else if (smbiosType === 32) moduleTypeStr = 'LPDDR4';
+
       return {
         capacityBytes: capBytes,
         capacityGB: capGB,
@@ -258,19 +272,24 @@ $os = Get-CimInstance Win32_OperatingSystem | Select-Object -First 1
         speedMhz: m.Speed || undefined,
         deviceLocator: (m.DeviceLocator || '').trim() || undefined,
         bankLabel: (m.BankLabel || '').trim() || undefined,
+        smbiosMemoryType: smbiosType,
+        memoryTypeStr: moduleTypeStr,
         provenance: capBytes > 0 ? 'SYSTEM_REPORTED' : 'UNKNOWN',
       };
     });
 
+    // Total RAM = suma exacta de módulos reportados
     const totalCapacityGB = Number((totalCapacityBytes / (1024 * 1024 * 1024)).toFixed(2));
     const firstModule = memoryModules[0];
     const configuredSpeedMhz = firstModule?.configuredClockSpeedMhz || firstModule?.speedMhz || 0;
     const spdSpeedMhz = firstModule?.speedMhz || configuredSpeedMhz;
 
-    let ramType: 'DDR5' | 'DDR4' | 'DDR3' | 'UNKNOWN' = 'UNKNOWN';
-    if (configuredSpeedMhz >= 4400) ramType = 'DDR5';
-    else if (configuredSpeedMhz >= 2133) ramType = 'DDR4';
-    else if (configuredSpeedMhz >= 1066) ramType = 'DDR3';
+    // Tipo DDR: usar SMBIOSMemoryType cuando exista. NO inferir DDR por velocidad.
+    const detectedType = memoryModules.find((m) => m.memoryTypeStr && m.memoryTypeStr !== 'UNKNOWN')?.memoryTypeStr;
+    const ramType: 'DDR5' | 'DDR4' | 'DDR3' | 'UNKNOWN' =
+      detectedType === 'DDR5' ? 'DDR5' :
+      detectedType === 'DDR4' ? 'DDR4' :
+      detectedType === 'DDR3' ? 'DDR3' : 'UNKNOWN';
 
     const memoryInventory: WindowsMemoryInventory = {
       totalCapacityBytes,
@@ -279,7 +298,7 @@ $os = Get-CimInstance Win32_OperatingSystem | Select-Object -First 1
       modules: memoryModules,
       configuredSpeedMhz,
       spdSpeedMhz,
-      // RULE 4: PROHIBITED TO DERIVE CHANNELS FROM MODULE COUNT! Strictly 0 (UNKNOWN)
+      // NO asumir Dual Channel por cantidad de módulos: 0 (UNKNOWN)
       channels: 0,
       type: ramType,
       provenance: totalCapacityGB > 0 ? 'SYSTEM_REPORTED' : 'UNKNOWN',
@@ -297,8 +316,10 @@ $os = Get-CimInstance Win32_OperatingSystem | Select-Object -First 1
       const isDedicated = this.isDedicatedGpu(name);
       const rawAdapterRam = typeof g.AdapterRAM === 'number' ? g.AdapterRAM : parseInt(g.AdapterRAM || '0', 10);
 
-      // Strict VRAM validity rule: AdapterRAM must be > 0 and <= 64GB to be reliable
-      const isVramReliable = rawAdapterRam > 0 && rawAdapterRam <= 68719476736;
+      // RULE 3: Identificar GPU reportada por Windows.
+      // NO interpretar AdapterRAM como VRAM real en una iGPU.
+      // Para gráfica integrada: VRAM dedicada = UNKNOWN (null) salvo provider fiable. NO calcular VRAM = RAM/2.
+      const isVramReliable = isDedicated && rawAdapterRam > 0 && rawAdapterRam <= 68719476736;
       const vramGB = isVramReliable ? Number((rawAdapterRam / (1024 * 1024 * 1024)).toFixed(1)) : null;
 
       return {

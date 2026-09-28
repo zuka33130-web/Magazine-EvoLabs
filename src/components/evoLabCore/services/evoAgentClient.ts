@@ -90,6 +90,34 @@ export class EvoAgentClient {
   }
 
   /**
+   * Performs handshake if session token does not exist yet.
+   * If Agent does not respond: throws or returns error with code AGENT_NOT_CONNECTED.
+   * NO fallback demo.
+   */
+  public static async ensureHandshake(timeoutMs: number = 2000): Promise<string> {
+    if (this.cachedSessionToken) {
+      return this.cachedSessionToken;
+    }
+
+    const health = await this.pingAgent(timeoutMs);
+    if (!health || health.status !== 'OK' || !health.sessionToken) {
+      const err: any = new Error('AGENT_NOT_CONNECTED: No se pudo conectar con el agente local EVO en http://127.0.0.1:43921.');
+      err.code = 'AGENT_NOT_CONNECTED';
+      throw err;
+    }
+
+    this.cachedSessionToken = health.sessionToken;
+    return this.cachedSessionToken;
+  }
+
+  /**
+   * Clears the cached session token (used for re-handshake testing or re-connection)
+   */
+  public static resetSessionToken(): void {
+    this.cachedSessionToken = null;
+  }
+
+  /**
    * Performs the mandatory 7-step hardware intake flow from EVO Local Agent:
    * IMPORTAR ESTA PC
    * → comprobar http://127.0.0.1:43921/health
@@ -104,34 +132,29 @@ export class EvoAgentClient {
    * If Agent does not respond: STRICTLY NO BROWSER COMPLETE FALLBACK, NO DEMO, NO FIXTURE.
    */
   public static async importThisPc(timeoutMs: number = 6000): Promise<AgentMachineImportResult> {
-    // Step 1: Comprobar http://127.0.0.1:43921/health
+    // Step 1 & 2: Comprobar health y handshake (guardar token de sesión)
+    let token = '';
     let health: AgentHealth | null = null;
     try {
       health = await this.pingAgent(2000);
+      if (!health || health.status !== 'OK' || !health.sessionToken) {
+        return {
+          success: false,
+          error: 'AGENT_NOT_CONNECTED: No se pudo establecer conexión con http://127.0.0.1:43921. Verificá que el agente local esté iniciado ejecutando START-EVO-AGENT.cmd.',
+          errorCode: 'AGENT_NOT_CONNECTED',
+          stage: 'HEALTH_CHECK',
+        };
+      }
+      this.cachedSessionToken = health.sessionToken;
+      token = health.sessionToken;
     } catch {
-      health = null;
-    }
-
-    if (!health || health.status !== 'OK') {
       return {
         success: false,
-        error: 'EVO AGENT NO CONECTADO: No se pudo establecer conexión con http://127.0.0.1:43921. Verificá que el agente local esté iniciado ejecutando START-EVO-AGENT.cmd.',
+        error: 'AGENT_NOT_CONNECTED: El agente local de EVO no responde en 127.0.0.1:43921.',
         errorCode: 'AGENT_NOT_CONNECTED',
         stage: 'HEALTH_CHECK',
       };
     }
-
-    // Step 2: Handshake (Session token acquisition)
-    const token = health.sessionToken || this.cachedSessionToken || '';
-    if (!token) {
-      return {
-        success: false,
-        error: 'EVO AGENT ERROR DE HANDSHAKE: El agente no entregó un token de sesión válido.',
-        errorCode: 'HANDSHAKE_FAILED',
-        stage: 'HANDSHAKE',
-      };
-    }
-    this.cachedSessionToken = token;
 
     // Step 3: GET /v1/machine
     const controller = new AbortController();
@@ -234,10 +257,11 @@ export class EvoAgentClient {
    */
   public static async fetchLiveTelemetry(): Promise<AgentLiveTelemetry | null> {
     try {
+      const token = await this.ensureHandshake(1500);
       const response = await fetch(`${this.AGENT_BASE_URL}/v1/telemetry`, {
         headers: {
           Accept: 'application/json',
-          ...(this.cachedSessionToken ? { 'X-Evo-Agent-Token': this.cachedSessionToken } : {}),
+          'X-Evo-Agent-Token': token,
         },
       });
       if (!response.ok) return null;
@@ -252,11 +276,12 @@ export class EvoAgentClient {
    */
   public static async startTelemetrySampling(): Promise<boolean> {
     try {
+      const token = await this.ensureHandshake(1500);
       const response = await fetch(`${this.AGENT_BASE_URL}/v1/telemetry/start`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
-          ...(this.cachedSessionToken ? { 'X-Evo-Agent-Token': this.cachedSessionToken } : {}),
+          'X-Evo-Agent-Token': token,
         },
       });
       return response.ok;
@@ -270,11 +295,12 @@ export class EvoAgentClient {
    */
   public static async stopTelemetrySampling(): Promise<boolean> {
     try {
+      const token = await this.ensureHandshake(1500);
       const response = await fetch(`${this.AGENT_BASE_URL}/v1/telemetry/stop`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
-          ...(this.cachedSessionToken ? { 'X-Evo-Agent-Token': this.cachedSessionToken } : {}),
+          'X-Evo-Agent-Token': token,
         },
       });
       return response.ok;

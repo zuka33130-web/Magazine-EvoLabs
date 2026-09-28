@@ -172,6 +172,7 @@ export const Header: React.FC<HeaderProps> = ({
                 setOpenDropdown(null);
                 if (onNavigateHome) onNavigateHome();
               }}
+              title="Ir al Centro de Operaciones Mundo EVO"
               className={`px-3 py-1.5 rounded-full flex items-center gap-2 transition-all cursor-pointer ${
                 currentView === 'world-map'
                   ? 'bg-amber-400/15 text-amber-300 border border-amber-400/40 font-bold shadow-[0_0_10px_rgba(251,191,36,0.15)]'
@@ -182,13 +183,14 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Mundo EVO</span>
             </button>
 
-            {/* 2. EVO CORE */}
+            {/* 2. EVO CORE -> Laboratorio Central de PC */}
             <button
               type="button"
               onClick={() => {
                 setOpenDropdown(null);
                 if (onNavigateLabCore) onNavigateLabCore('LAB_ACTIVE');
               }}
+              title="Diagnóstico, compatibilidad, telemetría y pruebas de carga."
               className={`px-3 py-1.5 rounded-full flex items-center gap-2 transition-all cursor-pointer ${
                 currentView === 'lab-core'
                   ? 'bg-amber-400/15 text-amber-300 border border-amber-400/40 font-bold shadow-[0_0_10px_rgba(251,191,36,0.15)]'
@@ -196,7 +198,7 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <Cpu className="w-3.5 h-3.5 text-amber-400" />
-              <span>EVO CORE</span>
+              <span>Laboratorio Central de PC</span>
             </button>
 
             {/* 3. TOMOS (DESPLEGABLE) */}
@@ -211,14 +213,14 @@ export const Header: React.FC<HeaderProps> = ({
                 }`}
               >
                 <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Tomos</span>
+                <span>Tomos Editoriales</span>
                 <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === 'tomos' ? 'rotate-180' : ''}`} />
               </button>
 
               {openDropdown === 'tomos' && (
                 <div className="absolute top-full left-0 mt-2 w-72 bg-[#0c0f17]/95 border border-zinc-700/80 rounded-2xl p-2 shadow-2xl backdrop-blur-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-1">
                   <div className="px-3 py-1.5 border-b border-white/[0.08] text-[10px] font-bold uppercase text-zinc-400 tracking-wider">
-                    BIBLIOTECA DE EDITORIAL & MANUALE
+                    BIBLIOTECA EDITORIAL & MANUALES
                   </div>
                   
                   <button
@@ -310,7 +312,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <Shield className="w-3.5 h-3.5 text-rose-400" />
                     <div>
                       <div className="font-bold text-white">Tomo 06: Ciberseguridad</div>
-                      <div className="text-[10px] text-zinc-400">Kernel Forensics & Amenazas</div>
+                      <div className="text-[10px] text-zinc-400">Análisis Forense & Kernel</div>
                     </div>
                   </button>
                 </div>
@@ -351,9 +353,9 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {openDropdown === 'labs' && (
-                <div className="absolute top-full left-0 mt-2 w-72 bg-[#0c0f17]/95 border border-zinc-700/80 rounded-2xl p-2 shadow-2xl backdrop-blur-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-1">
+                <div className="absolute top-full left-0 mt-2 w-80 bg-[#0c0f17]/95 border border-zinc-700/80 rounded-2xl p-2 shadow-2xl backdrop-blur-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-1">
                   <div className="px-3 py-1.5 border-b border-white/[0.08] text-[10px] font-bold uppercase text-zinc-400 tracking-wider">
-                    SUITE METROLÓGICA Y SIMULACIÓN
+                    SUITE DE LABORATORIOS Y SIMULACIÓN
                   </div>
 
                   <button
@@ -364,10 +366,10 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Simulador & Lab</div>
-                      <div className="text-[10px] text-zinc-400">Ultimate Silicon Sandbox</div>
+                      <div className="font-bold text-white">Laboratorio de Silicio</div>
+                      <div className="text-[10px] text-zinc-400">Simulación de CPU, GPU, RAM, cargas y comportamiento del sistema.</div>
                     </div>
                   </button>
 
@@ -379,10 +381,10 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <Zap className="w-3.5 h-3.5 text-emerald-400" />
+                    <Zap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Nuevo Laboratorio</div>
-                      <div className="text-[10px] text-zinc-400">EVO Core Metrology V1</div>
+                      <div className="font-bold text-white">Laboratorio de Metrología</div>
+                      <div className="text-[10px] text-zinc-400">Medición precisa de latencias, buses, memoria y rendimiento.</div>
                     </div>
                   </button>
 
@@ -394,10 +396,10 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <Cpu className="w-3.5 h-3.5 text-amber-400" />
+                    <Cpu className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Hot-Swap Hardware</div>
-                      <div className="text-[10px] text-zinc-400">Buses PCIe & Latencias RAM</div>
+                      <div className="font-bold text-white">Laboratorio de Hardware</div>
+                      <div className="text-[10px] text-zinc-400">Compará componentes y evaluá cambios antes de comprar.</div>
                     </div>
                   </button>
 
@@ -409,10 +411,10 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+                    <Terminal className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Hot-Swap Software</div>
-                      <div className="text-[10px] text-zinc-400">Interrupciones & DPC µs</div>
+                      <div className="font-bold text-white">Laboratorio de Software y Kernel</div>
+                      <div className="text-[10px] text-zinc-400">Drivers, DPC, temporizadores, mitigaciones y comportamiento de Windows.</div>
                     </div>
                   </button>
 
@@ -424,10 +426,10 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <Layers className="w-3.5 h-3.5 text-cyan-400" />
+                    <Layers className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Matriz de Versiones</div>
-                      <div className="text-[10px] text-zinc-400">Línea de tiempo Kernel NT</div>
+                      <div className="font-bold text-white">Laboratorio de Windows y Kernel</div>
+                      <div className="text-[10px] text-zinc-400">Versiones, scheduler, memoria, servicios y latencia.</div>
                     </div>
                   </button>
                 </div>
@@ -464,10 +466,10 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <Library className="w-3.5 h-3.5 text-purple-400" />
+                    <Library className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                     <div>
                       <div className="font-bold text-white">Expedientes & Archivo</div>
-                      <div className="text-[10px] text-zinc-400">Informes & Historiales de Casos</div>
+                      <div className="text-[10px] text-zinc-400">Informes e historiales de casos</div>
                     </div>
                   </button>
 
@@ -480,10 +482,10 @@ export const Header: React.FC<HeaderProps> = ({
                       }}
                       className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                     >
-                      <Globe className="w-3.5 h-3.5 text-cyan-400" />
+                      <Globe className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                       <div>
-                        <div className="font-bold text-white">Discovery Engine</div>
-                        <div className="text-[10px] text-zinc-400">Catálogo e Indexación de Silicio</div>
+                        <div className="font-bold text-white">Buscador de Hardware</div>
+                        <div className="text-[10px] text-zinc-400">Catálogo e indexación de silicio</div>
                       </div>
                     </button>
                   )}
@@ -497,10 +499,10 @@ export const Header: React.FC<HeaderProps> = ({
                       }}
                       className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                     >
-                      <Database className="w-3.5 h-3.5 text-purple-400" />
+                      <Database className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                       <div>
-                        <div className="font-bold text-white">Fuentes Tier 1</div>
-                        <div className="text-[10px] text-zinc-400">Ingesta Oficial de Fabricantes</div>
+                        <div className="font-bold text-white">Fuentes Oficiales</div>
+                        <div className="text-[10px] text-zinc-400">Ingesta oficial de fabricantes</div>
                       </div>
                     </button>
                   )}
@@ -514,10 +516,10 @@ export const Header: React.FC<HeaderProps> = ({
                       }}
                       className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                     >
-                      <History className="w-3.5 h-3.5 text-amber-400" />
+                      <History className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                       <div>
                         <div className="font-bold text-white">Historial de Casos</div>
-                        <div className="text-[10px] text-zinc-400">Casos Registrados & Peritajes</div>
+                        <div className="text-[10px] text-zinc-400">Casos registrados y peritajes</div>
                       </div>
                     </button>
                   )}
@@ -528,21 +530,21 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
 
           {/* ========================================================================= */}
-          {/* ZONA DERECHA: ACCIONES RÁPIDAS (AUTO-DETECTAR PC, MODO OPERATIVO)        */}
+          {/* ZONA DERECHA: ACCIONES RÁPIDAS (ESCÁNER EVO, MODO OPERATIVO)               */}
           {/* ========================================================================= */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             
-            {/* Auto-Detect PC Telemetry Trigger Button */}
+            {/* Escáner EVO Button */}
             <button
               type="button"
               onClick={() => setIsAutoDetectOpen(true)}
               className="px-3.5 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-400 text-amber-300 hover:text-black border border-amber-400/30 hover:border-amber-400 font-bold transition-all duration-200 flex items-center gap-2 cursor-pointer shadow-[0_0_12px_rgba(251,191,36,0.12)] group text-xs"
-              title="Escanear y auto-detectar silicio real con PowerShell de solo lectura"
+              title="Auditoría rápida de hardware, sistema y configuración."
             >
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:bg-black animate-pulse shadow-[0_0_6px_#fbbf24] shrink-0" />
               <Zap className="w-3.5 h-3.5 text-amber-400 group-hover:text-black transition-colors" />
-              <span className="hidden md:inline tracking-tight">AUTO-DETECTAR PC</span>
-              <span className="md:hidden">DETECTAR</span>
+              <span className="hidden md:inline tracking-tight">Escáner EVO</span>
+              <span className="md:hidden">Escáner</span>
             </button>
 
             {/* Operating Mode Switcher (Esencial / Pericial) */}
@@ -581,7 +583,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/[0.06] text-white"
               >
                 <Map className="w-4 h-4 text-amber-400" />
-                <span>Mundo EVO (Mapa Central)</span>
+                <span>Mundo EVO</span>
               </button>
 
               <button
@@ -593,7 +595,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/[0.06] text-white"
               >
                 <Cpu className="w-4 h-4 text-amber-400" />
-                <span>EVO CORE (Digital Computer Lab)</span>
+                <span>Laboratorio Central de PC</span>
               </button>
 
               <button
@@ -605,7 +607,19 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/[0.06] text-white"
               >
                 <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>Simulador & Lab (Sandbox)</span>
+                <span>Laboratorio de Silicio</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  if (onNavigateLabCore) onNavigateLabCore('LAB_ACTIVE');
+                }}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/[0.06] text-white"
+              >
+                <Zap className="w-4 h-4 text-emerald-400" />
+                <span>Laboratorio de Metrología</span>
               </button>
 
               <button
@@ -617,7 +631,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/[0.06] text-white"
               >
                 <Cpu className="w-4 h-4 text-amber-400" />
-                <span>Hot-Swap Hardware</span>
+                <span>Laboratorio de Hardware</span>
               </button>
 
               <button
@@ -629,7 +643,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/[0.06] text-white"
               >
                 <Terminal className="w-4 h-4 text-cyan-400" />
-                <span>Hot-Swap Software</span>
+                <span>Laboratorio de Software y Kernel</span>
               </button>
 
               <button
@@ -641,7 +655,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/[0.06] text-white"
               >
                 <Layers className="w-4 h-4 text-cyan-400" />
-                <span>Matriz de Versiones (Kernel NT)</span>
+                <span>Laboratorio de Windows y Kernel</span>
               </button>
 
               <button
@@ -653,7 +667,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/[0.06] text-white"
               >
                 <BookOpen className="w-4 h-4 text-amber-400" />
-                <span>Revista A4 (Edición & PDF)</span>
+                <span>Revista A4</span>
               </button>
 
               <div className="pt-2 text-[10px] font-bold text-cyan-400 uppercase tracking-widest px-2 pb-1 border-b border-white/[0.06]">
@@ -759,7 +773,7 @@ export const Header: React.FC<HeaderProps> = ({
                   className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-white/[0.06] text-zinc-300"
                 >
                   <Globe className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Discovery Engine</span>
+                  <span>Buscador de Hardware</span>
                 </button>
               )}
 
@@ -773,7 +787,7 @@ export const Header: React.FC<HeaderProps> = ({
                   className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-white/[0.06] text-zinc-300"
                 >
                   <Database className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Fuentes Tier 1</span>
+                  <span>Fuentes Oficiales</span>
                 </button>
               )}
 

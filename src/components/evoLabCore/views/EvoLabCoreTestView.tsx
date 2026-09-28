@@ -94,6 +94,10 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
 
   // Live Simulation State
   const [simulatedSecond, setSimulatedSecond] = useState<number>(0);
+  const simulatedSecondRef = useRef<number>(0);
+  const currentFrameRef = useRef<DigitalTwinFrame | null>(null);
+  const thermalStateInternalRef = useRef<ThermalSimulationState | null>(null);
+
   const [simSpeed, setSimSpeed] = useState<1 | 2 | 5 | 10>(2);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [activeStack, setActiveStack] = useState<WorkloadStack | null>(null);
@@ -192,9 +196,11 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
     };
 
     setActiveStack(initialStack);
+    simulatedSecondRef.current = 0;
     setSimulatedSecond(0);
     setFramesHistory([]);
     setEventsHistory([]);
+    thermalStateInternalRef.current = null;
     setThermalStateRef(null);
     setPhase('LIVE_SIMULATION');
     setIsPaused(false);
@@ -208,6 +214,8 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
       psuAgeYears,
       lastMaintenanceMonths
     );
+    currentFrameRef.current = frame;
+    thermalStateInternalRef.current = thermalState;
     setCurrentFrame(frame);
     setFramesHistory([frame]);
     setThermalStateRef(thermalState);
@@ -240,52 +248,60 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
     const intervalMs = Math.max(50, 1000 / simSpeed);
 
     timerRef.current = setInterval(() => {
-      setSimulatedSecond((prevSec) => {
-        const nextSec = prevSec + 1;
+      const nextSec = simulatedSecondRef.current + 1;
 
-        if (nextSec > totalTargetSeconds) {
-          // Simulation complete
-          if (timerRef.current) clearInterval(timerRef.current);
-          handleFinishSimulation();
-          return prevSec;
-        }
+      if (nextSec > totalTargetSeconds) {
+        // Simulation complete
+        if (timerRef.current) clearInterval(timerRef.current);
+        handleFinishSimulation();
+        return;
+      }
 
-        const { frame, thermalState } = EvoDigitalTwinEngine.generateFrame(
-          machine,
-          activeStack,
-          nextSec,
-          thermalStateRef,
-          psuAgeYears,
-          lastMaintenanceMonths
-        );
+      const { frame, thermalState } = EvoDigitalTwinEngine.generateFrame(
+        machine,
+        activeStack,
+        nextSec,
+        thermalStateInternalRef.current,
+        psuAgeYears,
+        lastMaintenanceMonths
+      );
 
-        setCurrentFrame(frame);
-        setThermalStateRef(thermalState);
-        setFramesHistory((prev) => [...prev, frame]);
+      simulatedSecondRef.current = nextSec;
+      thermalStateInternalRef.current = thermalState;
+      const prevFrame = currentFrameRef.current;
+      currentFrameRef.current = frame;
 
-        // Detect dynamic event triggers
-        if (frame.limitingFactor !== currentFrame?.limitingFactor && currentFrame) {
-          const ev: DigitalTwinEventMarker = {
-            id: `ev-bottle-${nextSec}`,
-            timestampSeconds: nextSec,
-            timeFormatted: frame.timeFormatted,
-            type: 'BOTTLENECK_CHANGED',
-            title: `Cambio de Régimen: ${DynamicBottleneckEngine.getFactorLabel(frame.limitingFactor)}`,
-            description: frame.limitingFactorReasonEs,
-            affectedSubsystem: frame.limitingFactor.includes('GPU') ? 'gpu' : 'cpu',
-            severity: frame.limitingFactor.includes('LIMIT') ? 'WARNING' : 'INFO',
-          };
-          setEventsHistory((prev) => [...prev, ev]);
-        }
+      setSimulatedSecond(nextSec);
+      setCurrentFrame(frame);
+      setThermalStateRef(thermalState);
+      setFramesHistory((prev) => [...prev, frame]);
 
-        return nextSec;
-      });
+      // Detect dynamic event triggers without duplicates
+      if (prevFrame && frame.limitingFactor !== prevFrame.limitingFactor) {
+        const evId = `ev-bottle-${nextSec}-${Date.now()}`;
+        const ev: DigitalTwinEventMarker = {
+          id: evId,
+          timestampSeconds: nextSec,
+          timeFormatted: frame.timeFormatted,
+          type: 'BOTTLENECK_CHANGED',
+          title: `Cambio de Régimen: ${DynamicBottleneckEngine.getFactorLabel(frame.limitingFactor)}`,
+          description: frame.limitingFactorReasonEs,
+          affectedSubsystem: frame.limitingFactor.includes('GPU') ? 'gpu' : 'cpu',
+          severity: frame.limitingFactor.includes('LIMIT') ? 'WARNING' : 'INFO',
+        };
+        setEventsHistory((prev) => {
+          if (prev.some((e) => e.type === 'BOTTLENECK_CHANGED' && e.timestampSeconds === nextSec)) {
+            return prev;
+          }
+          return [...prev, ev];
+        });
+      }
     }, intervalMs);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [phase, isPaused, activeStack, simSpeed, durationMinutes, thermalStateRef, currentFrame]);
+  }, [phase, isPaused, activeStack, simSpeed, durationMinutes, machine, psuAgeYears, lastMaintenanceMonths]);
 
   // --------------------------------------------------------------------------
   // LIVE WORKLOAD MODIFICATION (IN-FLIGHT)
@@ -484,6 +500,8 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
   // --------------------------------------------------------------------------
   const handleScrubTimeline = (second: number) => {
     if (framesHistory[second]) {
+      currentFrameRef.current = framesHistory[second];
+      simulatedSecondRef.current = second;
       setCurrentFrame(framesHistory[second]);
       setSimulatedSecond(second);
     }
@@ -1592,9 +1610,9 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
 
           {/* Event Markers Grid with Subsystem Highlighting on Hover / Click */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pt-2 border-t border-zinc-800/80">
-            {eventsHistory.slice(-6).map((ev) => (
+            {eventsHistory.slice(-6).map((ev, idx) => (
               <div
-                key={ev.id}
+                key={`${ev.id}-${ev.timestampSeconds}-${idx}`}
                 onClick={() => {
                   handleScrubTimeline(ev.timestampSeconds);
                   setHighlightedSubsystem(ev.affectedSubsystem);
@@ -1838,8 +1856,8 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
 
                 <div className="space-y-1.5">
                   <div className="text-zinc-400 font-bold uppercase">Eventos Críticos Registrados:</div>
-                  {finalReport.events.map((ev) => (
-                    <div key={ev.id} className="p-2 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-between text-[11px]">
+                  {finalReport.events.map((ev, idx) => (
+                    <div key={`${ev.id}-${ev.timestampSeconds}-${idx}`} className="p-2 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-between text-[11px]">
                       <div>
                         <span className="text-cyan-400 font-bold mr-2">{ev.timeFormatted}</span>
                         <span className="text-white font-bold">{ev.title}</span>
