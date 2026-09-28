@@ -18,8 +18,10 @@ import {
   Radio,
   Lock,
   Zap,
+  Power,
 } from 'lucide-react';
 import { VOLUMES_COLLECTION } from '../../data/collections';
+import { EvoBootLab } from '../tomo08/EvoBootLab';
 
 export interface ForensicBenchTarget {
   tomoId: string;
@@ -234,39 +236,39 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     tomoKey: 'tomo-05',
     number: '05',
     volumeLabel: 'TOMO 05',
-    editionLabel: 'EDICIÓN INFRAESTRUCTURA 2026 // REDES Y KERNEL',
+    editionLabel: 'EDICIÓN REDES 2026 // TRÁFICO Y PROTOCOLOS',
     primaryColor: '#06b6d4',
-    accentGradient: 'from-cyan-500/20 via-purple-600/10 to-transparent',
+    accentGradient: 'from-cyan-500/20 via-sky-600/10 to-transparent',
     glowShadow: 'rgba(6, 182, 212, 0.28)',
-    tagline: 'REDES AVANZADAS, LINUX SYSADMIN & VIRTUALIZACIÓN TIPO 1',
-    title: 'INFRAESTRUCTURA INVISIBLE: TRÁFICO CRUDO Y KERNEL LINUX',
+    tagline: 'REDES, ETHERNET, WI-FI, IP, DNS, TCP/UDP, ROUTING & WIRESHARK',
+    title: 'LA RED INVISIBLE',
     editorialSubtitle:
-      'Topología TCP/IP pericial, disección de paquetes Wireshark a nivel de bit, gobernanza del kernel monolítico Linux, almacenamiento resiliente ZFS y clústeres hipervisores KVM/Proxmox.',
-    pagesBadge: '210 PÁGINAS A4 // 12 MÓDULOS',
-    systemStandard: 'RFC PROTOCOL COMPLIANCE & LINUX KERNEL SUBSYSTEM',
+      'De cero a entender y dominar cómo viajan los datos. Redes, Ethernet, Wi-Fi, IP, DNS, TCP/UDP, routing, puertos, Wireshark, paquetes y análisis de tráfico.',
+    pagesBadge: '190 PÁGINAS A4 // 7 MÓDULOS',
+    systemStandard: 'RFC PROTOCOL COMPLIANCE & OSI/TCP STACK AUDITING',
     keyTopics: [
       {
         num: '01',
         title: 'Inspección de paquetes a bajo nivel',
-        description: 'Análisis de ventanas TCP, retraso de ida y vuelta (RTT), handshakes TLS 1.3 y retransmisiones anómalas.',
+        description: 'Análisis de ventanas TCP, handshakes TLS 1.3, retransmisiones, DNS y latencia de ida y vuelta (RTT).',
       },
       {
         num: '02',
-        title: 'Virtualización tipo 1 con passthrough PCIe',
-        description: 'IOMMU groups, VFIO driver bonding y aislamiento de tarjetas gráficas dedicadas sin penalización de CPU.',
+        title: 'Topología física & conmutación Ethernet',
+        description: 'Switches gestionables, segmentación de tráfico 802.1Q VLANs, STP y agregación LACP.',
       },
       {
         num: '03',
-        title: 'Optimización del stack TCP/IP',
-        description: 'BBR Congestion Control, MTU/Jumbo Frames, mitigación SYN Flood con cookies de kernel y colas eBPF.',
+        title: 'Filtrado de tráfico, puertos & enrutamiento',
+        description: 'Reglas NFTables, Stateful Inspection, NAT, tablas de enrutamiento IPv4/IPv6 y túneles cifrados WireGuard.',
       },
     ],
     heroGraphic: {
-      badge: 'TOPOLOGÍA OSI // KERNEL SYSFS & NFTABLES',
-      chipName: 'PROXMOX VE HYPERVISOR & CEPH CLUSTER',
-      frequencyOrSpec: '10GbE SFP+ Direct Attach // WireGuard Curve25519',
-      statusLabel: 'RED DE BAJA LATENCIA & VIRTUALIZACIÓN AISLADA',
-      features: ['Wireshark Deep Packet Engine', 'ZFS Atomic Snapshots RAID-Z', 'Docker OCI Namespaces Hardened'],
+      badge: 'TOPOLOGÍA OSI // ANÁLISIS DE TRÁFICO',
+      chipName: 'WIRESHARK RAW DEEP PACKET ENGINE',
+      frequencyOrSpec: 'Ethernet 10GbE // Wi-Fi 6E/7 // TCP BBR',
+      statusLabel: 'CAPTURA PERICIAL & DECODIFICACIÓN DE FLUJOS',
+      features: ['Wireshark Deep Packet Inspection', 'DNS & Routing Triage Table', 'Stateful Packet Filtering'],
       bgPattern: 'radial-gradient(ellipse at center, rgba(6,182,212,0.18) 0%, rgba(8,10,13,0.95) 75%)',
     },
   },
@@ -275,40 +277,204 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     tomoKey: 'tomo-06',
     number: '06',
     volumeLabel: 'TOMO 06',
-    editionLabel: 'EDICIÓN CIBERSEGURIDAD 2026 // ANÁLISIS FORENSE',
+    editionLabel: 'EDICIÓN CIBERSEGURIDAD 2026 // LABS VIRTUALES',
     primaryColor: '#ef4444',
     accentGradient: 'from-rose-600/25 via-red-600/10 to-transparent',
     glowShadow: 'rgba(239, 68, 68, 0.28)',
-    tagline: 'ANÁLISIS DE MALWARE // INGENIERÍA INVERSA // ZERO-TRUST',
-    title: 'EL ARTE DE LA INFILTRACIÓN: INGENIERÍA INVERSA Y RING -1',
+    tagline: 'APRENDIZAJE PROGRESIVO // PRÁCTICAS Y EJERCICIOS VIRTUALES',
+    title: 'CIBERSEGURIDAD: DEL CERO AL CONTROL TOTAL',
     editorialSubtitle:
-      'La ciencia de la seguridad ofensiva y defensiva profunda: desensamblado estático con Ghidra, análisis de comportamiento dinámico en sandboxes selladas, detección de rootkits y auditoría de memoria volátil.',
-    pagesBadge: '220 PÁGINAS A4 // 12 MÓDULOS',
-    systemStandard: 'MITRE ATT&CK FRAMEWORK & VOLATILITY MEMORY FORENSICS',
+      'Laboratorios virtuales incluidos por niveles. Aprendizaje progresivo, prácticas y ejercicios virtuales desde base hasta avanzado. Metodología de ataque y defensa, análisis dinámico y mitigación.',
+    pagesBadge: 'LABORATORIOS VIRTUALES POR NIVELES',
+    systemStandard: 'MITRE ATT&CK FRAMEWORK & DEFENSIVE HARDENING',
     keyTopics: [
       {
         num: '01',
-        title: 'Volcados forenses de memoria volátil',
-        description: 'Extracción de estructuras VAD, inyección DLL reflectiva y reconstrucción de procesos ocultos con Volatility 3.',
+        title: 'Nivel 01: Metodología del Ataque y Defensa',
+        description: 'Matriz táctica MITRE ATT&CK: desde el reconocimiento y acceso inicial hasta la contención defensiva.',
       },
       {
         num: '02',
-        title: 'Desensamblado x86/x64',
-        description: 'Lectura de descompilador Ghidra, control flow graphs, evasión de llamadas de sistema (direct Syscalls) y firmas YARA.',
+        title: 'Nivel 02: Laboratorio Dinámico en Sandbox Aislada',
+        description: 'Monitoreo de comportamiento en tiempo real con Procmon, Regshot e interceptación de tráfico simulado.',
       },
       {
         num: '03',
-        title: 'Análisis de artefactos y exploits',
-        description: 'Deconstrucción de rootkits de kernel (DKOM), evasión de EDR de última generación y persistencia mediante sombras VSS.',
+        title: 'Nivel 03: Hardening Defensivo y Arquitectura Zero-Trust',
+        description: 'Políticas ASR, AppLocker, Sysmon calibrado, mitigación de ransomware y segmentación de privilegios.',
       },
     ],
     heroGraphic: {
-      badge: 'INGENIERÍA INVERSA // PE DISASSEMBLER',
-      chipName: 'GHIDRA SRE // RING -1 HYPERVISOR PROBE',
-      frequencyOrSpec: 'SHA-256 Verified // Zero-Trust Sandbox Isolation',
-      statusLabel: 'FORENSE DE MEMORIA VOLÁTIL & ANÁLISIS DE KERNEL',
-      features: ['Volatility 3 Profile Engine', 'Kernel Callback Audit (DKOM)', 'MITRE ATT&CK Matrix Triage'],
+      badge: 'CIBERSEGURIDAD // LABS VIRTUALES POR NIVELES',
+      chipName: 'EVO CYBER LABS // MITRE DEFENSIVE SUITE',
+      frequencyOrSpec: 'Zero-Trust Sandbox // Dynamic Behavioral Triage',
+      statusLabel: 'APRENDIZAJE PROGRESIVO & LABORATORIOS PRÁCTICOS',
+      features: ['Laboratorios Virtuales Progresivos', 'Sandbox de Contención Segura', 'Mitigación Zero-Trust Calibrada'],
       bgPattern: 'radial-gradient(ellipse at center, rgba(239,68,68,0.18) 0%, rgba(8,10,13,0.95) 75%)',
+    },
+  },
+
+  'tomo-07': {
+    tomoKey: 'tomo-07',
+    number: '07',
+    volumeLabel: 'TOMO 07',
+    editionLabel: 'EN DESARROLLO // EDICIÓN GAMING 2026',
+    primaryColor: '#f59e0b',
+    accentGradient: 'from-amber-500/25 via-orange-600/10 to-transparent',
+    glowShadow: 'rgba(245, 158, 11, 0.28)',
+    tagline: 'METROLOGÍA DE RENDIMIENTO // FPS, FRAMETIME & LATENCIA',
+    title: 'GAMING PERFORMANCE',
+    editorialSubtitle:
+      'FPS, frametime, latencia, estabilidad y rendimiento medido.',
+    pagesBadge: 'EN DESARROLLO // INVESTIGACIÓN TÉCNICA',
+    systemStandard: 'FRAME PACING & HARDWARE TIMING SPEC',
+    keyTopics: [
+      {
+        num: '01',
+        title: 'Frametime & Consistencia de Renderizado',
+        description: 'Análisis de percentiles 1% low, 0.1% low, micro-stuttering y consistencia entre fotogramas sucesivos.',
+      },
+      {
+        num: '02',
+        title: 'Cadena de Latencia & Input Lag',
+        description: 'Muestreo de periféricos, colas del renderizador de Windows, tecnologías anti-lag y tasa de refresco.',
+      },
+      {
+        num: '03',
+        title: 'Estabilidad Térmica & Sostenibilidad de Frecuencia',
+        description: 'Curvas de voltaje/frecuencia bajo carga pesada continua versus picos sintéticos transitorios.',
+      },
+    ],
+    heroGraphic: {
+      badge: 'METROLOGÍA // FRAME PACING',
+      chipName: 'EVO GAMING BENCHMARK & TELEMETRY',
+      frequencyOrSpec: 'Frametimes μs // 1% Low Percentiles // CapFrameX Protocol',
+      statusLabel: 'MEDICIÓN CIENTÍFICA DE RENDIMIENTO BAJO CARGA',
+      features: ['Frametime Pacing Analysis', 'Input Lag Pipeline Triage', 'Clock Throttling Verification'],
+      bgPattern: 'radial-gradient(ellipse at center, rgba(245,158,11,0.18) 0%, rgba(8,10,13,0.95) 75%)',
+    },
+  },
+
+  'tomo-08': {
+    tomoKey: 'tomo-08',
+    number: '08',
+    volumeLabel: 'TOMO 08',
+    editionLabel: 'EN DESARROLLO // DIAGNÓSTICO EVO 2026',
+    primaryColor: '#10b981',
+    accentGradient: 'from-emerald-500/25 via-teal-600/10 to-transparent',
+    glowShadow: 'rgba(16, 185, 129, 0.28)',
+    tagline: 'LABORATORIO VIRTUAL DE ARRANQUE Y DIAGNÓSTICO EVO',
+    title: 'DEL BOTÓN POWER A WINDOWS',
+    editorialSubtitle:
+      'Laboratorio Virtual de Arranque y Diagnóstico EVO. Recorrido visual, guiado y paso a paso desde presionar POWER hasta llegar al escritorio de Windows, atravesando hardware, firmware, POST, BIOS/UEFI, memoria, GPU, almacenamiento, bootloader, kernel, drivers, servicios y sesión.',
+    pagesBadge: 'EN DESARROLLO // LABORATORIO VIRTUAL GUIADO',
+    systemStandard: 'UEFI SPECIFICATION & WINDOWS BOOT EXECUTION PATH',
+    keyTopics: [
+      {
+        num: '01',
+        title: 'Hardware, Firmware & POST Inicial',
+        description: 'Señales eléctricas Power Good, fases VRM, POST de placa madre y entrenamiento de memoria RAM.',
+      },
+      {
+        num: '02',
+        title: 'Bootloader, BCD & Carga del Kernel',
+        description: 'Partición ESP, winload.efi, ntoskrnl.exe, inicialización de HAL y verificación Secure Boot.',
+      },
+      {
+        num: '03',
+        title: 'Drivers, Servicios & Sesión de Usuario',
+        description: 'Drivers boot-start, subsistema SMSS/CSRSS, autenticación Winlogon y renderizado final de Explorer.',
+      },
+    ],
+    heroGraphic: {
+      badge: 'ARQUITECTURA DE ARRANQUE // SECUENCIA POST A KERNEL',
+      chipName: 'EVO BOOT SEQUENCE LAB & TRACER',
+      frequencyOrSpec: 'POST → UEFI → Winload → NT Kernel → User Session',
+      statusLabel: 'RECORRIDO VISUAL PASO A PASO GUIADO',
+      features: ['Etapas de Secuencia de Energía', 'Puntos Críticos de Falla en Boot', 'Auditoría de Drivers y Servicios'],
+      bgPattern: 'radial-gradient(ellipse at center, rgba(16,185,129,0.18) 0%, rgba(8,10,13,0.95) 75%)',
+    },
+  },
+
+  'tomo-09': {
+    tomoKey: 'tomo-09',
+    number: '09',
+    volumeLabel: 'TOMO 09',
+    editionLabel: 'EN DESARROLLO // KERNEL & SISTEMAS 2026',
+    primaryColor: '#38bdf8',
+    accentGradient: 'from-sky-500/25 via-blue-600/10 to-transparent',
+    glowShadow: 'rgba(56, 189, 248, 0.28)',
+    tagline: 'PROCESOS, MEMORIA, VIRTUALIZACIÓN Y FUNCIONAMIENTO INTERNO',
+    title: 'SISTEMAS, LINUX & KERNEL',
+    editorialSubtitle:
+      'Procesos, memoria, virtualización y funcionamiento interno del sistema.',
+    pagesBadge: 'EN DESARROLLO // ARQUITECTURA DE SISTEMAS',
+    systemStandard: 'POSIX / LINUX KERNEL SUBSYSTEM SPEC',
+    keyTopics: [
+      {
+        num: '01',
+        title: 'Arquitectura del Kernel Linux & Subsistemas',
+        description: 'Estructura monolithic modular, sysfs, procfs, systemd, llamadas de sistema y control de procesos.',
+      },
+      {
+        num: '02',
+        title: 'Gestión de Memoria & Almacenamiento ZFS',
+        description: 'Paginación virtual, TLB, pools RAID-Z, snapshots atómicos y compresión ZSTD.',
+      },
+      {
+        num: '03',
+        title: 'Hipervisores KVM & Contenedores OCI',
+        description: 'Virtualización Tipo 1 por hardware, passthrough PCIe con VFIO, cgroups v2 y namespaces aislados.',
+      },
+    ],
+    heroGraphic: {
+      badge: 'SUBSISTEMAS KERNEL // KVM HYPERVISOR',
+      chipName: 'LINUX KERNEL MONOLITHIC & CGROUPS V2',
+      frequencyOrSpec: 'KVM VFIO Passthrough // ZFS RAID-Z // eBPF',
+      statusLabel: 'FUNCIONAMIENTO INTERNO DEL SISTEMA OPERATIVO',
+      features: ['Sysfs & Procfs Governance', 'KVM / VFIO Hardware Passthrough', 'ZFS Atomic CoW Resiliency'],
+      bgPattern: 'radial-gradient(ellipse at center, rgba(56,189,248,0.18) 0%, rgba(8,10,13,0.95) 75%)',
+    },
+  },
+
+  'tomo-10': {
+    tomoKey: 'tomo-10',
+    number: '10',
+    volumeLabel: 'TOMO 10',
+    editionLabel: 'EN DESARROLLO // INGENIERÍA INVERSA & FORENSE',
+    primaryColor: '#a855f7',
+    accentGradient: 'from-purple-600/25 via-fuchsia-600/10 to-transparent',
+    glowShadow: 'rgba(168, 85, 247, 0.28)',
+    tagline: 'ANÁLISIS PROFUNDO, EVIDENCIA, MEMORIA, BINARIOS E INVESTIGACIÓN TÉCNICA',
+    title: 'INGENIERÍA INVERSA & FORENSE',
+    editorialSubtitle:
+      'Análisis profundo, evidencia, memoria, binarios e investigación técnica.',
+    pagesBadge: 'EN DESARROLLO // PERITAJE TÉCNICO',
+    systemStandard: 'VOLATILITY 3 & DISASSEMBLER SRE STANDARDS',
+    keyTopics: [
+      {
+        num: '01',
+        title: 'Análisis Estático de Binarios con Ghidra',
+        description: 'Desensamblado x86/x64, cabeceras PE/ELF, tablas IAT, grafos de flujo de control y firmas YARA.',
+      },
+      {
+        num: '02',
+        title: 'Análisis Forense de Memoria Volátil',
+        description: 'Extracción de volcados RAM con Volatility 3, inyección DLL reflectiva y reconstrucción de procesos ocultos.',
+      },
+      {
+        num: '03',
+        title: 'Rootkits de Kernel (Ring 0) & EDR Bypass',
+        description: 'DKOM (Direct Kernel Object Manipulation), hook de IRPs, evasión de sandboxes y cadena de custodia pericial.',
+      },
+    ],
+    heroGraphic: {
+      badge: 'INGENIERÍA INVERSA // FORENSE DE MEMORIA',
+      chipName: 'GHIDRA SRE // VOLATILITY 3 SUITE',
+      frequencyOrSpec: 'PE/ELF Disassembly // Ring 0 DKOM // SHA-256 Custodia',
+      statusLabel: 'PERITAJE TÉCNICO & EXTRACCIÓN DE EVIDENCIA',
+      features: ['Desensamblado x86/x64 Ghidra', 'Forense de RAM Volatility 3', 'Auditoría DKOM & Cadena de Custodia'],
+      bgPattern: 'radial-gradient(ellipse at center, rgba(168,85,247,0.18) 0%, rgba(8,10,13,0.95) 75%)',
     },
   },
 };
@@ -511,9 +677,9 @@ const TOMO_EXTENDED_DATA: Record<
     ],
   },
   'tomo-05': {
-    pages: '210 páginas A4',
-    modulesCount: '12 módulos técnicos de infraestructura',
-    targetAudience: 'Administradores de sistemas, ingenieros de redes y entusiastas de Linux',
+    pages: '190 páginas A4',
+    modulesCount: '7 módulos de análisis de red y tráfico',
+    targetAudience: 'Administradores de red, analistas de tráfico y especialistas en conectividad',
     modules: [
       {
         number: 'M01',
@@ -535,136 +701,162 @@ const TOMO_EXTENDED_DATA: Record<
       },
       {
         number: 'M04',
-        title: 'Arquitectura del Kernel Linux',
-        desc: 'Estructura monolithic modular, sysfs, procfs, systemd e inicialización de servicios.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'LINUX KERNEL SYSFS' }
+        title: 'Servicios de Red Esenciales',
+        desc: 'Resolución de nombres DNS, DHCP, asignación de puertos y servicios de red perimetrales.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'SERVICIOS DE RED' }
       },
       {
         number: 'M05',
-        title: 'Administración de Almacenamiento ZFS & Btrfs',
-        desc: 'Pools RAID-Z, snapshots atómicos, compresión ZSTD y reparación por paridad.',
-        benchConfig: { labView: 'hotswap-lab', scenario: 'ab-bench', badgeLabel: 'ZFS ATOMIC' }
-      },
-      {
-        number: 'M06',
-        title: 'Servicios de Red Esenciales en Debian/Ubuntu',
-        desc: 'Configuración endurecida de NGINX, Bind9, DHCP, SSH con claves ED25519.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'HARDENED SERVICES' }
-      },
-      {
-        number: 'M07',
         title: 'Firewalls e IPTables / NFTables',
-        desc: 'Reglas de filtrado de paquetes, NAT, Stateful Inspection y prevención de DoS.',
+        desc: 'Reglas de filtrado de paquetes, NAT, Stateful Inspection y control de flujo de puertos.',
         benchConfig: { labView: 'windows-matrix', scenario: 'dpc-conflict', badgeLabel: 'NFTABLES RULESET' }
       },
       {
-        number: 'M08',
-        title: 'Fundamentos de Hipervisores Tipo 1 vs Tipo 2',
-        desc: 'Virtualización KVM/QEMU por hardware (Intel VT-x / AMD-V) y passthrough de PCI.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'KVM VFIO PASSTHROUGH' }
-      },
-      {
-        number: 'M09',
-        title: 'Despliegue de Clúster Proxmox VE',
-        desc: 'Alta disponibilidad (HA), almacenamiento compartido Ceph y migración en caliente.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'PROXMOX CLUSTER' }
-      },
-      {
-        number: 'M10',
-        title: 'Contenedores Docker & Arquitectura OCI',
-        desc: 'Cgroups v2, namespaces, Dockerfile hardening y redes internas bridge/macvlan.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'win10-ltsc', badgeLabel: 'DOCKER CGROUPS' }
-      },
-      {
-        number: 'M11',
+        number: 'M06',
         title: 'VPNs Modernas: WireGuard vs OpenVPN',
-        desc: 'Criptografía Curve25519, túneles punto a punto y topologías hub-and-spoke.',
+        desc: 'Criptografía Curve25519, túneles punto a punto y topologías de enrutamiento seguro.',
         benchConfig: { labView: 'windows-matrix', scenario: 'dpc-conflict', badgeLabel: 'WIREGUARD P2P' }
       },
       {
-        number: 'M12',
-        title: 'Monitorización y Métricas con Prometheus & Grafana',
-        desc: 'Exporters de nodo, dashboards de telemetría de red y alertas automatizadas.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'timer-resolution', badgeLabel: 'PROMETHEUS METRICS' }
+        number: 'M07',
+        title: 'Monitorización y Métricas de Tráfico',
+        desc: 'Telemetría de interfaces de red, análisis de throughput, pérdida de paquetes y latencias.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'timer-resolution', badgeLabel: 'TELEMETRÍA DE RED' }
       },
     ],
   },
   'tomo-06': {
     pages: '220 páginas A4',
-    modulesCount: '12 módulos forenses de ciberseguridad',
-    targetAudience: 'Analistas SOC, investigadores de malware, pentesters y auditores de seguridad',
+    modulesCount: '7 niveles de laboratorios progresivos',
+    targetAudience: 'Estudiantes, analistas de seguridad, operadores SOC y defensores de sistemas',
+    modules: [
+      {
+        number: 'Nivel 01',
+        title: 'Metodología del Ataque y Defensa (MITRE ATT&CK)',
+        desc: 'Matriz táctica: desde el reconocimiento y acceso inicial hasta la contención defensiva.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'NIVEL 1 // MITRE' }
+      },
+      {
+        number: 'Nivel 02',
+        title: 'Reconocimiento Pasivo y Activo (OSINT & Scanning)',
+        desc: 'Enumeración de puertos, escaneos Nmap, detección de servicios y cartografía de superficie de ataque.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'dpc-conflict', badgeLabel: 'NIVEL 2 // SCANNING' }
+      },
+      {
+        number: 'Nivel 03',
+        title: 'Análisis Dinámico en Sandbox Aislada',
+        desc: 'Laboratorio virtual: monitoreo con Procmon, Regshot y análisis de comportamiento en entorno seguro.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'telemetry-diagtrack', badgeLabel: 'NIVEL 3 // SANDBOX' }
+      },
+      {
+        number: 'Nivel 04',
+        title: 'Morfología de Ransomware & Persistencia',
+        desc: 'Criptografía de extorsión, mecanismos de persistencia en el sistema y protección de sombras VSS.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'win10-ltsc', badgeLabel: 'NIVEL 4 // RESILIENCIA' }
+      },
+      {
+        number: 'Nivel 05',
+        title: 'Explotación Web y Auditoría (OWASP Top 10)',
+        desc: 'Laboratorio interactivo de vulnerabilidades: inyecciones, rotura de control de acceso y remediación.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'telemetry-diagtrack', badgeLabel: 'NIVEL 5 // WEB LAB' }
+      },
+      {
+        number: 'Nivel 06',
+        title: 'Seguridad en Directorio Activo & Credenciales',
+        desc: 'Ataques a Kerberos, extracción de credenciales, escalada de privilegios y contramedidas.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'NIVEL 6 // AD DEFENSE' }
+      },
+      {
+        number: 'Nivel 07',
+        title: 'Hardening Defensivo y Arquitectura Zero-Trust',
+        desc: 'Control total: políticas AppLocker, reglas ASR, Sysmon calibrado y aislamiento de privilegios.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'win10-ltsc', badgeLabel: 'NIVEL 7 // CONTROL TOTAL' }
+      },
+    ],
+  },
+  'tomo-07': {
+    pages: 'En desarrollo',
+    modulesCount: 'En fase de investigación técnica',
+    targetAudience: 'Entusiastas del rendimiento, gamers competitivos e ingenieros de benchmarking',
+    modules: [],
+  },
+  'tomo-08': {
+    pages: 'En desarrollo',
+    modulesCount: 'En fase de modelado de laboratorio',
+    targetAudience: 'Técnicos de diagnóstico, especialistas en firmware y depuradores de arranque',
+    modules: [],
+  },
+  'tomo-09': {
+    pages: 'En desarrollo',
+    modulesCount: '5 módulos de arquitectura interna y sistemas',
+    targetAudience: 'Administradores de sistemas Linux, desarrolladores de sistemas y entusiastas del kernel',
     modules: [
       {
         number: 'M01',
-        title: 'Metodología del Ataque y Defensa (MITRE ATT&CK)',
-        desc: 'Matriz táctica: desde el acceso inicial hasta la exfiltración e impacto.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'MITRE ATT&CK' }
+        title: 'Arquitectura del Kernel Linux & Subsistemas',
+        desc: 'Estructura monolithic modular, sysfs, procfs, systemd e inicialización de servicios.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'LINUX KERNEL SYSFS' }
       },
       {
         number: 'M02',
-        title: 'Reconocimiento Pasivo y Activo (OSINT & Scanning)',
-        desc: 'Nmap avanzado, NSE scripts, banners, enumeración de servicios y shodan.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'dpc-conflict', badgeLabel: 'NMAP RAW SCAN' }
+        title: 'Administración de Almacenamiento ZFS & Btrfs',
+        desc: 'Pools RAID-Z, snapshots atómicos, compresión ZSTD y reparación por paridad.',
+        benchConfig: { labView: 'hotswap-lab', scenario: 'ab-bench', badgeLabel: 'ZFS ATOMIC' }
       },
       {
         number: 'M03',
+        title: 'Fundamentos de Hipervisores Tipo 1 vs Tipo 2',
+        desc: 'Virtualización KVM/QEMU por hardware (Intel VT-x / AMD-V) y passthrough de PCI.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'KVM VFIO PASSTHROUGH' }
+      },
+      {
+        number: 'M04',
+        title: 'Despliegue de Clúster Proxmox VE',
+        desc: 'Alta disponibilidad (HA), almacenamiento compartido Ceph y migración en caliente.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'PROXMOX CLUSTER' }
+      },
+      {
+        number: 'M05',
+        title: 'Contenedores Docker & Arquitectura OCI',
+        desc: 'Cgroups v2, namespaces, procesos y aislamiento de subsistemas.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'win10-ltsc', badgeLabel: 'DOCKER CGROUPS' }
+      },
+    ],
+  },
+  'tomo-10': {
+    pages: 'En desarrollo',
+    modulesCount: '5 módulos de peritaje e ingeniería inversa',
+    targetAudience: 'Peritos forenses, analistas de binarios, investigadores de malware e ingenieros inversos',
+    modules: [
+      {
+        number: 'M01',
         title: 'Análisis Estático de Binarios con Ghidra',
         desc: 'Desensamblado x86/x64, PE headers, tablas de importación (IAT) y firmas YARA.',
         benchConfig: { labView: 'windows-matrix', scenario: 'boot-sequence', badgeLabel: 'GHIDRA SRE' }
       },
       {
-        number: 'M04',
-        title: 'Análisis Dinámico en Sandbox Aislada',
-        desc: 'Monitoreo con Procmon, Regshot, Wireshark y emulación de red con INetSim.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'telemetry-diagtrack', badgeLabel: 'SANDBOX ISOLATION' }
-      },
-      {
-        number: 'M05',
+        number: 'M02',
         title: 'Técnicas de Evasión y Desofuscación',
-        desc: 'Detección de hypervisor/sandbox, timing attacks, packers UPX y strings cifradas con XOR.',
+        desc: 'Detección de hipervisor/sandbox, timing attacks, packers UPX y strings cifradas con XOR.',
         benchConfig: { labView: 'windows-matrix', scenario: 'timer-resolution', badgeLabel: 'TIMING ATTACKS' }
       },
       {
-        number: 'M06',
-        title: 'Morfología de Ransomware & Persistencia',
-        desc: 'Criptografía asimétrica/simétrica híbrida, sombras de volumen (VSS) y Run keys.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'win10-ltsc', badgeLabel: 'VSS SHADOW AUDIT' }
-      },
-      {
-        number: 'M07',
+        number: 'M03',
         title: 'Análisis Forense de Memoria con Volatility 3',
-        desc: 'Extracción de dumps RAM, pslist, malfind, inyección DLL y dump de procesos.',
+        desc: 'Extracción de volcados RAM, pslist, malfind, inyección DLL y dump de procesos.',
         benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'VOLATILITY 3 DUMP' }
       },
       {
-        number: 'M08',
+        number: 'M04',
         title: 'Rootkits de Kernel (Ring 0) & EDR Bypass',
         desc: 'DKOM (Direct Kernel Object Manipulation), hook de IRPs y anulación de callbacks.',
         benchConfig: { labView: 'windows-matrix', scenario: 'dpc-conflict', badgeLabel: 'RING 0 DKOM' }
       },
       {
-        number: 'M09',
-        title: 'Explotación Web (OWASP Top 10)',
-        desc: 'SQLi, XSS, SSRF, IDOR y rotura de autenticación mediante proxies Burp Suite.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'telemetry-diagtrack', badgeLabel: 'BURP SUITE PROXY' }
-      },
-      {
-        number: 'M10',
-        title: 'Seguridad en Directorio Activo (AD Attacks)',
-        desc: 'Kerberoasting, AS-REP Roasting, Pass-the-Hash y escalada de privilegios.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'KERBEROASTING' }
-      },
-      {
-        number: 'M11',
+        number: 'M05',
         title: 'Respuesta ante Incidentes & Cadena de Custodia',
         desc: 'Adquisición forense de discos (dd/E01), hashing SHA-256 y reporte pericial judicial.',
         benchConfig: { labView: 'hotswap-lab', scenario: 'ab-bench', badgeLabel: 'SHA-256 CUSTODIA' }
-      },
-      {
-        number: 'M12',
-        title: 'Hardening Defensivo y Arquitectura Zero-Trust',
-        desc: 'Políticas AppLocker, ASR rules, LAPS, Sysmon calibrado y segmentación de privilegios.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'win10-ltsc', badgeLabel: 'ZERO-TRUST KERNEL' }
       },
     ],
   },
@@ -679,15 +871,25 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
 }) => {
   // CRITICAL DIRECTIVE: The modal MUST ALWAYS open in 'portada' (cover) view by default
   const [modalView, setModalView] = useState<'portada' | 'indice'>('portada');
+  const [isBootLabOpen, setIsBootLabOpen] = useState<boolean>(false);
 
   // Reset to 'portada' whenever the modal opens or tomoId changes
   useEffect(() => {
     if (isOpen) {
       setModalView('portada');
+      setIsBootLabOpen(false);
     }
   }, [isOpen, tomoId]);
 
   if (!isOpen || !tomoId) return null;
+
+  if (isBootLabOpen && tomoId === 'tomo-08') {
+    return (
+      <div className="fixed inset-0 z-[120] bg-black animate-in fade-in duration-200">
+        <EvoBootLab onClose={() => setIsBootLabOpen(false)} />
+      </div>
+    );
+  }
 
   const volume = VOLUMES_COLLECTION.find((v) => v.id === tomoId);
   const coverMeta = TOMOS_EDITORIAL_COVERS[tomoId] || TOMOS_EDITORIAL_COVERS['tomo-01'];
@@ -899,18 +1101,34 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
 
                 {/* Botones de Acción de Portada */}
                 <div className="pt-2 flex flex-wrap items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={handleOpenInteractive}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase text-black transition-all duration-200 cursor-pointer shadow-xl hover:brightness-110"
-                    style={{
-                      background: coverMeta.primaryColor,
-                      boxShadow: `0 8px 24px -6px ${coverMeta.primaryColor}40`,
-                    }}
-                  >
-                    <span>ABRIR EDICIÓN INTERACTIVA</span>
-                    <ArrowRight className="w-4 h-4 text-black" />
-                  </button>
+                  {tomoId === 'tomo-08' ? (
+                    <button
+                      type="button"
+                      onClick={() => setIsBootLabOpen(true)}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono-tech font-black text-xs tracking-wider uppercase text-black bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 hover:brightness-110 shadow-[0_0_25px_rgba(16,185,129,0.45)] transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                      <Power className="w-4 h-4 text-black" />
+                      <span>INICIAR LABORATORIO DE ARRANQUE</span>
+                    </button>
+                  ) : ['tomo-07', 'tomo-09', 'tomo-10'].includes(tomoId) ? (
+                    <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase border border-amber-400/40 bg-amber-400/10 text-amber-300 shadow-lg">
+                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                      <span>EDICIÓN EN DESARROLLO</span>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleOpenInteractive}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase text-black transition-all duration-200 cursor-pointer shadow-xl hover:brightness-110"
+                      style={{
+                        background: coverMeta.primaryColor,
+                        boxShadow: `0 8px 24px -6px ${coverMeta.primaryColor}40`,
+                      }}
+                    >
+                      <span>ABRIR EDICIÓN INTERACTIVA</span>
+                      <ArrowRight className="w-4 h-4 text-black" />
+                    </button>
+                  )}
 
                   <button
                     type="button"
@@ -1062,7 +1280,7 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
             </div>
 
             {/* Module Index */}
-            {extended?.modules && (
+            {extended?.modules && extended.modules.length > 0 ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
                   <span className="font-mono-tech font-bold text-white uppercase text-xs flex items-center gap-2">
@@ -1112,11 +1330,11 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
                             onClick={() => {
                               if (mod.benchConfig) {
                                 handleNavigateToLab({
-                                  tomoId,
-                                  moduleNumber: mod.number,
-                                  labView: mod.benchConfig.labView,
-                                  scenario: mod.benchConfig.scenario,
-                                  station: mod.benchConfig.station,
+                                   tomoId,
+                                   moduleNumber: mod.number,
+                                   labView: mod.benchConfig.labView,
+                                   scenario: mod.benchConfig.scenario,
+                                   station: mod.benchConfig.station,
                                 });
                               }
                             }}
@@ -1131,6 +1349,42 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
                     </div>
                   ))}
                 </div>
+              </div>
+            ) : (
+              <div className="p-8 rounded-2xl border border-zinc-800/80 bg-[#080a0d] flex flex-col items-center justify-center text-center space-y-4 my-2">
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center border shadow-lg"
+                  style={{
+                    backgroundColor: `${coverMeta.primaryColor}15`,
+                    borderColor: `${coverMeta.primaryColor}40`,
+                    color: coverMeta.primaryColor,
+                  }}
+                >
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <div className="space-y-1.5 max-w-lg">
+                  <div className="font-bold text-white text-sm font-mono-tech uppercase tracking-wider">
+                    {coverMeta.volumeLabel} — EN DESARROLLO
+                  </div>
+                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
+                    {coverMeta.editorialSubtitle}
+                  </p>
+                </div>
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 text-amber-300 text-[11px] font-mono-tech">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  <span>En fase activa de investigación técnica y preparación de laboratorios</span>
+                </div>
+
+                {tomoId === 'tomo-08' && (
+                  <button
+                    type="button"
+                    onClick={() => setIsBootLabOpen(true)}
+                    className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono-tech font-black text-xs tracking-wider uppercase text-black bg-gradient-to-r from-emerald-400 to-teal-400 hover:brightness-110 shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all cursor-pointer"
+                  >
+                    <Power className="w-4 h-4 text-black" />
+                    <span>INICIAR LABORATORIO DE ARRANQUE EVO</span>
+                  </button>
+                )}
               </div>
             )}
 

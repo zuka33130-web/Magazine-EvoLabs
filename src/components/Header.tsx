@@ -20,6 +20,10 @@ import {
   Wrench,
   Server,
   Shield,
+  Network,
+  Gauge,
+  Power,
+  FileSearch,
 } from 'lucide-react';
 import { EvoOperatingModeSelector } from './common/EvoOperatingModeSelector';
 import { EvoAutoDetectPcModal } from './common/EvoAutoDetectPcModal';
@@ -218,11 +222,12 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {openDropdown === 'tomos' && (
-                <div className="absolute top-full left-0 mt-2 w-72 bg-[#0c0f17]/95 border border-zinc-700/80 rounded-2xl p-2 shadow-2xl backdrop-blur-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-1">
+                <div className="absolute top-full left-0 mt-2 w-80 bg-[#0c0f17]/98 border border-zinc-700/80 rounded-2xl p-2 shadow-2xl backdrop-blur-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-1 max-h-[82vh] overflow-y-auto">
                   <div className="px-3 py-1.5 border-b border-white/[0.08] text-[10px] font-bold uppercase text-zinc-400 tracking-wider">
                     BIBLIOTECA EDITORIAL & MANUALES
                   </div>
                   
+                  {/* TOMO 01 */}
                   <button
                     type="button"
                     onClick={() => {
@@ -232,13 +237,14 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+                    <BookOpen className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 01: Hardware</div>
-                      <div className="text-[10px] text-zinc-400">Conocé tu PC // Silicio & Topología</div>
+                      <div className="font-bold text-white">Tomo 01: Conocé tu PC</div>
+                      <div className="text-[10px] text-zinc-400">Arquitectura física & topología de componentes</div>
                     </div>
                   </button>
 
+                  {/* TOMO 02 */}
                   <button
                     type="button"
                     onClick={() => {
@@ -247,13 +253,14 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
+                    <BookOpen className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 02: Windows NT</div>
-                      <div className="text-[10px] text-zinc-400">La Biblia Negra de Windows</div>
+                      <div className="font-bold text-white">Tomo 02: La Biblia Negra de Windows</div>
+                      <div className="text-[10px] text-zinc-400">El manual forense definitivo del sistema operativo</div>
                     </div>
                   </button>
 
+                  {/* TOMO 03 */}
                   <button
                     type="button"
                     onClick={() => {
@@ -262,13 +269,14 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 03: Reparación</div>
-                      <div className="text-[10px] text-zinc-400">Repará tu PC // Manual de Taller</div>
+                      <div className="font-bold text-white">Tomo 03: Repará tu PC</div>
+                      <div className="text-[10px] text-zinc-400">La biblia del servicio técnico de escritorio</div>
                     </div>
                   </button>
 
+                  {/* TOMO 04 */}
                   <button
                     type="button"
                     onClick={() => {
@@ -277,13 +285,14 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <BookOpen className="w-3.5 h-3.5 text-purple-400" />
+                    <BookOpen className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 04: Notebooks</div>
-                      <div className="text-[10px] text-zinc-400">Microelectrónica Portátil</div>
+                      <div className="font-bold text-white">Tomo 04: Repará tu Notebook</div>
+                      <div className="text-[10px] text-zinc-400">La biblia del reparador de portátiles</div>
                     </div>
                   </button>
 
+                  {/* TOMO 05 */}
                   <button
                     type="button"
                     onClick={() => {
@@ -293,13 +302,14 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <Server className="w-3.5 h-3.5 text-sky-400" />
+                    <Network className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 05: Redes & Linux</div>
-                      <div className="text-[10px] text-zinc-400">Virtualización & Hipervisores</div>
+                      <div className="font-bold text-white">Tomo 05: La Red Invisible</div>
+                      <div className="text-[10px] text-zinc-400">De cero a entender y dominar cómo viajan los datos</div>
                     </div>
                   </button>
 
+                  {/* TOMO 06 */}
                   <button
                     type="button"
                     onClick={() => {
@@ -309,10 +319,94 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <Shield className="w-3.5 h-3.5 text-rose-400" />
+                    <Shield className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 06: Ciberseguridad</div>
-                      <div className="text-[10px] text-zinc-400">Análisis Forense & Kernel</div>
+                      <div className="font-bold text-white">Tomo 06: Ciberseguridad: del Cero al Control Total</div>
+                      <div className="text-[10px] text-rose-300 font-medium">Laboratorios virtuales incluidos por niveles</div>
+                    </div>
+                  </button>
+
+                  {/* TOMO 07 */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenDropdown(null);
+                      setInternalDossierTomoId('tomo-07');
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
+                  >
+                    <Gauge className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-white flex items-center justify-between gap-1.5">
+                        <span className="truncate">Tomo 07: Gaming Performance</span>
+                        <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-amber-400/10 text-amber-300 border border-amber-400/30 shrink-0">
+                          EN DESARROLLO
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-zinc-400 truncate">FPS, frametime, latencia, estabilidad y rendimiento medido</div>
+                    </div>
+                  </button>
+
+                  {/* TOMO 08 */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenDropdown(null);
+                      setInternalDossierTomoId('tomo-08');
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
+                  >
+                    <Power className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-white flex items-center justify-between gap-1.5">
+                        <span className="truncate">Tomo 08: Del Botón Power a Windows</span>
+                        <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-emerald-400/10 text-emerald-300 border border-emerald-400/30 shrink-0">
+                          EN DESARROLLO
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-zinc-400 truncate">Laboratorio Virtual de Arranque y Diagnóstico EVO</div>
+                    </div>
+                  </button>
+
+                  {/* TOMO 09 */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenDropdown(null);
+                      setInternalDossierTomoId('tomo-09');
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
+                  >
+                    <Terminal className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-white flex items-center justify-between gap-1.5">
+                        <span className="truncate">Tomo 09: Sistemas, Linux & Kernel</span>
+                        <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-sky-400/10 text-sky-300 border border-sky-400/30 shrink-0">
+                          EN DESARROLLO
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-zinc-400 truncate">Procesos, memoria, virtualización y funcionamiento interno del sistema</div>
+                    </div>
+                  </button>
+
+                  {/* TOMO 10 */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenDropdown(null);
+                      setInternalDossierTomoId('tomo-10');
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
+                  >
+                    <FileSearch className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-white flex items-center justify-between gap-1.5">
+                        <span className="truncate">Tomo 10: Ingeniería Inversa & Forense</span>
+                        <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-purple-400/10 text-purple-300 border border-purple-400/30 shrink-0">
+                          EN DESARROLLO
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-zinc-400 truncate">Análisis profundo, evidencia, memoria, binarios e investigación técnica</div>
                     </div>
                   </button>
                 </div>
@@ -708,7 +802,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-white/[0.06] text-zinc-300"
               >
                 <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Tomo 03: Reparación</span>
+                <span>Tomo 03: Repará tu PC</span>
               </button>
 
               <button
@@ -720,31 +814,101 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-white/[0.06] text-zinc-300"
               >
                 <BookOpen className="w-3.5 h-3.5 text-purple-400" />
-                <span>Tomo 04: Notebooks</span>
+                <span>Tomo 04: Repará tu Notebook</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => {
                   setIsMobileMenuOpen(false);
-                  setInternalDossierTomoId('tomo-05');
+                  if (onNavigateTomo05) onNavigateTomo05();
+                  else setInternalDossierTomoId('tomo-05');
                 }}
                 className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-white/[0.06] text-zinc-300"
               >
-                <Server className="w-3.5 h-3.5 text-sky-400" />
-                <span>Tomo 05: Redes & Linux</span>
+                <Network className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Tomo 05: La Red Invisible</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => {
                   setIsMobileMenuOpen(false);
-                  setInternalDossierTomoId('tomo-06');
+                  if (onNavigateTomo06) onNavigateTomo06();
+                  else setInternalDossierTomoId('tomo-06');
                 }}
                 className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-white/[0.06] text-zinc-300"
               >
                 <Shield className="w-3.5 h-3.5 text-rose-400" />
                 <span>Tomo 06: Ciberseguridad</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setInternalDossierTomoId('tomo-07');
+                }}
+                className="flex items-center justify-between px-3 py-1.5 rounded-xl hover:bg-white/[0.06] text-zinc-300"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Gauge className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Tomo 07: Gaming Performance</span>
+                </div>
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-amber-400/10 text-amber-300 border border-amber-400/30">
+                  EN DESARROLLO
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setInternalDossierTomoId('tomo-08');
+                }}
+                className="flex items-center justify-between px-3 py-1.5 rounded-xl hover:bg-white/[0.06] text-zinc-300"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Power className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Tomo 08: Del Botón Power a Windows</span>
+                </div>
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-emerald-400/10 text-emerald-300 border border-emerald-400/30">
+                  EN DESARROLLO
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setInternalDossierTomoId('tomo-09');
+                }}
+                className="flex items-center justify-between px-3 py-1.5 rounded-xl hover:bg-white/[0.06] text-zinc-300"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Terminal className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Tomo 09: Sistemas, Linux & Kernel</span>
+                </div>
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-sky-400/10 text-sky-300 border border-sky-400/30">
+                  EN DESARROLLO
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setInternalDossierTomoId('tomo-10');
+                }}
+                className="flex items-center justify-between px-3 py-1.5 rounded-xl hover:bg-white/[0.06] text-zinc-300"
+              >
+                <div className="flex items-center gap-2.5">
+                  <FileSearch className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Tomo 10: Forense & Reversing</span>
+                </div>
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-purple-400/10 text-purple-300 border border-purple-400/30">
+                  EN DESARROLLO
+                </span>
               </button>
 
               <div className="pt-2 text-[10px] font-bold text-purple-400 uppercase tracking-widest px-2 pb-1 border-b border-white/[0.06]">
