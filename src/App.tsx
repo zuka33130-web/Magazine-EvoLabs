@@ -6,7 +6,6 @@ import {
   TOMO_01_OUTCOMES,
 } from './data/collections';
 import { Header } from './components/Header';
-import { EvoSidebarNav, NavActionTarget } from './components/navigation/EvoSidebarNav';
 import { MagazineCover } from './components/MagazineCover';
 import { HorizontalCollection } from './components/HorizontalCollection';
 import { EditorialIndex } from './components/EditorialIndex';
@@ -51,16 +50,6 @@ export default function App() {
   const [labCorePhase, setLabCorePhase] = useState<'SELECT_PC' | 'BUILD_PC' | 'LAB_ACTIVE'>('SELECT_PC');
   const [matrixInitialScenario, setMatrixInitialScenario] = useState<string | undefined>(undefined);
 
-  // Navigation sidebar states (remember collapsed state in localStorage)
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem('evo_sidebar_collapsed') === 'true';
-    } catch {
-      return false;
-    }
-  });
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
-
   // Modals state
   const [showDiscoveryModal, setShowDiscoveryModal] = useState<boolean>(false);
   const [showCoverageDashboard, setShowCoverageDashboard] = useState<boolean>(false);
@@ -82,18 +71,6 @@ export default function App() {
       return null;
     }
   });
-
-  const handleToggleSidebarCollapse = () => {
-    setIsSidebarCollapsed((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem('evo_sidebar_collapsed', String(next));
-      } catch {
-        // ignore
-      }
-      return next;
-    });
-  };
 
   // Load saved profile & handle URL query parameters for direct PDF printing / magazine mode
   useEffect(() => {
@@ -600,23 +577,19 @@ export default function App() {
     setShowCaseHistoryModal(true);
   };
 
-  const handleSidebarNavigate = (target: NavActionTarget) => {
-    if (target.tomoId) {
-      setDossierModalTomoId(target.tomoId);
-      return;
+  const handleNavigateHotSwapLab = (subPanel?: 'sandbox' | 'hardware' | 'software' | 'telemetry' | 'all') => {
+    if (subPanel) {
+      setActiveLabPanel(subPanel);
     }
+    setCurrentView('hotswap-lab');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-    if (target.subPanel) {
-      setActiveLabPanel(target.subPanel);
+  const handleNavigateLabCore = (phase?: 'SELECT_PC' | 'BUILD_PC' | 'LAB_ACTIVE') => {
+    if (phase) {
+      setLabCorePhase(phase);
     }
-    if (target.labMission) {
-      setActiveLabMission(target.labMission);
-    }
-    if (target.corePhase) {
-      setLabCorePhase(target.corePhase);
-    }
-
-    setCurrentView(target.view);
+    setCurrentView('lab-core');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -699,36 +672,41 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-[#f4f4f6] flex flex-row selection:bg-amber-400 selection:text-black">
-      {/* 1. Global Collapsible Left Sidebar */}
-      <EvoSidebarNav
+    <div className="min-h-screen bg-[#07090e] text-[#f4f4f6] flex flex-col selection:bg-amber-400 selection:text-black">
+      {/* Streamlined Clean Header with Upper Navigation Bar */}
+      <Header
         currentView={currentView}
         activeLabPanel={activeLabPanel}
         activeLabMission={activeLabMission}
-        isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={handleToggleSidebarCollapse}
-        isMobileOpen={isMobileNavOpen}
-        onCloseMobile={() => setIsMobileNavOpen(false)}
-        onNavigate={handleSidebarNavigate}
-        onOpenAutoDetectModal={() => {
-          const event = new CustomEvent('evo_open_autodetect');
-          window.dispatchEvent(event);
+        onNavigateHome={handleNavigateHome}
+        onNavigateArchive={handleNavigateArchive}
+        onNavigateTomo01={handleNavigateTomo01}
+        onNavigateTomo02={handleNavigateTomo02}
+        onNavigateTomo03={handleNavigateTomo03}
+        onNavigateTomo04={handleNavigateTomo04}
+        onNavigateTomo05={() => setDossierModalTomoId('tomo-05')}
+        onNavigateTomo06={() => setDossierModalTomoId('tomo-06')}
+        onNavigateMagazine={() => setCurrentView('magazine')}
+        onNavigateHotSwapLab={handleNavigateHotSwapLab}
+        onNavigateLabCore={handleNavigateLabCore}
+        onNavigateWindowsMatrixLab={() => {
+          setMatrixInitialScenario(undefined);
+          setCurrentView('windows-matrix-lab');
         }}
         onOpenDiscoveryModal={() => setShowDiscoveryModal(true)}
         onOpenCoverageDashboard={() => setShowCoverageDashboard(true)}
         onOpenCaseHistory={handleOpenCaseHistory}
         onOpenLiveScanAudit={handleOpenLiveScanAudit}
-        onOpenTomoDossier={(tomoId) => setDossierModalTomoId(tomoId)}
+        onOpenForensicBench={handleOpenForensicBench}
         activeProfile={activeProfile}
-        onChangeProfile={handleChangeProfile}
+        onReplayIntro={() => setIsIntroActive(true)}
+        onHardwareDetected={(passport) => setUserPassport(passport)}
+        dossierModalTomoId={dossierModalTomoId}
+        onCloseDossierModal={() => setDossierModalTomoId(null)}
       />
 
-      {/* 2. Main Body Container with Dynamic Margin Offset for Sidebar */}
-      <div
-        className={`flex-1 min-h-screen flex flex-col transition-all duration-300 relative ${
-          isSidebarCollapsed ? 'lg:pl-[64px]' : 'lg:pl-[240px]'
-        }`}
-      >
+      {/* Main Body Container */}
+      <div className="flex-1 min-h-screen flex flex-col relative">
         {/* Subtle Ambient Workspace Top Glow */}
         <div
           className="absolute top-0 left-0 right-0 h-[380px] pointer-events-none opacity-40 -z-10"
@@ -736,38 +714,6 @@ export default function App() {
             background:
               'radial-gradient(ellipse 80% 300px at 50% 0%, rgba(251, 191, 36, 0.05), transparent 70%)',
           }}
-        />
-
-        {/* Streamlined Clean Header */}
-        <Header
-          currentView={currentView}
-          activeLabPanel={activeLabPanel}
-          activeLabMission={activeLabMission}
-          onNavigateHome={handleNavigateHome}
-          onNavigateArchive={handleNavigateArchive}
-          onNavigateTomo01={handleNavigateTomo01}
-          onNavigateTomo02={handleNavigateTomo02}
-          onNavigateTomo03={handleNavigateTomo03}
-          onNavigateTomo04={handleNavigateTomo04}
-          onNavigateTomo05={() => setDossierModalTomoId('tomo-05')}
-          onNavigateTomo06={() => setDossierModalTomoId('tomo-06')}
-          onNavigateMagazine={() => setCurrentView('magazine')}
-          onNavigateHotSwapLab={() => setCurrentView('hotswap-lab')}
-          onNavigateLabCore={() => {
-            setCurrentView('lab-core');
-            window.scrollTo({ top: 0, behavior: 'instant' });
-          }}
-          onNavigateWindowsMatrixLab={() => {
-            setMatrixInitialScenario(undefined);
-            setCurrentView('windows-matrix-lab');
-          }}
-          onOpenForensicBench={handleOpenForensicBench}
-          activeProfile={activeProfile}
-          onReplayIntro={() => setIsIntroActive(true)}
-          onHardwareDetected={(passport) => setUserPassport(passport)}
-          onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
-          dossierModalTomoId={dossierModalTomoId}
-          onCloseDossierModal={() => setDossierModalTomoId(null)}
         />
 
         {/* Main View Render Stage */}

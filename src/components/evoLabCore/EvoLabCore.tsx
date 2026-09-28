@@ -41,8 +41,6 @@ import { EvoLabCoreBuildView } from './views/EvoLabCoreBuildView';
 import { EvoLabCoreBottleneckView } from './views/EvoLabCoreBottleneckView';
 import { EvoLabCoreOptimizationView } from './views/EvoLabCoreOptimizationView';
 import { EvoLabCoreUpgradeView } from './views/EvoLabCoreUpgradeView';
-import { useLabAestheticMode } from '../../utils/labAestheticMode';
-import { EvoLabAestheticToggle } from '../common/EvoLabAestheticToggle';
 
 interface EvoLabCoreProps {
   onNavigateToTomo?: (tomoId: '01' | '02' | '03' | '04') => void;
@@ -72,7 +70,7 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
   initialPhase,
   initialMission,
 }) => {
-  const { isElite } = useLabAestheticMode();
+  const isElite = true;
 
   // Phase state: strictly starts at SELECT_PC ("¿QUÉ PC QUERÉS EVALUAR?") unless specified
   const [corePhase, setCorePhase] = useState<CorePhase>(initialPhase || 'SELECT_PC');
@@ -210,8 +208,6 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
 
           {/* Right Action Bar */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
-            {/* Design & Typography Aesthetic Mode Toggle (Elite Lettering vs Classic) */}
-            <EvoLabAestheticToggle />
 
             {/* PERMANENT "CAMBIAR PC" BUTTON */}
             {corePhase !== 'SELECT_PC' && (
