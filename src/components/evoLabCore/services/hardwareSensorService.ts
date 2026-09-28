@@ -82,16 +82,16 @@ export class HardwareSensorService {
 
     const arch = /WOW64|Win64|x86_64|x64/i.test(ua) ? 'x86_64 (64-bit)' : /ARM/i.test(ua) ? 'ARM64' : '64-bit';
 
-    // 2. CPU Concurrency
-    const logicalCores = navigator.hardwareConcurrency || 8;
-    const estimatedCores = logicalCores >= 8 ? Math.max(4, Math.round(logicalCores / 2)) : logicalCores;
+    // 2. CPU Concurrency (Strict: Only actual value reported by navigator)
+    const logicalCores = typeof navigator !== 'undefined' && navigator.hardwareConcurrency ? navigator.hardwareConcurrency : 0;
+    const estimatedCores = 0; // Cores físicos no son medibles directamente desde el navegador (UNKNOWN)
 
     // 3. WebGL GPU Extraction
     let rawRenderer = 'Renderizador WebGL de Sistema';
     let rawVendor = 'Fabricante WebGL';
-    let cleanGpuModel = 'Aceleradora Gráfica Detectada';
+    let cleanGpuModel = 'UNKNOWN';
     let isDedicatedGpu = false;
-    let estimatedVram = 4;
+    const estimatedVram = 0; // VRAM no es medible confiablemente desde WebGL -> 0 (UNKNOWN)
 
     try {
       const canvas = document.createElement('canvas');
@@ -107,7 +107,7 @@ export class HardwareSensorService {
           rawVendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) || rawVendor;
         }
 
-        // Clean commercial GPU string
+        // Clean commercial GPU string without estimating VRAM
         const lower = rawRenderer.toLowerCase();
         if (lower.includes('geforce') || lower.includes('nvidia') || lower.includes('rtx') || lower.includes('gtx')) {
           isDedicatedGpu = true;
@@ -115,47 +115,40 @@ export class HardwareSensorService {
           const matchGtx = rawRenderer.match(/GTX\s*[0-9]{3,4}(\s*Ti)?/i);
           if (matchRtx) {
             cleanGpuModel = `NVIDIA GeForce ${matchRtx[0].toUpperCase()}`;
-            estimatedVram = matchRtx[0].includes('4090') || matchRtx[0].includes('5090') ? 24 : matchRtx[0].includes('4080') || matchRtx[0].includes('4070') ? 12 : 8;
           } else if (matchGtx) {
             cleanGpuModel = `NVIDIA GeForce ${matchGtx[0].toUpperCase()}`;
-            estimatedVram = 6;
           } else {
-            cleanGpuModel = 'NVIDIA GeForce GPU Dedicada';
-            estimatedVram = 8;
+            cleanGpuModel = 'NVIDIA GeForce (Modelo Específico no expuesto)';
           }
         } else if (lower.includes('radeon') || lower.includes('amd')) {
           const matchRx = rawRenderer.match(/RX\s*[0-9]{4}(\s*XT(X)?)?/i);
           if (matchRx) {
             isDedicatedGpu = true;
             cleanGpuModel = `AMD Radeon ${matchRx[0].toUpperCase()}`;
-            estimatedVram = 16;
           } else {
             cleanGpuModel = 'AMD Radeon Graphics';
-            estimatedVram = 4;
           }
         } else if (lower.includes('arc') || lower.includes('intel')) {
           if (lower.includes('arc')) {
             isDedicatedGpu = true;
             cleanGpuModel = 'Intel Arc Graphics';
-            estimatedVram = 8;
           } else if (lower.includes('iris')) {
             cleanGpuModel = 'Intel Iris Xe Graphics';
-            estimatedVram = 2;
           } else {
             cleanGpuModel = 'Intel UHD Graphics';
-            estimatedVram = 2;
           }
         } else if (lower.includes('apple')) {
           cleanGpuModel = rawRenderer.includes('M') ? `Apple Silicon (${rawRenderer})` : 'Apple Metal GPU';
-          estimatedVram = 8;
+        } else {
+          cleanGpuModel = rawRenderer !== 'Renderizador WebGL de Sistema' ? rawRenderer : 'UNKNOWN';
         }
       }
     } catch (e) {
       console.warn('[HardwareSensor] WebGL GPU context query failed:', e);
     }
 
-    // 4. Memory (deviceMemory API)
-    const deviceMem = (navigator as any).deviceMemory || (logicalCores >= 16 ? 32 : logicalCores >= 8 ? 16 : 8);
+    // 4. Memory (deviceMemory API: strictly browser reported or 0)
+    const deviceMem = typeof navigator !== 'undefined' && (navigator as any).deviceMemory ? Number((navigator as any).deviceMemory) : 0;
 
     // 5. Screen & Estimated Refresh Rate
     const screenWidth = window.screen?.width || window.innerWidth;
@@ -216,8 +209,8 @@ export class HardwareSensorService {
       },
       cpu: {
         logicalCores,
-        estimatedCores,
-        inferredModel: `${isWindows ? 'Intel / AMD' : 'Procesador'} (${logicalCores} Núcleos Lógicos Concurrentes)`,
+        estimatedCores: 0, // Cores físicos no son medibles directamente desde el navegador (UNKNOWN)
+        inferredModel: logicalCores > 0 ? `CPU (${logicalCores} Núcleos Lógicos Concurrentes)` : 'UNKNOWN',
         architecture: arch,
       },
       gpu: {
@@ -229,8 +222,8 @@ export class HardwareSensorService {
       },
       memory: {
         deviceMemoryGb: deviceMem,
-        estimatedSpeedMts: 3200,
-        type: 'DDR4',
+        estimatedSpeedMts: 0,
+        type: 'UNKNOWN',
       },
       display: {
         resolution: `${screenWidth}x${screenHeight}`,

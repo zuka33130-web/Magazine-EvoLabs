@@ -41,7 +41,8 @@ import { EvoThermalHistoryModal } from './EvoThermalHistoryModal';
 // MEASURED:  Lectura directa de sensores/contadores físicos de hardware (WMI / ETW / PresentMon v2).
 // ESTIMATED: Proyección analítica basada en modelos empíricos de silicio y cuellos de botella reales.
 // SIMULATED: Simulación hipotética de componentes que NO están físicamente en la máquina (Sandbox cruzado).
-export type EpistemicProvenance = 'MEASURED' | 'ESTIMATED' | 'SIMULATED';
+// Epistemic Provenance tags
+export type EpistemicProvenance = 'MEASURED' | 'ESTIMATED' | 'SIMULATED' | 'SYSTEM_REPORTED' | 'UNKNOWN';
 
 export interface TelemetryMetric<T> {
   value: T;
@@ -172,11 +173,11 @@ export const INDIVIDUAL_GAMES: GameBenchmark[] = [
     maxFpsIGPU: 160,
     low1PctIGPU: 75,
     thermalLoad: 'medium',
-    descEs: 'Optimizado en P-Cores del i3',
-    descEn: 'Optimized on i3 P-Cores',
-    descPt: 'Otimizado nos P-Cores do i3',
+    descEs: 'Referencia en procesador multi-núcleo',
+    descEn: 'Reference on multi-core CPU',
+    descPt: 'Referência em processador multi-núcleo',
     bottleneck: 'CPU IPC / P-Cores',
-    verdictEs: 'Optimizado en P-Cores del i3',
+    verdictEs: 'Optimizado en P-Cores',
     empiricalBaseline: {
       avgFps: 160,
       low1PctFps: 75,
@@ -184,16 +185,16 @@ export const INDIVIDUAL_GAMES: GameBenchmark[] = [
       bottleneckEs: 'Frecuencia mono-núcleo y contención en bus DDR5 de video',
       bottleneckEn: 'Single-core clock and DDR5 video bus contention',
       bottleneckPt: 'Frequência de núcleo único e contenção de barramento DDR5',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
     empiricalTweaked: {
       avgFps: 165,
-      low1PctFps: 88, // +17% en 1% Low medido por eliminación de salto de hilos a E-Cores
+      low1PctFps: 88,
       tempC: 66,
       bottleneckEs: 'Afinidad P-Core fijada. Fluidez de fotogramas estabilizada en 0.500ms',
       bottleneckEn: 'P-Core affinity pinned. Frametime variance stabilized at 0.500ms',
       bottleneckPt: 'Afinidade P-Core fixada. Variância de frametime estabilizada em 0.500ms',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
   },
   {
@@ -215,16 +216,16 @@ export const INDIVIDUAL_GAMES: GameBenchmark[] = [
       bottleneckEs: 'Cuello de botella térmico severo y saturación de ancho de banda iGPU',
       bottleneckEn: 'Severe thermal bottleneck and iGPU bandwidth saturation',
       bottleneckPt: 'Gargalo térmico severo e saturação de largura de banda iGPU',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
     empiricalTweaked: {
       avgFps: 72,
-      low1PctFps: 36, // +20% en 1% Low por mitigación de latencia de driver dxgkrnl
+      low1PctFps: 36,
       tempC: 81,
       bottleneckEs: 'Búfer de cola estabilizado. Límite físico en 64 EUs de la iGPU',
       bottleneckEn: 'Queue buffer stabilized. Physical ceiling at 64 EUs of iGPU',
       bottleneckPt: 'Buffer estabilizado. Teto físico em 64 EUs da iGPU',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
   },
   {
@@ -246,16 +247,16 @@ export const INDIVIDUAL_GAMES: GameBenchmark[] = [
       bottleneckEs: 'Render en Unreal Engine 5 limitado por tasa de llenado compartida',
       bottleneckEn: 'Unreal Engine 5 render bound by shared fill-rate',
       bottleneckPt: 'Render em Unreal Engine 5 limitado pela taxa de preenchimento',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
     empiricalTweaked: {
       avgFps: 124,
-      low1PctFps: 65, // +18% en 1% Low por contención eliminada de DPC
+      low1PctFps: 65,
       tempC: 71,
       bottleneckEs: 'Plan de energía bloqueado. Texturas dinámicas fluyen sin micro-tirones',
       bottleneckEn: 'Power scheme locked. Streaming textures flow without micro-stutter',
       bottleneckPt: 'Esquema de energia travado. Texturas fluem sem micro-travamentos',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
   },
   {
@@ -277,7 +278,7 @@ export const INDIVIDUAL_GAMES: GameBenchmark[] = [
       bottleneckEs: 'Tasa de sombreado insuficiente en combates de humo y partículas',
       bottleneckEn: 'Insufficient shader throughput in heavy particle smoke combat',
       bottleneckPt: 'Taxa de shader insuficiente em fumaça e combate pesado',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
     empiricalTweaked: {
       avgFps: 60,
@@ -286,7 +287,7 @@ export const INDIVIDUAL_GAMES: GameBenchmark[] = [
       bottleneckEs: 'Relojes de CPU fijados; latencia de entrada reducida a 16.6ms',
       bottleneckEn: 'CPU clocks fixed; frame-time latency capped at 16.6ms',
       bottleneckPt: 'Clocks de CPU travados; latência de entrada reduzida a 16.6ms',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
   },
   {
@@ -308,7 +309,7 @@ export const INDIVIDUAL_GAMES: GameBenchmark[] = [
       bottleneckEs: 'Carga pura sobre hilo principal de Java en un único P-Core',
       bottleneckEn: 'Pure Java main-thread bottleneck bound to single P-Core',
       bottleneckPt: 'Gargalo de thread principal de Java em único P-Core',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
     empiricalTweaked: {
       avgFps: 156,
@@ -317,7 +318,7 @@ export const INDIVIDUAL_GAMES: GameBenchmark[] = [
       bottleneckEs: 'Prioridad de hilo en tiempo real; generación de chunks instantánea',
       bottleneckEn: 'Real-time thread priority; instant chunk generation',
       bottleneckPt: 'Prioridade de thread em tempo real; geração instantânea de chunks',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
   },
   {
@@ -339,7 +340,7 @@ export const INDIVIDUAL_GAMES: GameBenchmark[] = [
       bottleneckEs: 'Población densa y tráfico saturan el bus bidireccional DDR5',
       bottleneckEn: 'Crowd density and traffic choke the bidirectional DDR5 bus',
       bottleneckPt: 'Densidade populacional e tráfego sobrecarregam o barramento DDR5',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
     empiricalTweaked: {
       avgFps: 67,
@@ -348,7 +349,7 @@ export const INDIVIDUAL_GAMES: GameBenchmark[] = [
       bottleneckEs: 'Descriptores de memoria optimizados para streaming de mundo abierto',
       bottleneckEn: 'Memory descriptors optimized for open-world asset streaming',
       bottleneckPt: 'Descritores de memória otimizados para streaming de mundo aberto',
-      provenance: 'MEASURED',
+      provenance: 'ESTIMATED',
     },
   },
 ];
@@ -357,102 +358,102 @@ export const MARKET_GAMES = INDIVIDUAL_GAMES;
 export type IndividualGameBenchmark = GameBenchmark;
 
 // ============================================================================
-// SANDBOX OPTIONS (COMPONENTE SIMULADO VS FÍSICO DETECTADO)
+// SANDBOX OPTIONS (COMPONENTE SIMULADO VS REFERENCIA)
 // ============================================================================
 export const SANDBOX_OPTIONS: Record<string, HardwareComponentOption[]> = {
   cpu: [
-    { id: 'i3_1220p', name: 'Intel Core i3-1220P (Hardware Real Detectado)', category: 'cpu', multiplierFps: 1.0, thermalDelta: 72, powerDrawW: 35, isPhysicalCurrentHardware: true },
+    { id: 'i3_1220p', name: 'Intel Core i3-1220P (Referencia Benchmark)', category: 'cpu', multiplierFps: 1.0, thermalDelta: 72, powerDrawW: 35, isPhysicalCurrentHardware: false },
     { id: 'i7_13700h', name: 'Intel Core i7-13700H (Alto Rendimiento)', category: 'cpu', multiplierFps: 1.45, thermalDelta: 82, powerDrawW: 65, isPhysicalCurrentHardware: false },
     { id: 'i9_14900ks', name: 'Intel Core i9-14900KS (Envíos de Élite)', category: 'cpu', multiplierFps: 1.85, thermalDelta: 95, powerDrawW: 250, isPhysicalCurrentHardware: false },
     { id: 'ryzen_7800x3d', name: 'AMD Ryzen 7 7800X3D (Gaming Benchmark)', category: 'cpu', multiplierFps: 1.92, thermalDelta: 68, powerDrawW: 85, isPhysicalCurrentHardware: false }
   ],
   gpu: [
-    { id: 'uhd_intel', name: 'Intel UHD Graphics (Integrada 64GB/s Real)', category: 'gpu', multiplierFps: 1.0, thermalDelta: 70, powerDrawW: 15, isPhysicalCurrentHardware: true },
+    { id: 'uhd_intel', name: 'Intel UHD Graphics (Referencia Integrada)', category: 'gpu', multiplierFps: 1.0, thermalDelta: 70, powerDrawW: 15, isPhysicalCurrentHardware: false },
     { id: 'rtx_4060', name: 'NVIDIA GeForce RTX 4060 8GB (Dedicada)', category: 'gpu', multiplierFps: 2.30, thermalDelta: 65, powerDrawW: 115, isPhysicalCurrentHardware: false },
     { id: 'rtx_4070_ti', name: 'NVIDIA GeForce RTX 4070 Ti 12GB', category: 'gpu', multiplierFps: 3.40, thermalDelta: 72, powerDrawW: 220, isPhysicalCurrentHardware: false },
     { id: 'rx_7800_xt', name: 'AMD Radeon RX 7800 XT 16GB', category: 'gpu', multiplierFps: 3.25, thermalDelta: 75, powerDrawW: 260, isPhysicalCurrentHardware: false }
   ],
   ram: [
     { id: 'ddr5_4800', name: '16GB DDR5 @ 4800 MT/s (JEDEC Base)', category: 'ram', multiplierFps: 0.95, thermalDelta: 50, powerDrawW: 5, isPhysicalCurrentHardware: false },
-    { id: 'ddr5_5600', name: '16GB DDR5 @ 5600 MT/s Dual-Channel (Real)', category: 'ram', multiplierFps: 1.0, thermalDelta: 52, powerDrawW: 6, isPhysicalCurrentHardware: true },
+    { id: 'ddr5_5600', name: '16GB DDR5 @ 5600 MT/s (Referencia DDR5)', category: 'ram', multiplierFps: 1.0, thermalDelta: 52, powerDrawW: 6, isPhysicalCurrentHardware: false },
     { id: 'ddr5_7200', name: '32GB DDR5 @ 7200 MT/s XMP Elite', category: 'ram', multiplierFps: 1.12, thermalDelta: 58, powerDrawW: 10, isPhysicalCurrentHardware: false }
   ],
   cooling: [
     { id: 'stock_fan', name: 'Disipador Pasivo / Mini Ventilador Stock', category: 'cooling', multiplierFps: 0.92, thermalDelta: 88, powerDrawW: 2, isPhysicalCurrentHardware: false },
-    { id: 'copper_vapor', name: 'Cámara de Vapor de Cobre 8 Niveles (Real)', category: 'cooling', multiplierFps: 1.05, thermalDelta: 65, powerDrawW: 8, isPhysicalCurrentHardware: true },
+    { id: 'copper_vapor', name: 'Cámara de Vapor de Cobre (Simulada)', category: 'cooling', multiplierFps: 1.05, thermalDelta: 65, powerDrawW: 8, isPhysicalCurrentHardware: false },
     { id: 'liquid_aio', name: 'Refrigeración Líquida AIO 240mm', category: 'cooling', multiplierFps: 1.15, thermalDelta: 54, powerDrawW: 25, isPhysicalCurrentHardware: false }
   ]
 };
 
 // ============================================================================
-// INITIAL EMPIRICAL TELEMETRY STATE (SIMULATES DIRECT WMI/ETW EXTRACTION)
+// INITIAL EMPIRICAL TELEMETRY STATE (STRICTLY UNKNOWN BEFORE REAL TELEMETRY)
 // ============================================================================
 export const DEFAULT_EMPIRICAL_SNAPSHOT: StructuredSystemTelemetry = {
   cpu: {
-    model: "12th Gen Intel(R) Core(TM) i3-1220P",
-    cores: 10,
-    threads: 12,
-    pCores: 2,
-    eCores: 8,
-    baseClockGhz: 1.5,
-    boostClockGhz: 4.4,
+    model: "UNKNOWN",
+    cores: 0,
+    threads: 0,
+    pCores: 0,
+    eCores: 0,
+    baseClockGhz: 0,
+    boostClockGhz: 0,
     tjMaxC: 100,
     currentTempC: {
-      value: 68,
-      provenance: 'MEASURED',
-      source: 'WMI:Win32_PerfFormattedData_Counters_ThermalZoneInformation',
+      value: 0,
+      provenance: 'UNKNOWN',
+      source: 'Sin telemetría de temperatura',
       unit: '°C'
     },
-    provenance: 'MEASURED'
+    provenance: 'UNKNOWN'
   },
   memory: {
-    totalGb: 16,
-    spdSpeedMts: 5600,          // Velocidad SPD Nominal grabada en chip
-    configuredSpeedMts: 5600,   // Velocidad Efectiva en placa base
-    channels: 2,
-    busWidthBits: 128,          // 2 sub-canales DDR5 de 32-bit (efectivo dual)
+    totalGb: 0,
+    spdSpeedMts: 0,
+    configuredSpeedMts: 0,
+    channels: 0,
+    busWidthBits: 0,
     effectiveBandwidthGbps: {
-      value: 64.2,
-      provenance: 'MEASURED',
-      source: 'Intel MLC Stream Bandwidth Benchmark',
+      value: 0,
+      provenance: 'UNKNOWN',
+      source: 'Sin medición de ancho de banda',
       unit: 'GB/s'
     },
-    moduleType: 'DDR5 SODIMM',
-    provenance: 'MEASURED'
+    moduleType: 'UNKNOWN',
+    provenance: 'UNKNOWN'
   },
   gpu: {
-    model: "Intel(R) UHD Graphics (Alder Lake-U 64 EU)",
-    vramDedicatedGb: 0.128,
-    vramSharedGb: 8.0,
-    driverVersion: "31.0.101.4575",
+    model: "UNKNOWN",
+    vramDedicatedGb: 0,
+    vramSharedGb: 0,
+    driverVersion: "UNKNOWN",
     temperatureC: {
-      value: 66,
-      provenance: 'MEASURED',
-      source: 'Intel Graphics Control Library (IGCL)',
+      value: 0,
+      provenance: 'UNKNOWN',
+      source: 'Sin sensor de GPU',
       unit: '°C'
     },
-    provenance: 'MEASURED'
+    provenance: 'UNKNOWN'
   },
   kernel: {
     isrLatencyMs: {
-      value: 0.18,
-      provenance: 'MEASURED',
-      source: 'ETW:Microsoft-Windows-Kernel-Interrupt-Steering',
+      value: 0,
+      provenance: 'UNKNOWN',
+      source: 'Sin monitor ETW activo',
       unit: 'ms'
     },
     dpcLatencyMs: {
-      value: 0.32,
-      provenance: 'MEASURED',
-      source: 'ETW:Microsoft-Windows-Kernel-DPC-Analysis',
+      value: 0,
+      provenance: 'UNKNOWN',
+      source: 'Sin monitor ETW activo',
       unit: 'ms'
     },
-    culpritDriver: "dxgkrnl.sys (Estable // Cola nominal)",
-    interruptRatePerSec: 1420,
-    dpcRatePerSec: 2850,
-    timerResolutionMs: 0.500,
-    provenance: 'MEASURED'
+    culpritDriver: "UNKNOWN",
+    interruptRatePerSec: 0,
+    dpcRatePerSec: 0,
+    timerResolutionMs: 15.625,
+    provenance: 'UNKNOWN'
   },
-  overallProvenance: 'MEASURED',
+  overallProvenance: 'UNKNOWN',
   ingestedAt: new Date().toISOString()
 };
 
@@ -483,7 +484,7 @@ export const translations = {
     sandboxDesc: "Hardware real medido (Intel i3-1220P, 16GB DDR5 @ 5600MT/s). Simula componentes para evaluar impacto antes de invertir en piezas físicas.",
     sandboxChartTitle: "Comparativa Gráfica de Silicio por Título",
     sandboxChartSubtitle: "Impacto del silicio seleccionado vs. Hardware real detectado (i3-1220P + iGPU UHD)",
-    barBaseLabel: "Hardware Real Base (iGPU) [MEASURED]",
+    barBaseLabel: "Hardware Base de Referencia (iGPU) [REFERENCE]",
     barSimulatedLabel: "Simulación Proyectada [SIMULATED]",
     barLow1PctLabel: "1% Low Proyectado",
     chartAllView: "Vista Integral (Base vs Simulado vs 1% Low)",
@@ -522,7 +523,7 @@ export const translations = {
     sandboxDesc: "Real hardware measured (Intel i3-1220P, 16GB DDR5 @ 5600MT/s). Simulate components to test impact before investing.",
     sandboxChartTitle: "Comparative Silicon Performance by Title",
     sandboxChartSubtitle: "Selected silicon impact vs. Real detected hardware (i3-1220P + UHD iGPU)",
-    barBaseLabel: "Base Real Hardware (iGPU) [MEASURED]",
+    barBaseLabel: "Base Reference Hardware (iGPU) [REFERENCE]",
     barSimulatedLabel: "Projected Simulation [SIMULATED]",
     barLow1PctLabel: "Projected 1% Low",
     chartAllView: "Full View (Base vs Simulated vs 1% Low)",
@@ -561,7 +562,7 @@ export const translations = {
     sandboxDesc: "Hardware real medido (Intel i3-1220P, 16GB DDR5 @ 5600MT/s). Simule componentes para testar o impacto antes de investir.",
     sandboxChartTitle: "Comparativo Gráfico de Silício por Título",
     sandboxChartSubtitle: "Impacto dos componentes selecionados vs. Hardware real detectado (i3-1220P + iGPU UHD)",
-    barBaseLabel: "Hardware Real Base (iGPU) [MEASURED]",
+    barBaseLabel: "Hardware Base de Referência (iGPU) [REFERENCE]",
     barSimulatedLabel: "Simulação Projetada [SIMULATED]",
     barLow1PctLabel: "1% Low Projetado",
     chartAllView: "Visão Completa (Base vs Simulado vs 1% Low)",
@@ -615,25 +616,26 @@ export const EvoSingleTruthSurface: React.FC<EvoSingleTruthSurfaceProps> = ({
   useEffect(() => {
     try {
       if (passport) {
-        const cpuName = passport.cpu || passport.cpuModel || "12th Gen Intel(R) Core(TM) i3-1220P";
-        const gpuName = passport.gpu || passport.gpuModel || "Intel(R) UHD Graphics (Alder Lake-U 64 EU)";
-        const ramGb = Number(passport.ramGb || passport.ramCapacityGb || 16);
-        const configuredSpeed = Number(passport.ramSpeedMhz || 5600);
-        const spdSpeed = Number(passport.ramSpdSpeedMhz || 5600);
+        const cpuName = passport.cpu || passport.cpuModel || "UNKNOWN";
+        const gpuName = passport.gpu || passport.gpuModel || "UNKNOWN";
+        const ramGb = Number(passport.ramGb || passport.ramCapacityGb || 0);
+        const configuredSpeed = Number(passport.ramSpeedMhz || 0);
+        const spdSpeed = Number(passport.ramSpdSpeedMhz || configuredSpeed || 0);
+        const vramGb = Number(passport.vramGb || passport.vramSharedGb || 0);
 
-        // Cálculo formal del ancho de banda efectivo: Dual-Channel (128 bits total = 16 bytes/ciclo)
-        const computedBandwidthGbps = +((configuredSpeed * 16) / 1000 * 0.72).toFixed(1); // 72% de eficiencia real de controlador
+        // Ancho de banda estimado solo si hay velocidad reportada
+        const computedBandwidthGbps = configuredSpeed > 0 ? +((configuredSpeed * 16) / 1000 * 0.72).toFixed(1) : 0;
 
         setSnapshot((prev) => ({
           ...prev,
           cpu: {
             ...prev.cpu,
             model: cpuName,
-            cores: passport.cores || 10,
-            threads: passport.threads || 12,
-            pCores: 2,
-            eCores: 8,
-            provenance: 'MEASURED',
+            cores: Number(passport.cores || 0),
+            threads: Number(passport.threads || 0),
+            pCores: Number(passport.pCores || 0),
+            eCores: Number(passport.eCores || 0),
+            provenance: cpuName !== 'UNKNOWN' ? 'SYSTEM_REPORTED' : 'UNKNOWN',
           },
           memory: {
             ...prev.memory,
@@ -642,19 +644,19 @@ export const EvoSingleTruthSurface: React.FC<EvoSingleTruthSurfaceProps> = ({
             configuredSpeedMts: configuredSpeed,
             effectiveBandwidthGbps: {
               value: computedBandwidthGbps,
-              provenance: 'MEASURED',
-              source: 'Hardware Memory Bus Calculation (Dual-Channel DDR5)',
+              provenance: computedBandwidthGbps > 0 ? 'ESTIMATED' : 'UNKNOWN',
+              source: 'Hardware Memory Bus Calculation',
               unit: 'GB/s'
             },
-            provenance: 'MEASURED',
+            provenance: ramGb > 0 ? 'SYSTEM_REPORTED' : 'UNKNOWN',
           },
           gpu: {
             ...prev.gpu,
             model: gpuName,
-            vramSharedGb: +(ramGb / 2).toFixed(1),
-            provenance: 'MEASURED',
+            vramSharedGb: vramGb,
+            provenance: gpuName !== 'UNKNOWN' ? 'SYSTEM_REPORTED' : 'UNKNOWN',
           },
-          overallProvenance: 'MEASURED',
+          overallProvenance: cpuName !== 'UNKNOWN' || ramGb > 0 ? 'SYSTEM_REPORTED' : 'UNKNOWN',
           ingestedAt: new Date().toISOString()
         }));
         return;
@@ -664,40 +666,47 @@ export const EvoSingleTruthSurface: React.FC<EvoSingleTruthSurfaceProps> = ({
       const rawAutodetect = localStorage.getItem('evo_autodetected_hardware') || localStorage.getItem('evo_c01_specs');
       if (rawAutodetect) {
         const parsed = JSON.parse(rawAutodetect);
-        const configuredSpeed = Number(parsed.RAM_Speed || 5600);
-        const spdSpeed = Number(parsed.RAM_Spd_Speed || parsed.RAM_Speed || 5600);
-        const computedBandwidth = +((configuredSpeed * 16) / 1000 * 0.72).toFixed(1);
+        const configuredSpeed = Number(parsed.RAM_Speed || 0);
+        const spdSpeed = Number(parsed.RAM_Spd_Speed || parsed.RAM_Speed || configuredSpeed || 0);
+        const computedBandwidth = configuredSpeed > 0 ? +((configuredSpeed * 16) / 1000 * 0.72).toFixed(1) : 0;
 
-        setSnapshot((prev) => ({
-          ...prev,
-          cpu: {
-            ...prev.cpu,
-            model: parsed.CPU || prev.cpu.model,
-            cores: parsed.Cores || prev.cpu.cores,
-            threads: parsed.Threads || prev.cpu.threads,
-            provenance: 'MEASURED'
-          },
-          memory: {
-            ...prev.memory,
-            totalGb: parsed.RAM_GB || prev.memory.totalGb,
-            spdSpeedMts: spdSpeed,
-            configuredSpeedMts: configuredSpeed,
-            effectiveBandwidthGbps: {
-              value: computedBandwidth,
-              provenance: 'MEASURED',
-              source: 'WMI Win32_PhysicalMemory ConfiguredClockSpeed',
-              unit: 'GB/s'
+        setSnapshot((prev) => {
+          const cpuName = parsed.CPU || prev.cpu.model;
+          const gpuName = parsed.GPU || prev.gpu.model;
+          const ramGb = Number(parsed.RAM_GB || prev.memory.totalGb || 0);
+
+          return {
+            ...prev,
+            cpu: {
+              ...prev.cpu,
+              model: cpuName,
+              cores: Number(parsed.Cores || prev.cpu.cores || 0),
+              threads: Number(parsed.Threads || prev.cpu.threads || 0),
+              provenance: cpuName !== 'UNKNOWN' ? 'SYSTEM_REPORTED' : 'UNKNOWN'
             },
-            provenance: 'MEASURED'
-          },
-          gpu: {
-            ...prev.gpu,
-            model: parsed.GPU || prev.gpu.model,
-            provenance: 'MEASURED'
-          },
-          overallProvenance: 'MEASURED',
-          ingestedAt: new Date().toISOString()
-        }));
+            memory: {
+              ...prev.memory,
+              totalGb: ramGb,
+              spdSpeedMts: spdSpeed,
+              configuredSpeedMts: configuredSpeed,
+              effectiveBandwidthGbps: {
+                value: computedBandwidth,
+                provenance: computedBandwidth > 0 ? 'ESTIMATED' : 'UNKNOWN',
+                source: 'WMI Win32_PhysicalMemory ConfiguredClockSpeed',
+                unit: 'GB/s'
+              },
+              provenance: ramGb > 0 ? 'SYSTEM_REPORTED' : 'UNKNOWN'
+            },
+            gpu: {
+              ...prev.gpu,
+              model: gpuName,
+              vramSharedGb: Number(parsed.VRAM_GB || 0),
+              provenance: gpuName !== 'UNKNOWN' ? 'SYSTEM_REPORTED' : 'UNKNOWN'
+            },
+            overallProvenance: cpuName !== 'UNKNOWN' || ramGb > 0 ? 'SYSTEM_REPORTED' : 'UNKNOWN',
+            ingestedAt: new Date().toISOString()
+          };
+        });
       }
     } catch (e) {
       console.error("Error al sincronizar telemetría empírica", e);
@@ -723,21 +732,22 @@ export const EvoSingleTruthSurface: React.FC<EvoSingleTruthSurfaceProps> = ({
       }
 
       // Si viene en el formato plano extraído por PowerShell (CPU, GPU, RAM_GB, RAM_Speed, etc.)
-      const cpuName = parsed.CPU || parsed.cpuModel || "12th Gen Intel(R) Core(TM) i3-1220P";
-      const gpuName = parsed.GPU || parsed.gpuModel || "Intel(R) UHD Graphics (Alder Lake-U 64 EU)";
-      const ramGb = Number(parsed.RAM_GB || parsed.ramSizeGb || 16);
-      const configuredSpeed = Number(parsed.RAM_Speed || parsed.ramSpeedMhz || 5600);
-      const spdSpeed = Number(parsed.RAM_Spd_Speed || parsed.ramSpdSpeedMhz || configuredSpeed || 5600);
-      const computedBandwidthGbps = +((configuredSpeed * 16) / 1000 * 0.72).toFixed(1);
+      const cpuName = parsed.CPU || parsed.cpuModel || "UNKNOWN";
+      const gpuName = parsed.GPU || parsed.gpuModel || "UNKNOWN";
+      const ramGb = Number(parsed.RAM_GB || parsed.ramSizeGb || 0);
+      const configuredSpeed = Number(parsed.RAM_Speed || parsed.ramSpeedMhz || 0);
+      const spdSpeed = Number(parsed.RAM_Spd_Speed || parsed.ramSpdSpeedMhz || configuredSpeed || 0);
+      const computedBandwidthGbps = configuredSpeed > 0 ? +((configuredSpeed * 16) / 1000 * 0.72).toFixed(1) : 0;
+      const vramGb = Number(parsed.VRAM_GB || parsed.vramGb || 0);
 
       setSnapshot((prev) => ({
         ...prev,
         cpu: {
           ...prev.cpu,
           model: cpuName,
-          cores: Number(parsed.Cores || parsed.cores || prev.cpu.cores),
-          threads: Number(parsed.Threads || parsed.threads || prev.cpu.threads),
-          provenance: 'SYSTEM_REPORTED',
+          cores: Number(parsed.Cores || parsed.cores || 0),
+          threads: Number(parsed.Threads || parsed.threads || 0),
+          provenance: cpuName !== 'UNKNOWN' ? 'SYSTEM_REPORTED' : 'UNKNOWN',
         },
         memory: {
           ...prev.memory,
@@ -746,19 +756,19 @@ export const EvoSingleTruthSurface: React.FC<EvoSingleTruthSurfaceProps> = ({
           configuredSpeedMts: configuredSpeed,
           effectiveBandwidthGbps: {
             value: computedBandwidthGbps,
-            provenance: 'DERIVED',
-            source: 'Hardware Memory Bus Calculation (Dual-Channel DDR5)',
+            provenance: computedBandwidthGbps > 0 ? 'DERIVED' : 'UNKNOWN',
+            source: 'Hardware Memory Bus Calculation',
             unit: 'GB/s'
           },
-          provenance: 'SYSTEM_REPORTED',
+          provenance: ramGb > 0 ? 'SYSTEM_REPORTED' : 'UNKNOWN',
         },
         gpu: {
           ...prev.gpu,
           model: gpuName,
-          vramSharedGb: +(ramGb / 2).toFixed(1),
-          provenance: 'SYSTEM_REPORTED',
+          vramSharedGb: vramGb,
+          provenance: gpuName !== 'UNKNOWN' ? 'SYSTEM_REPORTED' : 'UNKNOWN',
         },
-        overallProvenance: 'SYSTEM_REPORTED',
+        overallProvenance: cpuName !== 'UNKNOWN' || ramGb > 0 ? 'SYSTEM_REPORTED' : 'UNKNOWN',
         ingestedAt: new Date().toISOString()
       }));
 
@@ -1065,7 +1075,7 @@ $payload = [PSCustomObject]@{
     RAM_GB = $ramGb
     RAM_Speed = $configuredSpeed
     RAM_Spd_Speed = $spdSpeed
-    Provenance = "MEASURED"
+    Provenance = "SYSTEM_REPORTED"
     CapturedAt = (Get-Date).ToString("o")
 }
 
@@ -1538,7 +1548,7 @@ Dictamen Técnico Pericial: ${simulationResult.bottleneck}
                               </div>
                               <div className="space-y-1.5">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-slate-400">Base Real (iGPU) [MEASURED]:</span>
+                                  <span className="text-slate-400">Base de Referencia (iGPU) [REFERENCE]:</span>
                                   <span className="text-slate-200 font-semibold">{data.baseFps} FPS</span>
                                 </div>
                                 <div className="flex justify-between items-center">
@@ -1675,7 +1685,7 @@ Dictamen Técnico Pericial: ${simulationResult.bottleneck}
               <div className="flex justify-between items-center mb-5">
                 <span className="text-xs uppercase tracking-[0.2em] text-slate-400 font-mono font-semibold">{t.selectGameTitle}</span>
                 <span className="text-[11px] font-mono text-cyan-400 bg-cyan-950/40 px-3 py-1 rounded-full border border-cyan-800/50">
-                  Mostrando {filteredGames.length} títulos validados [MEASURED]
+                  Mostrando {filteredGames.length} títulos validados [REFERENCE]
                 </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
@@ -1785,7 +1795,7 @@ Dictamen Técnico Pericial: ${simulationResult.bottleneck}
               <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-inner">
                 <div className="flex justify-between items-center text-xs text-slate-400">
                   <span>ISR Latency Peak</span>
-                  <span className="text-[10px] text-emerald-400 border border-emerald-500/30 px-1 rounded">MEASURED</span>
+                  <span className="text-[10px] text-cyan-400 border border-cyan-500/30 px-1 rounded">{snapshot.kernel.isrLatencyMs.provenance}</span>
                 </div>
                 <div className="text-3xl font-light text-white mt-2">{snapshot.kernel.isrLatencyMs.value} ms</div>
                 <div className="text-[11px] text-slate-500 mt-1">{snapshot.kernel.isrLatencyMs.source}</div>
@@ -1793,7 +1803,7 @@ Dictamen Técnico Pericial: ${simulationResult.bottleneck}
               <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-inner">
                 <div className="flex justify-between items-center text-xs text-slate-400">
                   <span>DPC Execution Spike</span>
-                  <span className="text-[10px] text-emerald-400 border border-emerald-500/30 px-1 rounded">MEASURED</span>
+                  <span className="text-[10px] text-cyan-400 border border-cyan-500/30 px-1 rounded">{snapshot.kernel.dpcLatencyMs.provenance}</span>
                 </div>
                 <div className="text-3xl font-light text-cyan-400 mt-2">{snapshot.kernel.dpcLatencyMs.value} ms</div>
                 <div className="text-[11px] text-slate-500 mt-1">{snapshot.kernel.dpcLatencyMs.source}</div>
@@ -1801,7 +1811,7 @@ Dictamen Técnico Pericial: ${simulationResult.bottleneck}
               <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-inner">
                 <div className="flex justify-between items-center text-xs text-slate-400">
                   <span>Driver Culprit Check</span>
-                  <span className="text-[10px] text-emerald-400 border border-emerald-500/30 px-1 rounded">MEASURED</span>
+                  <span className="text-[10px] text-cyan-400 border border-cyan-500/30 px-1 rounded">{snapshot.kernel.provenance}</span>
                 </div>
                 <div className="text-base font-semibold text-emerald-400 mt-2">{snapshot.kernel.culpritDriver}</div>
                 <div className="text-[11px] text-slate-500 mt-1">Timer Resolution: {userModeTweaksActive ? '0.500 ms' : '15.625 ms'}</div>
@@ -1819,7 +1829,7 @@ Dictamen Técnico Pericial: ${simulationResult.bottleneck}
                 <h2 className="text-3xl font-light text-white mt-1">Telemetría de Canales de Memoria</h2>
               </div>
               <span className="px-4 py-1.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs rounded-2xl font-bold">
-                DUAL-CHANNEL DDR5 [{snapshot.memory.provenance}]
+                {snapshot.memory.channels > 0 ? `${snapshot.memory.channels === 2 ? 'DUAL-CHANNEL' : 'SINGLE-CHANNEL'} ${snapshot.memory.moduleType}` : 'CANALES // NO DETECTADOS'} [{snapshot.memory.provenance}]
               </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-mono text-sm">

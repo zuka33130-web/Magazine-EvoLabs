@@ -35,6 +35,8 @@ import { EvoMasterLabPrintDossier, EvoMasterLabPrintData } from './EvoMasterLabP
 import { useEvoOperatingMode } from '../../../hooks/useEvoOperatingMode';
 import { UserHardwarePassport } from '../../../types';
 import { EvoOperatingModeSelector } from '../../common/EvoOperatingModeSelector';
+import { useLabAestheticMode } from '../../../utils/labAestheticMode';
+import { EvoLabAestheticToggle } from '../../common/EvoLabAestheticToggle';
 
 interface EvoMasterLabSuiteProps {
   onOpenAutoDetectModal?: () => void;
@@ -54,6 +56,7 @@ export const EvoMasterLabSuite: React.FC<EvoMasterLabSuiteProps> = ({
   initialScenario,
 }) => {
   const { mode, isPericial } = useEvoOperatingMode();
+  const { isElite } = useLabAestheticMode();
   const [activePanel, setActivePanel] = useState<'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>(initialPanel);
 
   // Print & PDF Export State
@@ -429,6 +432,9 @@ ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
 
             {/* Operating Mode Selector Compact */}
             <EvoOperatingModeSelector compact />
+
+            {/* Design & Typography Aesthetic Mode Toggle (Elite Engineering vs Classic) */}
+            <EvoLabAestheticToggle />
 
             {/* Generate & Print A4 PDF Dossier Button */}
             <button

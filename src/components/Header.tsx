@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { EvoNarrativeProfile, UserHardwarePassport } from '../types';
-import { EVO_NARRATIVE_PROFILES } from '../data/evoWorldData';
-import { Map, Library, BookOpen, RotateCcw, Compass, Zap, Shield, Server, Activity } from 'lucide-react';
+import { Menu, Zap, RotateCcw, Activity } from 'lucide-react';
 import { EvoOperatingModeSelector } from './common/EvoOperatingModeSelector';
 import { EvoAutoDetectPcModal } from './common/EvoAutoDetectPcModal';
 import { EvoTomoDossierModal, ForensicBenchTarget } from './common/EvoTomoDossierModal';
+import { EvoLabAestheticToggle } from './common/EvoLabAestheticToggle';
 
 interface HeaderProps {
   currentView?: string;
+  activeLabPanel?: string;
+  activeLabMission?: string;
   onNavigateHome?: () => void;
   onNavigateArchive?: () => void;
   onNavigateTomo01?: () => void;
@@ -24,12 +26,15 @@ interface HeaderProps {
   activeProfile?: EvoNarrativeProfile;
   onReplayIntro?: () => void;
   onHardwareDetected?: (hardware: UserHardwarePassport) => void;
+  onToggleMobileNav?: () => void;
+  dossierModalTomoId?: string | null;
+  onCloseDossierModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  currentView,
+  currentView = 'lab-core',
+  activeLabPanel,
   onNavigateHome,
-  onNavigateArchive,
   onNavigateTomo01,
   onNavigateTomo02,
   onNavigateTomo03,
@@ -37,54 +42,147 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigateTomo05,
   onNavigateTomo06,
   onNavigateMagazine,
-  onNavigateHotSwapLab,
-  onNavigateWindowsMatrixLab,
-  onNavigateLabCore,
   onOpenForensicBench,
-  activeProfile = 'investigador',
   onReplayIntro,
   onHardwareDetected,
+  onToggleMobileNav,
+  dossierModalTomoId = null,
+  onCloseDossierModal,
 }) => {
   const [isAutoDetectOpen, setIsAutoDetectOpen] = useState(false);
-  const [dossierModalTomoId, setDossierModalTomoId] = useState<string | null>(null);
+  const [internalDossierTomoId, setInternalDossierTomoId] = useState<string | null>(null);
 
-  const isHomeMap = currentView === 'world-map';
-  const isArchive = currentView === 'archivo';
-  const isMagazine = currentView === 'magazine';
-  const isHotSwap = currentView === 'hotswap-lab';
-  const isWindowsMatrix = currentView === 'windows-matrix-lab' || currentView === 'matrix-lab';
-  const profileData = EVO_NARRATIVE_PROFILES[activeProfile] || EVO_NARRATIVE_PROFILES.investigador;
+  const activeDossierId = dossierModalTomoId || internalDossierTomoId;
 
-  const handleOpenTomoCover = (tomoId: string) => {
-    setDossierModalTomoId(tomoId);
+  // Compute readable module category and name for contextual header breadcrumb
+  const getModuleInfo = (): { category: string; name: string; tag: string; accentColor: string } => {
+    switch (currentView) {
+      case 'lab-core':
+        return {
+          category: 'SOFTWARE',
+          name: 'EVO CORE DIGITAL COMPUTER LAB',
+          tag: 'V1 CORE',
+          accentColor: '#fbbf24',
+        };
+      case 'hotswap-lab':
+        if (activeLabPanel === 'sandbox') {
+          return {
+            category: 'LABORATORIOS',
+            name: 'SIMULADOR DEFINITIVO EVO',
+            tag: 'SANDBOX',
+            accentColor: '#fbbf24',
+          };
+        }
+        if (activeLabPanel === 'hardware') {
+          return {
+            category: 'LABORATORIOS',
+            name: 'HOT-SWAP DE HARDWARE & LATENCIA',
+            tag: 'SILICON',
+            accentColor: '#fbbf24',
+          };
+        }
+        if (activeLabPanel === 'software') {
+          return {
+            category: 'LABORATORIOS',
+            name: 'HOT-SWAP DE SOFTWARE & DPC µs',
+            tag: 'KERNEL',
+            accentColor: '#22d3ee',
+          };
+        }
+        if (activeLabPanel === 'telemetry') {
+          return {
+            category: 'LABORATORIOS',
+            name: 'PARSER REACTIVO DE TELEMETRÍA',
+            tag: 'CIM/WMI',
+            accentColor: '#34d399',
+          };
+        }
+        return {
+          category: 'LABORATORIOS',
+          name: 'TALLER METROLÓGICO INTEGRAL',
+          tag: 'SUITE',
+          accentColor: '#34d399',
+        };
+      case 'windows-matrix-lab':
+        return {
+          category: 'LABORATORIOS',
+          name: 'MATRIZ DE VERSIONES & KERNEL NT',
+          tag: 'NT MATRIX',
+          accentColor: '#22d3ee',
+        };
+      case 'magazine':
+        return {
+          category: 'REVISTAS',
+          name: 'REVISTA A4 // EDICIÓN DIGITAL & IMPRESIÓN',
+          tag: 'PDF PRESS',
+          accentColor: '#fbbf24',
+        };
+      case 'cover':
+      case 'index':
+      case 'chapter-01':
+      case 'chapter-02':
+      case 'chapter-03':
+      case 'chapter-04':
+      case 'chapter-05':
+      case 'chapter-06':
+      case 'chapter-07':
+        return {
+          category: 'REVISTAS',
+          name: 'TOMO 01: CONOCÉ TU PC // HARDWARE',
+          tag: '7 CAPÍTULOS',
+          accentColor: '#fbbf24',
+        };
+      case 'tomo-02':
+        return {
+          category: 'REVISTAS',
+          name: 'TOMO 02: LA BIBLIA NEGRA DE WINDOWS',
+          tag: '26 ÁREAS',
+          accentColor: '#22d3ee',
+        };
+      case 'tomo-03':
+        return {
+          category: 'REVISTAS',
+          name: 'TOMO 03: REPARÁ TU PC // MANUAL DE TALLER',
+          tag: '35 MÓDULOS',
+          accentColor: '#34d399',
+        };
+      case 'tomo-04':
+        return {
+          category: 'REVISTAS',
+          name: 'TOMO 04: REPARÁ TU NOTEBOOK // MICROELECTRÓNICA',
+          tag: '28 MÓDULOS',
+          accentColor: '#c084fc',
+        };
+      case 'world-map':
+        return {
+          category: 'INVESTIGACIÓN',
+          name: 'MUNDO EVO // MAPA INTERACTIVO',
+          tag: 'COMMAND CENTER',
+          accentColor: '#fbbf24',
+        };
+      case 'archivo':
+        return {
+          category: 'INVESTIGACIÓN',
+          name: 'ARCHIVO EVO // EXPEDIENTES & INFORMES',
+          tag: 'DOSSIERS',
+          accentColor: '#c084fc',
+        };
+      default:
+        return {
+          category: 'EVO LABS',
+          name: 'PLATAFORMA DE INGENIERÍA & METROLOGÍA',
+          tag: 'SYSTEM',
+          accentColor: '#fbbf24',
+        };
+    }
   };
 
-  const handleOpenTomo01 = () => {
-    handleOpenTomoCover('tomo-01');
-  };
-
-  const handleOpenTomo02 = () => {
-    handleOpenTomoCover('tomo-02');
-  };
-
-  const handleOpenTomo03 = () => {
-    handleOpenTomoCover('tomo-03');
-  };
-
-  const handleOpenTomo04 = () => {
-    handleOpenTomoCover('tomo-04');
-  };
-
-  const handleOpenTomo05 = () => {
-    handleOpenTomoCover('tomo-05');
-  };
-
-  const handleOpenTomo06 = () => {
-    handleOpenTomoCover('tomo-06');
-  };
+  const moduleInfo = getModuleInfo();
 
   const handleProceedToTomoView = (id: string) => {
-    setDossierModalTomoId(null);
+    setInternalDossierTomoId(null);
+    if (onCloseDossierModal) onCloseDossierModal();
+
     if (id === 'tomo-01') {
       if (onNavigateTomo01) onNavigateTomo01();
       else if (onNavigateMagazine) onNavigateMagazine();
@@ -103,275 +201,75 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="border-b border-zinc-800/80 bg-[#090a0e]/95 backdrop-blur-md sticky top-0 z-40 select-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 h-18 sm:h-20 flex items-center justify-between gap-4">
-          {/* Masthead: EVO LABS + Identity phrase */}
-          <div
-            onClick={onNavigateHome}
-            className="flex items-center gap-3 sm:gap-4 cursor-pointer group shrink-0"
-            title="Volver al Mapa del Laboratorio"
-          >
-            <span className="w-3 h-3 bg-amber-400 rounded-none inline-block shadow-[0_0_12px_#facc15] group-hover:scale-110 transition-transform" />
-            <div className="flex flex-col">
-              <span className="font-display font-black text-2xl sm:text-3xl text-white tracking-tight uppercase leading-none">
+      <header className="border-b border-white/[0.06] bg-[#07090e]/85 backdrop-blur-2xl sticky top-0 z-40 select-none">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
+          
+          {/* Zone 1: Mobile Hamburger + Brand Anchor + Contextual Breadcrumb & Active Module */}
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            {/* Mobile Drawer Toggle */}
+            <button
+              type="button"
+              onClick={onToggleMobileNav}
+              className="lg:hidden p-2 rounded-full bg-white/[0.04] border border-white/[0.08] text-zinc-300 hover:text-amber-400 hover:border-amber-400/40 transition-colors cursor-pointer"
+              aria-label="Abrir navegación de laboratorio"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+
+            {/* Brand Anchor */}
+            <div
+              onClick={onNavigateHome}
+              className="flex items-center gap-2.5 cursor-pointer group shrink-0"
+              title="Ir al Centro de Operaciones Mundo EVO"
+            >
+              <div className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24] group-hover:scale-125 transition-transform" />
+              <span className="font-display font-black text-lg sm:text-xl text-white tracking-tight uppercase leading-none">
                 EVO LABS
               </span>
-              <span className="text-[11px] font-mono-tech text-amber-400 font-semibold tracking-wide hidden sm:block">
-                “Hacemos milagros, pero los medimos.”
+            </div>
+
+            {/* Breadcrumb Hierarchy */}
+            <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-white/[0.08] min-w-0">
+              <span className="text-[10px] font-mono-tech uppercase font-bold text-zinc-500 tracking-wider">
+                {moduleInfo.category}
+              </span>
+              <span className="text-zinc-600 text-xs">/</span>
+              <span className="text-xs font-mono-tech font-bold text-zinc-200 uppercase tracking-tight truncate max-w-[200px] md:max-w-[320px] lg:max-w-[420px]">
+                {moduleInfo.name}
+              </span>
+              <span
+                className="hidden md:inline text-[9px] font-mono-tech font-bold px-2 py-0.5 rounded-full border ml-1 shrink-0"
+                style={{
+                  color: moduleInfo.accentColor,
+                  borderColor: `${moduleInfo.accentColor}33`,
+                  backgroundColor: `${moduleInfo.accentColor}12`,
+                }}
+              >
+                {moduleInfo.tag}
               </span>
             </div>
           </div>
 
-          {/* Center/Right Navigation Controls */}
-          <div className="flex items-center gap-2 sm:gap-3 font-mono-tech text-xs overflow-x-auto py-1">
+          {/* Zone 2: Global Control Deck (Auto-Detect, Mode Switcher) */}
+          <div className="flex items-center gap-2 sm:gap-3 font-mono-tech text-xs shrink-0">
             
-            {/* Auto-Detect My PC Trigger Button */}
+            {/* Auto-Detect My PC Telemetry Trigger - Pill Capsule Style with Technical Pulse */}
             <button
               type="button"
               onClick={() => setIsAutoDetectOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-cyan-500/15 to-transparent hover:from-amber-400 hover:to-amber-300 text-amber-300 hover:text-black border border-amber-400/50 hover:border-amber-400 font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(251,191,36,0.2)] shrink-0 group"
-              title="Auto-detectar especificaciones reales de mi PC con comando nativo de PowerShell (CIM/WMI de solo lectura)"
+              className="px-4 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-400 text-amber-300 hover:text-black border border-amber-400/30 hover:border-amber-400 font-bold transition-all duration-200 flex items-center gap-2 cursor-pointer shadow-[0_0_14px_rgba(251,191,36,0.12)] group"
+              title="Escanear y auto-detectar silicio real con PowerShell de solo lectura"
             >
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 group-hover:bg-black animate-pulse shadow-[0_0_6px_#fbbf24] shrink-0" />
               <Zap className="w-3.5 h-3.5 text-amber-400 group-hover:text-black transition-colors" />
-              <span className="hidden lg:inline">⚡ AUTO-DETECTAR MI PC</span>
-              <span className="lg:hidden">⚡ DETECTAR PC</span>
+              <span className="hidden md:inline tracking-tight">AUTO-DETECTAR PC</span>
+              <span className="md:hidden">DETECTAR</span>
             </button>
 
-            {/* Navigation Pill between World Map, Archive and Tomo */}
-            <div className="flex items-center bg-[#13151f] p-1 rounded-xl border border-zinc-800 shrink-0">
-              <button
-                type="button"
-                onClick={onNavigateHome}
-                className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                  isHomeMap
-                    ? 'bg-amber-400 text-black font-bold shadow'
-                    : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                <Map className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">MUNDO EVO</span>
-                <span className="sm:hidden">MAPA</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={onNavigateArchive}
-                className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                  isArchive
-                    ? 'bg-amber-400 text-black font-bold shadow'
-                    : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                <Library className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">ARCHIVO EVO</span>
-                <span className="sm:hidden">ARCHIVO</span>
-              </button>
-
-              {/* Tomos 01 al 06 direct selector: APERTURA OBLIGATORIA EN PORTADA */}
-              <div className="flex items-center gap-1 border-l border-zinc-800 pl-1.5 ml-1">
-                <button
-                  type="button"
-                  onClick={handleOpenTomo01}
-                  className={`px-2 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer text-[11px] ${
-                    dossierModalTomoId === 'tomo-01' || currentView === 'magazine'
-                      ? 'bg-amber-400 text-black shadow'
-                      : 'bg-zinc-900 hover:bg-zinc-800 text-amber-400 border border-amber-400/40'
-                  }`}
-                  title="Tomo 01: Conocé tu PC // Hardware (46 páginas A4)"
-                >
-                  <BookOpen className="w-3 h-3" />
-                  <span>T01</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleOpenTomo02}
-                  className={`px-2 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer text-[11px] ${
-                    dossierModalTomoId === 'tomo-02' || currentView === 'tomo-02'
-                      ? 'bg-cyan-400 text-black shadow'
-                      : 'bg-zinc-900 hover:bg-zinc-800 text-cyan-400 border border-cyan-400/40'
-                  }`}
-                  title="Tomo 02: La Biblia Negra de Windows (26 áreas / 48 páginas A4)"
-                >
-                  <BookOpen className="w-3 h-3" />
-                  <span>T02</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleOpenTomo03}
-                  className={`px-2 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer text-[11px] ${
-                    dossierModalTomoId === 'tomo-03' || currentView === 'tomo-03'
-                      ? 'bg-emerald-400 text-black shadow'
-                      : 'bg-zinc-900 hover:bg-zinc-800 text-emerald-400 border border-emerald-400/40'
-                  }`}
-                  title="Tomo 03: Repará tu PC // Manual de Taller (35 módulos / 122 páginas A4)"
-                >
-                  <BookOpen className="w-3 h-3" />
-                  <span>T03</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleOpenTomo04}
-                  className={`px-2 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer text-[11px] ${
-                    dossierModalTomoId === 'tomo-04' || currentView === 'tomo-04'
-                      ? 'bg-purple-400 text-white shadow'
-                      : 'bg-zinc-900 hover:bg-zinc-800 text-purple-400 border border-purple-400/40'
-                  }`}
-                  title="Tomo 04: Repará tu Notebook // Micromecánica (22 páginas / roadmap)"
-                >
-                  <BookOpen className="w-3 h-3" />
-                  <span>T04</span>
-                </button>
-
-                {/* Tomo 05 Button */}
-                <button
-                  type="button"
-                  onClick={handleOpenTomo05}
-                  className={`px-2 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer text-[11px] ${
-                    dossierModalTomoId === 'tomo-05'
-                      ? 'bg-sky-400 text-black shadow'
-                      : 'bg-zinc-900 hover:bg-zinc-800 text-sky-400 border border-sky-400/40'
-                  }`}
-                  title="Tomo 05: Redes, Linux y Virtualización (12 módulos / 210 páginas A4)"
-                >
-                  <Server className="w-3 h-3" />
-                  <span>T05</span>
-                </button>
-
-                {/* Tomo 06 Button */}
-                <button
-                  type="button"
-                  onClick={handleOpenTomo06}
-                  className={`px-2 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer text-[11px] ${
-                    dossierModalTomoId === 'tomo-06'
-                      ? 'bg-rose-500 text-white shadow'
-                      : 'bg-zinc-900 hover:bg-zinc-800 text-rose-400 border border-rose-400/40'
-                  }`}
-                  title="Tomo 06: Ciberseguridad Ofensiva y Análisis de Malware (12 módulos / 220 páginas A4)"
-                >
-                  <Shield className="w-3 h-3" />
-                  <span>T06</span>
-                </button>
-              </div>
-
-              {onNavigateMagazine && (
-                <button
-                  type="button"
-                  onClick={onNavigateMagazine}
-                  className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ml-1 ${
-                    isMagazine
-                      ? 'bg-yellow-400 text-black font-bold shadow'
-                      : 'bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 font-semibold'
-                  }`}
-                  title="Abrir edición digital impresa A4 de EVO LABS MAGAZINE (con descargas PDF)"
-                >
-                  <BookOpen className="w-3.5 h-3.5 text-yellow-400" />
-                  <span className="hidden sm:inline">REVISTA A4</span>
-                  <span className="sm:hidden">REVISTA</span>
-                </button>
-              )}
-
-              {onNavigateHotSwapLab && (
-                <button
-                  type="button"
-                  onClick={onNavigateHotSwapLab}
-                  className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ml-1 ${
-                    isHotSwap
-                      ? 'bg-amber-400 text-black font-bold shadow-[0_0_15px_rgba(251,191,36,0.4)]'
-                      : 'bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 border border-amber-400/40 font-semibold'
-                  }`}
-                  title="Abrir Simulador Definitivo EVO y Banco de Ensamble de Hardware/Software"
-                >
-                  <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden sm:inline">SIMULADOR & LAB</span>
-                  <span className="sm:hidden">SIMULADOR</span>
-                </button>
-              )}
-
-              {onNavigateLabCore && (
-                <button
-                  type="button"
-                  onClick={onNavigateLabCore}
-                  className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ml-1 font-bold ${
-                    currentView === 'lab-core'
-                      ? 'bg-gradient-to-r from-amber-400 via-emerald-400 to-cyan-400 text-black shadow-[0_0_18px_rgba(251,191,36,0.5)] border border-amber-300'
-                      : 'bg-gradient-to-r from-amber-500/20 to-cyan-500/20 hover:from-amber-400 hover:to-cyan-300 text-amber-300 hover:text-black border border-amber-400/50 shadow-[0_0_12px_rgba(251,191,36,0.2)]'
-                  }`}
-                  title="Abrir EVO LABS CORE V1 — Nuevo Laboratorio Digital Unificado"
-                >
-                  <Zap className="w-3.5 h-3.5 text-amber-400 group-hover:text-black fill-current" />
-                  <span className="hidden sm:inline">NUEVO LABORATORIO</span>
-                  <span className="sm:hidden">LAB CORE</span>
-                </button>
-              )}
-
-              {onNavigateWindowsMatrixLab && (
-                <button
-                  type="button"
-                  onClick={onNavigateWindowsMatrixLab}
-                  className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ml-1 ${
-                    isWindowsMatrix
-                      ? 'bg-cyan-400 text-black font-bold shadow-[0_0_15px_rgba(6,182,212,0.4)]'
-                      : 'bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 border border-cyan-400/40 font-semibold'
-                  }`}
-                  title="Abrir Matriz de Versiones Windows & Planificador de Kernel NT"
-                >
-                  <Activity className="w-3.5 h-3.5 text-cyan-400" />
-                  <span className="hidden sm:inline">MATRIZ DE VERSIONES & KERNEL NT</span>
-                  <span className="sm:hidden">KERNEL NT</span>
-                </button>
-              )}
-            </div>
-
-            {/* Dark Industrial Mode Selector: MODO ESENCIAL / MODO PERICIAL */}
+            {/* Operating Mode Switcher (Esencial / Pericial) */}
             <div className="flex items-center shrink-0">
               <EvoOperatingModeSelector compact />
             </div>
-
-            {/* Top Right Master EVO LABS Button */}
-            <button
-              type="button"
-              onClick={onNavigateHome}
-              className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-2 cursor-pointer font-mono-tech font-bold text-xs uppercase tracking-wider border shadow-md shrink-0 ${
-                isHomeMap
-                  ? 'bg-amber-400 text-black border-amber-300 shadow-[0_0_20px_rgba(251,191,36,0.45)] ring-2 ring-amber-400/30'
-                  : 'bg-amber-500/10 hover:bg-amber-400 text-amber-400 hover:text-black border-amber-400/50 hover:border-amber-400 shadow-sm'
-              }`}
-              title="Abrir Centro de Ingeniería y Metrología Mundo EVO"
-            >
-              <span className={`w-2 h-2 rounded-full ${isHomeMap ? 'bg-black animate-pulse' : 'bg-amber-400 animate-ping'}`} />
-              <Map className="w-3.5 h-3.5" />
-              <span className="font-display font-black tracking-normal">EVO LABS</span>
-              <span className="hidden xl:inline text-[10px] opacity-80">// MUNDO EVO</span>
-            </button>
-
-            {/* Active Profile Pill (Discreet) */}
-            <div
-              title="Perfil de Operador Narrativo Activo"
-              className="hidden 2xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-300 shrink-0"
-            >
-              <Compass className="w-3.5 h-3.5 text-amber-400" />
-              <div className="flex flex-col text-left">
-                <span className="text-[9px] text-zinc-500 uppercase leading-none">PERFIL</span>
-                <span className="font-bold text-white text-[10px] uppercase tracking-wider">
-                  {profileData.title}
-                </span>
-              </div>
-            </div>
-
-            {/* Replay Intro Button */}
-            {onReplayIntro && (
-              <button
-                type="button"
-                onClick={onReplayIntro}
-                title="Volver a ver la presentación cinemática inicial"
-                className="p-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-amber-400 transition-colors cursor-pointer shrink-0"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-              </button>
-            )}
           </div>
         </div>
       </header>
@@ -385,20 +283,21 @@ export const Header: React.FC<HeaderProps> = ({
         }}
       />
 
-      {/* Tomo Dossier Modal for T01 to T06: Apertura Obligatoria en Portada */}
+      {/* Tomo Dossier Modal for T01 to T06: Apertura en Portada */}
       <EvoTomoDossierModal
-        isOpen={!!dossierModalTomoId}
-        tomoId={dossierModalTomoId}
-        onClose={() => setDossierModalTomoId(null)}
+        isOpen={!!activeDossierId}
+        tomoId={activeDossierId}
+        onClose={() => {
+          setInternalDossierTomoId(null);
+          if (onCloseDossierModal) onCloseDossierModal();
+        }}
         onOpenTomoView={handleProceedToTomoView}
         onOpenForensicBench={(target) => {
-          setDossierModalTomoId(null);
-          if (onOpenForensicBench) {
-            onOpenForensicBench(target);
-          }
+          setInternalDossierTomoId(null);
+          if (onCloseDossierModal) onCloseDossierModal();
+          if (onOpenForensicBench) onOpenForensicBench(target);
         }}
       />
     </>
   );
 };
-

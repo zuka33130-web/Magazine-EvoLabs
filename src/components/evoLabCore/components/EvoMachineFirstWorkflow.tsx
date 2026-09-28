@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import { Machine, EpistemicProvenance } from '../types';
 import { BaselineSnapshot, BaselineEngine } from '../services/baselineEngine';
-import { HardwareSensorService } from '../services/hardwareSensorService';
+import { EvoAgentClient } from '../services/evoAgentClient';
 import { EvoLiveMachineBusDiagram } from '../components/EvoLiveMachineBusDiagram';
 
 interface EvoMachineFirstWorkflowProps {
@@ -75,13 +75,13 @@ export const EvoMachineFirstWorkflow: React.FC<EvoMachineFirstWorkflowProps> = (
   const handleLiveHardwareImport = async () => {
     setIsSamplingLiveSensor(true);
     try {
-      const { machine: detectedMachine } = await HardwareSensorService.sampleLiveSilicon();
-      localStorage.setItem('evo_lab_core_active_machine_v1', JSON.stringify(detectedMachine));
-      window.dispatchEvent(new Event('evo_hardware_updated'));
-      setHasEnteredBench(true);
-    } catch (err) {
-      console.error('Error importing live silicon:', err);
-      // Fallback to modal if live sample fails
+      const result = await EvoAgentClient.importThisPc();
+      if (result.success && result.machine) {
+        setHasEnteredBench(true);
+      } else {
+        onImportThisPc();
+      }
+    } catch {
       onImportThisPc();
     } finally {
       setIsSamplingLiveSensor(false);

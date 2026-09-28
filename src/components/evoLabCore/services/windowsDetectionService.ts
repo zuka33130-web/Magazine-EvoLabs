@@ -147,6 +147,10 @@ exit /b 0
       return input as WindowsTelemetryPayload;
     }
 
+    if (typeof input !== 'string') {
+      throw new Error('AUTODETECTION_FAILED: El texto ingresado no es válido.');
+    }
+
     const trimmed = input.trim();
     if (!trimmed) {
       throw new Error('AUTODETECTION_FAILED: El texto ingresado está vacío.');
@@ -349,6 +353,7 @@ exit /b 0
         pcieGen: 'UNKNOWN',
         formFactor: 'UNKNOWN',
         provenance: hasMb ? 'SYSTEM_REPORTED' : 'UNKNOWN',
+        source: hasMb ? 'CIM:Win32_BaseBoard' : 'UNSUPPORTED_BY_WMI',
       },
 
       // CPU: Exactly what Windows reported
@@ -361,18 +366,20 @@ exit /b 0
         tdpW: 0, // UNKNOWN until user or spec verification, NEVER FAKE 65W!
         hasIGPU: !isDedicated || cpuModel.toLowerCase().includes('intel'),
         provenance: cpuModel !== 'UNKNOWN' ? 'SYSTEM_REPORTED' : 'UNKNOWN',
+        source: cpuModel !== 'UNKNOWN' ? 'CIM:Win32_Processor' : 'UNSUPPORTED_BY_WMI',
       },
 
-      // RAM: Exactly reported capacity and modules
+      // RAM: Exactly reported capacity and modules (Real sum of Win32_PhysicalMemory)
       ram: {
         sizeGb: totalRamGb,
         configuredSpeedMts: ramSpeed,
         spdSpeedMts: firstSpeed || ramSpeed,
         type: ramType,
-        channels: ramChannels, // 0 = UNKNOWN
+        channels: ramChannels, // 0 = UNKNOWN (No asumir Dual Channel)
         slotsUsed: rawRamModules.length,
         totalSlots: undefined,
         provenance: totalRamGb > 0 ? 'SYSTEM_REPORTED' : 'UNKNOWN',
+        source: totalRamGb > 0 ? 'CIM:Win32_PhysicalMemory' : 'UNSUPPORTED_BY_WMI',
       },
 
       // GPU: Exactly reported model & driver
@@ -382,6 +389,7 @@ exit /b 0
         isDedicated,
         powerW: 0, // UNKNOWN until user or official datasheet, NEVER FAKE WATTAGE!
         provenance: gpuModel !== 'UNKNOWN' ? 'SYSTEM_REPORTED' : 'UNKNOWN',
+        source: gpuModel !== 'UNKNOWN' ? 'CIM:Win32_VideoController' : 'UNSUPPORTED_BY_WMI',
       },
 
       // STORAGE: Exactly reported drive
@@ -390,6 +398,7 @@ exit /b 0
         type: storageType,
         capacityGb: storageCapacityGb,
         provenance: storageProvenance,
+        source: primaryDisk ? 'CIM:Win32_DiskDrive' : 'UNSUPPORTED_BY_WMI',
       },
 
       // PSU: Windows CANNOT detect PSU -> STRICTLY UNKNOWN!
@@ -397,6 +406,7 @@ exit /b 0
         wattageW: 0,
         rating: 'UNKNOWN',
         provenance: 'UNKNOWN',
+        source: 'UNSUPPORTED_BY_WMI',
       },
 
       // COOLING: Windows CANNOT detect cooler -> STRICTLY UNKNOWN!
@@ -404,6 +414,7 @@ exit /b 0
         type: 'UNKNOWN',
         tdpCapacityW: 0,
         provenance: 'UNKNOWN',
+        source: 'UNSUPPORTED_BY_WMI',
       },
 
       // CHASSIS: Windows CANNOT detect case -> STRICTLY UNKNOWN!
@@ -411,6 +422,7 @@ exit /b 0
         model: 'UNKNOWN',
         formFactor: 'UNKNOWN',
         provenance: 'UNKNOWN',
+        source: 'UNSUPPORTED_BY_WMI',
       },
 
       // FANS: Windows CANNOT detect fans -> STRICTLY UNKNOWN!
@@ -418,6 +430,7 @@ exit /b 0
         count: 0,
         sizeMm: 0,
         provenance: 'UNKNOWN',
+        source: 'UNSUPPORTED_BY_WMI',
       },
 
       // DISPLAY: Reported by video controller or UNKNOWN
@@ -425,6 +438,7 @@ exit /b 0
         resolution,
         refreshHz,
         provenance: resolution !== 'UNKNOWN' ? 'SYSTEM_REPORTED' : 'UNKNOWN',
+        source: resolution !== 'UNKNOWN' ? 'CIM:Win32_VideoController' : 'UNSUPPORTED_BY_WMI',
       },
 
       // BIOS
@@ -434,6 +448,7 @@ exit /b 0
             version: biosVer || 'UNKNOWN',
             releaseDate: biosDate,
             provenance: 'SYSTEM_REPORTED',
+            source: 'CIM:Win32_BIOS',
           }
         : undefined,
 
@@ -443,6 +458,7 @@ exit /b 0
             ethernet: ethernetAdapters.length > 0 ? ethernetAdapters : undefined,
             wifi: wifiAdapter,
             provenance: 'SYSTEM_REPORTED',
+            source: 'CIM:Win32_NetworkAdapter',
           }
         : undefined,
 
@@ -452,16 +468,25 @@ exit /b 0
         version: osVersion,
         build: osBuild,
         provenance: 'SYSTEM_REPORTED',
+        source: 'CIM:Win32_OperatingSystem',
       },
 
       // Granular Module Details
       ramModules: rawRamModules.map((m) => ({
         model: m.PartNumber || m.Manufacturer || 'Módulo DIMM',
+        manufacturer: m.Manufacturer,
+        partNumber: m.PartNumber,
+        capacityGb: m.CapacityGB,
         sizeGb: m.CapacityGB,
         speedMts: m.ConfiguredClockMhz || m.SpeedMhz || 0,
+        configuredClockSpeedMts: m.ConfiguredClockMhz,
+        configuredClockSpeed: m.ConfiguredClockMhz,
+        deviceLocator: m.DeviceLocator,
+        bankLabel: m.BankLabel,
         type: ramType,
-        partNumber: m.PartNumber,
         quantity: 1,
+        provenance: 'SYSTEM_REPORTED',
+        source: 'CIM:Win32_PhysicalMemory',
       })),
 
       storageDrives: rawDisks.map((d) => ({

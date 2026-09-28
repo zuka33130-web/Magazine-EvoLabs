@@ -30,6 +30,8 @@ import {
 } from 'lucide-react';
 import { useEvoOperatingMode } from '../../../../hooks/useEvoOperatingMode';
 import { EvoOperatingModeSelector } from '../../../common/EvoOperatingModeSelector';
+import { useLabAestheticMode } from '../../../../utils/labAestheticMode';
+import { EvoLabAestheticToggle } from '../../../common/EvoLabAestheticToggle';
 
 export interface EvoWindowsMatrixLabProps {
   initialBuild?: 'win10-22h2' | 'win10-ltsc' | 'win11-23h2' | 'win11-24h2';
@@ -182,6 +184,7 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
   onOpenTomo,
 }) => {
   const { isPericial } = useEvoOperatingMode();
+  const { isElite } = useLabAestheticMode();
 
   // State: Windows Build Matrix
   const [selectedBuildId, setSelectedBuildId] = useState<string>(initialBuild);
@@ -541,6 +544,9 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
 
           <div className="flex items-center gap-2 self-start lg:self-center shrink-0 flex-wrap">
             <EvoOperatingModeSelector compact />
+
+            {/* Design & Typography Aesthetic Mode Toggle (Elite Engineering vs Classic) */}
+            <EvoLabAestheticToggle />
 
             {onNavigateToHardwareBench && (
               <button

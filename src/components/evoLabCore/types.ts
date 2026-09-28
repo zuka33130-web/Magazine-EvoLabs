@@ -54,6 +54,7 @@ export interface MachineMotherboard {
   pcieGen: string; // ej: "PCIe 4.0", "PCIe 5.0"
   formFactor: 'ATX' | 'Micro-ATX' | 'Mini-ITX' | 'Laptop' | 'UNKNOWN';
   provenance: EpistemicProvenance;
+  source?: string;
 }
 
 export interface MachineCPU {
@@ -68,6 +69,7 @@ export interface MachineCPU {
   tdpW: number;
   hasIGPU: boolean;
   provenance: EpistemicProvenance;
+  source?: string;
 }
 
 export interface MachineRAM {
@@ -75,10 +77,11 @@ export interface MachineRAM {
   configuredSpeedMts: number;
   spdSpeedMts?: number;
   type: 'DDR4' | 'DDR5' | 'UNKNOWN';
-  channels: number; // 1 = Single, 2 = Dual
+  channels: number; // 0 = UNKNOWN, 1 = Single, 2 = Dual
   slotsUsed?: number;
   totalSlots?: number;
   provenance: EpistemicProvenance;
+  source?: string;
 }
 
 export interface MachineGPU {
@@ -88,6 +91,7 @@ export interface MachineGPU {
   pcieGen?: string;
   powerW: number;
   provenance: EpistemicProvenance;
+  source?: string;
 }
 
 export interface MachineStorage {
@@ -96,24 +100,28 @@ export interface MachineStorage {
   model?: string;
   healthPct?: number;
   provenance: EpistemicProvenance;
+  source?: string;
 }
 
 export interface MachinePSU {
   wattageW: number;
   rating?: string; // ej: "80+ Bronze", "80+ Gold", "OEM Laptop"
   provenance: EpistemicProvenance;
+  source?: string;
 }
 
 export interface MachineCooling {
   type: 'Stock Fan' | 'Air Tower' | 'AIO Liquid 240mm' | 'AIO Liquid 360mm' | 'Laptop Vapor Chamber' | 'UNKNOWN';
   tdpCapacityW: number;
   provenance: EpistemicProvenance;
+  source?: string;
 }
 
 export interface MachineDisplay {
   resolution: string; // ej: "1920x1080", "2560x1440"
   refreshHz: number;
   provenance: EpistemicProvenance;
+  source?: string;
 }
 
 export interface MachineCase {
@@ -124,6 +132,7 @@ export interface MachineCase {
   coolerClearanceMm?: number;
   radiatorSupportMm?: number;
   provenance: EpistemicProvenance;
+  source?: string;
 }
 
 export interface MachineFans {
@@ -132,6 +141,7 @@ export interface MachineFans {
   sizeMm: number;
   rgb?: boolean;
   provenance: EpistemicProvenance;
+  source?: string;
 }
 
 export interface MachineExpansionCard {
@@ -298,26 +308,37 @@ export interface Machine {
     releaseDate?: string;
     uefiMode?: boolean;
     provenance: EpistemicProvenance;
+    source?: string;
   };
   network?: {
     ethernet?: string[];
     wifi?: string;
     bluetooth?: string;
     provenance: EpistemicProvenance;
+    source?: string;
   };
   audio?: {
     integrated?: string;
     dedicatedSoundCard?: string;
     usbDacInterface?: string;
     provenance: EpistemicProvenance;
+    source?: string;
   };
   ramModules?: {
     model: string;
+    manufacturer?: string;
+    partNumber?: string;
+    capacityGb?: number;
     sizeGb: number;
     speedMts: number;
-    type: 'DDR4' | 'DDR5' | 'UNKNOWN';
-    partNumber?: string;
+    configuredClockSpeedMts?: number;
+    configuredClockSpeed?: number;
+    deviceLocator?: string;
+    bankLabel?: string;
+    type: 'DDR4' | 'DDR5' | 'DDR3' | 'UNKNOWN';
     quantity?: number;
+    provenance?: EpistemicProvenance;
+    source?: string;
   }[];
   storageDrives?: {
     model: string;
@@ -339,6 +360,7 @@ export interface Machine {
     version?: string;
     build?: string;
     provenance: EpistemicProvenance;
+    source?: string;
   };
   notes?: string;
 }

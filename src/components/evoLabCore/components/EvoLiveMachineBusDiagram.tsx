@@ -270,15 +270,15 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
   const coolingState = getSubsystemState('COOLING');
   const networkState = getSubsystemState('NETWORK');
 
-  // Bus Utilizations
-  const cpuRamUtil = frame?.buses.cpuRam.utilizationEstimatePct ?? (workloadState === 'GAMING' ? 68 : 20);
-  const cpuGpuUtil = frame?.buses.cpuGpu.utilizationEstimatePct ?? (workloadState === 'GAMING' ? 82 : 15);
-  const gpuVramUtil = frame?.buses.gpuVram.utilizationEstimatePct ?? (workloadState === 'GAMING' ? 89 : 10);
-  const cpuStorageUtil = frame?.buses.cpuStorage.utilizationEstimatePct ?? (workloadState === 'GAMING' ? 35 : 5);
-  const networkUtil = frame?.buses.chipsetNetwork.utilizationEstimatePct ?? (workloadState === 'GAMING' ? 25 : 5);
-  const psuLoadUtil = frame ? Math.round((frame.psu.estimatedLoadW / Math.max(1, frame.psu.ratedWattageW)) * 100) : 40;
-  const coolingLoadUtil = frame ? frame.cooling.fanSpeedPct : 50;
-  const cpuPchUtil = frame?.buses.cpuStorage.utilizationEstimatePct ?? (workloadState === 'GAMING' ? 45 : 15);
+  // Bus Utilizations (Strict: 0 when no frame is present)
+  const cpuRamUtil = frame ? frame.buses.cpuRam.utilizationEstimatePct : 0;
+  const cpuGpuUtil = frame ? frame.buses.cpuGpu.utilizationEstimatePct : 0;
+  const gpuVramUtil = frame ? frame.buses.gpuVram.utilizationEstimatePct : 0;
+  const cpuStorageUtil = frame ? frame.buses.cpuStorage.utilizationEstimatePct : 0;
+  const networkUtil = frame ? frame.buses.chipsetNetwork.utilizationEstimatePct : 0;
+  const psuLoadUtil = frame ? Math.round((frame.psu.estimatedLoadW / Math.max(1, frame.psu.ratedWattageW)) * 100) : 0;
+  const coolingLoadUtil = frame ? frame.cooling.fanSpeedPct : 0;
+  const cpuPchUtil = frame ? frame.buses.cpuStorage.utilizationEstimatePct : 0;
 
   const cpuRamFlow = getBusFlowStyles(cpuRamUtil, ramState === 'FAULT' ? 'FAULT' : ramState === 'LIMITING' ? 'LIMITING' : 'NONE');
   const cpuGpuFlow = getBusFlowStyles(cpuGpuUtil, gpuState === 'FAULT' ? 'FAULT' : gpuState === 'LIMITING' ? 'LIMITING' : 'NONE');
@@ -292,59 +292,59 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
   // Load-reactive pulse animation speeds (in seconds)
   // Higher load -> shorter period -> faster pulses traveling along SVG paths
   const ramPulseDur = useMemo(() => {
-    if (!isPoweredOn) return '15s';
+    if (!isPoweredOn || !frame) return '15s';
     const sec = Math.max(0.32, 3.2 - (cpuRamUtil / 100) * 2.85);
     return `${sec.toFixed(2)}s`;
-  }, [isPoweredOn, cpuRamUtil]);
+  }, [isPoweredOn, frame, cpuRamUtil]);
 
   const gpuPulseDur = useMemo(() => {
-    if (!isPoweredOn) return '15s';
+    if (!isPoweredOn || !frame) return '15s';
     const sec = Math.max(0.25, 3.0 - (cpuGpuUtil / 100) * 2.7);
     return `${sec.toFixed(2)}s`;
-  }, [isPoweredOn, cpuGpuUtil]);
+  }, [isPoweredOn, frame, cpuGpuUtil]);
 
   const pchPulseDur = useMemo(() => {
-    if (!isPoweredOn) return '15s';
+    if (!isPoweredOn || !frame) return '15s';
     const sec = Math.max(0.38, 3.5 - (cpuPchUtil / 100) * 3.05);
     return `${sec.toFixed(2)}s`;
-  }, [isPoweredOn, cpuPchUtil]);
+  }, [isPoweredOn, frame, cpuPchUtil]);
 
   const vramPulseDur = useMemo(() => {
-    if (!isPoweredOn) return '15s';
+    if (!isPoweredOn || !frame) return '15s';
     const sec = Math.max(0.22, 2.5 - (gpuVramUtil / 100) * 2.25);
     return `${sec.toFixed(2)}s`;
-  }, [isPoweredOn, gpuVramUtil]);
+  }, [isPoweredOn, frame, gpuVramUtil]);
 
   const storagePulseDur = useMemo(() => {
-    if (!isPoweredOn) return '15s';
+    if (!isPoweredOn || !frame) return '15s';
     const sec = Math.max(0.35, 3.2 - (cpuStorageUtil / 100) * 2.75);
     return `${sec.toFixed(2)}s`;
-  }, [isPoweredOn, cpuStorageUtil]);
+  }, [isPoweredOn, frame, cpuStorageUtil]);
 
   const networkPulseDur = useMemo(() => {
-    if (!isPoweredOn) return '15s';
+    if (!isPoweredOn || !frame) return '15s';
     const sec = Math.max(0.4, 3.5 - (networkUtil / 100) * 2.95);
     return `${sec.toFixed(2)}s`;
-  }, [isPoweredOn, networkUtil]);
+  }, [isPoweredOn, frame, networkUtil]);
 
   const psuPulseDur = useMemo(() => {
-    if (!isPoweredOn) return '15s';
+    if (!isPoweredOn || !frame) return '15s';
     const sec = Math.max(0.45, 3.5 - (psuLoadUtil / 100) * 2.9);
     return `${sec.toFixed(2)}s`;
-  }, [isPoweredOn, psuLoadUtil]);
+  }, [isPoweredOn, frame, psuLoadUtil]);
 
   const coolingPulseDur = useMemo(() => {
-    if (!isPoweredOn) return '15s';
+    if (!isPoweredOn || !frame) return '15s';
     const sec = Math.max(0.4, 3.2 - (coolingLoadUtil / 100) * 2.65);
     return `${sec.toFixed(2)}s`;
-  }, [isPoweredOn, coolingLoadUtil]);
+  }, [isPoweredOn, frame, coolingLoadUtil]);
 
-  // Component Live Temperatures (°C)
-  const cpuTemp = frame?.cpu.temperatureC ?? (workloadState === 'STRESS_TEST' ? 88 : workloadState === 'GAMING' ? 76 : 45);
-  const gpuTemp = frame?.gpu.temperatureC ?? (workloadState === 'STRESS_TEST' ? 82 : workloadState === 'GAMING' ? 72 : 42);
-  const storageTemp = frame?.storage.temperatureC ?? (workloadState === 'STRESS_TEST' ? 68 : 41);
-  const chipsetTemp = (frame as any)?.chipset?.temperatureC ?? (workloadState === 'STRESS_TEST' ? 77 : 48);
-  const vrmTemp = cpuTemp > 75 ? Math.round(cpuTemp + 3) : Math.round(cpuTemp - 8);
+  // Component Live Temperatures (°C: strictly 0/null without real/simulated frame)
+  const cpuTemp = frame?.cpu.temperatureC ?? 0;
+  const gpuTemp = frame?.gpu.temperatureC ?? 0;
+  const storageTemp = frame?.storage.temperatureC ?? 0;
+  const chipsetTemp = (frame as any)?.chipset?.temperatureC ?? 0;
+  const vrmTemp = frame && cpuTemp > 75 ? Math.round(cpuTemp + 3) : 0;
 
   // Radial Thermal Ripple Hotspots (expands across PCB from components when temperature > 75°C)
   interface ThermalHotspot {
@@ -1391,10 +1391,10 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
                 {/* Compact HUD for Cooling */}
                 <text x="187" y="134" fill="#38bdf8" fontSize="8" fontWeight="black">COOLING PWM</text>
                 <text x="187" y="210" fill="#ffffff" fontSize="9" fontWeight="bold">
-                  {frame?.cooling.fanSpeedPct ?? 65}% • {frame?.cooling.cpuFanRpm ?? 1850} RPM
+                  {frame ? `${frame.cooling.fanSpeedPct}% • ${frame.cooling.cpuFanRpm} RPM` : 'PWM: UNKNOWN'}
                 </text>
                 <text x="187" y="222" fill="#94a3b8" fontSize="7">
-                  SIMULATED • {coolingState}
+                  {frame ? `SIMULATED • ${coolingState}` : 'ESTADO: IDLE'}
                 </text>
               </g>
 
@@ -1435,7 +1435,7 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
                 {/* Cores Cluster */}
                 <rect x="330" y="145" width="140" height={hasDedicatedGpu ? '110' : '70'} fill="#09090b" stroke="#3f3f46" strokeWidth="1" rx="4" />
                 <text x="338" y="162" fill="#fbbf24" fontSize="10" fontWeight="900" letterSpacing="1">
-                  CPU: {machine.cpu.cores}C / {machine.cpu.threads}T
+                  CPU: {machine.cpu.cores > 0 ? `${machine.cpu.cores}C / ${machine.cpu.threads}T` : machine.cpu.model}
                 </text>
                 <text
                   x="338"
@@ -1444,14 +1444,13 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
                   fontSize="9"
                   fontWeight="bold"
                 >
-                  {frame ? `${frame.cpu.loadPct}%` : '0%'} • {frame?.cpu.temperatureC ?? cpuTemp}°C
-                  {cpuTemp > 75 ? ' 🔥 (>75°C)' : ''}
+                  {frame ? `${frame.cpu.loadPct}% • ${frame.cpu.temperatureC}°C${cpuTemp > 75 ? ' 🔥' : ''}` : 'CARGA: IDLE • UNKNOWN'}
                 </text>
                 <text x="338" y="190" fill="#38bdf8" fontSize="8" fontWeight="bold">
-                  {frame ? `${(frame.cpu.effectiveClockMhz / 1000).toFixed(2)} GHz` : '3.8 GHz'} • {frame?.cpu.powerW ?? machine.cpu.tdpW}W
+                  {frame ? `${(frame.cpu.effectiveClockMhz / 1000).toFixed(2)} GHz • ${frame.cpu.powerW}W` : (machine.cpu.tdpW > 0 ? `TDP: ${machine.cpu.tdpW}W` : 'FRECUENCIA: UNKNOWN')}
                 </text>
                 <text x="338" y="202" fill="#a1a1aa" fontSize="7.5" fontFamily="monospace">
-                  {frame?.cpu.provenance || 'SYSTEM_REPORTED'} • {cpuState}
+                  {frame ? `${frame.cpu.provenance} • ${cpuState}` : `${machine.cpu.provenance} • IDLE`}
                 </text>
 
                 {/* INTEGRATED GRAPHICS iGPU (Only if machine has NO dedicated GPU!) */}
@@ -1468,8 +1467,7 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
                       fontSize="8"
                       fontWeight="bold"
                     >
-                      {frame ? `${frame.gpu.loadPct}%` : '0%'} • {frame?.gpu.temperatureC ?? gpuTemp}°C
-                      {gpuTemp > 75 ? ' 🔥' : ''}
+                      {frame ? `${frame.gpu.loadPct}% • ${frame.gpu.temperatureC}°C` : 'iGPU: IDLE • UNKNOWN'}
                     </text>
                     <text x="338" y="264" fill="#a1a1aa" fontSize="7">
                       SOC INTEGRADO • UMA SHARED RAM
@@ -1543,7 +1541,7 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
 
                 {/* Compact HUD for RAM */}
                 <text x="598" y="300" fill="#ffffff" fontSize="8" fontWeight="bold">
-                  {frame ? `${frame.ram.usedGb}GB (${frame.ram.pressurePct}%)` : `${machine.ram.sizeGb}GB`} • {machine.ram.configuredSpeedMts} MT/s
+                  {frame ? `${frame.ram.usedGb}GB (${frame.ram.pressurePct}%)` : (machine.ram.sizeGb > 0 ? `${machine.ram.sizeGb}GB` : 'RAM: UNKNOWN')} • {machine.ram.configuredSpeedMts > 0 ? `${machine.ram.configuredSpeedMts} MT/s` : 'UNKNOWN'}
                 </text>
               </g>
 
@@ -1588,10 +1586,10 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
                   {isNvmeStorage ? 'M.2 NVMe SSD (PCIe Gen4 x4)' : 'SATA 6Gbps STORAGE'}
                 </text>
                 <text x="550" y="367" fill="#ffffff" fontSize="8" fontWeight="bold">
-                  {machine.storage.capacityGb} GB • {frame?.storage.temperatureC ?? 41}°C
+                  {machine.storage.capacityGb > 0 ? `${machine.storage.capacityGb} GB` : 'CAPACIDAD: UNKNOWN'} • {frame ? `${frame.storage.temperatureC}°C` : 'TEMP: UNKNOWN'}
                 </text>
                 <text x="550" y="381" fill="#cbd5e1" fontSize="7.5">
-                  Lectura: {frame ? `${frame.storage.readSpeedMBps} MB/s` : '0 MB/s'} • {frame?.storage.provenance || 'MEASURED'}
+                  Lectura: {frame ? `${frame.storage.readSpeedMBps} MB/s` : 'IDLE'} • {frame?.storage.provenance || machine.storage.provenance}
                 </text>
               </g>
 
@@ -1648,14 +1646,13 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
                       fontSize="8.5"
                       fontWeight="bold"
                     >
-                      {frame ? `${frame.gpu.loadPct}%` : '0%'} • {frame?.gpu.temperatureC ?? gpuTemp}°C
-                      {gpuTemp > 75 ? ' 🔥 (>75°C)' : ''}
+                      {frame ? `${frame.gpu.loadPct}% • ${frame.gpu.temperatureC}°C${gpuTemp > 75 ? ' 🔥' : ''}` : 'GPU: IDLE • UNKNOWN'}
                     </text>
                     <text x="280" y="519" fill="#38bdf8" fontSize="8">
-                      {frame ? `${frame.gpu.effectiveClockMhz} MHz` : 'Base'} • {frame?.gpu.powerW ?? machine.gpu.powerW}W
+                      {frame ? `${frame.gpu.effectiveClockMhz} MHz • ${frame.gpu.powerW}W` : 'ESTADO: IDLE'}
                     </text>
                     <text x="280" y="534" fill="#94a3b8" fontSize="7.5">
-                      {frame?.gpu.provenance || 'SYSTEM_REPORTED'} • {gpuState}
+                      {frame ? `${frame.gpu.provenance} • ${gpuState}` : `${machine.gpu.provenance} • IDLE`}
                     </text>
 
                     {/* GPU Model title */}
@@ -1685,7 +1682,7 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
                           />
                         ))}
                         <text x="145" y="585" fill="#e9d5ff" fontSize="8" fontWeight="bold">
-                          VRAM: {frame ? `${frame.gpu.vramUsedGb} / ${machine.gpu.vramGb} GB` : `${machine.gpu.vramGb} GB`} ({frame?.gpu.vramPressurePct ?? 25}%) • GDDR6
+                          VRAM: {frame ? `${frame.gpu.vramUsedGb} / ${machine.gpu.vramGb} GB (${frame.gpu.vramPressurePct}%)` : (machine.gpu.vramGb > 0 ? `${machine.gpu.vramGb} GB` : 'VRAM: UNKNOWN')} • GDDR6
                         </text>
                       </g>
                     )}
@@ -1730,7 +1727,7 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
                   {machine.motherboard?.chipset || 'Southbridge'} • DMI 4.0 x8
                 </text>
                 <text x="730" y="548" fill="#94a3b8" fontSize="7.5">
-                  I/O CARGA: {frame ? `${frame.buses.cpuStorage.utilizationEstimatePct}%` : '15%'} • SYSTEM_REPORTED
+                  I/O CARGA: {frame ? `${frame.buses.cpuStorage.utilizationEstimatePct}%` : 'IDLE'} • SYSTEM_REPORTED
                 </text>
               </g>
 
@@ -1754,7 +1751,7 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
                 <text x="72" y="210" fill="#ffffff" fontSize="7.5" fontWeight="bold">2.5G LAN</text>
                 <text x="72" y="224" fill="#a7f3d0" fontSize="7">Wi-Fi 6E</text>
                 <text x="72" y="238" fill="#6ee7b7" fontSize="7">
-                  {frame ? `${frame.buses.chipsetNetwork.effectiveDemandGbps}M` : '1.2M'}
+                  {frame ? `${frame.buses.chipsetNetwork.effectiveDemandGbps}M` : 'IDLE'}
                 </text>
               </g>
 
@@ -1780,13 +1777,17 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
                   PSU POWER ATX
                 </text>
                 <text x="125" y="642" fill="#ffffff" fontSize="8.5" fontWeight="bold">
-                  {machine.psu.wattageW > 0
-                    ? `${frame ? `${frame.psu.estimatedLoadW}W` : '120W'} / ${frame?.psu.ratedWattageW ?? machine.psu.wattageW}W`
+                  {frame
+                    ? `${frame.psu.estimatedLoadW}W / ${frame.psu.ratedWattageW}W`
+                    : machine.psu.wattageW > 0
+                    ? `${machine.psu.wattageW}W`
                     : 'PSU: UNKNOWN'}
                 </text>
                 <text x="125" y="658" fill={machine.psu.wattageW > 0 ? '#cbd5e1' : '#facc15'} fontSize="7.5">
-                  {machine.psu.wattageW > 0
-                    ? `Margen: ${frame?.psu.headroomW ?? 450}W (${frame?.psu.headroomPct ?? 75}%)`
+                  {frame
+                    ? `Margen: ${frame.psu.headroomW}W (${frame.psu.headroomPct}%)`
+                    : machine.psu.wattageW > 0
+                    ? 'CARGA: IDLE'
                     : 'CARGA MANUAL REQUERIDA'}
                 </text>
                 <text x="125" y="672" fill="#a1a1aa" fontSize="7">
@@ -1843,66 +1844,66 @@ export const EvoLiveMachineBusDiagram: React.FC<EvoLiveMachineBusDiagramProps> =
                 <div className="p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-800">
                   <div className="text-[9px] text-zinc-500 font-bold uppercase">VALOR ACTUAL</div>
                   <div className="text-sm font-black text-white font-mono mt-0.5">
-                    {activeSubsystem === 'CPU' && (frame ? `${frame.cpu.loadPct}%` : 'Reposo')}
-                    {activeSubsystem === 'RAM' && (frame ? `${frame.ram.usedGb} GB` : `${machine.ram.sizeGb} GB`)}
-                    {activeSubsystem === 'GPU' && (frame ? `${frame.gpu.loadPct}%` : 'Reposo')}
-                    {activeSubsystem === 'VRAM' && (frame ? `${frame.gpu.vramUsedGb} GB` : `${machine.gpu.vramGb} GB`)}
-                    {activeSubsystem === 'STORAGE' && (frame ? `${frame.storage.readSpeedMBps} MB/s` : '0 MB/s')}
-                    {activeSubsystem === 'PSU' && (frame ? `${frame.psu.estimatedLoadW}W` : '120W')}
-                    {activeSubsystem === 'COOLING' && (frame?.cooling.cpuFanRpm ? `${frame.cooling.cpuFanRpm} RPM` : 'PWM')}
-                    {activeSubsystem === 'CHIPSET' && 'DMI 4.0 x8'}
-                    {activeSubsystem === 'NETWORK' && (frame ? `${frame.buses.chipsetNetwork.effectiveDemandGbps} Mbps` : '1 Gbps')}
-                    {activeSubsystem === 'BUS' && (frame ? `${frame.buses.cpuGpu.effectiveDemandGbps} GB/s` : 'PCIe 4.0')}
+                    {activeSubsystem === 'CPU' && (frame ? `${frame.cpu.loadPct}%` : 'IDLE • UNKNOWN')}
+                    {activeSubsystem === 'RAM' && (frame ? `${frame.ram.usedGb} GB` : (machine.ram.sizeGb > 0 ? `${machine.ram.sizeGb} GB` : 'UNKNOWN'))}
+                    {activeSubsystem === 'GPU' && (frame ? `${frame.gpu.loadPct}%` : 'IDLE • UNKNOWN')}
+                    {activeSubsystem === 'VRAM' && (frame ? `${frame.gpu.vramUsedGb} GB` : (machine.gpu.vramGb > 0 ? `${machine.gpu.vramGb} GB` : 'UNKNOWN'))}
+                    {activeSubsystem === 'STORAGE' && (frame ? `${frame.storage.readSpeedMBps} MB/s` : 'IDLE')}
+                    {activeSubsystem === 'PSU' && (frame ? `${frame.psu.estimatedLoadW}W` : 'IDLE • UNKNOWN')}
+                    {activeSubsystem === 'COOLING' && (frame?.cooling.cpuFanRpm ? `${frame.cooling.cpuFanRpm} RPM` : 'PWM: UNKNOWN')}
+                    {activeSubsystem === 'CHIPSET' && (machine.motherboard?.chipset || 'UNKNOWN')}
+                    {activeSubsystem === 'NETWORK' && (frame ? `${frame.buses.chipsetNetwork.effectiveDemandGbps} Mbps` : 'IDLE')}
+                    {activeSubsystem === 'BUS' && (frame ? `${frame.buses.cpuGpu.effectiveDemandGbps} GB/s` : (machine.motherboard?.pcieGen || 'UNKNOWN'))}
                   </div>
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-800">
                   <div className="text-[9px] text-zinc-500 font-bold uppercase">MARGEN / HEADROOM</div>
                   <div className="text-sm font-black text-emerald-400 font-mono mt-0.5">
-                    {activeSubsystem === 'CPU' && (frame ? `${frame.cpu.thermalHeadroomC}°C térmico` : '55°C')}
-                    {activeSubsystem === 'RAM' && (frame ? `${(frame.ram.totalGb - frame.ram.usedGb).toFixed(1)} GB libre` : 'Nativo')}
-                    {activeSubsystem === 'GPU' && (frame ? `${frame.gpu.thermalHeadroomC}°C térmico` : '42°C')}
-                    {activeSubsystem === 'VRAM' && (frame ? `${(frame.gpu.vramTotalGb - frame.gpu.vramUsedGb).toFixed(1)} GB libre` : 'Capacidad')}
-                    {activeSubsystem === 'STORAGE' && (frame ? `${100 - frame.storage.queuePressurePct}% cola` : '100%')}
-                    {activeSubsystem === 'PSU' && (frame ? `${frame.psu.headroomW}W (${frame.psu.headroomPct}%)` : '450W')}
-                    {activeSubsystem === 'COOLING' && `${100 - (frame?.cooling.thermalSoakFactorPct ?? 30)}% capacidad`}
-                    {activeSubsystem === 'CHIPSET' && 'Margen Óptimo'}
-                    {activeSubsystem === 'NETWORK' && '95% ancho libre'}
-                    {activeSubsystem === 'BUS' && 'Headroom PCIe'}
+                    {activeSubsystem === 'CPU' && (frame ? `${frame.cpu.thermalHeadroomC}°C térmico` : 'UNKNOWN')}
+                    {activeSubsystem === 'RAM' && (frame ? `${(frame.ram.totalGb - frame.ram.usedGb).toFixed(1)} GB libre` : 'UNKNOWN')}
+                    {activeSubsystem === 'GPU' && (frame ? `${frame.gpu.thermalHeadroomC}°C térmico` : 'UNKNOWN')}
+                    {activeSubsystem === 'VRAM' && (frame ? `${(frame.gpu.vramTotalGb - frame.gpu.vramUsedGb).toFixed(1)} GB libre` : 'UNKNOWN')}
+                    {activeSubsystem === 'STORAGE' && (frame ? `${100 - frame.storage.queuePressurePct}% cola` : 'UNKNOWN')}
+                    {activeSubsystem === 'PSU' && (frame ? `${frame.psu.headroomW}W (${frame.psu.headroomPct}%)` : 'UNKNOWN')}
+                    {activeSubsystem === 'COOLING' && (frame ? `${100 - frame.cooling.thermalSoakFactorPct}% capacidad` : 'UNKNOWN')}
+                    {activeSubsystem === 'CHIPSET' && (frame ? 'Nominal' : 'UNKNOWN')}
+                    {activeSubsystem === 'NETWORK' && (frame ? 'Enlace Nominal' : 'UNKNOWN')}
+                    {activeSubsystem === 'BUS' && (frame ? 'Headroom PCIe' : 'UNKNOWN')}
                   </div>
                 </div>
               </div>
 
               {/* Capacidad Nominal vs Demanda Instantánea */}
-              <div className="p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-850 text-[11px] space-y-1">
+              <div className="p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-855 text-[11px] space-y-1">
                 <div className="flex justify-between text-zinc-400">
                   <span>Capacidad nominal:</span>
                   <span className="font-mono text-white font-bold">
-                    {activeSubsystem === 'CPU' && `${machine.cpu.cores} Cores / ${machine.cpu.tdpW}W TDP`}
-                    {activeSubsystem === 'RAM' && `${machine.ram.sizeGb} GB @ ${machine.ram.configuredSpeedMts} MT/s`}
-                    {activeSubsystem === 'GPU' && `${machine.gpu.model.split(' ')[0]} ${machine.gpu.vramGb}GB`}
-                    {activeSubsystem === 'VRAM' && `${machine.gpu.vramGb} GB GDDR6/X`}
-                    {activeSubsystem === 'STORAGE' && `${machine.storage.capacityGb} GB NVMe`}
-                    {activeSubsystem === 'PSU' && `${machine.psu.wattageW}W Certificada`}
-                    {activeSubsystem === 'COOLING' && 'Chasis ATX Flujo Positivo'}
-                    {activeSubsystem === 'CHIPSET' && 'Placa Base ATX Bus Directo'}
+                    {activeSubsystem === 'CPU' && (machine.cpu.cores > 0 ? `${machine.cpu.cores} Cores / ${machine.cpu.tdpW > 0 ? `${machine.cpu.tdpW}W TDP` : ''}` : (machine.cpu.model !== 'UNKNOWN' ? machine.cpu.model : 'CPU: UNKNOWN'))}
+                    {activeSubsystem === 'RAM' && (machine.ram.sizeGb > 0 ? `${machine.ram.sizeGb} GB @ ${machine.ram.configuredSpeedMts > 0 ? `${machine.ram.configuredSpeedMts} MT/s` : 'UNKNOWN'}` : 'RAM: UNKNOWN')}
+                    {activeSubsystem === 'GPU' && (machine.gpu.model !== 'UNKNOWN' ? `${machine.gpu.model} ${machine.gpu.vramGb > 0 ? `${machine.gpu.vramGb}GB` : ''}` : 'GPU: UNKNOWN')}
+                    {activeSubsystem === 'VRAM' && (machine.gpu.vramGb > 0 ? `${machine.gpu.vramGb} GB GDDR6/X` : 'VRAM: UNKNOWN')}
+                    {activeSubsystem === 'STORAGE' && (machine.storage.capacityGb > 0 ? `${machine.storage.capacityGb} GB ${machine.storage.type}` : 'STORAGE: UNKNOWN')}
+                    {activeSubsystem === 'PSU' && (machine.psu.wattageW > 0 ? `${machine.psu.wattageW}W Certificada` : 'PSU: UNKNOWN')}
+                    {activeSubsystem === 'COOLING' && (machine.cooling.model !== 'UNKNOWN' ? machine.cooling.model : 'COOLING: UNKNOWN')}
+                    {activeSubsystem === 'CHIPSET' && (machine.motherboard?.chipset ? `${machine.motherboard.chipset} ATX Bus Directo` : 'CHIPSET: UNKNOWN')}
                     {activeSubsystem === 'NETWORK' && '2.5 Gbps Enlace'}
-                    {activeSubsystem === 'BUS' && 'PCIe 4.0 x16 (64 GB/s bi-dir)'}
+                    {activeSubsystem === 'BUS' && (machine.motherboard?.pcieGen ? `${machine.motherboard.pcieGen} x16` : 'BUS: UNKNOWN')}
                   </span>
                 </div>
                 <div className="flex justify-between text-zinc-400">
                   <span>Demanda actual:</span>
                   <span className="font-mono text-cyan-300 font-bold">
-                    {activeSubsystem === 'CPU' && (frame ? `${frame.cpu.powerW}W (${frame.cpu.loadPct}% carga)` : 'Baja')}
-                    {activeSubsystem === 'RAM' && (frame ? `${frame.ram.usedGb} GB asignados` : 'Baja')}
-                    {activeSubsystem === 'GPU' && (frame ? `${frame.gpu.powerW}W (${frame.gpu.loadPct}% carga)` : 'Baja')}
-                    {activeSubsystem === 'VRAM' && (frame ? `${frame.gpu.vramUsedGb} GB texturas/shaders` : 'Baja')}
-                    {activeSubsystem === 'STORAGE' && (frame ? `${frame.storage.readSpeedMBps} MB/s I/O` : '0 MB/s')}
-                    {activeSubsystem === 'PSU' && (frame ? `${frame.psu.estimatedLoadW}W consumo total` : '120W')}
-                    {activeSubsystem === 'COOLING' && (frame ? `${frame.cooling.fanSpeedPct}% ciclo PWM` : 'Reposo')}
-                    {activeSubsystem === 'CHIPSET' && 'I/O balanceado'}
-                    {activeSubsystem === 'NETWORK' && (frame ? `${frame.buses.chipsetNetwork.effectiveDemandGbps} Mbps` : 'Baja')}
-                    {activeSubsystem === 'BUS' && (frame ? `${frame.buses.cpuGpu.effectiveDemandGbps} GB/s` : 'Nominal')}
+                    {activeSubsystem === 'CPU' && (frame ? `${frame.cpu.powerW}W (${frame.cpu.loadPct}% carga)` : 'IDLE')}
+                    {activeSubsystem === 'RAM' && (frame ? `${frame.ram.usedGb} GB asignados` : 'IDLE')}
+                    {activeSubsystem === 'GPU' && (frame ? `${frame.gpu.powerW}W (${frame.gpu.loadPct}% carga)` : 'IDLE')}
+                    {activeSubsystem === 'VRAM' && (frame ? `${frame.gpu.vramUsedGb} GB texturas/shaders` : 'IDLE')}
+                    {activeSubsystem === 'STORAGE' && (frame ? `${frame.storage.readSpeedMBps} MB/s I/O` : 'IDLE')}
+                    {activeSubsystem === 'PSU' && (frame ? `${frame.psu.estimatedLoadW}W consumo total` : 'IDLE')}
+                    {activeSubsystem === 'COOLING' && (frame ? `${frame.cooling.fanSpeedPct}% ciclo PWM` : 'IDLE')}
+                    {activeSubsystem === 'CHIPSET' && (frame ? 'I/O balanceado' : 'IDLE')}
+                    {activeSubsystem === 'NETWORK' && (frame ? `${frame.buses.chipsetNetwork.effectiveDemandGbps} Mbps` : 'IDLE')}
+                    {activeSubsystem === 'BUS' && (frame ? `${frame.buses.cpuGpu.effectiveDemandGbps} GB/s` : 'IDLE')}
                   </span>
                 </div>
               </div>

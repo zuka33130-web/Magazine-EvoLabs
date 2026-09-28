@@ -33,17 +33,23 @@ import { EvoUniversalPcBuilder } from './components/EvoUniversalPcBuilder';
 import { EvoVirtualAssemblyAnimation } from './components/EvoVirtualAssemblyAnimation';
 import { EvoLiveMachineBusDiagram } from './components/EvoLiveMachineBusDiagram';
 import { BaselineEngine, BaselineSnapshot } from './services/baselineEngine';
+import { TelemetryIntegrityService, LiveScanIntegrityResult } from './services/telemetryIntegrityService';
+import { EvoTelemetryIntegrityModal } from './components/EvoTelemetryIntegrityModal';
 import { EvoLabCoreRepairView } from './views/EvoLabCoreRepairView';
 import { EvoLabCoreTestView } from './views/EvoLabCoreTestView';
 import { EvoLabCoreBuildView } from './views/EvoLabCoreBuildView';
 import { EvoLabCoreBottleneckView } from './views/EvoLabCoreBottleneckView';
 import { EvoLabCoreOptimizationView } from './views/EvoLabCoreOptimizationView';
 import { EvoLabCoreUpgradeView } from './views/EvoLabCoreUpgradeView';
+import { useLabAestheticMode } from '../../utils/labAestheticMode';
+import { EvoLabAestheticToggle } from '../common/EvoLabAestheticToggle';
 
 interface EvoLabCoreProps {
   onNavigateToTomo?: (tomoId: '01' | '02' | '03' | '04') => void;
   onOpenGlobalAutoDetectModal?: () => void;
   onExitToWorld?: () => void;
+  initialPhase?: CorePhase;
+  initialMission?: LabMission;
 }
 
 type CorePhase = 'SELECT_PC' | 'BUILD_PC' | 'ASSEMBLING' | 'LAB_ACTIVE';
@@ -63,10 +69,22 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
   onNavigateToTomo,
   onOpenGlobalAutoDetectModal,
   onExitToWorld,
+  initialPhase,
+  initialMission,
 }) => {
-  // Phase state: strictly starts at SELECT_PC ("¿QUÉ PC QUERÉS EVALUAR?")
-  const [corePhase, setCorePhase] = useState<CorePhase>('SELECT_PC');
-  const [activeMission, setActiveMission] = useState<LabMission>('IDLE');
+  const { isElite } = useLabAestheticMode();
+
+  // Phase state: strictly starts at SELECT_PC ("¿QUÉ PC QUERÉS EVALUAR?") unless specified
+  const [corePhase, setCorePhase] = useState<CorePhase>(initialPhase || 'SELECT_PC');
+  const [activeMission, setActiveMission] = useState<LabMission>(initialMission || 'IDLE');
+
+  useEffect(() => {
+    if (initialPhase) setCorePhase(initialPhase);
+  }, [initialPhase]);
+
+  useEffect(() => {
+    if (initialMission) setActiveMission(initialMission);
+  }, [initialMission]);
 
   // Active Machine Entity
   const [activeMachine, setActiveMachine] = useState<Machine>(() => MachineAdapter.createBlankMachine());
@@ -82,7 +100,36 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
   const [showCaseHistoryModal, setShowCaseHistoryModal] = useState<boolean>(false);
   const [showDiscoveryModal, setShowDiscoveryModal] = useState<boolean>(false);
   const [showCoverageDashboard, setShowCoverageDashboard] = useState<boolean>(false);
+  const [showIntegrityModal, setShowIntegrityModal] = useState<boolean>(false);
+  const [isScanningIntegrity, setIsScanningIntegrity] = useState<boolean>(false);
+  const [liveScanResult, setLiveScanResult] = useState<LiveScanIntegrityResult | null>(null);
   const [caseHistory, setCaseHistory] = useState<EvoCase[]>([]);
+
+  /**
+   * Compares detected hardware from '/api/telemetry/live-scan' against
+   * the allowed components list, marking discrepancies with 'UNKNOWN'
+   * to guarantee the integrity of the active machine.
+   */
+  const compareLiveScanAgainstAllowedComponents = async () => {
+    setIsScanningIntegrity(true);
+    setShowIntegrityModal(true);
+    try {
+      const result = await TelemetryIntegrityService.scanAndValidateLiveEndpoint();
+      setLiveScanResult(result);
+    } catch (err) {
+      console.error('[EvoLabCore] Error comparing telemetry against allowed components:', err);
+    } finally {
+      setIsScanningIntegrity(false);
+    }
+  };
+
+  const handleApplyIntegrityMachine = () => {
+    if (liveScanResult) {
+      handleUpdateMachine(liveScanResult.machine);
+      setShowIntegrityModal(false);
+      setCorePhase('BUILD_PC');
+    }
+  };
 
   useEffect(() => {
     // Listen to global hardware detected events
@@ -163,6 +210,9 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
 
           {/* Right Action Bar */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            {/* Design & Typography Aesthetic Mode Toggle (Elite Lettering vs Classic) */}
+            <EvoLabAestheticToggle />
+
             {/* PERMANENT "CAMBIAR PC" BUTTON */}
             {corePhase !== 'SELECT_PC' && (
               <button
@@ -195,6 +245,17 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
             >
               <History className="w-3.5 h-3.5 text-cyan-400" />
               <span>EXPEDIENTES</span>
+            </button>
+
+            {/* Telemetry Live-Scan Integrity Audit Button */}
+            <button
+              type="button"
+              onClick={compareLiveScanAgainstAllowedComponents}
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+              title="Comparar /api/telemetry/live-scan contra componentes permitidos (discrepancias marcadas como UNKNOWN)"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>AUDITAR SILICIO LIVE</span>
             </button>
 
             {/* Master Hardware Ingestion & Coverage Dashboard Button */}
@@ -292,16 +353,45 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
               /* LAB BENCH WORKSTATION OVERVIEW */
               <div className="space-y-8 animate-in fade-in duration-300">
                 {/* ACTIVE MACHINE STATION CARD */}
-                <div className="p-6 rounded-3xl bg-[#0d1017] border border-zinc-800 space-y-4 shadow-xl">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div
+                  className={`p-6 rounded-3xl transition-all duration-300 relative overflow-hidden ${
+                    isElite
+                      ? 'bg-gradient-to-br from-[#0c1017] via-[#080b11] to-[#06080d] border border-cyan-500/20 shadow-[0_0_30px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.06)]'
+                      : 'bg-[#0d1017] border border-zinc-800 shadow-xl'
+                  } space-y-4`}
+                >
+                  {/* Subtle Blueprint Grid Accent in Elite Mode */}
+                  {isElite && (
+                    <div
+                      className="absolute inset-0 pointer-events-none opacity-5 -z-0"
+                      style={{
+                        backgroundImage:
+                          'linear-gradient(to right, #00e5ff 1px, transparent 1px), linear-gradient(to bottom, #00e5ff 1px, transparent 1px)',
+                        backgroundSize: '24px 24px',
+                      }}
+                    />
+                  )}
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                        <span className="text-[10px] text-emerald-400 font-black uppercase tracking-wider font-mono">
-                          ESTACIÓN DE PRUEBAS ACTIVA // SILICIO IDENTIFICADO
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+                        <span
+                          className={`text-[10px] font-black uppercase tracking-[0.18em] font-mono ${
+                            isElite ? 'text-cyan-400' : 'text-emerald-400'
+                          }`}
+                        >
+                          {isElite
+                            ? 'ESTACIÓN DE PRUEBAS DE SILICIO // REGISTRO NT ACTIVO'
+                            : 'ESTACIÓN DE PRUEBAS ACTIVA // SILICIO IDENTIFICADO'}
                         </span>
+                        {isElite && (
+                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-950/60 border border-cyan-500/30 text-cyan-300">
+                            0x7FFE0030
+                          </span>
+                        )}
                       </div>
-                      <h2 className="font-display font-black text-2xl text-white uppercase tracking-tight">
+                      <h2 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight">
                         {activeMachine.alias}
                       </h2>
                       <p className="text-xs text-zinc-400 font-sans-editorial">
@@ -330,31 +420,67 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
                     </div>
                   </div>
 
-                  {/* Hardware Quick Summary Chips */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-xs font-mono">
-                    <div className="p-3 rounded-xl bg-black/40 border border-zinc-800/80">
-                      <span className="text-[9px] text-zinc-500 block uppercase">CPU</span>
+                  {/* Hardware Quick Summary Chips with Lettercraft */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 text-xs font-mono relative z-10">
+                    <div
+                      className={`p-3 rounded-xl transition-colors ${
+                        isElite
+                          ? 'bg-[#06080d]/80 border border-cyan-500/20 hover:border-cyan-500/40'
+                          : 'bg-black/40 border border-zinc-800/80'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-[9px] text-zinc-500 uppercase tracking-wider mb-1">
+                        <span>CPU_REGISTER</span>
+                        {isElite && <span className="text-cyan-500/60">x86_64</span>}
+                      </div>
                       <span className="text-white font-bold truncate block" title={activeMachine.cpu.model}>
                         {activeMachine.cpu.model}
                       </span>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-black/40 border border-zinc-800/80">
-                      <span className="text-[9px] text-zinc-500 block uppercase">GPU</span>
+                    <div
+                      className={`p-3 rounded-xl transition-colors ${
+                        isElite
+                          ? 'bg-[#06080d]/80 border border-amber-500/20 hover:border-amber-500/40'
+                          : 'bg-black/40 border border-zinc-800/80'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-[9px] text-zinc-500 uppercase tracking-wider mb-1">
+                        <span>GPU_VRAM</span>
+                        {isElite && <span className="text-amber-500/60">PCIe_4.0</span>}
+                      </div>
                       <span className="text-white font-bold truncate block" title={activeMachine.gpu.model}>
                         {activeMachine.gpu.model}
                       </span>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-black/40 border border-zinc-800/80">
-                      <span className="text-[9px] text-zinc-500 block uppercase">RAM</span>
+                    <div
+                      className={`p-3 rounded-xl transition-colors ${
+                        isElite
+                          ? 'bg-[#06080d]/80 border border-emerald-500/20 hover:border-emerald-500/40'
+                          : 'bg-black/40 border border-zinc-800/80'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-[9px] text-zinc-500 uppercase tracking-wider mb-1">
+                        <span>DRAM_PHYSICAL</span>
+                        {isElite && <span className="text-emerald-500/60">DIMM_REAL</span>}
+                      </div>
                       <span className="text-white font-bold">
                         {activeMachine.ram.sizeGb}GB {activeMachine.ram.type}
                       </span>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-black/40 border border-zinc-800/80">
-                      <span className="text-[9px] text-zinc-500 block uppercase">MOTHERBOARD</span>
+                    <div
+                      className={`p-3 rounded-xl transition-colors ${
+                        isElite
+                          ? 'bg-[#06080d]/80 border border-purple-500/20 hover:border-purple-500/40'
+                          : 'bg-black/40 border border-zinc-800/80'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-[9px] text-zinc-500 uppercase tracking-wider mb-1">
+                        <span>MOTHERBOARD_VRM</span>
+                        {isElite && <span className="text-purple-500/60">ACPI_DSDT</span>}
+                      </div>
                       <span className="text-white font-bold truncate block" title={activeMachine.motherboard.model}>
                         {activeMachine.motherboard.model}
                       </span>
@@ -397,10 +523,17 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
                 {/* OPERATIONAL LAB MISSIONS */}
                 <div className="space-y-4">
                   <div className="space-y-1">
-                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono">
-                      HERRAMIENTAS OPERATIVAS // BANCO DE TRABAJO
-                    </span>
-                    <h3 className="font-display font-black text-xl text-white uppercase tracking-tight">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-zinc-500 uppercase tracking-[0.16em] font-mono">
+                        HERRAMIENTAS OPERATIVAS // BANCO DE TRABAJO
+                      </span>
+                      {isElite && (
+                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-400/10 text-amber-300 border border-amber-400/30">
+                          6 PROTOCOLOS
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-display font-black text-xl sm:text-2xl text-white uppercase tracking-tight">
                       SELECCIONÁ LA MISIÓN PERICIAL
                     </h3>
                   </div>
@@ -409,11 +542,22 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
                     {/* MISSION 1: REPARACIÓN */}
                     <div
                       onClick={() => setActiveMission('REPAIR')}
-                      className="p-5 rounded-2xl border border-red-500/30 bg-red-950/10 hover:bg-red-950/20 hover:border-red-400 transition-all cursor-pointer flex flex-col justify-between space-y-4 group shadow-md"
+                      className={`p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4 group shadow-md ${
+                        isElite
+                          ? 'border-red-500/30 bg-gradient-to-br from-[#12080a] via-[#0d0708] to-[#080506] hover:border-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.15)]'
+                          : 'border-red-500/30 bg-red-950/10 hover:bg-red-950/20 hover:border-red-400'
+                      }`}
                     >
                       <div className="space-y-2">
-                        <div className="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400 group-hover:scale-105 transition-transform">
-                          <Wrench className="w-5 h-5" />
+                        <div className="flex items-center justify-between">
+                          <div className="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400 group-hover:scale-105 transition-transform">
+                            <Wrench className="w-5 h-5" />
+                          </div>
+                          {isElite && (
+                            <span className="text-[9px] font-mono text-red-400/80 px-1.5 py-0.5 rounded bg-red-950/50 border border-red-500/30">
+                              OP_0x01_DIAG
+                            </span>
+                          )}
                         </div>
                         <h4 className="font-display font-black text-base text-white uppercase group-hover:text-red-300 transition-colors">
                           DIAGNÓSTICO & REPARACIÓN
@@ -431,11 +575,22 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
                     {/* MISSION 2: TEST & BENCHMARK */}
                     <div
                       onClick={() => setActiveMission('TEST')}
-                      className="p-5 rounded-2xl border border-cyan-500/30 bg-cyan-950/10 hover:bg-cyan-950/20 hover:border-cyan-400 transition-all cursor-pointer flex flex-col justify-between space-y-4 group shadow-md"
+                      className={`p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4 group shadow-md ${
+                        isElite
+                          ? 'border-cyan-500/30 bg-gradient-to-br from-[#061016] via-[#050c12] to-[#04080d] hover:border-cyan-400 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]'
+                          : 'border-cyan-500/30 bg-cyan-950/10 hover:bg-cyan-950/20 hover:border-cyan-400'
+                      }`}
                     >
                       <div className="space-y-2">
-                        <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-transform">
-                          <Activity className="w-5 h-5" />
+                        <div className="flex items-center justify-between">
+                          <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-transform">
+                            <Activity className="w-5 h-5" />
+                          </div>
+                          {isElite && (
+                            <span className="text-[9px] font-mono text-cyan-400/80 px-1.5 py-0.5 rounded bg-cyan-950/50 border border-cyan-500/30">
+                              OP_0x02_STRESS
+                            </span>
+                          )}
                         </div>
                         <h4 className="font-display font-black text-base text-white uppercase group-hover:text-cyan-300 transition-colors">
                           ENSAYOS DE CARGA & BENCHMARK
@@ -453,11 +608,22 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
                     {/* MISSION 3: BOTTLENECKS */}
                     <div
                       onClick={() => setActiveMission('BOTTLENECK')}
-                      className="p-5 rounded-2xl border border-amber-500/30 bg-amber-950/10 hover:bg-amber-950/20 hover:border-amber-400 transition-all cursor-pointer flex flex-col justify-between space-y-4 group shadow-md"
+                      className={`p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4 group shadow-md ${
+                        isElite
+                          ? 'border-amber-500/30 bg-gradient-to-br from-[#141006] via-[#0f0c05] to-[#090703] hover:border-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]'
+                          : 'border-amber-500/30 bg-amber-950/10 hover:bg-amber-950/20 hover:border-amber-400'
+                      }`}
                     >
                       <div className="space-y-2">
-                        <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
-                          <Sparkles className="w-5 h-5" />
+                        <div className="flex items-center justify-between">
+                          <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
+                            <Sparkles className="w-5 h-5" />
+                          </div>
+                          {isElite && (
+                            <span className="text-[9px] font-mono text-amber-400/80 px-1.5 py-0.5 rounded bg-amber-950/50 border border-amber-500/30">
+                              OP_0x03_THROUGHPUT
+                            </span>
+                          )}
                         </div>
                         <h4 className="font-display font-black text-base text-white uppercase group-hover:text-amber-300 transition-colors">
                           CUELLOS DE BOTELLA
@@ -475,11 +641,22 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
                     {/* MISSION 4: OPTIMIZACIÓN */}
                     <div
                       onClick={() => setActiveMission('OPTIMIZE')}
-                      className="p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/10 hover:bg-emerald-950/20 hover:border-emerald-400 transition-all cursor-pointer flex flex-col justify-between space-y-4 group shadow-md"
+                      className={`p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4 group shadow-md ${
+                        isElite
+                          ? 'border-emerald-500/30 bg-gradient-to-br from-[#06140d] via-[#050f0a] to-[#030a07] hover:border-emerald-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]'
+                          : 'border-emerald-500/30 bg-emerald-950/10 hover:bg-emerald-950/20 hover:border-emerald-400'
+                      }`}
                     >
                       <div className="space-y-2">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
-                          <Zap className="w-5 h-5" />
+                        <div className="flex items-center justify-between">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+                            <Zap className="w-5 h-5" />
+                          </div>
+                          {isElite && (
+                            <span className="text-[9px] font-mono text-emerald-400/80 px-1.5 py-0.5 rounded bg-emerald-950/50 border border-emerald-500/30">
+                              OP_0x04_KERNEL_TUNE
+                            </span>
+                          )}
                         </div>
                         <h4 className="font-display font-black text-base text-white uppercase group-hover:text-emerald-300 transition-colors">
                           OPTIMIZACIÓN TÉCNICA
@@ -497,11 +674,22 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
                     {/* MISSION 5: UPGRADE */}
                     <div
                       onClick={() => setActiveMission('UPGRADE')}
-                      className="p-5 rounded-2xl border border-purple-500/30 bg-purple-950/10 hover:bg-purple-950/20 hover:border-purple-400 transition-all cursor-pointer flex flex-col justify-between space-y-4 group shadow-md"
+                      className={`p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4 group shadow-md ${
+                        isElite
+                          ? 'border-purple-500/30 bg-gradient-to-br from-[#120817] via-[#0e0612] to-[#08040a] hover:border-purple-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)]'
+                          : 'border-purple-500/30 bg-purple-950/10 hover:bg-purple-950/20 hover:border-purple-400'
+                      }`}
                     >
                       <div className="space-y-2">
-                        <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform">
-                          <Layers className="w-5 h-5" />
+                        <div className="flex items-center justify-between">
+                          <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform">
+                            <Layers className="w-5 h-5" />
+                          </div>
+                          {isElite && (
+                            <span className="text-[9px] font-mono text-purple-400/80 px-1.5 py-0.5 rounded bg-purple-950/50 border border-purple-500/30">
+                              OP_0x05_TOPOLOGY
+                            </span>
+                          )}
                         </div>
                         <h4 className="font-display font-black text-base text-white uppercase group-hover:text-purple-300 transition-colors">
                           PLANIFICAR UPGRADE
@@ -521,11 +709,22 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
                       onClick={() => {
                         if (onNavigateToTomo) onNavigateToTomo('01');
                       }}
-                      className="p-5 rounded-2xl border border-blue-500/30 bg-blue-950/10 hover:bg-blue-950/20 hover:border-blue-400 transition-all cursor-pointer flex flex-col justify-between space-y-4 group shadow-md"
+                      className={`p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4 group shadow-md ${
+                        isElite
+                          ? 'border-blue-500/30 bg-gradient-to-br from-[#080d19] via-[#060a13] to-[#04060d] hover:border-blue-400 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)]'
+                          : 'border-blue-500/30 bg-blue-950/10 hover:bg-blue-950/20 hover:border-blue-400'
+                      }`}
                     >
                       <div className="space-y-2">
-                        <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-transform">
-                          <Cpu className="w-5 h-5" />
+                        <div className="flex items-center justify-between">
+                          <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-transform">
+                            <Cpu className="w-5 h-5" />
+                          </div>
+                          {isElite && (
+                            <span className="text-[9px] font-mono text-blue-400/80 px-1.5 py-0.5 rounded bg-blue-950/50 border border-blue-500/30">
+                              OP_0x06_DEEP_SPEC
+                            </span>
+                          )}
                         </div>
                         <h4 className="font-display font-black text-base text-white uppercase group-hover:text-blue-300 transition-colors">
                           TOMOS DE ARQUITECTURA
@@ -623,6 +822,16 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
       <CatalogCoverageDashboard
         isOpen={showCoverageDashboard}
         onClose={() => setShowCoverageDashboard(false)}
+      />
+
+      {/* Telemetry Live-Scan Integrity Audit Modal */}
+      <EvoTelemetryIntegrityModal
+        isOpen={showIntegrityModal}
+        onClose={() => setShowIntegrityModal(false)}
+        integrityResult={liveScanResult}
+        isLoading={isScanningIntegrity}
+        onReScan={compareLiveScanAgainstAllowedComponents}
+        onApplyMachine={handleApplyIntegrityMachine}
       />
 
       {/* Case History Dossier Modal */}

@@ -58,18 +58,51 @@
 
 /* Custom fine scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0c0d10;
+  background: #07090e;
 }
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #1c2230;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: #2a3449;
+}
+
+/* Elite Shell & Laboratory Glow Effects */
+.evo-shell-glow-amber {
+  box-shadow: 0 0 20px -3px rgba(251, 191, 36, 0.2), inset 0 1px 0 0 rgba(251, 191, 36, 0.3);
+}
+
+.evo-shell-glow-cyan {
+  box-shadow: 0 0 20px -3px rgba(34, 211, 238, 0.2), inset 0 1px 0 0 rgba(34, 211, 238, 0.3);
+}
+
+.evo-shell-glow-emerald {
+  box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.2), inset 0 1px 0 0 rgba(16, 185, 129, 0.3);
+}
+
+.evo-shell-glow-purple {
+  box-shadow: 0 0 20px -3px rgba(192, 132, 252, 0.2), inset 0 1px 0 0 rgba(192, 132, 252, 0.3);
+}
+
+.evo-glass-panel {
+  background: linear-gradient(180deg, rgba(16, 20, 30, 0.75) 0%, rgba(8, 10, 15, 0.9) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.evo-active-nav-indicator {
+  position: absolute;
+  left: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
 }
 
 /* Laboratory environmental animations */

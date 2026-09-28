@@ -6,6 +6,7 @@ import {
   TOMO_01_OUTCOMES,
 } from './data/collections';
 import { Header } from './components/Header';
+import { EvoSidebarNav, NavActionTarget } from './components/navigation/EvoSidebarNav';
 import { MagazineCover } from './components/MagazineCover';
 import { HorizontalCollection } from './components/HorizontalCollection';
 import { EditorialIndex } from './components/EditorialIndex';
@@ -31,13 +32,45 @@ import { EvoMasterLabSuite } from './components/world/labs/EvoMasterLabSuite';
 import { EvoWindowsMatrixLab } from './components/world/labs/windowsMatrix/EvoWindowsMatrixLab';
 import { EvoLabCore } from './components/evoLabCore/EvoLabCore';
 import { ForensicBenchTarget } from './components/common/EvoTomoDossierModal';
-import { CheckCircle2, X } from 'lucide-react';
+import { EvoHardwareDiscoveryModal } from './components/evoLabCore/components/EvoHardwareDiscoveryModal';
+import { CatalogCoverageDashboard } from './components/evoLabCore/components/CatalogCoverageDashboard';
+import { EvoTelemetryIntegrityModal } from './components/evoLabCore/components/EvoTelemetryIntegrityModal';
+import { TelemetryIntegrityService, LiveScanIntegrityResult } from './components/evoLabCore/services/telemetryIntegrityService';
+import { EvoCaseRepository } from './components/evoLabCore/services/caseRepository';
+import { EvoCase } from './components/evoLabCore/types';
+import { CheckCircle2, X, History } from 'lucide-react';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<
     'magazine' | 'tomo-02' | 'tomo-03' | 'tomo-04' | 'world-map' | 'archivo' | 'cover' | 'index' | 'chapter-01' | 'chapter-02' | 'chapter-03' | 'chapter-04' | 'chapter-05' | 'chapter-06' | 'chapter-07' | 'hotswap-lab' | 'windows-matrix-lab' | 'lab-core'
   >('lab-core');
+
+  // Sub-panel & Lab states
+  const [activeLabPanel, setActiveLabPanel] = useState<'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>('sandbox');
+  const [activeLabMission, setActiveLabMission] = useState<'IDLE' | 'REPAIR' | 'TEST' | 'BOTTLENECK' | 'OPTIMIZE' | 'UPGRADE'>('IDLE');
+  const [labCorePhase, setLabCorePhase] = useState<'SELECT_PC' | 'BUILD_PC' | 'LAB_ACTIVE'>('SELECT_PC');
   const [matrixInitialScenario, setMatrixInitialScenario] = useState<string | undefined>(undefined);
+
+  // Navigation sidebar states (remember collapsed state in localStorage)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('evo_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
+
+  // Modals state
+  const [showDiscoveryModal, setShowDiscoveryModal] = useState<boolean>(false);
+  const [showCoverageDashboard, setShowCoverageDashboard] = useState<boolean>(false);
+  const [showIntegrityModal, setShowIntegrityModal] = useState<boolean>(false);
+  const [isScanningIntegrity, setIsScanningIntegrity] = useState<boolean>(false);
+  const [liveScanResult, setLiveScanResult] = useState<LiveScanIntegrityResult | null>(null);
+  const [showCaseHistoryModal, setShowCaseHistoryModal] = useState<boolean>(false);
+  const [caseHistoryList, setCaseHistoryList] = useState<EvoCase[]>([]);
+  const [dossierModalTomoId, setDossierModalTomoId] = useState<string | null>(null);
+
   const [isIntroActive, setIsIntroActive] = useState<boolean>(false);
   const [activeProfile, setActiveProfile] = useState<EvoNarrativeProfile>('investigador');
   const [activeNotice, setActiveNotice] = useState<string | null>(null);
@@ -49,6 +82,18 @@ export default function App() {
       return null;
     }
   });
+
+  const handleToggleSidebarCollapse = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('evo_sidebar_collapsed', String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
 
   // Load saved profile & handle URL query parameters for direct PDF printing / magazine mode
   useEffect(() => {
@@ -73,7 +118,6 @@ export default function App() {
         setIsIntroActive(false);
       } else if (vol === '04') {
         setCurrentView('tomo-04');
-        setIsIntroActive(false);
       } else if (
         url.searchParams.get('print') === 'true' ||
         url.searchParams.get('mode') === 'magazine' ||
@@ -95,7 +139,7 @@ export default function App() {
       // ignore
     }
   }, []);
-  
+
   // Navigation target station for Chapter 02
   const [c02TargetStation, setC02TargetStation] = useState<Chapter02Station | undefined>(undefined);
 
@@ -126,7 +170,6 @@ export default function App() {
       const isC05Completed = localStorage.getItem('evo_c05_status') === 'completed';
       const isC05Unlocked = isC04Completed || localStorage.getItem('evo_c05_unlocked') === 'true';
 
-      // Chapter 06 completion strictly requires at least one completed case in evo_c06_cases
       let isC06Completed = false;
       try {
         const rawCases = localStorage.getItem('evo_c06_cases');
@@ -142,7 +185,6 @@ export default function App() {
         isC06Completed = false;
       }
 
-      // Synchronize localStorage flags if state was out of sync
       if (!isC06Completed) {
         if (localStorage.getItem('evo_c06_status') === 'completed') {
           localStorage.removeItem('evo_c06_status');
@@ -199,10 +241,8 @@ export default function App() {
     }
   };
 
-  // Track dynamically unlocked chapters
   const [chaptersList, setChaptersList] = useState<ChapterItem[]>(computeChaptersList);
 
-  // Sync state whenever local storage changes
   useEffect(() => {
     const handleStorage = () => {
       setChaptersList(computeChaptersList());
@@ -215,11 +255,6 @@ export default function App() {
 
   const handleOpenEdition = () => {
     setCurrentView('index');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleBackToCover = () => {
-    setCurrentView('cover');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -254,20 +289,23 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleStartChapter07 = () => {
+    setCurrentView('chapter-07');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleBackToIndex = () => {
     setChaptersList(computeChaptersList());
     setCurrentView('index');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Trigger locked chapter requirement inspection
   const handleSelectLockedChapter = (chapter: ChapterItem) => {
     const req = getChapterRequirements(chapter.number, chaptersList);
     setLockedRequirements(req);
     setIsLockedModalOpen(true);
   };
 
-  // Direct navigation from "IR A LO QUE FALTA"
   const handleGoToMissing = (targetChapterNumber: string, targetStationOrSection?: string) => {
     setIsLockedModalOpen(false);
 
@@ -323,16 +361,9 @@ export default function App() {
       return;
     }
 
-    // Default fallback
     setCurrentView('index');
   };
 
-  const handleStartChapter07 = () => {
-    setCurrentView('chapter-07');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Completion of Chapter 01
   const handleChapterCompleted = () => {
     try {
       localStorage.setItem('evo_c02_unlocked', 'true');
@@ -357,7 +388,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Completion of Chapter 02
   const handleChapter02Completed = () => {
     try {
       localStorage.setItem('evo_c02_status', 'completed');
@@ -379,7 +409,6 @@ export default function App() {
     );
   };
 
-  // Completion of Chapter 03
   const handleChapter03Completed = () => {
     try {
       localStorage.setItem('evo_c03_status', 'completed');
@@ -402,7 +431,6 @@ export default function App() {
     );
   };
 
-  // Completion of Chapter 04
   const handleChapter04Completed = () => {
     try {
       localStorage.setItem('evo_c04_status', 'completed');
@@ -425,7 +453,6 @@ export default function App() {
     );
   };
 
-  // Completion of Chapter 05
   const handleChapter05Completed = () => {
     try {
       localStorage.setItem('evo_c05_status', 'completed');
@@ -448,7 +475,6 @@ export default function App() {
     );
   };
 
-  // Completion of Chapter 06
   const handleChapter06Completed = () => {
     try {
       localStorage.setItem('evo_c06_status', 'completed');
@@ -471,7 +497,6 @@ export default function App() {
     );
   };
 
-  // Completion of Chapter 07 (Tomo 01 Finale)
   const handleChapter07Completed = () => {
     try {
       localStorage.setItem('evo_c07_status', 'completed');
@@ -557,7 +582,44 @@ export default function App() {
     }
   };
 
-  // Completed chapters count & dossier summary
+  const handleOpenLiveScanAudit = async () => {
+    setIsScanningIntegrity(true);
+    setShowIntegrityModal(true);
+    try {
+      const result = await TelemetryIntegrityService.scanAndValidateLiveEndpoint();
+      setLiveScanResult(result);
+    } catch (err) {
+      console.error('[App] Error comparing telemetry against allowed components:', err);
+    } finally {
+      setIsScanningIntegrity(false);
+    }
+  };
+
+  const handleOpenCaseHistory = () => {
+    setCaseHistoryList(EvoCaseRepository.getAllCases());
+    setShowCaseHistoryModal(true);
+  };
+
+  const handleSidebarNavigate = (target: NavActionTarget) => {
+    if (target.tomoId) {
+      setDossierModalTomoId(target.tomoId);
+      return;
+    }
+
+    if (target.subPanel) {
+      setActiveLabPanel(target.subPanel);
+    }
+    if (target.labMission) {
+      setActiveLabMission(target.labMission);
+    }
+    if (target.corePhase) {
+      setLabCorePhase(target.corePhase);
+    }
+
+    setCurrentView(target.view);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const completedChaptersCount = chaptersList.filter((c) => c.status === 'COMPLETADO').length;
 
   const dossierSummary: Tome01DossierSummary = {
@@ -587,7 +649,6 @@ export default function App() {
     allCompleted: completedChaptersCount >= 7,
   };
 
-  // Fullscreen Cinematic Intro
   if (isIntroActive) {
     return (
       <EvoIntroExperience
@@ -624,162 +685,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
-  // Dedicated Editorial Magazine Views (A4 Print-Ready Digital Magazines)
-  if (currentView === 'magazine') {
-    return (
-      <div className="relative">
-        <div className="fixed top-3 right-3 sm:right-6 z-[60] print:hidden flex items-center gap-1.5 bg-black/90 backdrop-blur-md border border-amber-500/30 p-1.5 rounded-xl shadow-2xl">
-          <span className="text-[10px] font-mono-tech text-zinc-400 font-bold px-1.5 hidden md:inline">TOMOS:</span>
-          <button
-            type="button"
-            onClick={() => handleNavigateTomo('01')}
-            className="px-2.5 py-1 rounded text-[11px] font-mono-tech font-bold bg-amber-400 text-black border border-amber-400 shadow cursor-pointer"
-            title="Tomo 01: Conocé tu PC // Hardware"
-          >
-            T01
-          </button>
-          <button
-            type="button"
-            onClick={() => handleNavigateTomo('02')}
-            className="px-2.5 py-1 rounded text-[11px] font-mono-tech font-bold bg-zinc-900 text-cyan-400 hover:bg-cyan-950 border border-cyan-500/40 cursor-pointer"
-            title="Tomo 02: La Biblia Negra de Windows"
-          >
-            T02
-          </button>
-          <button
-            type="button"
-            onClick={() => handleNavigateTomo('03')}
-            className="px-2.5 py-1 rounded text-[11px] font-mono-tech font-bold bg-zinc-900 text-emerald-400 hover:bg-emerald-950 border border-emerald-500/40 cursor-pointer"
-            title="Tomo 03: Repará tu PC // Taller de Escritorio"
-          >
-            T03
-          </button>
-          <button
-            type="button"
-            onClick={() => handleNavigateTomo('04')}
-            className="px-2.5 py-1 rounded text-[11px] font-mono-tech font-bold bg-zinc-900 text-purple-400 hover:bg-purple-950 border border-purple-500/40 cursor-pointer"
-            title="Tomo 04: Repará tu Notebook // Microelectrónica"
-          >
-            T04
-          </button>
-
-          <div className="h-4 w-[1px] bg-zinc-700 mx-1 hidden sm:block" />
-
-          <button
-            type="button"
-            onClick={() => setCurrentView('hotswap-lab')}
-            className="px-2.5 py-1 rounded-lg text-[11px] font-mono-tech font-bold bg-amber-400/20 hover:bg-amber-400 text-amber-300 hover:text-black border border-amber-400/50 flex items-center gap-1 cursor-pointer transition-all"
-            title="Abrir Banco Hot-Swap y Suite Metrológica"
-          >
-            <span>⚡ BANCO HOT-SWAP</span>
-          </button>
-          <button
-            type="button"
-            onClick={handleNavigateHome}
-            className="px-3 py-1 rounded-lg text-[11px] font-mono-tech font-bold bg-amber-400 hover:bg-amber-300 text-black border border-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.45)] flex items-center gap-1.5 cursor-pointer transition-all"
-            title="Abrir Centro de Ingeniería Mundo EVO"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
-            <span>⚡ EVO LABS</span>
-          </button>
-        </div>
-        <EvoMagazineView
-          onBackToApp={handleNavigateHome}
-        />
-      </div>
-    );
-  }
-
-  if (currentView === 'tomo-02') {
-    return (
-      <div className="relative">
-        <div className="fixed top-3 right-3 sm:right-6 z-[60] print:hidden flex items-center gap-1.5 bg-black/90 backdrop-blur-md border border-cyan-500/30 p-1.5 rounded-xl shadow-2xl">
-          <button
-            type="button"
-            onClick={() => setCurrentView('hotswap-lab')}
-            className="px-2.5 py-1 rounded-lg text-[11px] font-mono-tech font-bold bg-amber-400/20 hover:bg-amber-400 text-amber-300 hover:text-black border border-amber-400/50 flex items-center gap-1 cursor-pointer transition-all"
-            title="Abrir Banco Hot-Swap y Suite Metrológica"
-          >
-            <span>⚡ BANCO HOT-SWAP</span>
-          </button>
-          <button
-            type="button"
-            onClick={handleNavigateHome}
-            className="px-3 py-1 rounded-lg text-[11px] font-mono-tech font-bold bg-amber-400 hover:bg-amber-300 text-black border border-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.45)] flex items-center gap-1.5 cursor-pointer transition-all"
-            title="Abrir Centro de Ingeniería Mundo EVO"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
-            <span>⚡ EVO LABS</span>
-          </button>
-        </div>
-        <Tomo02MagazineView
-          onBackToApp={handleNavigateHome}
-          onNavigateTomo={handleNavigateTomo}
-        />
-      </div>
-    );
-  }
-
-  if (currentView === 'tomo-03') {
-    return (
-      <div className="relative">
-        <div className="fixed top-3 right-3 sm:right-6 z-[60] print:hidden flex items-center gap-1.5 bg-black/90 backdrop-blur-md border border-emerald-500/30 p-1.5 rounded-xl shadow-2xl">
-          <button
-            type="button"
-            onClick={() => setCurrentView('hotswap-lab')}
-            className="px-2.5 py-1 rounded-lg text-[11px] font-mono-tech font-bold bg-amber-400/20 hover:bg-amber-400 text-amber-300 hover:text-black border border-amber-400/50 flex items-center gap-1 cursor-pointer transition-all"
-            title="Abrir Banco Hot-Swap y Suite Metrológica"
-          >
-            <span>⚡ BANCO HOT-SWAP</span>
-          </button>
-          <button
-            type="button"
-            onClick={handleNavigateHome}
-            className="px-3 py-1 rounded-lg text-[11px] font-mono-tech font-bold bg-amber-400 hover:bg-amber-300 text-black border border-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.45)] flex items-center gap-1.5 cursor-pointer transition-all"
-            title="Abrir Centro de Ingeniería Mundo EVO"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
-            <span>⚡ EVO LABS</span>
-          </button>
-        </div>
-        <Tomo03MagazineView
-          onBackToApp={handleNavigateHome}
-          onNavigateTomo={handleNavigateTomo}
-        />
-      </div>
-    );
-  }
-
-  if (currentView === 'tomo-04') {
-    return (
-      <div className="relative">
-        <div className="fixed top-3 right-3 sm:right-6 z-[60] print:hidden flex items-center gap-1.5 bg-black/90 backdrop-blur-md border border-purple-500/30 p-1.5 rounded-xl shadow-2xl">
-          <button
-            type="button"
-            onClick={() => setCurrentView('hotswap-lab')}
-            className="px-2.5 py-1 rounded-lg text-[11px] font-mono-tech font-bold bg-amber-400/20 hover:bg-amber-400 text-amber-300 hover:text-black border border-amber-400/50 flex items-center gap-1 cursor-pointer transition-all"
-            title="Abrir Banco Hot-Swap y Suite Metrológica"
-          >
-            <span>⚡ BANCO HOT-SWAP</span>
-          </button>
-          <button
-            type="button"
-            onClick={handleNavigateHome}
-            className="px-3 py-1 rounded-lg text-[11px] font-mono-tech font-bold bg-amber-400 hover:bg-amber-300 text-black border border-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.45)] flex items-center gap-1.5 cursor-pointer transition-all"
-            title="Abrir Centro de Ingeniería Mundo EVO"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
-            <span>⚡ EVO LABS</span>
-          </button>
-        </div>
-        <Tomo04MagazineView
-          onBackToApp={handleNavigateHome}
-          onNavigateTomo={handleNavigateTomo}
-        />
-      </div>
-    );
-  }
-
   const handleOpenForensicBench = (target: ForensicBenchTarget) => {
     if (target.labView === 'windows-matrix') {
       setMatrixInitialScenario(target.scenario);
@@ -794,192 +699,346 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-[#f4f4f6] flex flex-col selection:bg-amber-400 selection:text-black">
-      {/* Header: EVO LABS, Tomos con acentos temáticos */}
-      <Header
+    <div className="min-h-screen bg-[#07090e] text-[#f4f4f6] flex flex-row selection:bg-amber-400 selection:text-black">
+      {/* 1. Global Collapsible Left Sidebar */}
+      <EvoSidebarNav
         currentView={currentView}
-        onNavigateHome={handleNavigateHome}
-        onNavigateArchive={handleNavigateArchive}
-        onNavigateTomo01={handleNavigateTomo01}
-        onNavigateTomo02={handleNavigateTomo02}
-        onNavigateTomo03={handleNavigateTomo03}
-        onNavigateTomo04={handleNavigateTomo04}
-        onNavigateMagazine={() => setCurrentView('magazine')}
-        onNavigateHotSwapLab={() => setCurrentView('hotswap-lab')}
-        onNavigateLabCore={() => {
-          setCurrentView('lab-core');
-          window.scrollTo({ top: 0, behavior: 'instant' });
+        activeLabPanel={activeLabPanel}
+        activeLabMission={activeLabMission}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={handleToggleSidebarCollapse}
+        isMobileOpen={isMobileNavOpen}
+        onCloseMobile={() => setIsMobileNavOpen(false)}
+        onNavigate={handleSidebarNavigate}
+        onOpenAutoDetectModal={() => {
+          const event = new CustomEvent('evo_open_autodetect');
+          window.dispatchEvent(event);
         }}
-        onNavigateWindowsMatrixLab={() => {
-          setMatrixInitialScenario(undefined);
-          setCurrentView('windows-matrix-lab');
-        }}
-        onOpenForensicBench={handleOpenForensicBench}
+        onOpenDiscoveryModal={() => setShowDiscoveryModal(true)}
+        onOpenCoverageDashboard={() => setShowCoverageDashboard(true)}
+        onOpenCaseHistory={handleOpenCaseHistory}
+        onOpenLiveScanAudit={handleOpenLiveScanAudit}
+        onOpenTomoDossier={(tomoId) => setDossierModalTomoId(tomoId)}
         activeProfile={activeProfile}
-        onReplayIntro={() => setIsIntroActive(true)}
-        onHardwareDetected={(passport) => setUserPassport(passport)}
+        onChangeProfile={handleChangeProfile}
       />
 
-      {/* Main View Container */}
-      <main className="flex-1 w-full">
-        {currentView === 'lab-core' && (
-          <EvoLabCore
-            onNavigateToTomo={handleNavigateTomo}
-            onOpenGlobalAutoDetectModal={() => {
-              // Can open auto detect modal or trigger update
-              const event = new CustomEvent('evo_open_autodetect');
-              window.dispatchEvent(event);
-            }}
-            onExitToWorld={handleNavigateHome}
-          />
-        )}
+      {/* 2. Main Body Container with Dynamic Margin Offset for Sidebar */}
+      <div
+        className={`flex-1 min-h-screen flex flex-col transition-all duration-300 relative ${
+          isSidebarCollapsed ? 'lg:pl-[64px]' : 'lg:pl-[240px]'
+        }`}
+      >
+        {/* Subtle Ambient Workspace Top Glow */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[380px] pointer-events-none opacity-40 -z-10"
+          style={{
+            background:
+              'radial-gradient(ellipse 80% 300px at 50% 0%, rgba(251, 191, 36, 0.05), transparent 70%)',
+          }}
+        />
 
-        {currentView === 'windows-matrix-lab' && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-6">
-            <EvoWindowsMatrixLab
-              initialScenario={matrixInitialScenario}
-              onNavigateToHardwareBench={() => setCurrentView('hotswap-lab')}
+        {/* Streamlined Clean Header */}
+        <Header
+          currentView={currentView}
+          activeLabPanel={activeLabPanel}
+          activeLabMission={activeLabMission}
+          onNavigateHome={handleNavigateHome}
+          onNavigateArchive={handleNavigateArchive}
+          onNavigateTomo01={handleNavigateTomo01}
+          onNavigateTomo02={handleNavigateTomo02}
+          onNavigateTomo03={handleNavigateTomo03}
+          onNavigateTomo04={handleNavigateTomo04}
+          onNavigateTomo05={() => setDossierModalTomoId('tomo-05')}
+          onNavigateTomo06={() => setDossierModalTomoId('tomo-06')}
+          onNavigateMagazine={() => setCurrentView('magazine')}
+          onNavigateHotSwapLab={() => setCurrentView('hotswap-lab')}
+          onNavigateLabCore={() => {
+            setCurrentView('lab-core');
+            window.scrollTo({ top: 0, behavior: 'instant' });
+          }}
+          onNavigateWindowsMatrixLab={() => {
+            setMatrixInitialScenario(undefined);
+            setCurrentView('windows-matrix-lab');
+          }}
+          onOpenForensicBench={handleOpenForensicBench}
+          activeProfile={activeProfile}
+          onReplayIntro={() => setIsIntroActive(true)}
+          onHardwareDetected={(passport) => setUserPassport(passport)}
+          onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
+          dossierModalTomoId={dossierModalTomoId}
+          onCloseDossierModal={() => setDossierModalTomoId(null)}
+        />
+
+        {/* Main View Render Stage */}
+        <main className="flex-1 w-full">
+          {currentView === 'magazine' && (
+            <EvoMagazineView onBackToApp={handleNavigateHome} />
+          )}
+
+          {currentView === 'tomo-02' && (
+            <Tomo02MagazineView
+              onBackToApp={handleNavigateHome}
+              onNavigateTomo={handleNavigateTomo}
+            />
+          )}
+
+          {currentView === 'tomo-03' && (
+            <Tomo03MagazineView
+              onBackToApp={handleNavigateHome}
+              onNavigateTomo={handleNavigateTomo}
+            />
+          )}
+
+          {currentView === 'tomo-04' && (
+            <Tomo04MagazineView
+              onBackToApp={handleNavigateHome}
+              onNavigateTomo={handleNavigateTomo}
+            />
+          )}
+
+          {currentView === 'lab-core' && (
+            <EvoLabCore
+              initialPhase={labCorePhase}
+              initialMission={activeLabMission}
+              onNavigateToTomo={handleNavigateTomo}
+              onOpenGlobalAutoDetectModal={() => {
+                const event = new CustomEvent('evo_open_autodetect');
+                window.dispatchEvent(event);
+              }}
+              onExitToWorld={handleNavigateHome}
+            />
+          )}
+
+          {currentView === 'windows-matrix-lab' && (
+            <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-6">
+              <EvoWindowsMatrixLab
+                initialScenario={matrixInitialScenario}
+                onNavigateToHardwareBench={() => {
+                  setActiveLabPanel('hardware');
+                  setCurrentView('hotswap-lab');
+                }}
+                onOpenTomo={handleNavigateTomo}
+              />
+            </div>
+          )}
+
+          {currentView === 'hotswap-lab' && (
+            <EvoMasterLabSuite
+              initialPanel={activeLabPanel}
+              onNavigateTomo={handleNavigateTomo}
+              onNavigateHome={handleNavigateHome}
+              passport={userPassport}
+            />
+          )}
+
+          {currentView === 'world-map' && (
+            <EvoWorldMap
+              passport={userPassport}
+              completedChaptersCount={completedChaptersCount}
+              onEnterZone={handleEnterZone}
+              activeProfile={activeProfile}
+              onChangeProfile={handleChangeProfile}
               onOpenTomo={handleNavigateTomo}
             />
-          </div>
-        )}
+          )}
 
-        {currentView === 'hotswap-lab' && (
-          <EvoMasterLabSuite
-            onNavigateTomo={handleNavigateTomo}
-            onNavigateHome={handleNavigateHome}
-            passport={userPassport}
-          />
-        )}
-
-        {currentView === 'world-map' && (
-          <EvoWorldMap
-            passport={userPassport}
-            completedChaptersCount={completedChaptersCount}
-            onEnterZone={handleEnterZone}
-            activeProfile={activeProfile}
-            onChangeProfile={handleChangeProfile}
-            onOpenTomo={handleNavigateTomo}
-          />
-        )}
-
-        {currentView === 'archivo' && (
-          <EvoArchiveEntrance
-            dossierSummary={dossierSummary}
-            onEnterTome01={handleExploreTomo01}
-            onEnterMagazine={() => setCurrentView('magazine')}
-            onEnterTome02={handleNavigateTomo02}
-            onEnterTome03={handleNavigateTomo03}
-            onEnterTome04={handleNavigateTomo04}
-            onBackToMap={handleNavigateHome}
-          />
-        )}
-
-        {currentView === 'cover' && (
-          <div className="max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-12 py-6">
-            {/* Cover: Strong headline, subtitle, 3 secondary headlines, single image, single CTA */}
-            <MagazineCover
-              headlines={TOMO_01_HEADLINES}
-              onOpenEdition={handleOpenEdition}
-              onOpenA4Magazine={() => setCurrentView('magazine')}
-              onBackToWorldMap={handleNavigateHome}
+          {currentView === 'archivo' && (
+            <EvoArchiveEntrance
+              dossierSummary={dossierSummary}
+              onEnterTome01={handleExploreTomo01}
+              onEnterMagazine={() => setCurrentView('magazine')}
+              onEnterTome02={handleNavigateTomo02}
+              onEnterTome03={handleNavigateTomo03}
+              onEnterTome04={handleNavigateTomo04}
+              onBackToMap={handleNavigateHome}
             />
+          )}
 
-            {/* Horizontal collection of 4 volumes with locked states and real mini-covers */}
-            <HorizontalCollection
-              volumes={VOLUMES_COLLECTION}
-              onOpenVolume={handleOpenVolume}
+          {currentView === 'cover' && (
+            <div className="max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-12 py-6">
+              <MagazineCover
+                headlines={TOMO_01_HEADLINES}
+                onOpenEdition={handleOpenEdition}
+                onOpenA4Magazine={() => setCurrentView('magazine')}
+                onBackToWorldMap={handleNavigateHome}
+              />
+              <HorizontalCollection
+                volumes={VOLUMES_COLLECTION}
+                onOpenVolume={handleOpenVolume}
+              />
+            </div>
+          )}
+
+          {currentView === 'index' && (
+            <div className="max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-12">
+              <EditorialIndex
+                chapters={chaptersList}
+                outcomes={TOMO_01_OUTCOMES}
+                onBackToCover={() => setCurrentView('archivo')}
+                onOpenA4Magazine={() => setCurrentView('magazine')}
+                onBackToWorldMap={handleNavigateHome}
+                onStartResearch={handleStartChapter01}
+                onStartChapter02={handleStartChapter02}
+                onStartChapter03={handleStartChapter03}
+                onStartChapter04={handleStartChapter04}
+                onStartChapter05={handleStartChapter05}
+                onStartChapter06={handleStartChapter06}
+                onStartChapter07={handleStartChapter07}
+                onSelectLockedChapter={handleSelectLockedChapter}
+              />
+            </div>
+          )}
+
+          {currentView === 'chapter-01' && (
+            <Chapter01View
+              onBackToIndex={handleBackToIndex}
+              onChapterCompleted={handleChapterCompleted}
+              isChapter02Unlocked={!!isChapter02Unlocked}
             />
-          </div>
-        )}
+          )}
 
-        {currentView === 'index' && (
-          <div className="max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-12">
-            {/* Editorial Index View for Tomo 01 */}
-            <EditorialIndex
-              chapters={chaptersList}
-              outcomes={TOMO_01_OUTCOMES}
-              onBackToCover={() => setCurrentView('archivo')}
-              onOpenA4Magazine={() => setCurrentView('magazine')}
-              onBackToWorldMap={handleNavigateHome}
-              onStartResearch={handleStartChapter01}
-              onStartChapter02={handleStartChapter02}
-              onStartChapter03={handleStartChapter03}
-              onStartChapter04={handleStartChapter04}
-              onStartChapter05={handleStartChapter05}
-              onStartChapter06={handleStartChapter06}
-              onStartChapter07={handleStartChapter07}
-              onSelectLockedChapter={handleSelectLockedChapter}
+          {currentView === 'chapter-02' && (
+            <Chapter02View
+              onBackToIndex={handleBackToIndex}
+              onChapterCompleted={handleChapter02Completed}
+              initialStation={c02TargetStation}
+              onOpenChapter03={handleStartChapter03}
             />
+          )}
+
+          {currentView === 'chapter-03' && (
+            <Chapter03View
+              onBackToIndex={handleBackToIndex}
+              onOpenChapter02={handleStartChapter02}
+              onChapterCompleted={handleChapter03Completed}
+            />
+          )}
+
+          {currentView === 'chapter-04' && (
+            <Chapter04View
+              onBackToIndex={handleBackToIndex}
+              onOpenChapter03={handleStartChapter03}
+              onChapterCompleted={handleChapter04Completed}
+            />
+          )}
+
+          {currentView === 'chapter-05' && (
+            <Chapter05View
+              onBackToIndex={handleBackToIndex}
+              onOpenChapter04={handleStartChapter04}
+              onOpenChapter06={handleStartChapter06}
+              onChapterCompleted={handleChapter05Completed}
+            />
+          )}
+
+          {currentView === 'chapter-06' && (
+            <Chapter06View
+              onBackToIndex={handleBackToIndex}
+              onOpenChapter07={handleStartChapter07}
+              onChapterCompleted={handleChapter06Completed}
+            />
+          )}
+
+          {currentView === 'chapter-07' && (
+            <Chapter07View
+              onBackToIndex={handleBackToIndex}
+              onChapterCompleted={handleChapter07Completed}
+            />
+          )}
+        </main>
+
+        {/* Minimal Footer */}
+        <footer className="border-t border-zinc-800/60 py-6 bg-[#06070a] text-zinc-500 text-xs font-mono-tech mt-auto">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 bg-yellow-400 inline-block" />
+              <span className="font-display font-bold text-white uppercase tracking-tight">
+                EVO LABS
+              </span>
+              <span className="text-zinc-600">•</span>
+              <span className="text-zinc-400">Plataforma Editorial & Laboratorio de Silicio</span>
+            </div>
+            <div className="text-zinc-500 text-[11px] tracking-wider uppercase">
+              METROLOGÍA EMPÍRICA // HARDWARE & KERNEL NT
+            </div>
           </div>
-        )}
+        </footer>
+      </div>
 
-        {currentView === 'chapter-01' && (
-          /* CHAPTER 01 FULL INTERACTIVE MODEL VIEW */
-          <Chapter01View
-            onBackToIndex={handleBackToIndex}
-            onChapterCompleted={handleChapterCompleted}
-            isChapter02Unlocked={!!isChapter02Unlocked}
-          />
-        )}
+      {/* Global Modals from Navigation */}
+      <EvoHardwareDiscoveryModal
+        isOpen={showDiscoveryModal}
+        onClose={() => setShowDiscoveryModal(false)}
+        onComponentIncorporated={() => {
+          setActiveNotice('Componente incorporado al catálogo de silicio con éxito.');
+        }}
+      />
 
-        {currentView === 'chapter-02' && (
-          /* CHAPTER 02 FULL INTERACTIVE MODEL VIEW */
-          <Chapter02View
-            onBackToIndex={handleBackToIndex}
-            onChapterCompleted={handleChapter02Completed}
-            initialStation={c02TargetStation}
-            onOpenChapter03={handleStartChapter03}
-          />
-        )}
+      <CatalogCoverageDashboard
+        isOpen={showCoverageDashboard}
+        onClose={() => setShowCoverageDashboard(false)}
+      />
 
-        {currentView === 'chapter-03' && (
-          /* CHAPTER 03 FULL INTERACTIVE MODEL VIEW */
-          <Chapter03View
-            onBackToIndex={handleBackToIndex}
-            onOpenChapter02={handleStartChapter02}
-            onChapterCompleted={handleChapter03Completed}
-          />
-        )}
+      <EvoTelemetryIntegrityModal
+        isOpen={showIntegrityModal}
+        onClose={() => setShowIntegrityModal(false)}
+        integrityResult={liveScanResult}
+        isLoading={isScanningIntegrity}
+        onReScan={handleOpenLiveScanAudit}
+        onApplyMachine={() => {
+          setShowIntegrityModal(false);
+          setCurrentView('lab-core');
+        }}
+      />
 
-        {currentView === 'chapter-04' && (
-          /* CHAPTER 04 FULL INTERACTIVE MODEL VIEW */
-          <Chapter04View
-            onBackToIndex={handleBackToIndex}
-            onOpenChapter03={handleStartChapter03}
-            onChapterCompleted={handleChapter04Completed}
-          />
-        )}
+      {/* Case History Dossier Modal */}
+      {showCaseHistoryModal && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md animate-in fade-in select-none">
+          <div className="w-full max-w-3xl max-h-[85vh] rounded-2xl border border-zinc-700 bg-[#0e1219] shadow-2xl flex flex-col font-mono-tech overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-zinc-800 bg-[#080a0d] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <History className="w-5 h-5 text-cyan-400" />
+                <h3 className="font-display font-bold text-white text-base uppercase">
+                  EXPEDIENTES Y CASOS REGISTRADOS
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCaseHistoryModal(false)}
+                className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
 
-        {currentView === 'chapter-05' && (
-          /* CHAPTER 05 FULL INTERACTIVE MODEL VIEW */
-          <Chapter05View
-            onBackToIndex={handleBackToIndex}
-            onOpenChapter04={handleStartChapter04}
-            onOpenChapter06={handleStartChapter06}
-            onChapterCompleted={handleChapter05Completed}
-          />
-        )}
+            <div className="p-5 overflow-y-auto space-y-3 flex-1 text-xs">
+              {caseHistoryList.length === 0 ? (
+                <div className="text-center p-8 text-zinc-500">
+                  Aún no se han completado expedientes en esta sesión.
+                </div>
+              ) : (
+                caseHistoryList.map((c) => (
+                  <div
+                    key={c.id}
+                    className="p-4 rounded-xl border border-zinc-800 bg-[#121620] space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-white text-sm">{c.title}</span>
+                      <span className="text-[10px] text-zinc-400 font-mono">
+                        {new Date(c.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-zinc-400 text-xs font-sans-editorial">{c.summary}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
-        {currentView === 'chapter-06' && (
-          /* CHAPTER 06 FULL INTERACTIVE MODEL VIEW */
-          <Chapter06View
-            onBackToIndex={handleBackToIndex}
-            onOpenChapter07={handleStartChapter07}
-            onChapterCompleted={handleChapter06Completed}
-          />
-        )}
-
-        {currentView === 'chapter-07' && (
-          /* CHAPTER 07 FULL INTERACTIVE MODEL VIEW */
-          <Chapter07View
-            onBackToIndex={handleBackToIndex}
-            onChapterCompleted={handleChapter07Completed}
-          />
-        )}
-      </main>
-
-      {/* Modal: Locked Chapter Requirements (UX enriquecida y contextual) */}
+      {/* Locked Chapter Modal */}
       <LockedChapterModal
         isOpen={isLockedModalOpen}
         onClose={() => setIsLockedModalOpen(false)}
@@ -987,7 +1046,7 @@ export default function App() {
         onGoToMissing={handleGoToMissing}
       />
 
-      {/* Modal: Chapter Unlocked Celebration (Estética sobria, editorial EVO LABS) */}
+      {/* Celebration Modal */}
       {celebrationData && (
         <ChapterUnlockedCelebrationModal
           isOpen={!!celebrationData}
@@ -1038,24 +1097,6 @@ export default function App() {
           </button>
         </div>
       )}
-
-      {/* Minimal Footer: Clean & Unobtrusive */}
-      <footer className="border-t border-zinc-800/60 py-8 bg-[#0a0b0d] text-zinc-400 text-xs font-mono-tech">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-yellow-400 inline-block" />
-            <span className="font-display font-bold text-white uppercase tracking-tight">
-              EVO LABS
-            </span>
-            <span className="text-zinc-600">•</span>
-            <span className="text-zinc-400">Tomo 01 // Edición 01</span>
-          </div>
-
-          <div className="text-zinc-400 text-[11px] tracking-wider uppercase">
-            PUBLICACIÓN EDITORIAL DE ARQUITECTURA DE COMPUTADORAS
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
