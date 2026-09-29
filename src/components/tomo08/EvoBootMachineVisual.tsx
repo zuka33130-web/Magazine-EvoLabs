@@ -8,16 +8,13 @@ import {
   Shield,
   Layers,
   Activity,
-  Terminal,
-  Server,
   Power,
   Sliders,
-  CheckCircle2,
-  Lock,
   Flame,
   X,
-  Info,
   HelpCircle,
+  Fan,
+  CircuitBoard,
 } from 'lucide-react';
 
 interface EvoBootMachineVisualProps {
@@ -52,7 +49,7 @@ const COMPONENT_EDU_INFO: Record<string, ComponentEduModalData> = {
     title: 'VRM // MÓDULO REGULADOR DE VOLTAJE',
     category: 'ALIMENTACIÓN DE SILICIO',
     queEs: 'Circuito reductor multifase (MOSFETs/Power Stages, Chokes de ferrita y condensadores de tantalio) gobernado por PWM.',
-    queHace: 'Convierte los +12V de la fuente de poder en voltajes precisos y limpios de bajo rizado (VCore ~1.1V-1.35V, VDDQ, VSoC).',
+    queHace: 'Convierte los +12V de la fuente de poder en voltajes precisos y limpios de bajo rizado (VCore nominal, VDDQ, VSoC).',
     cuandoInterviene: 'Paso 05 (Estabilización de rieles de potencia y generación de VCore previo al desreset del CPU).',
     fallasPosibles: [
       'Cortocircuito en MOSFETs de alta drenando el riel de +12V de la fuente a masa.',
@@ -73,7 +70,7 @@ const COMPONENT_EDU_INFO: Record<string, ComponentEduModalData> = {
     ],
   },
   gpu: {
-    title: 'GPU // TARJETA GRÁFICA & GOP',
+    title: 'GPU // TARJETA GRÁFICA DEDICADA & GOP',
     category: 'PROCESAMIENTO VISUAL & PCIe',
     queEs: 'Unidad de procesamiento gráfico dedicada conectada mediante enlace PCIe primario con memoria VRAM y driver GOP.',
     queHace: 'Inicializa el framebuffer básico UEFI mediante Graphics Output Protocol (GOP) y asume la aceleración por hardware con el driver nativo.',
@@ -145,7 +142,7 @@ const COMPONENT_EDU_INFO: Record<string, ComponentEduModalData> = {
     ],
   },
   motherboard: {
-    title: 'MOTHERBOARD // PCB, SUPER I/O & CHIPSET',
+    title: 'MOTHERBOARD // PCB, SUPER I/O & POWER LOGIC',
     category: 'COLUMNA VERTEBRAL & BUSES',
     queEs: 'Circuito impreso multicapa que interconecta todos los componentes, chips Super I/O, RTC y lógica de potencia.',
     queHace: 'Coordina la secuencia de encendido mediante lógica combinacional, enruta buses DMI/PCIe/SPI y distribuye energía.',
@@ -177,89 +174,300 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
     return isPoweredOn && (currentStep.activeConnections || []).includes(connectionName);
   };
 
-  return (
-    <div className="w-full bg-[#07090e] border border-zinc-800/90 rounded-2xl p-4 sm:p-5 relative overflow-hidden font-mono-tech shadow-2xl select-none">
-      {/* Grid Pattern overlay */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:20px_20px]" />
+  const isSignalActive = (signalType: string) => {
+    if (!isPoweredOn) return false;
+    switch (signalType) {
+      case 'PWR_SW':
+        return isConnectionActive('front-panel-pulse') || currentStep.stepNumber === 1 || currentStep.stepNumber === 2;
+      case 'PS_ON#':
+        return isConnectionActive('mobo-psu-pson') || currentStep.stepNumber === 3;
+      case 'RAILS_MAIN':
+        return (
+          isConnectionActive('psu-rails-12v') ||
+          isConnectionActive('psu-rails-5v') ||
+          isConnectionActive('psu-mobo-standby') ||
+          currentStep.stepNumber === 4 ||
+          currentStep.stepNumber === 1
+        );
+      case 'PWR_OK':
+        return isConnectionActive('psu-mobo-pwrok') || currentStep.stepNumber === 5;
+      case 'RESET#':
+        return isConnectionActive('mobo-cpu-reset') || currentStep.stepNumber === 6;
+      case 'SPI_BUS':
+        return (
+          isConnectionActive('cpu-spi-flash') ||
+          currentStep.stepNumber === 7 ||
+          currentStep.stepNumber === 8 ||
+          currentStep.stepNumber === 9
+        );
+      case 'RAM_BUS':
+        return (
+          isConnectionActive('cpu-ram-spd') ||
+          isConnectionActive('cpu-ram-data-bus') ||
+          isConnectionActive('cpu-imc-bus') ||
+          (currentStep.stepNumber >= 10 && currentStep.stepNumber <= 13)
+        );
+      case 'PCIE_GPU':
+        return (
+          isConnectionActive('cpu-gpu-pcie') ||
+          isConnectionActive('cpu-pcie-root') ||
+          currentStep.stepNumber === 14 ||
+          currentStep.stepNumber === 15 ||
+          currentStep.stepNumber === 16
+        );
+      case 'STORAGE_BUS':
+        return (
+          isConnectionActive('pcie-nvme-controller') ||
+          isConnectionActive('storage-firmware-query') ||
+          currentStep.stepNumber === 17 ||
+          currentStep.stepNumber === 18 ||
+          currentStep.stepNumber === 19 ||
+          currentStep.stepNumber === 20 ||
+          currentStep.stepNumber === 21
+        );
+      case 'BOOT_STREAM':
+        return currentStep.stepNumber >= 22 && currentStep.stepNumber <= 34;
+      default:
+        return isConnectionActive(signalType);
+    }
+  };
 
-      {/* Top Header Status Bar */}
-      <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80 mb-4 relative z-10">
+  const getStepSignalTitle = () => {
+    if (isSignalActive('PWR_SW')) return '⚡ PWR_SW // Pulso de Panel Frontal (Pines 6-8 a Masa)';
+    if (isSignalActive('PS_ON#')) return '⚡ PS_ON# // Activación Lógica de Fuente (0V Cable Verde)';
+    if (isSignalActive('PWR_OK')) return '⚡ PWR_OK (Power Good) // Rieles Estabilizados (+5V Cable Gris)';
+    if (isSignalActive('RESET#')) return '⚡ RESET# // Liberación de Reset CPU (Transición Low ➔ High)';
+    if (isSignalActive('SPI_BUS')) return '⚡ SPI BUS // Fetch de Microcódigo & Vector FFFF_FFF0h';
+    if (isSignalActive('RAM_BUS')) return '⚡ MEMORY BUS // SPD I2C & Calibración DQS/DQ (Memory Training)';
+    if (isSignalActive('PCIE_GPU')) return '⚡ PCIe LINK // Handshake GOP & Inicialización de Framebuffer';
+    if (isSignalActive('STORAGE_BUS')) return '⚡ NVMe / STORAGE BUS // Lectura de Partición EFI (ESP) & BCD';
+    if (isSignalActive('BOOT_STREAM')) return '⚡ WINDOWS PIPELINE // Carga de Kernel, HAL, Drivers y Sesión 0';
+    if (isSignalActive('RAILS_MAIN')) return '⚡ RIELES PRINCIPALES // Distribución de +12V, +5V, +3.3V y +5VSB';
+    return '⚡ REPOSO LÓGICO // Esperando evento de inicio';
+  };
+
+  return (
+    <div className="w-full bg-[#05070c] border-2 border-zinc-800 rounded-2xl p-3 sm:p-5 relative overflow-hidden font-mono-tech shadow-2xl select-none">
+      {/* Background Technical Grid */}
+      <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#06b6d4_1px,transparent_1px)] [background-size:24px_24px]" />
+
+      {/* Top Banner: Stage Status & Real Time Signal */}
+      <div className="flex flex-wrap items-center justify-between pb-3 border-b border-zinc-800/90 mb-4 gap-2 relative z-10">
         <div className="flex items-center gap-2">
           <div
-            className={`w-2.5 h-2.5 rounded-full ${
+            className={`w-3 h-3 rounded-full ${
               !isPoweredOn
                 ? 'bg-zinc-600'
                 : isFailed
-                ? 'bg-rose-500 animate-ping shadow-[0_0_10px_#f43f5e]'
+                ? 'bg-rose-500 animate-ping shadow-[0_0_12px_#f43f5e]'
                 : currentStep.stepNumber === 34
-                ? 'bg-emerald-400 shadow-[0_0_10px_#10b981]'
-                : 'bg-amber-400 animate-pulse shadow-[0_0_10px_#f59e0b]'
+                ? 'bg-emerald-400 shadow-[0_0_12px_#10b981]'
+                : 'bg-amber-400 animate-pulse shadow-[0_0_12px_#f59e0b]'
             }`}
           />
-          <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">
-            ESQUEMA FÍSICO EVO //{' '}
-            <span
-              style={{
-                color: !isPoweredOn ? '#71717a' : isFailed ? '#f43f5e' : currentStep.layerColor,
-              }}
-            >
-              {!isPoweredOn ? 'OFF (APAGADO)' : isFailed ? 'DETENCIÓN EN ESTADO' : currentStep.powerState}
-            </span>
+          <span className="text-xs font-bold text-white uppercase tracking-wider">
+            GABINETE ABIERTO // CORTE LATERAL TÉCNICO
+          </span>
+          <span
+            className="text-[10px] px-2 py-0.5 rounded font-bold uppercase ml-1"
+            style={{
+              backgroundColor: `${currentStep.layerColor}20`,
+              color: currentStep.layerColor,
+              border: `1px solid ${currentStep.layerColor}50`,
+            }}
+          >
+            {!isPoweredOn ? 'OFF' : isFailed ? 'DETENCIÓN' : currentStep.powerState}
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
-          <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">
-            CAPA:{' '}
-            <strong style={{ color: currentStep.layerColor }}>
-              {currentStep.layer}
-            </strong>
-          </span>
-          <span className="text-[10px] text-zinc-500 hidden sm:inline">
-            GABINETE & MOTHERBOARD INTERACTIVA
-          </span>
+        {/* Signal in transit live marker */}
+        <div className="px-3 py-1 rounded-lg bg-cyan-950/40 border border-cyan-500/40 text-cyan-300 font-mono text-[10px] flex items-center gap-2 shadow-inner">
+          <Zap className="w-3.5 h-3.5 text-amber-400 animate-bounce" />
+          <span className="font-bold">{getStepSignalTitle()}</span>
         </div>
       </div>
 
-      {/* Main Schematic: Cabinet + Motherboard + Side Monitor */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 relative z-10">
-        {/* ========================================================================= */}
-        {/* LEFT / CENTER: GABINETE ABIERTO CON MOTHERBOARD REAL (COL 1-8)            */}
-        {/* ========================================================================= */}
-        <div className="xl:col-span-8 bg-[#0b0e14] border border-zinc-800 rounded-xl p-3 sm:p-4 relative overflow-hidden shadow-inner flex flex-col justify-between min-h-[470px]">
+      {/* ========================================================================= */}
+      {/* CUADRO CENTRAL GRANDE: GABINETE ABIERTO CON TODAS LAS ZONAS REALES        */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 relative z-10">
+        
+        {/* LEFT / CENTER 9 COLS: EL GABINETE ABIERTO Y LA MOTHERBOARD TÉCNICA */}
+        <div className="lg:col-span-8 xl:col-span-9 bg-[#090d16] border-2 border-zinc-700/80 rounded-2xl p-3 sm:p-4 relative overflow-hidden shadow-2xl flex flex-col justify-between min-h-[520px]">
           
-          {/* Cabinet Top Header with Live Signal Traveling */}
-          <div className="flex flex-wrap items-center justify-between pb-2 mb-2.5 border-b border-zinc-800/60 text-[10px] gap-2">
-            <span className="flex items-center gap-1.5 font-bold text-zinc-300">
-              <span className="w-2 h-2 rounded-full bg-cyan-400/80 animate-pulse" />
-              CHASIS EVO // CORTE LATERAL ABIERTO
-            </span>
-            <span className="text-[9px] px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-cyan-300 font-mono-tech flex items-center gap-1">
-              <Zap className="w-3 h-3 text-amber-400 animate-bounce" />
-              <span>SEÑAL EN TRÁNSITO: <strong>{currentStep.activeConnections?.[0] || 'REPOSO / LÓGICA PASIVA'}</strong></span>
-            </span>
+          {/* Chassis Top Bar with Exhaust Fans & Airflow indicator */}
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-800/80 text-[10px]">
+            <div className="flex items-center gap-2 font-bold text-zinc-300">
+              <CircuitBoard className="w-4 h-4 text-cyan-400" />
+              <span>BASTIDOR DE CHASIS // INTERIOR ABIERTO</span>
+            </div>
+
+            {/* Chassis Fans Activity Indicator */}
+            <div className="flex items-center gap-3 text-[9px] font-mono text-zinc-400">
+              <div className="flex items-center gap-1">
+                <Fan className={`w-3.5 h-3.5 ${isPoweredOn && currentStep.stepNumber >= 4 ? 'text-cyan-400 animate-spin' : 'text-zinc-600'}`} />
+                <span>EXTRACTOR TRASERO</span>
+              </div>
+              <div className="flex items-center gap-1 hidden sm:flex">
+                <Fan className={`w-3.5 h-3.5 ${isPoweredOn && currentStep.stepNumber >= 4 ? 'text-cyan-400 animate-spin' : 'text-zinc-600'}`} />
+                <span>VENTILACIÓN SUPERIOR</span>
+              </div>
+            </div>
           </div>
 
-          {/* MOTHERBOARD AREA (PCB) - FLEXBOX SCHEMATIC ARCHITECTURE */}
-          <div className="w-full bg-[#0d121c] border-2 border-zinc-700/80 rounded-xl p-3 sm:p-3.5 relative overflow-hidden shadow-2xl flex-1 flex flex-col justify-between gap-2.5">
-            {/* PCB Texture & Mounting Standoffs */}
-            <div className="absolute top-2 left-2 w-2 h-2 rounded-full border border-amber-500/50 bg-zinc-800 shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
-            <div className="absolute top-2 right-2 w-2 h-2 rounded-full border border-amber-500/50 bg-zinc-800 shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
-            <div className="absolute bottom-2 left-2 w-2 h-2 rounded-full border border-amber-500/50 bg-zinc-800 shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
-            <div className="absolute bottom-2 right-2 w-2 h-2 rounded-full border border-amber-500/50 bg-zinc-800 shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
+          {/* MOTHERBOARD MOUNTED ON CHASSIS TRAY */}
+          <div className="relative w-full bg-[#0b101c] border-2 border-cyan-900/40 rounded-xl p-3 sm:p-4 flex-1 flex flex-col justify-between gap-3 shadow-inner">
+            
+            {/* Metallic Mounting Standoff Screws (4 corners + center) */}
+            <div className="absolute top-2 left-2 w-2.5 h-2.5 rounded-full border border-amber-500/80 bg-amber-600/40 shadow-[0_0_8px_rgba(245,158,11,0.6)] z-0" />
+            <div className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full border border-amber-500/80 bg-amber-600/40 shadow-[0_0_8px_rgba(245,158,11,0.6)] z-0" />
+            <div className="absolute bottom-2 left-2 w-2.5 h-2.5 rounded-full border border-amber-500/80 bg-amber-600/40 shadow-[0_0_8px_rgba(245,158,11,0.6)] z-0" />
+            <div className="absolute bottom-2 right-2 w-2.5 h-2.5 rounded-full border border-amber-500/80 bg-amber-600/40 shadow-[0_0_8px_rgba(245,158,11,0.6)] z-0" />
 
-            {/* Motherboard Header Info & Architecture Legend */}
-            <div className="flex flex-wrap items-center justify-between text-[9px] text-zinc-500 pb-1.5 border-b border-zinc-800/70 gap-2">
+            {/* LIVE SVG BUS & TRAVELING SIGNAL PARTICLES OVERLAY */}
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none z-10 opacity-90"
+              viewBox="0 0 640 340"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <defs>
+                <filter id="glow-amber-strong" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="glow-cyan-strong" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="glow-emerald-strong" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              {/* 1. Track: Front Switch -> F_PANEL -> Power Logic [PWR_SW] */}
+              <path
+                d="M 580 300 L 460 300 L 460 260"
+                fill="none"
+                stroke={isSignalActive('PWR_SW') ? '#f59e0b' : '#1e293b'}
+                strokeWidth={isSignalActive('PWR_SW') ? '4' : '1.5'}
+                strokeDasharray={isSignalActive('PWR_SW') ? '8 4' : 'none'}
+                filter={isSignalActive('PWR_SW') ? 'url(#glow-amber-strong)' : 'none'}
+              />
+
+              {/* 2. Track: Power Logic -> PSU Connector [PS_ON#] */}
+              <path
+                d="M 420 270 L 420 315 L 70 315"
+                fill="none"
+                stroke={isSignalActive('PS_ON#') ? '#10b981' : '#1e293b'}
+                strokeWidth={isSignalActive('PS_ON#') ? '4' : '1.5'}
+                strokeDasharray={isSignalActive('PS_ON#') ? '8 4' : 'none'}
+                filter={isSignalActive('PS_ON#') ? 'url(#glow-emerald-strong)' : 'none'}
+              />
+
+              {/* 3. Track: PSU Main Harness -> VRM & ATX 24-Pin [RAILS_MAIN] */}
+              <path
+                d="M 70 300 L 70 75 L 120 75"
+                fill="none"
+                stroke={isSignalActive('RAILS_MAIN') ? '#f59e0b' : '#1e293b'}
+                strokeWidth={isSignalActive('RAILS_MAIN') ? '4.5' : '1.5'}
+                strokeDasharray={isSignalActive('RAILS_MAIN') ? '10 4' : 'none'}
+                filter={isSignalActive('RAILS_MAIN') ? 'url(#glow-amber-strong)' : 'none'}
+              />
+
+              {/* 4. Track: PSU -> Reset Logic [PWR_OK] */}
+              <path
+                d="M 130 315 L 220 315 L 220 270"
+                fill="none"
+                stroke={isSignalActive('PWR_OK') ? '#38bdf8' : '#1e293b'}
+                strokeWidth={isSignalActive('PWR_OK') ? '4' : '1.5'}
+                strokeDasharray={isSignalActive('PWR_OK') ? '8 4' : 'none'}
+                filter={isSignalActive('PWR_OK') ? 'url(#glow-cyan-strong)' : 'none'}
+              />
+
+              {/* 5. Track: Reset Logic -> CPU Socket [RESET#] */}
+              <path
+                d="M 220 260 L 220 125 L 290 125"
+                fill="none"
+                stroke={isSignalActive('RESET#') ? '#06b6d4' : '#1e293b'}
+                strokeWidth={isSignalActive('RESET#') ? '4' : '1.5'}
+                strokeDasharray={isSignalActive('RESET#') ? '8 4' : 'none'}
+                filter={isSignalActive('RESET#') ? 'url(#glow-cyan-strong)' : 'none'}
+              />
+
+              {/* 6. Track: SPI BIOS -> CPU Socket [SPI BUS / Microcode Fetch] */}
+              <path
+                d="M 90 260 L 90 170 L 260 170 L 260 125"
+                fill="none"
+                stroke={isSignalActive('SPI_BUS') ? '#a855f7' : '#1e293b'}
+                strokeWidth={isSignalActive('SPI_BUS') ? '3.5' : '1.5'}
+                strokeDasharray={isSignalActive('SPI_BUS') ? '6 4' : 'none'}
+                filter={isSignalActive('SPI_BUS') ? 'url(#glow-cyan-strong)' : 'none'}
+              />
+
+              {/* 7. Track: CPU Socket / IMC <-> RAM DIMM Slots [MEMORY BUS / DQS] */}
+              <path
+                d="M 400 75 L 500 75"
+                fill="none"
+                stroke={isSignalActive('RAM_BUS') ? '#3b82f6' : '#1e293b'}
+                strokeWidth={isSignalActive('RAM_BUS') ? '4' : '1.5'}
+                strokeDasharray={isSignalActive('RAM_BUS') ? '8 4' : 'none'}
+                filter={isSignalActive('RAM_BUS') ? 'url(#glow-cyan-strong)' : 'none'}
+              />
+
+              {/* 8. Track: CPU Socket <-> PCIe x16 GPU Card [PCIe Video Bus] */}
+              <path
+                d="M 290 120 L 290 180 L 190 180"
+                fill="none"
+                stroke={isSignalActive('PCIE_GPU') ? '#6366f1' : '#1e293b'}
+                strokeWidth={isSignalActive('PCIE_GPU') ? '4' : '1.5'}
+                strokeDasharray={isSignalActive('PCIE_GPU') ? '8 4' : 'none'}
+                filter={isSignalActive('PCIE_GPU') ? 'url(#glow-cyan-strong)' : 'none'}
+              />
+
+              {/* 9. Track: Chipset PCH <-> NVMe M.2 Slot [Storage Bus] */}
+              <path
+                d="M 370 260 L 370 200 L 490 200 L 490 180"
+                fill="none"
+                stroke={isSignalActive('STORAGE_BUS') ? '#10b981' : '#1e293b'}
+                strokeWidth={isSignalActive('STORAGE_BUS') ? '3.5' : '1.5'}
+                strokeDasharray={isSignalActive('STORAGE_BUS') ? '6 4' : 'none'}
+                filter={isSignalActive('STORAGE_BUS') ? 'url(#glow-emerald-strong)' : 'none'}
+              />
+
+              {/* 10. Track: Storage -> RAM -> CPU -> Execution [BOOT STREAM] */}
+              <path
+                d="M 500 160 L 500 95 L 390 75"
+                fill="none"
+                stroke={isSignalActive('BOOT_STREAM') ? '#06b6d4' : '#1e293b'}
+                strokeWidth={isSignalActive('BOOT_STREAM') ? '3.5' : '1.5'}
+                strokeDasharray={isSignalActive('BOOT_STREAM') ? '8 4' : 'none'}
+                filter={isSignalActive('BOOT_STREAM') ? 'url(#glow-cyan-strong)' : 'none'}
+              />
+            </svg>
+
+            {/* Motherboard Header Information */}
+            <div className="flex flex-wrap items-center justify-between text-[9.5px] text-zinc-400 pb-1.5 border-b border-zinc-800/80 gap-2 relative z-20">
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.motherboard)}
-                className="hover:text-cyan-300 transition-colors flex items-center gap-1.5 text-zinc-300 font-bold"
+                className="hover:text-cyan-300 transition-colors flex items-center gap-1.5 text-white font-bold"
               >
                 <Sliders className="w-3.5 h-3.5 text-cyan-400" />
-                <span className="tracking-wide">MOTHERBOARD EVO ATX // ESQUEMA DE SILICIO Y ZONAS</span>
+                <span>MOTHERBOARD ATX // TOPOLOGÍA FÍSICA Y SILICIO</span>
                 <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
               </button>
-              <div className="flex items-center gap-1.5 text-[8px] font-mono-tech">
+              <div className="flex items-center gap-1.5 text-[8.5px] font-mono">
                 <span className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300">Z1: VRM</span>
                 <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">Z2: CPU</span>
                 <span className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-300">Z3: RAM</span>
@@ -268,106 +476,112 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
               </div>
             </div>
 
-            {/* FLEXBOX ROW 1: VRM + CPU SOCKET + RAM SLOTS */}
-            <div className="flex flex-col md:flex-row gap-2.5 items-stretch">
-              {/* ZONA 1: VRM & ALIMENTACIÓN */}
+            {/* ROW 1: VRM + CPU SOCKET + RAM SLOTS */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-stretch relative z-20">
+              
+              {/* ZONA 1: VRM & POWER DELIVERY (3 Cols) */}
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.vrm)}
-                className={`flex-1 md:basis-1/4 p-2.5 rounded-lg border text-left transition-all flex flex-col justify-between ${
+                className={`md:col-span-3 p-3 rounded-xl border text-left transition-all flex flex-col justify-between ${
                   isComponentActive('motherboard') && currentStep.stepNumber >= 4
-                    ? 'bg-amber-500/15 border-amber-400/90 shadow-[0_0_15px_rgba(245,158,11,0.25)] ring-1 ring-amber-400/50'
+                    ? 'bg-amber-500/15 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)] ring-1 ring-amber-400/50'
                     : isComponentEverReached(4)
-                    ? 'bg-zinc-900/70 border-zinc-700/80 text-zinc-300'
-                    : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-600'
+                    ? 'bg-zinc-900/80 border-zinc-700/80 text-zinc-300'
+                    : 'bg-zinc-950/70 border-zinc-800 text-zinc-600'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-1.5">
-                      <Flame className="w-3.5 h-3.5 text-amber-400" />
-                      <span className="text-[10px] font-bold text-white tracking-wide">ZONA VRM</span>
+                      <Flame className="w-4 h-4 text-amber-400" />
+                      <span className="text-[11px] font-bold text-white tracking-wide">VRM // FASES</span>
                     </div>
-                    <span className="text-[7.5px] px-1 py-0.2 rounded bg-amber-950/80 border border-amber-700/50 text-amber-300 font-mono">
+                    <span className="text-[8px] px-1 py-0.2 rounded bg-amber-950 border border-amber-700/60 text-amber-300 font-mono">
                       Z1
                     </span>
                   </div>
-                  <div className="text-[8px] text-zinc-400 leading-tight">
-                    {currentStep.stepNumber < 4 ? '0V Standby' : 'VCore ~1.2V Regulado'}
+                  <div className="text-[8.5px] text-zinc-400 leading-tight">
+                    {currentStep.stepNumber < 4 ? '0V Standby' : 'VCore Nominal Regulado'}
                   </div>
                 </div>
-                {/* Visual Inductor coils & Mosfets */}
-                <div className="flex items-center gap-1 mt-2 pt-1 border-t border-zinc-800/60">
-                  <div className="flex gap-0.5 opacity-80">
-                    <span className={`w-2 h-2 rounded-sm border ${isComponentActive('motherboard') && currentStep.stepNumber >= 4 ? 'bg-amber-400 border-amber-300' : 'bg-zinc-700 border-zinc-600'}`} />
-                    <span className={`w-2 h-2 rounded-sm border ${isComponentActive('motherboard') && currentStep.stepNumber >= 4 ? 'bg-amber-400 border-amber-300' : 'bg-zinc-700 border-zinc-600'}`} />
-                    <span className={`w-2 h-2 rounded-sm border ${isComponentActive('motherboard') && currentStep.stepNumber >= 4 ? 'bg-amber-400 border-amber-300' : 'bg-zinc-700 border-zinc-600'}`} />
+
+                <div className="flex items-center gap-1.5 mt-2 pt-1.5 border-t border-zinc-800/80">
+                  <div className="flex gap-1">
+                    <span className={`w-2.5 h-2.5 rounded-sm border ${isComponentActive('motherboard') && currentStep.stepNumber >= 4 ? 'bg-amber-400 border-amber-300 shadow-[0_0_6px_#f59e0b]' : 'bg-zinc-700 border-zinc-600'}`} />
+                    <span className={`w-2.5 h-2.5 rounded-sm border ${isComponentActive('motherboard') && currentStep.stepNumber >= 4 ? 'bg-amber-400 border-amber-300 shadow-[0_0_6px_#f59e0b]' : 'bg-zinc-700 border-zinc-600'}`} />
+                    <span className={`w-2.5 h-2.5 rounded-sm border ${isComponentActive('motherboard') && currentStep.stepNumber >= 4 ? 'bg-amber-400 border-amber-300 shadow-[0_0_6px_#f59e0b]' : 'bg-zinc-700 border-zinc-600'}`} />
                   </div>
-                  <span className="text-[7.5px] text-zinc-500 font-mono">PWM 8+2</span>
+                  <span className="text-[8px] text-zinc-400 font-mono">PWM CHOKES</span>
                 </div>
               </button>
 
-              {/* ZONA 2: CPU SOCKET & IMC */}
+              {/* ZONA 2: SOCKET CPU & IMC (6 Cols) */}
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.cpu)}
-                className={`flex-1 md:basis-2/4 p-2.5 rounded-lg border text-left transition-all relative flex flex-col justify-between ${
+                className={`md:col-span-6 p-3 rounded-xl border text-left transition-all relative flex flex-col justify-between ${
                   isComponentActive('cpu')
-                    ? 'bg-emerald-500/15 border-emerald-400/90 shadow-[0_0_20px_rgba(16,185,129,0.35)] ring-1 ring-emerald-400/50'
+                    ? 'bg-emerald-500/15 border-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.35)] ring-1 ring-emerald-400/50'
                     : isComponentEverReached(6)
-                    ? 'bg-zinc-900/70 border-zinc-700/80 text-zinc-300'
-                    : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-600'
+                    ? 'bg-zinc-900/80 border-zinc-700/80 text-zinc-300'
+                    : 'bg-zinc-950/70 border-zinc-800 text-zinc-600'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-1.5">
-                      <Cpu className={`w-4 h-4 ${isComponentActive('cpu') ? 'text-emerald-400 animate-pulse' : 'text-zinc-500'}`} />
-                      <span className="text-[11px] font-bold text-white tracking-wide">SOCKET CPU & IMC</span>
+                    <div className="flex items-center gap-2">
+                      <Cpu className={`w-5 h-5 ${isComponentActive('cpu') ? 'text-emerald-400 animate-pulse' : 'text-zinc-500'}`} />
+                      <div>
+                        <span className="text-xs font-bold text-white tracking-wide block">SOCKET CPU & IMC</span>
+                        <span className="text-[8px] text-zinc-400">CONTROLADOR DE MEMORIA & BUS PCIe</span>
+                      </div>
                     </div>
-                    <span className="text-[7.5px] px-1 py-0.2 rounded bg-emerald-950/80 border border-emerald-700/50 text-emerald-300 font-mono">
+                    <span className="text-[8px] px-1.5 py-0.2 rounded bg-emerald-950 border border-emerald-700/60 text-emerald-300 font-mono">
                       Z2
                     </span>
                   </div>
-                  <p className="text-[8.5px] text-zinc-400 leading-tight">
+
+                  <p className="text-[9px] text-zinc-300 leading-tight mt-1 bg-zinc-950/60 p-1.5 rounded border border-zinc-800/60">
                     {currentStep.stepNumber < 6
-                      ? 'Reset Activo (0V) • Esperando PWR_OK'
+                      ? 'Reset Activo (0V) • Esperando señal PWR_OK'
                       : currentStep.stepNumber < 13
-                      ? 'Vector FFFF_FFF0h • Microcódigo & IMC'
-                      : 'Pipeline x86-64 Operativo • Ring 0'}
+                      ? 'Vector FFFF_FFF0h • Ejecutando Microcódigo & IMC'
+                      : 'Pipeline x86-64 Operativo • Modo Protegido / Ring 0'}
                   </p>
                 </div>
-                <div className="flex items-center justify-between mt-2 pt-1 border-t border-zinc-800/60 text-[8px]">
-                  <span className="text-zinc-500 font-mono">LGA / AM SOCKET</span>
-                  <span className={`font-bold ${isComponentActive('cpu') ? 'text-emerald-400 animate-pulse' : 'text-zinc-600'}`}>
-                    {isComponentActive('cpu') ? '● PROCESANDO' : 'PASIVO'}
+
+                <div className="flex items-center justify-between mt-2 pt-1 border-t border-zinc-800/80 text-[8.5px]">
+                  <span className="text-zinc-400 font-mono">LGA / AM RETENTION BRACKET</span>
+                  <span className={`font-bold ${isComponentActive('cpu') ? 'text-emerald-400 animate-pulse' : 'text-zinc-500'}`}>
+                    {isComponentActive('cpu') ? '● PROCESANDO' : 'STANDBY'}
                   </span>
                 </div>
               </button>
 
-              {/* ZONA 3: SLOTS RAM DIMM */}
+              {/* ZONA 3: SLOTS RAM DIMM (3 Cols) */}
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.ram)}
-                className={`flex-1 md:basis-1/4 p-2.5 rounded-lg border text-left transition-all flex flex-col justify-between ${
+                className={`md:col-span-3 p-3 rounded-xl border text-left transition-all flex flex-col justify-between ${
                   isComponentActive('ram')
-                    ? 'bg-blue-500/15 border-blue-400/90 shadow-[0_0_20px_rgba(59,130,246,0.35)] ring-1 ring-blue-400/50'
+                    ? 'bg-blue-500/15 border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.35)] ring-1 ring-blue-400/50'
                     : isComponentEverReached(10)
-                    ? 'bg-zinc-900/70 border-zinc-700/80 text-zinc-300'
-                    : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-600'
+                    ? 'bg-zinc-900/80 border-zinc-700/80 text-zinc-300'
+                    : 'bg-zinc-950/70 border-zinc-800 text-zinc-600'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-1.5">
-                      <Activity className="w-3.5 h-3.5 text-blue-400" />
-                      <span className="text-[10px] font-bold text-white tracking-wide">SLOTS RAM</span>
+                      <Activity className="w-4 h-4 text-blue-400" />
+                      <span className="text-[11px] font-bold text-white tracking-wide">SLOTS RAM</span>
                     </div>
-                    <span className="text-[7.5px] px-1 py-0.2 rounded bg-blue-950/80 border border-blue-700/50 text-blue-300 font-mono">
+                    <span className="text-[8px] px-1 py-0.2 rounded bg-blue-950 border border-blue-700/60 text-blue-300 font-mono">
                       Z3
                     </span>
                   </div>
-                  <div className="text-[8px] text-zinc-400 leading-tight">
+                  <div className="text-[8.5px] text-zinc-400 leading-tight">
                     {currentStep.stepNumber < 10
                       ? 'Sin Inicializar'
                       : currentStep.stepNumber < 13
@@ -375,48 +589,53 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
                       : 'DRAM Calibrada'}
                   </div>
                 </div>
-                {/* 4 DIMM Slots visualization (Canal A / Canal B) */}
-                <div className="flex items-center justify-between mt-2 pt-1 border-t border-zinc-800/60">
+
+                {/* 4 Physical DIMM Slots */}
+                <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-zinc-800/80">
                   <div className="flex gap-1 justify-center">
-                    <span className={`h-3 w-1 rounded-xs ${isComponentActive('ram') ? 'bg-blue-400 animate-pulse' : 'bg-zinc-700'}`} />
-                    <span className={`h-3 w-1 rounded-xs ${isComponentActive('ram') ? 'bg-blue-400 animate-pulse' : 'bg-zinc-700'}`} />
-                    <span className="h-3 w-1 rounded-xs bg-zinc-800" />
-                    <span className="h-3 w-1 rounded-xs bg-zinc-800" />
+                    <span className={`h-4 w-1.5 rounded-xs ${isComponentActive('ram') ? 'bg-blue-400 animate-pulse shadow-[0_0_6px_#3b82f6]' : 'bg-zinc-700'}`} />
+                    <span className={`h-4 w-1.5 rounded-xs ${isComponentActive('ram') ? 'bg-blue-400 animate-pulse shadow-[0_0_6px_#3b82f6]' : 'bg-zinc-700'}`} />
+                    <span className="h-4 w-1.5 rounded-xs bg-zinc-800" />
+                    <span className="h-4 w-1.5 rounded-xs bg-zinc-800" />
                   </div>
-                  <span className="text-[7.5px] text-zinc-500 font-mono">CANAL A/B</span>
+                  <span className="text-[8px] text-zinc-400 font-mono">CANAL A/B</span>
                 </div>
               </button>
             </div>
 
-            {/* FLEXBOX ROW 2: PCIe/GPU + NVMe M.2 */}
-            <div className="flex flex-col md:flex-row gap-2.5 items-stretch">
-              {/* Dedicated PCIe GPU slot and card */}
+            {/* ROW 2: DEDICATED PCIe GPU + M.2 NVMe SSD */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-stretch relative z-20">
+              
+              {/* Dedicated PCIe x16 GPU Card (7 Cols) */}
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.gpu)}
-                className={`flex-1 md:basis-7/12 p-2.5 rounded-lg border text-left transition-all ${
+                className={`md:col-span-7 p-3 rounded-xl border text-left transition-all ${
                   isComponentActive('gpu')
-                    ? 'bg-indigo-500/15 border-indigo-400/90 shadow-[0_0_20px_rgba(99,102,241,0.35)] ring-1 ring-indigo-400/50'
+                    ? 'bg-indigo-500/15 border-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.35)] ring-1 ring-indigo-400/50'
                     : isComponentEverReached(14)
-                    ? 'bg-zinc-900/70 border-zinc-700/80 text-zinc-300'
-                    : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-600'
+                    ? 'bg-zinc-900/80 border-zinc-700/80 text-zinc-300'
+                    : 'bg-zinc-950/70 border-zinc-800 text-zinc-600'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1.5">
-                    <Monitor className="w-3.5 h-3.5 text-indigo-400" />
-                    <span className="text-[10px] font-bold text-white">SLOT PCIe x16 // GPU</span>
+                  <div className="flex items-center gap-2">
+                    <Monitor className="w-4 h-4 text-indigo-400" />
+                    <span className="text-xs font-bold text-white">TARJETA GRÁFICA DEDICADA // PCIe x16</span>
                   </div>
-                  <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
+                  <div className="flex items-center gap-1.5">
+                    <Fan className={`w-3 h-3 ${isComponentActive('gpu') ? 'text-indigo-400 animate-spin' : 'text-zinc-600'}`} />
+                    <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
+                  </div>
                 </div>
-                <div className="text-[8px] text-zinc-400 leading-tight">
+                <div className="text-[8.5px] text-zinc-400 leading-tight">
                   {currentStep.stepNumber < 14
                     ? 'Bus PCIe en reposo'
                     : currentStep.stepNumber < 16
-                    ? 'GOP / VBIOS Handshake'
-                    : 'Enlace PCIe Activo (Salida de Video)'}
+                    ? 'GOP / VBIOS Handshake • Framebuffer Inicial'
+                    : 'Enlace PCIe x16 Activo • Salida de Video'}
                 </div>
-                <div className="w-full bg-zinc-900 h-1 rounded-full mt-2 overflow-hidden">
+                <div className="w-full bg-zinc-900 h-1.5 rounded-full mt-2 overflow-hidden border border-zinc-800">
                   <div
                     className={`h-full ${
                       isComponentActive('gpu')
@@ -429,54 +648,55 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
                 </div>
               </button>
 
-              {/* M.2 NVMe Storage */}
+              {/* M.2 NVMe Storage (5 Cols) */}
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.storage)}
-                className={`flex-1 md:basis-5/12 p-2.5 rounded-lg border text-left transition-all ${
+                className={`md:col-span-5 p-3 rounded-xl border text-left transition-all ${
                   isComponentActive('storage')
-                    ? 'bg-emerald-500/15 border-emerald-400/90 shadow-[0_0_15px_rgba(16,185,129,0.3)] ring-1 ring-emerald-400/50'
+                    ? 'bg-emerald-500/15 border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] ring-1 ring-emerald-400/50'
                     : isComponentEverReached(17)
-                    ? 'bg-zinc-900/70 border-zinc-700/80 text-zinc-300'
-                    : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-600'
+                    ? 'bg-zinc-900/80 border-zinc-700/80 text-zinc-300'
+                    : 'bg-zinc-950/70 border-zinc-800 text-zinc-600'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-1.5">
-                    <HardDrive className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-[10px] font-bold text-white">NVMe M.2 (SSD)</span>
+                    <HardDrive className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold text-white">NVMe M.2 (SSD)</span>
                   </div>
                   <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
                 </div>
-                <div className="text-[8px] text-zinc-400 leading-tight">
+                <div className="text-[8.5px] text-zinc-400 leading-tight">
                   {currentStep.stepNumber < 17
                     ? 'Sin Interrogar'
                     : currentStep.stepNumber < 22
-                    ? 'ESP / BCD Detectado'
-                    : 'Lectura de Kernel NTFS'}
+                    ? 'ESP / BCD Detectado en Tabla GPT'
+                    : 'Lectura de Kernel NTFS (ntoskrnl.exe)'}
                 </div>
               </button>
             </div>
 
-            {/* FLEXBOX ROW 3: SPI FLASH BIOS + ZONA 4: PCH/CHIPSET + ZONA 5: HEADER PANEL FRONTAL */}
-            <div className="flex flex-col sm:flex-row gap-2 items-stretch pt-2 border-t border-zinc-800/70 text-[8.5px]">
+            {/* ROW 3: SPI FLASH BIOS + ZONA 4: PCH/CHIPSET + ZONA 5: HEADER PANEL FRONTAL */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-stretch pt-2 border-t border-zinc-800/80 text-[9px] relative z-20">
+              
               {/* SPI BIOS Chip */}
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.bios)}
-                className={`flex-1 p-2 rounded-lg border transition-all text-left flex items-center justify-between ${
+                className={`p-2.5 rounded-xl border transition-all text-left flex items-center justify-between ${
                   isComponentActive('firmware')
-                    ? 'bg-purple-500/20 border-purple-400 text-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.3)]'
+                    ? 'bg-purple-500/20 border-purple-400 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.35)]'
                     : isComponentEverReached(7)
                     ? 'bg-zinc-900 border-zinc-700 text-zinc-300'
                     : 'bg-zinc-950 border-zinc-900 text-zinc-600'
                 }`}
               >
-                <div className="flex items-center gap-1.5">
-                  <Shield className="w-3 h-3 text-purple-400" />
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-purple-400" />
                   <div>
-                    <div className="font-bold text-white text-[9px]">SPI FLASH (UEFI)</div>
-                    <div className="text-[7.5px] text-zinc-400">Microcódigo & NVRAM</div>
+                    <div className="font-bold text-white text-[9.5px]">SPI FLASH (UEFI)</div>
+                    <div className="text-[8px] text-zinc-400">Microcódigo & NVRAM</div>
                   </div>
                 </div>
                 <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
@@ -486,22 +706,22 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.pch)}
-                className={`flex-1 p-2 rounded-lg border transition-all text-left flex items-center justify-between ${
+                className={`p-2.5 rounded-xl border transition-all text-left flex items-center justify-between ${
                   isComponentActive('motherboard') && currentStep.stepNumber >= 2
-                    ? 'bg-cyan-500/15 border-cyan-400/90 text-cyan-200 shadow-[0_0_10px_rgba(6,182,212,0.25)] ring-1 ring-cyan-400/40'
+                    ? 'bg-cyan-500/15 border-cyan-400 text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.3)] ring-1 ring-cyan-400/40'
                     : isComponentEverReached(2)
                     ? 'bg-zinc-900 border-zinc-700 text-zinc-300'
                     : 'bg-zinc-950 border-zinc-900 text-zinc-600'
                 }`}
               >
-                <div className="flex items-center gap-1.5">
-                  <Sliders className="w-3 h-3 text-cyan-400" />
+                <div className="flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-cyan-400" />
                   <div>
                     <div className="flex items-center gap-1">
-                      <span className="font-bold text-white text-[9px]">PCH / CHIPSET</span>
-                      <span className="text-[7px] px-1 py-0.2 rounded bg-cyan-950 border border-cyan-700/50 text-cyan-300 font-mono">Z4</span>
+                      <span className="font-bold text-white text-[9.5px]">PCH / CHIPSET</span>
+                      <span className="text-[7.5px] px-1 py-0.2 rounded bg-cyan-950 border border-cyan-700/60 text-cyan-300 font-mono">Z4</span>
                     </div>
-                    <div className="text-[7.5px] text-zinc-400">Enlace DMI & Periféricos</div>
+                    <div className="text-[8px] text-zinc-400">Enlace DMI & Periféricos</div>
                   </div>
                 </div>
                 <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
@@ -511,29 +731,29 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.fpanel)}
-                className={`flex-1 p-2 rounded-lg border transition-all text-left flex items-center justify-between ${
+                className={`p-2.5 rounded-xl border transition-all text-left flex items-center justify-between ${
                   isComponentActive('psu') || currentStep.stepNumber === 1 || currentStep.stepNumber === 2
-                    ? 'bg-amber-500/15 border-amber-400/90 text-amber-200 shadow-[0_0_10px_rgba(245,158,11,0.25)] ring-1 ring-amber-400/40'
+                    ? 'bg-amber-500/15 border-amber-400 text-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.3)] ring-1 ring-amber-400/40'
                     : currentStep.stepNumber >= 1
                     ? 'bg-zinc-900 border-zinc-700 text-zinc-300'
                     : 'bg-zinc-950 border-zinc-900 text-zinc-600'
                 }`}
               >
-                <div className="flex items-center gap-1.5">
-                  <Power className="w-3 h-3 text-amber-400" />
+                <div className="flex items-center gap-2">
+                  <Power className="w-4 h-4 text-amber-400" />
                   <div>
                     <div className="flex items-center gap-1">
-                      <span className="font-bold text-white text-[9px]">F_PANEL HEADER</span>
-                      <span className="text-[7px] px-1 py-0.2 rounded bg-amber-950 border border-amber-700/50 text-amber-300 font-mono">Z5</span>
+                      <span className="font-bold text-white text-[9.5px]">F_PANEL HEADER</span>
+                      <span className="text-[7.5px] px-1 py-0.2 rounded bg-amber-950 border border-amber-700/60 text-amber-300 font-mono">Z5</span>
                     </div>
-                    <div className="text-[7.5px] text-zinc-400">PWR_SW / RESET / LEDs</div>
+                    <div className="text-[8px] text-zinc-400">PWR_SW / RESET / LEDs</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
                   <span
-                    className={`w-1.5 h-1.5 rounded-full ${
+                    className={`w-2 h-2 rounded-full ${
                       isComponentActive('psu') || currentStep.stepNumber >= 1
-                        ? 'bg-amber-400 animate-pulse'
+                        ? 'bg-amber-400 animate-pulse shadow-[0_0_6px_#f59e0b]'
                         : 'bg-zinc-700'
                     }`}
                   />
@@ -543,44 +763,70 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
             </div>
           </div>
 
-          {/* PSU COMPARTMENT (AT BOTTOM OF CABINET, OUTSIDE MOTHERBOARD) */}
-          <div className="mt-3 pt-2.5 border-t border-zinc-800/80 flex items-center justify-between">
+          {/* PSU BASEMENT COMPARTMENT (OUTSIDE MOTHERBOARD IN LOWER CHASSIS SHROUD) */}
+          <div className="mt-3 pt-2.5 border-t border-zinc-800/80 flex flex-col sm:flex-row items-stretch gap-2.5">
             <button
               type="button"
               onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.psu)}
-              className={`p-2.5 rounded-xl border flex items-center gap-3 transition-all flex-1 ${
+              className={`p-3 rounded-xl border flex items-center justify-between transition-all flex-1 ${
                 isComponentActive('psu')
-                  ? 'bg-amber-500/10 border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
+                  ? 'bg-amber-500/10 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
                   : isComponentEverReached(1)
-                  ? 'bg-zinc-900/60 border-zinc-700/60 text-zinc-300'
-                  : 'bg-zinc-950/40 border-zinc-900 text-zinc-600 opacity-60'
+                  ? 'bg-zinc-900/80 border-zinc-700/80 text-zinc-300'
+                  : 'bg-zinc-950/60 border-zinc-900 text-zinc-600 opacity-70'
               }`}
             >
-              <Power className={`w-4 h-4 ${isComponentActive('psu') ? 'text-amber-400 animate-pulse' : 'text-zinc-600'}`} />
-              <div className="text-left">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10.5px] font-bold text-white">FUENTE DE PODER ATX (PSU)</span>
-                  <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
+              <div className="flex items-center gap-3">
+                <Power className={`w-5 h-5 ${isComponentActive('psu') ? 'text-amber-400 animate-pulse' : 'text-zinc-600'}`} />
+                <div className="text-left">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-white">FUENTE DE PODER ATX (PSU)</span>
+                    <span className="text-[8px] px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-400">COMPARTIMIENTO INFERIOR</span>
+                    <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
+                  </div>
+                  <span className="text-[9px] text-zinc-400">
+                    {currentStep.stepNumber === 0
+                      ? '0V OFF (Reposo absoluto)'
+                      : currentStep.stepNumber < 4
+                      ? '+5VSB Activo (Super I/O Standby) • Pin 9 Violeta'
+                      : '+12V / +5V / +3.3V Estabilizados // PWR_OK Generado (Pin 8 Gris)'}
+                  </span>
                 </div>
-                <span className="text-[8.5px] text-zinc-400">
-                  {currentStep.stepNumber === 0
-                    ? '0V OFF (Reposo)'
-                    : currentStep.stepNumber < 4
-                    ? '+5VSB Activo (Super I/O Standby)'
-                    : '+12V / +5V / +3.3V Estabilizados // PWR_OK Generado'}
-                </span>
+              </div>
+
+              {/* Fan in PSU */}
+              <div className="hidden sm:flex items-center gap-1.5 text-[8.5px] text-zinc-400 font-mono">
+                <Fan className={`w-3.5 h-3.5 ${currentStep.stepNumber >= 4 ? 'text-amber-400 animate-spin' : 'text-zinc-600'}`} />
+                <span>COOLER PSU</span>
+              </div>
+            </button>
+
+            {/* Front Panel Power Button Mechanism on Chassis */}
+            <button
+              type="button"
+              onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.fpanel)}
+              className={`p-2.5 rounded-xl border flex items-center gap-2.5 text-left transition-all ${
+                isSignalActive('PWR_SW')
+                  ? 'bg-amber-500/20 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.4)]'
+                  : 'bg-zinc-900/80 border-zinc-800 text-zinc-400'
+              }`}
+            >
+              <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSignalActive('PWR_SW') ? 'bg-amber-400 border-amber-300 animate-ping' : 'bg-zinc-800 border-zinc-600'}`}>
+                <span className="w-1.5 h-1.5 rounded-full bg-white" />
+              </div>
+              <div>
+                <div className="text-[9.5px] font-bold text-white">BOTÓN POWER FRONTAL</div>
+                <div className="text-[8px] text-zinc-500 font-mono">PULSADOR MECÁNICO (NO)</div>
               </div>
             </button>
           </div>
         </div>
 
-        {/* ========================================================================= */}
-        {/* RIGHT: OVERLAYS DE SOFTWARE & MONITOR SIMULADO (COL 9-12)                */}
-        {/* ========================================================================= */}
-        <div className="xl:col-span-4 flex flex-col justify-between gap-3">
+        {/* RIGHT 3-4 COLS: OVERLAYS DE SOFTWARE & MONITOR SIMULADO INTEGRADO */}
+        <div className="lg:col-span-4 xl:col-span-3 flex flex-col justify-between gap-3">
           
           {/* Software Layers Stack (Overlays contextuales, no hardware falso) */}
-          <div className="bg-[#0b0e14] border border-zinc-800 rounded-xl p-3.5 space-y-2">
+          <div className="bg-[#090d16] border border-zinc-800 rounded-xl p-3.5 space-y-2">
             <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5 pb-1 border-b border-zinc-800/80">
               <Layers className="w-3.5 h-3.5 text-cyan-400" />
               <span>CAPAS DE SOFTWARE & SISTEMA</span>
@@ -660,7 +906,7 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
           </div>
 
           {/* SIMULATED MONITOR DISPLAY SCREEN */}
-          <div className="bg-[#0b0e14] border border-zinc-800 rounded-xl p-3 flex flex-col justify-between">
+          <div className="bg-[#090d16] border border-zinc-800 rounded-xl p-3 flex flex-col justify-between">
             <div className="flex items-center justify-between mb-1.5 text-[9px]">
               <span className="font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
                 <Monitor className="w-3.5 h-3.5 text-indigo-400" />
@@ -670,8 +916,8 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
                 {currentStep.stepNumber < 15
                   ? 'SIN SEÑAL'
                   : currentStep.stepNumber < 29
-                  ? 'RESOLUCIÓN GESTIONADA POR FIRMWARE (GOP)'
-                  : 'RESOLUCIÓN NATIVA (DIRECTX DWM)'}
+                  ? 'GOP FRAMEBUFFER'
+                  : 'DIRECTX DWM'}
               </span>
             </div>
 
@@ -768,7 +1014,7 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
               </div>
 
               <div>
-                <span className="text-[10px] font-bold text-zinc-400 uppercase block mb-0.5">¿CUÁNDO INTERVIENE EN EL ARRANQUE?</span>
+                <span className="text-[10px] font-bold text-cyan-400 uppercase block mb-0.5">¿CUÁNDO INTERVIENE EN EL ARRANQUE?</span>
                 <p className="text-cyan-300 font-sans-editorial leading-relaxed text-[11px]">{inspectedComponent.cuandoInterviene}</p>
               </div>
 

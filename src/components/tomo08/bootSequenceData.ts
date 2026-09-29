@@ -1837,7 +1837,7 @@ export const STEP_FORENSIC_DETAILS: Record<number, StepForensicDetail> = {
       'Multímetro marca 0V en pin 9 (+5VSB) del conector ATX.',
       'Ninguna reacción al presionar el pulsador frontal.',
     ],
-    evoTip: 'Si la máquina ni siquiera tiene standby (+5VSB), no pierdas tiempo desarmando procesador o RAM: el problema es 100% primario o eléctrico.',
+    evoTip: 'Si la máquina ni siquiera tiene standby (+5VSB), no pierdas tiempo desarmando procesador o RAM: el síntoma apunta a la etapa primaria o de suministro eléctrico.',
   },
   1: {
     purpose: 'Generar la tensión permanente (+5VSB) que alimenta los circuitos lógicos de escucha del encendido.',
@@ -1897,7 +1897,7 @@ export const STEP_FORENSIC_DETAILS: Record<number, StepForensicDetail> = {
       'Tensión anómala o nula en cables amarillos (+12V), rojos (+5V) o naranjas (+3.3V).',
       'Desconectar el cable EPS de CPU permite que la fuente permanezca encendida.',
     ],
-    evoTip: 'Si los ventiladores amagan con girar y se apagan en 100 ms, casi siempre hay un cortocircuito en los MOSFETs de 12V del procesador o placa de video.',
+    evoTip: 'Si los ventiladores amagan con girar y se apagan en 100 ms, aumenta la sospecha de un cortocircuito en los MOSFETs de 12V del procesador o placa de video.',
   },
   5: {
     purpose: 'Asegurar que los voltajes de la fuente estén estabilizados antes de permitir que el procesador intente operar.',
@@ -1927,7 +1927,7 @@ export const STEP_FORENSIC_DETAILS: Record<number, StepForensicDetail> = {
       'Vcore en 0V medido en los inductores del VRM.',
       'La placa madre no avanza al bus SPI ni emite códigos de diagnóstico.',
     ],
-    evoTip: 'Un socket completamente frío tras varios segundos de encendido es síntoma inequívoco de falta de Vcore o CPU atascada en reset.',
+    evoTip: 'Un socket completamente frío tras varios segundos de encendido es compatible con falta de alimentación Vcore o inhibición en reset.',
   },
   7: {
     purpose: 'Ejecutar el primer salto (Reset Vector 0xFFFFFFF0) para cargar el microcódigo inicial almacenado en la memoria flash SPI.',
@@ -2227,7 +2227,7 @@ export const STEP_FORENSIC_DETAILS: Record<number, StepForensicDetail> = {
       'Cambiar el modo SATA/VMD en el setup del BIOS restaura el booteo de inmediato.',
       'El fallo se reproduce idéntico en Modo Seguro porque los drivers BOOT_START son obligatorios.',
     ],
-    evoTip: 'El 90% de los BSOD 0x7B ocurren tras actualizar la BIOS porque la placa reactiva "Intel VMD / RAID" por defecto cuando Windows se instaló en modo AHCI.',
+    evoTip: 'Una causa frecuente de BSOD 0x7B tras actualizar BIOS es que la placa reactiva "Intel VMD / RAID" por defecto cuando Windows se instaló en modo AHCI.',
   },
   27: {
     purpose: 'Ejecutar KiSystemStartup(), habilitar interrupciones, crear el proceso System (PID 4) y mostrar el splash de inicio.',
@@ -2242,13 +2242,13 @@ export const STEP_FORENSIC_DETAILS: Record<number, StepForensicDetail> = {
       'Diagnóstico de memoria con MemTest86 revela errores de bit en direcciones altas.',
       'Limpiar perfiles de overclocking o reemplazar módulo de RAM resuelve la inestabilidad.',
     ],
-    evoTip: 'Si Windows arroja códigos de pantalla azul diferentes en cada reinicio durante la animación de carga, casi siempre la causante es la memoria RAM.',
+    evoTip: 'Si Windows arroja códigos de pantalla azul diferentes en cada reinicio durante la animación de carga, aumenta la sospecha sobre la estabilidad de la memoria RAM o IMC.',
   },
   28: {
     purpose: 'Iniciar el Session Manager Subsystem (smss.exe), crear variables de entorno, montar archivos de paginación y crear la Sesión 0 y Sesión 1.',
     signalFlow: 'Proceso System (PID 4) → C:\\Windows\\System32\\smss.exe → Creación de Sesión 0 (Servicios) y Sesión 1 (Usuario interactivo).',
     possibleFailures: [
-      'Binario smss.exe corrupto o modificado por malware.',
+      'Binario smss.exe corrupto o modificado por software malicioso.',
       'Pantalla azul crítica STATUS_SYSTEM_PROCESS_TERMINATED (0xC000021A).',
       'Falla al montar el archivo pagefile.sys por falta de espacio crítico en C:.',
     ],
@@ -2257,7 +2257,7 @@ export const STEP_FORENSIC_DETAILS: Record<number, StepForensicDetail> = {
       'Iniciar en Modo Seguro permite verificar si el subsistema carga.',
       'Liberar espacio en disco y ejecutar SFC restaura el binario smss.exe.',
     ],
-    evoTip: 'smss.exe es el abuelo de todos los procesos de usuario en Windows: si este proceso muere, el sistema operativo colapsa en un BSOD 0xC000021A.',
+    evoTip: 'smss.exe es el iniciador de los subsistemas en Windows: si este proceso muere, el sistema operativo genera un BSOD 0xC000021A de protección.',
   },
   29: {
     purpose: 'Arrancar los subsistemas esenciales de Sesión 0: csrss.exe (Runtime Win32), win32k.sys (subsistema gráfico) y wininit.exe.',
@@ -2272,7 +2272,7 @@ export const STEP_FORENSIC_DETAILS: Record<number, StepForensicDetail> = {
       'Arrancar en "Modo de video de baja resolución" o "Modo Seguro" permite entrar a Windows.',
       'Desinstalar el driver con DDU (Display Driver Uninstaller) resuelve el cuelgue.',
     ],
-    evoTip: 'Si la pantalla queda en negro justo después de los puntos girando cuando el monitor cambia de resolución, el causante es el driver de video.',
+    evoTip: 'Si la pantalla queda en negro justo después de los puntos girando cuando el monitor cambia de resolución, aumenta la probabilidad de conflicto en el driver de video.',
   },
   30: {
     purpose: 'Lanzar el Service Control Manager (services.exe), LSASS (lsass.exe) y desplegar los servicios automáticos agrupados en instancias de svchost.exe.',
@@ -2352,27 +2352,20 @@ export const STEP_FORENSIC_DETAILS: Record<number, StepForensicDetail> = {
 };
 
 export function getStepForensicDetails(stepNumber: number): StepForensicDetail {
+  const step = BOOT_SEQUENCE_STEPS[stepNumber] || BOOT_SEQUENCE_STEPS[0];
   const base = STEP_FORENSIC_DETAILS[stepNumber] || {
-    purpose: 'Etapa del proceso de arranque y sincronización de arquitectura.',
-    signalFlow: 'Hardware → Microcódigo → Sistema Operativo.',
-    possibleFailures: [
-      'Falla de sincronización en el bus.',
-      'Incompatibilidad de hardware o controlador.',
-    ],
-    detectionClues: [
-      'Detención en la etapa correspondiente.',
-      'Ausencia de progreso hacia el siguiente eslabón.',
-    ],
-    evoTip: 'Observá los síntomas observables y aislá el eslabón de la cadena donde se detuvo el flujo.',
+    purpose: step.whatIsHappening,
+    signalFlow: `${step.initiator} → ${step.responder}`,
+    possibleFailures: [step.ifFails],
+    detectionClues: [step.technicalObservation],
+    evoTip: 'Comprobá siempre el último eslabón confirmado antes de formular hipótesis sobre etapas posteriores.',
   };
 
-  const step = BOOT_SEQUENCE_STEPS[stepNumber] || BOOT_SEQUENCE_STEPS[0];
-
-  // Specific microclasses enrichment per step
+  // Base fallback defaults
   let simpleExplanation = step.whatIsHappening;
   let technicalDetail = step.technicalObservation || step.whatIsHappening;
   let signalTraveling = base.signalFlow;
-  let visibleSymptoms = 'Equipo en reposo o con iluminación LED acorde al estado alcanzado.';
+  let visibleSymptoms = 'Equipo en reposo o con comportamiento correspondiente a la etapa alcanzada.';
   let whatToVerify: string[] = [
     'Confirmar el estado de la etapa previa antes de formular hipótesis posteriores.',
     'Inspeccionar conexiones físicas y ausencia de anomalías visuales en el circuito.',
@@ -2380,243 +2373,867 @@ export function getStepForensicDetails(stepNumber: number): StepForensicDetail {
   ];
 
   let structuredVerification: StructuredWorkshopVerification = {
-    testName: `Verificación física de etapa ${step.name}`,
-    objective: `Determinar si la etapa ${step.name} completa su transición correctamente.`,
-    tools: 'Inspección visual y manual de la motherboard.',
-    procedure: 'Comprobar conexiones y estado de componentes asociados con el equipo desenergizado.',
-    expectedResult: step.expectedResponse || 'Comportamiento normal del subsistema.',
+    testName: `Verificación física de ${step.name}`,
+    objective: `Determinar si la etapa [${step.name}] completa su transición de forma correcta y oportuna.`,
+    tools: 'Inspección visual y manual de la motherboard y periféricos.',
+    procedure: 'Comprobar conexiones, estado de buses y respuestas del subsistema asociado.',
+    expectedResult: step.expectedResponse || 'Comportamiento nominal del subsistema.',
     ifCorrect: `Avanzar la comprobación hacia el siguiente eslabón: ${step.nextStep}.`,
     ifIncorrect: `Aislar los componentes intervinientes (${step.activeComponents.join(', ')}).`,
-    whatItProves: 'Descarta fallas en este eslabón y permite focalizar el diagnóstico.',
+    whatItProves: 'Descarta anomalías en este eslabón y delimita el área de sospecha.',
     nextStep: step.nextStep,
     safetyLevel: step.safetyLevel,
     safetyRequirement: step.safetyRequirement,
   };
 
-  if (stepNumber === 0) {
-    simpleExplanation = 'La computadora está totalmente apagada sin corriente eléctrica activa.';
-    technicalDetail = 'Aislamiento galvánico primario. Ningún semiconductor ni circuito de control está polarizado.';
-    signalTraveling = 'Red Eléctrica → Cable Interlock → Interruptor I/O (Abierto)';
-    visibleSymptoms = 'Ningún ventilador gira. Todos los LEDs de la placa están apagados.';
-    whatToVerify = [
-      '1. Comprobar que el cable interlock esté firmemente asentado en la toma trasera de la fuente.',
-      '2. Verificar que la toma de pared disponga de tensión eléctrica.',
-      '3. Asegurar que la llave I/O trasera de la fuente se encuentre en posición 1 (ON).',
-    ];
-    structuredVerification = {
-      testName: 'Comprobación de alimentación eléctrica primaria',
-      objective: 'Verificar la presencia de suministro eléctrico seguro en la entrada de la PSU.',
-      tools: 'Inspección visual del cableado y llave trasera.',
-      procedure: 'Revisar la inserción firme del cable de poder interlock y activar la llave I/O.',
-      expectedResult: 'Habilitación de entrada de red hacia el circuito de standby de la fuente.',
-      ifCorrect: 'Avanzar al Paso 01 para verificar el riel +5VSB de espera.',
-      ifIncorrect: 'Revisar zapatilla eléctrica, disyuntor o sustituir cable de poder interlock.',
-      whatItProves: 'Descarta problemas de suministro domiciliario o falsos contactos en la entrada AC.',
-      nextStep: 'Paso 01: Standby (+5VSB)',
-      safetyLevel: 'USUARIO',
-    };
-  } else if (stepNumber === 1) {
-    simpleExplanation = 'La fuente genera un pequeño voltaje permanente de espera (+5VSB) que mantiene despiertos los circuitos que escucharán el botón de encendido.';
-    technicalDetail = 'El conversor auxiliar flyback de la fuente polariza el pin 9 (+5VSB). Alimenta el Super I/O, EC y circuito RTC.';
-    signalTraveling = 'Transformador Auxiliar PSU → Pin 9 ATX (+5VSB) → Controlador Super I/O / EC';
-    visibleSymptoms = 'LED de standby de la motherboard iluminado. Ventiladores aún estáticos.';
-    whatToVerify = [
-      '1. Confirmar si el LED de standby de la placa madre enciende al conectar la energía.',
-      '2. Si no enciende, verificar con fuente de prueba o multímetro en banco.',
-      '3. Descartar cortocircuitos en puertos USB que drenen el riel de espera.',
-    ];
-    structuredVerification = {
-      testName: 'Inspección del estado de espera (Standby +5VSB)',
-      objective: 'Confirmar si la motherboard recibe alimentación para escuchar el botón frontal.',
-      tools: 'Inspección de LED testigo en placa (o multímetro en banco para técnicos).',
-      procedure: 'Observar si se enciende el LED de presencia de energía en la placa base.',
-      expectedResult: 'LED de standby encendido de forma fija.',
-      ifCorrect: 'La placa está lista para procesar la pulsación del botón POWER (Paso 02).',
-      ifIncorrect: 'Sospechar de la fuente auxiliar o cortocircuito en placa madre.',
-      whatItProves: 'Demuestra si la placa madre tiene energía basal para iniciar la lógica de arranque.',
-      nextStep: 'Paso 02: Pulsación de POWER (PWR_SW)',
-      safetyLevel: 'USUARIO',
-    };
-  } else if (stepNumber === 2) {
-    simpleExplanation = 'Al pulsar el botón del gabinete, se unen momentáneamente dos pines en la placa madre para enviar la orden de encendido.';
-    technicalDetail = 'Cierre de contacto momentáneo a masa (0V) en el pin PWR_SW del header Front Panel. El Super I/O detecta la transición de flanco descendente.';
-    signalTraveling = 'Pulsador Frontal → Header Front Panel → Señal PWR_SW a Masa (0V)';
-    visibleSymptoms = 'Presión mecánica del botón. La placa madre recibe la solicitud.';
-    whatToVerify = [
-      '1. Confirmar la conexión física de los cables PWR_SW en el header según manual de la placa.',
-      '2. Inspeccionar que el pulsador mecánico no esté trabado o roto.',
-      '3. Probar puente momentáneo seguro en pines PWR_SW si se sospecha del botón del gabinete.',
-    ];
-    structuredVerification = {
-      testName: 'Verificación del pulsador frontal y cableado PWR_SW',
-      objective: 'Determinar si la solicitud mecánica de encendido llega al header de la placa.',
-      tools: 'Manual de la motherboard e inspección visual.',
-      procedure: 'Revisar la guía de pines del front panel y asegurar el conector PWR_SW.',
-      expectedResult: 'El botón cierra el circuito y la placa madre activa la solicitud PS_ON#.',
-      ifCorrect: 'Avanzar al Paso 03 para auditar la orden hacia la fuente (PS_ON#).',
-      ifIncorrect: 'Reacomodar el conector o sustituir el pulsador defectuoso.',
-      whatItProves: 'Diferencia un problema de botón roto de una falla electrónica en la motherboard.',
-      nextStep: 'Paso 03: Señal de encendido (PS_ON#)',
-      safetyLevel: 'USUARIO',
-    };
-  } else if (stepNumber === 3) {
-    simpleExplanation = 'La placa madre le pide formalmente a la fuente que encienda los voltajes principales mediante la señal PS_ON#.';
-    technicalDetail = 'El Super I/O / EC conmuta la línea PS_ON# (pin 16 ATX, cable verde) a potencial de masa (0V), activando el PWM principal de la PSU.';
-    signalTraveling = 'Super I/O / EC → Pin 16 ATX (PS_ON# a 0V) → Supervisor de la PSU';
-    visibleSymptoms = 'La fuente reacciona iniciando el giro de ventiladores.';
-    whatToVerify = [
-      '1. Comprobar que el conector ATX de 24 pines esté firmemente calzado en la placa madre.',
-      '2. Si los ventiladores no giran, verificar si la placa madre baja la señal PS_ON#.',
-      '3. Descartar protecciones por cortocircuito (OCP/SCP) en componentes de la placa.',
-    ];
-    structuredVerification = {
-      testName: 'Comprobación de la señal de encendido PS_ON#',
-      objective: 'Verificar si la placa madre solicita el encendido de los rieles principales a la PSU.',
-      tools: 'Inspección de asentamiento del conector ATX 24 pines.',
-      procedure: 'Verificar la traba del conector ATX 24p. En banco técnico: medir pin 16.',
-      expectedResult: 'PS_ON# baja a nivel lógico bajo y la PSU enciende sus salidas.',
-      ifCorrect: 'Avanzar al Paso 04 para verificar la estabilización de voltajes.',
-      ifIncorrect: 'Falla en lógica de placa madre o protección por cortocircuito en fuente.',
-      whatItProves: 'Demuestra si la motherboard es capaz de ordenar el encendido a la fuente.',
-      nextStep: 'Paso 04: Estabilización de voltajes principales',
-      safetyLevel: 'USUARIO',
-    };
-  } else if (stepNumber === 5) {
-    simpleExplanation = 'La fuente confirma que sus voltajes (+12V, +5V, +3.3V) son estables enviando la señal PWR_OK (Power Good).';
-    technicalDetail = 'El supervisor interno de la PSU eleva la señal PWR_OK (pin 8 ATX, cable gris) a +5V entre 100ms y 500ms tras estabilizarse.';
-    signalTraveling = 'Supervisor PSU → Pin 8 ATX (PWR_OK = +5V) → Super I/O / Lógica de Reset';
-    visibleSymptoms = 'Ventiladores girando con velocidad constante. La placa madre recibe confirmación de potencia limpia.';
-    whatToVerify = [
-      '1. Si los ventiladores giran pero no hay arranque, sospechar de PWR_OK ausente.',
-      '2. Probar con una fuente de poder conocida funcional en banco de pruebas.',
-      '3. Comprobar que no existan caídas de tensión en líneas de 12V EPS.',
-    ];
-    structuredVerification = {
-      testName: 'Verificación de estabilidad de potencia PWR_OK',
-      objective: 'Confirmar que la fuente de poder entrega tensiones estables y notifica a la placa.',
-      tools: 'Fuente de prueba certificada o tester ATX en banco.',
-      procedure: 'Comprobar el comportamiento del equipo con una fuente conocida funcional.',
-      expectedResult: 'PWR_OK emitido y la placa procede a liberar la condición de reset.',
-      ifCorrect: 'Avanzar al Paso 06 (Liberación de Reset de CPU).',
-      ifIncorrect: 'Reemplazar la fuente de poder defectuosa.',
-      whatItProves: 'Distingue una fuente que gira ventiladores con voltajes inestables de una fuente sana.',
-      nextStep: 'Paso 06: Liberación de Reset de CPU',
-      safetyLevel: 'USUARIO',
-    };
-  } else if (stepNumber === 11 || stepNumber === 12) {
-    simpleExplanation = 'El procesador se comunica con los módulos de memoria RAM, lee sus características y calibra los tiempos de transmisión (entrenamiento).';
-    technicalDetail = 'El Integrated Memory Controller (IMC) lee los perfiles SPD por bus SMBus y ajusta alineación DQS/CLK y voltajes ODT en picosegundos.';
-    signalTraveling = 'CPU / IMC ↔ Bancos DIMM de Memoria RAM (Bus de Datos DQ / Señal DQS)';
-    visibleSymptoms = 'Ventiladores pueden variar velocidad durante el entrenamiento. En este punto la pantalla aún no tiene video.';
-    whatToVerify = [
-      '1. Asentar los módulos con firmeza en los slots preferenciales indicados en el manual de la placa.',
-      '2. Probar con un solo módulo en el slot principal para aislar problemas de canal o perfiles.',
-      '3. Realizar Clear CMOS para restablecer frecuencias y latencias a valores base de fábrica.',
-      '4. Limpiar contactos dorados de la memoria con alcohol isopropílico con el equipo apagado.',
-    ];
-    structuredVerification = {
-      testName: 'Aislamiento de módulos de memoria y restablecimiento de CMOS',
-      objective: 'Descartar fallas de contacto, perfiles de memoria inestables o módulo defectuoso.',
-      tools: 'Manual de la motherboard y alcohol isopropílico.',
-      procedure: 'Desenergizar el equipo, retirar un módulo y colocar el restante en el slot principal. Realizar Clear CMOS.',
-      expectedResult: 'Entrenamiento superado con éxito en pocos segundos.',
-      ifCorrect: 'El equipo supera la etapa de memoria y continúa hacia la GPU (Paso 15).',
-      ifIncorrect: 'Probar con otro módulo funcional o sospechar de zócalo/IMC.',
-      whatItProves: 'Diferencia un fallo de configuración de latencias de una avería física en la placa madre.',
-      nextStep: 'Paso 13: Validación de integridad DRAM',
-      safetyLevel: 'USUARIO',
-    };
-  } else if (stepNumber === 15) {
-    simpleExplanation = 'La placa base inicializa la tarjeta gráfica para poder mostrar los primeros textos o logo en la pantalla.';
-    technicalDetail = 'El firmware UEFI ejecuta el controlador GOP (Graphics Output Protocol) del VBIOS de la GPU y configura el framebuffer básico.';
-    signalTraveling = 'CPU / PCIe x16 → GPU dedicada (VBIOS / GOP) → Salida DisplayPort / HDMI';
-    visibleSymptoms = 'El monitor despierta de reposo y muestra el logo de la motherboard o texto de configuración.';
-    whatToVerify = [
-      '1. Confirmar que el cable de video esté conectado a la tarjeta gráfica dedicada y no a la placa madre (si no hay iGPU).',
-      '2. Asegurar los conectores de alimentación auxiliar PCIe de 8 pines en la tarjeta de video.',
-      '3. Comprobar que la tarjeta esté firmemente calzada en el slot PCIe con la traba trabada.',
-      '4. Probar con otro cable DisplayPort/HDMI o monitor funcional.',
-    ];
-    structuredVerification = {
-      testName: 'Inspección de conectores y alimentación de la GPU',
-      objective: 'Verificar la correcta alimentación e inserción física de la tarjeta de video.',
-      tools: 'Inspección visual de conectores PCIe y cable de monitor.',
-      procedure: 'Comprobar el acople de la tarjeta en el slot x16 y la conexión de energía auxiliar con equipo apagado.',
-      expectedResult: 'El monitor recibe sincronismo y muestra el logo UEFI.',
-      ifCorrect: 'Avanzar al Paso 16 (Enumeración de periféricos y almacenamiento).',
-      ifIncorrect: 'Revisar alimentación de la GPU, slot PCIe o probar salida integrada.',
-      whatItProves: 'Diferencia un problema de cable/monitor de una falla en la inicialización GOP de la placa de video.',
-      nextStep: 'Paso 16: Enumeración de periféricos',
-      safetyLevel: 'USUARIO',
-    };
-  } else if (stepNumber === 17 || stepNumber === 20) {
-    simpleExplanation = 'El firmware busca y reconoce los discos duros y SSDs para decidir desde cuál arrancar el sistema operativo.';
-    technicalDetail = 'Fase BDS (Boot Device Selection): La UEFI lee la tabla GPT, localiza la partición EFI FAT32 y consulta las variables NVRAM de arranque.';
-    signalTraveling = 'Firmware UEFI ↔ NVMe M.2 / SATA ↔ Variables NVRAM de Boot Order';
-    visibleSymptoms = 'Visualización de lista de discos en BIOS o carga del gestor de arranque.';
-    whatToVerify = [
-      '1. Entrar al Setup UEFI y comprobar si la unidad SSD/NVMe figura detectada físicamente.',
-      '2. Verificar que la opción "Windows Boot Manager" figure primera en la lista de Boot Priority.',
-      '3. Comprobar que el modo SATA/NVMe coincida con la instalación original (AHCI / NVMe nativo).',
-      '4. Si no aparece, auditar la presencia de la partición EFI con un medio USB de instalación.',
-    ];
-    structuredVerification = {
-      testName: 'Auditoría de dispositivos de arranque en el Setup UEFI',
-      objective: 'Determinar si la unidad de almacenamiento está presente y configurada como medio primario.',
-      tools: 'Menú de configuración UEFI / BIOS Setup.',
-      procedure: 'Ingresar al BIOS con Del/F2 y revisar la sección Boot y Storage Configuration.',
-      expectedResult: 'SSD detectado y "Windows Boot Manager" como primera opción de booteo.',
-      ifCorrect: 'Avanzar al Paso 22 (Ejecución de Windows Boot Manager).',
-      ifIncorrect: 'Reindexar el orden de arranque o reparar el almacén BCD con bcdboot.',
-      whatItProves: 'Distingue una falla de disco dañado de un simple desorden en las opciones de booteo.',
-      nextStep: 'Paso 21: Carga del Bootloader EFI',
-      safetyLevel: 'USUARIO',
-    };
-  } else if (stepNumber >= 22 && stepNumber <= 26) {
-    simpleExplanation = 'Windows toma el control de la computadora: carga sus archivos centrales (Kernel) y los controladores indispensables de disco.';
-    technicalDetail = 'bootmgfw.efi ejecuta winload.efi, que carga ntoskrnl.exe, hal.dll y los controladores con Start=0 (BOOT_START).';
-    signalTraveling = 'SSD Partición EFI → winload.efi → RAM → ntoskrnl.exe & HAL';
-    visibleSymptoms = 'Logo de Windows con animación de puntos girando en pantalla.';
-    whatToVerify = [
-      '1. Si aparece BSOD 0x7B (INACCESSIBLE_BOOT_DEVICE), verificar modo de controladora en BIOS.',
-      '2. Si hay errores de firma digital, auditar integridad del BCD y Secure Boot.',
-      '3. Descartar archivos de sistema corruptos ejecutando SFC /scannow desde consola de recuperación.',
-    ];
-    structuredVerification = {
-      testName: 'Verificación de coherencia del controlador de arranque',
-      objective: 'Confirmar que el kernel de Windows tiene el driver adecuado para montar el disco de sistema.',
-      tools: 'Setup UEFI y consola de recuperación de Windows.',
-      procedure: 'Revisar configuración de almacenamiento en BIOS y comprobar booteo en Modo Seguro.',
-      expectedResult: 'El kernel monta la partición C: y continúa hacia la carga de servicios.',
-      ifCorrect: 'Avanzar al Paso 27 (Inicialización de subsistemas del kernel).',
-      ifIncorrect: 'Corregir modo AHCI/VMD en BIOS o reinstalar drivers de almacenamiento.',
-      whatItProves: 'Demuestra si la falla es de configuración de controladores tempranos o de hardware.',
-      nextStep: 'Paso 27: Kernel entra en Fase 1',
-      safetyLevel: 'USUARIO',
-    };
-  } else if (stepNumber >= 30) {
-    simpleExplanation = 'Windows inicia los servicios de fondo, valida tu usuario y contraseña, y levanta el escritorio interactivo.';
-    technicalDetail = 'services.exe inicia la base de datos SCM. winlogon autentica con LSASS, monta NTUSER.DAT y lanza el shell explorer.exe con DWM.';
-    signalTraveling = 'winlogon.exe → LSASS → NTUSER.DAT → dwm.exe → explorer.exe (Desktop)';
-    visibleSymptoms = 'Pantalla de bloqueo (LogonUI), mensaje de bienvenida y aparición de la barra de tareas y escritorio.';
-    whatToVerify = [
-      '1. Si la pantalla queda en negro tras la clave pero el mouse se mueve, presionar Ctrl+Shift+Esc.',
-      '2. En Administrador de Tareas, ejecutar manualmente "explorer.exe" para comprobar si levanta el escritorio.',
-      '3. Si levanta manualmente, restaurar la clave "Shell" en el Registro de Windows (Winlogon).',
-      '4. Si el círculo gira indefinidamente, iniciar en Modo Seguro para aislar servicios en conflicto.',
-    ];
-    structuredVerification = {
-      testName: 'Diagnóstico de inicio de sesión y proceso explorer.exe',
-      objective: 'Comprobar si los subsistemas gráficos y de sesión responden a comandos de usuario.',
-      tools: 'Teclado (Ctrl+Shift+Esc / Administrador de Tareas) y Registro de Windows.',
-      procedure: 'Invocar el Administrador de Tareas y lanzar explorer.exe desde Archivo -> Ejecutar nueva tarea.',
-      expectedResult: 'Aparición inmediata del escritorio, barra de tareas e iconos.',
-      ifCorrect: 'El sistema está sano; restaurar la clave Shell en el Registro de Windows.',
-      ifIncorrect: 'Revisar drivers de video o servicios de inicio de sesión.',
-      whatItProves: 'Diferencia un bloqueo total de sistema de un fallo de autoarranque del shell de usuario.',
-      nextStep: 'Paso 34: Sistema 100% Operativo en Reposo (Idle)',
-      safetyLevel: 'USUARIO',
-    };
+  // Individual 00 to 34 pedagogical microclasses
+  switch (stepNumber) {
+    case 0:
+      simpleExplanation = 'La computadora está totalmente apagada sin corriente eléctrica activa.';
+      technicalDetail = 'Aislamiento galvánico primario. Ningún semiconductor ni circuito de control está energizado.';
+      signalTraveling = 'Red Eléctrica → Cable Interlock → Interruptor I/O (Abierto)';
+      visibleSymptoms = 'Ningún ventilador gira. Todos los LEDs de la placa están apagados.';
+      whatToVerify = [
+        '1. Comprobar que el cable interlock esté firmemente asentado en la toma trasera de la fuente.',
+        '2. Verificar que la toma de pared disponga de tensión eléctrica adecuada.',
+        '3. Asegurar que la llave I/O trasera de la fuente se encuentre en posición 1 (ON).',
+      ];
+      structuredVerification = {
+        testName: 'Comprobación de alimentación eléctrica primaria',
+        objective: 'Verificar la presencia de suministro eléctrico seguro en la entrada de la PSU.',
+        tools: 'Inspección visual del cableado y llave trasera.',
+        procedure: 'Revisar la inserción firme del cable de poder interlock y activar la llave I/O.',
+        expectedResult: 'Habilitación de entrada de red hacia el circuito de standby de la fuente.',
+        ifCorrect: 'Avanzar al Paso 01 para verificar el riel +5VSB de espera.',
+        ifIncorrect: 'Revisar zapatilla eléctrica, disyuntor o sustituir cable de poder interlock.',
+        whatItProves: 'Descarta problemas de suministro domiciliario o falsos contactos en la entrada AC.',
+        nextStep: 'Paso 01: Standby (+5VSB)',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 1:
+      simpleExplanation = 'La fuente genera un voltaje permanente de espera (+5VSB) que mantiene alimentados los circuitos de escucha del encendido.';
+      technicalDetail = 'El conversor auxiliar flyback de la fuente polariza el pin 9 (+5VSB). Alimenta el Super I/O, EC y circuito RTC.',
+      signalTraveling = 'Transformador Auxiliar PSU → Pin 9 ATX (+5VSB) → Controlador Super I/O / EC';
+      visibleSymptoms = 'LED testigo de standby iluminado en la motherboard (según modelo). Ventiladores aún estáticos.';
+      whatToVerify = [
+        '1. Confirmar si la placa base recibe energía de espera antes de presionar el botón.',
+        '2. En taller, medir con multímetro en escala DCV en pin 9 (+5VSB) del conector ATX.',
+        '3. Descartar cortocircuitos en puertos USB que drenen el riel de espera.',
+      ];
+      structuredVerification = {
+        testName: 'Inspección del estado de espera (Standby +5VSB)',
+        objective: 'Confirmar si la motherboard recibe alimentación para escuchar el botón frontal.',
+        tools: 'Inspección de LED testigo en placa (o multímetro en banco para técnicos).',
+        procedure: 'Observar presencia de energía en la placa base y medir riel auxiliar.',
+        expectedResult: 'Tensión de +5V (+/- 5%) permanente en el pin 9 del conector ATX.',
+        ifCorrect: 'La placa está lista para procesar la pulsación del botón POWER (Paso 02).',
+        ifIncorrect: 'Sospechar de la fuente auxiliar o cortocircuito en placa madre.',
+        whatItProves: 'Demuestra si la placa madre tiene energía basal para iniciar la lógica de arranque.',
+        nextStep: 'Paso 02: Pulsación de POWER (PWR_SW)',
+        safetyLevel: 'TECNICO',
+        safetyRequirement: 'Requiere conocimiento, instrumental adecuado y procedimiento seguro.',
+      };
+      break;
+
+    case 2:
+      simpleExplanation = 'Al pulsar el botón del gabinete, se unen momentáneamente dos pines en la placa madre para enviar la orden de encendido.';
+      technicalDetail = 'Cierre de contacto momentáneo a masa (0V) en el pin PWR_SW del header Front Panel. La lógica de control detecta la transición de flanco descendente.';
+      signalTraveling = 'Pulsador Frontal → Header Front Panel → Señal PWR_SW a Masa (0V)';
+      visibleSymptoms = 'Presión mecánica del botón. La placa madre recibe la solicitud.';
+      whatToVerify = [
+        '1. Confirmar la conexión física de los cables PWR_SW en el header según manual de la placa.',
+        '2. Inspeccionar que el pulsador mecánico no esté trabado o roto.',
+        '3. Probar puente momentáneo seguro en pines PWR_SW si se sospecha del botón del gabinete.',
+      ];
+      structuredVerification = {
+        testName: 'Verificación del pulsador frontal y cableado PWR_SW',
+        objective: 'Determinar si la solicitud mecánica de encendido llega al header de la placa.',
+        tools: 'Manual de la motherboard e inspección visual.',
+        procedure: 'Revisar la guía de pines del front panel y asegurar el conector PWR_SW.',
+        expectedResult: 'El botón cierra el circuito y la placa madre activa la solicitud PS_ON#.',
+        ifCorrect: 'Avanzar al Paso 03 para auditar la orden hacia la fuente (PS_ON#).',
+        ifIncorrect: 'Reacomodar el conector o sustituir el pulsador defectuoso.',
+        whatItProves: 'Diferencia un problema de botón roto de una falla electrónica en la motherboard.',
+        nextStep: 'Paso 03: Señal de encendido (PS_ON#)',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 3:
+      simpleExplanation = 'La placa madre le pide formalmente a la fuente que encienda los voltajes principales mediante la señal PS_ON#.';
+      technicalDetail = 'La lógica de control de plataforma (Super I/O / EC / PCH) conmuta la línea PS_ON# (pin 16 ATX, cable verde) a potencial de masa (0V).';
+      signalTraveling = 'Lógica de Plataforma → Pin 16 ATX (PS_ON# a 0V) → Supervisor de la PSU';
+      visibleSymptoms = 'La fuente reacciona iniciando el giro de ventiladores.';
+      whatToVerify = [
+        '1. Comprobar que el conector ATX de 24 pines esté firmemente calzado en la placa madre.',
+        '2. Si los ventiladores no giran, verificar si la línea PS_ON# baja a nivel bajo.',
+        '3. Descartar protecciones por cortocircuito (OCP/SCP) en componentes de la placa.',
+      ];
+      structuredVerification = {
+        testName: 'Comprobación de la señal de encendido PS_ON#',
+        objective: 'Verificar si la placa madre solicita el encendido de los rieles principales a la PSU.',
+        tools: 'Inspección de traba del conector ATX 24 pines (y multímetro en banco).',
+        procedure: 'Verificar la traba del conector ATX 24p. En banco técnico: medir pin 16.',
+        expectedResult: 'PS_ON# cae a 0V y la PSU enciende sus salidas principales.',
+        ifCorrect: 'Avanzar al Paso 04 para verificar la estabilización de voltajes.',
+        ifIncorrect: 'Falla en lógica de placa madre o protección por cortocircuito en fuente.',
+        whatItProves: 'Demuestra si la motherboard es capaz de ordenar el encendido a la fuente.',
+        nextStep: 'Paso 04: Activación de rieles principales',
+        safetyLevel: 'BANCO',
+        safetyRequirement: 'Requiere conocimiento, instrumental adecuado y procedimiento seguro.',
+      };
+      break;
+
+    case 4:
+      simpleExplanation = 'La fuente de poder activa sus transformadores principales y suministra energía de alta potencia a toda la placa base.';
+      technicalDetail = 'Conmutación de etapas primarias y generación de rieles nominales (+12V, +5V, +3.3V). Alimentación hacia VRM, Chipset y slots PCIe/M.2.';
+      signalTraveling = 'PSU Secundario Conmutado → Rieles +12V / +5V / +3.3V → Motherboard & VRM';
+      visibleSymptoms = 'Ventiladores de chasis, fuente y disipador comienzan a girar sostenidamente.';
+      whatToVerify = [
+        '1. Si los ventiladores amagan con girar y se apagan en 100 ms, sospechar de cortocircuito en riel de 12V.',
+        '2. Desconectar el conector EPS de 8 pines del CPU para aislar si el corto reside en el VRM del procesador.',
+        '3. Medir voltajes de salida bajo carga con multímetro en banco técnico.',
+      ];
+      structuredVerification = {
+        testName: 'Medición de rieles principales de potencia',
+        objective: 'Verificar que las tensiones de 12V, 5V y 3.3V se encuentren dentro de tolerancias ATX (+/- 5%).',
+        tools: 'Multímetro digital en escala DC o tester ATX en banco de pruebas.',
+        procedure: 'Medir en conector acoplado o carga simulada los voltajes de cada riel.',
+        expectedResult: '+12V (11.4V-12.6V), +5V (4.75V-5.25V), +3.3V (3.14V-3.47V).',
+        ifCorrect: 'Avanzar al Paso 05 (Confirmación de PWR_OK).',
+        ifIncorrect: 'Fuente dañada o cortocircuito en placa madre activando protecciones OCP/SCP.',
+        whatItProves: 'Demuestra si la fuente entrega energía con capacidad de corriente suficiente.',
+        nextStep: 'Paso 05: Power Good / PWR_OK',
+        safetyLevel: 'BANCO',
+        safetyRequirement: 'Requiere conocimiento, instrumental adecuado y procedimiento seguro.',
+      };
+      break;
+
+    case 5:
+      simpleExplanation = 'La fuente confirma que sus voltajes (+12V, +5V, +3.3V) son estables enviando la señal PWR_OK (Power Good).';
+      technicalDetail = 'El supervisor interno de la PSU eleva la señal PWR_OK (pin 8 ATX, cable gris) a +5V entre 100ms y 500ms tras estabilizarse la salida.',
+      signalTraveling = 'Supervisor PSU → Pin 8 ATX (PWR_OK = +5V) → Lógica de Reset de Motherboard';
+      visibleSymptoms = 'Ventiladores girando con velocidad constante. La placa madre recibe confirmación de potencia limpia.';
+      whatToVerify = [
+        '1. Si los ventiladores giran pero la placa madre nunca avanza, sospechar de PWR_OK ausente.',
+        '2. Probar con una fuente de poder conocida funcional en banco de pruebas.',
+        '3. Medir presencia de +5V en cable gris (pin 8) con multímetro con puntas de precisión.',
+      ];
+      structuredVerification = {
+        testName: 'Verificación de estabilidad de potencia PWR_OK',
+        objective: 'Confirmar que la fuente de poder entrega tensiones estables y notifica a la placa.',
+        tools: 'Fuente de prueba certificada o multímetro en banco.',
+        procedure: 'Comprobar el comportamiento del equipo con una fuente conocida funcional.',
+        expectedResult: 'PWR_OK emitido en +5V sostenidos y la placa procede a liberar el reset.',
+        ifCorrect: 'Avanzar al Paso 06 (Liberación de Reset de CPU).',
+        ifIncorrect: 'Reemplazar la fuente de poder defectuosa o revisar circuito supervisor.',
+        whatItProves: 'Distingue una fuente que gira ventiladores con voltajes inestables de una fuente sana.',
+        nextStep: 'Paso 06: Liberación de Reset de CPU',
+        safetyLevel: 'TECNICO',
+        safetyRequirement: 'Requiere conocimiento, instrumental adecuado y procedimiento seguro.',
+      };
+      break;
+
+    case 6:
+      simpleExplanation = 'La placa madre estabiliza la alimentación del procesador (VRM) y le quita el freno de reset para que pueda empezar a trabajar.';
+      technicalDetail = 'El generador de reloj y el regulador VRM entregan Vcore y elevan la línea RESET# a nivel alto lógico. La CPU sale de inhibición.';
+      signalTraveling = 'Lógica de Reset & VRM → Línea RESET# (Nivel Alto) → Socket CPU';
+      visibleSymptoms = 'El procesador comienza a consumir energía y a generar calor disipado leve.';
+      whatToVerify = [
+        '1. Comprobar que el conector EPS de alimentación de CPU esté conectado con firmeza.',
+        '2. En banco técnico, verificar ausencia de cortocircuitos en los MOSFETs de fase del VRM.',
+        '3. Confirmar que el cristal oscilador base esté generando frecuencia de reloj.',
+      ];
+      structuredVerification = {
+        testName: 'Inspección de alimentación y desreset de CPU',
+        objective: 'Confirmar que la CPU recibe alimentación del VRM y que la línea de reset pasa a nivel alto.',
+        tools: 'Inspección de cable EPS y multímetro en banco para técnicos.',
+        procedure: 'Revisar conector EPS de 12V con equipo apagado; en banco medir impedancia en inductores VRM.',
+        expectedResult: 'Impedancia nominal sin cortocircuito y CPU liberada de reset.',
+        ifCorrect: 'Avanzar al Paso 07 (Lectura del Reset Vector en chip SPI Flash).',
+        ifIncorrect: 'Falla en VRM, socket o procesador dañado.',
+        whatItProves: 'Demuestra si el procesador está en condiciones eléctricas de ejecutar instrucciones.',
+        nextStep: 'Paso 07: Reset Vector (0xFFFFFFF0)',
+        safetyLevel: 'TECNICO',
+        safetyRequirement: 'Requiere conocimiento, instrumental adecuado y procedimiento seguro.',
+      };
+      break;
+
+    case 7:
+      simpleExplanation = 'El procesador ejecuta su primer salto obligatorio (Reset Vector) hacia el chip de memoria Flash donde está grabado el firmware UEFI.';
+      technicalDetail = 'El puntero CS:IP apunta a la dirección mapeada 0xFFFFFFF0h. La CPU inicia el bus SPI para leer el microcódigo de la BIOS.',
+      signalTraveling = 'CPU (CS:IP = 0xFFFFFFF0h) → Bus SPI (CS#, CLK, MOSI/MISO) → Chip SPI Flash UEFI';
+      visibleSymptoms = 'Actividad en el bus SPI. En placas con LED debug, el testigo de CPU se enciende momentáneamente.';
+      whatToVerify = [
+        '1. Comprobar que la versión de BIOS grabada sea compatible con el procesador instalado.',
+        '2. Utilizar función BIOS Flashback si la placa dispone de ella para regrabar el firmware.',
+        '3. Inspeccionar el chip SPI Flash en busca de pines sueltos o suciedad.',
+      ];
+      structuredVerification = {
+        testName: 'Auditoría de compatibilidad de firmware y bus SPI',
+        objective: 'Verificar que la CPU pueda comunicarse con el chip SPI Flash de la motherboard.',
+        tools: 'Pendrive FAT32 con BIOS oficial o programador SPI en banco.',
+        procedure: 'Consultar la lista QVL de CPUs y aplicar actualización de BIOS con flashback si corresponde.',
+        expectedResult: 'Lectura correcta del bloque inicial de microcódigo UEFI.',
+        ifCorrect: 'Avanzar al Paso 08 (Fase SEC & PEI de UEFI).',
+        ifIncorrect: 'Regrabar chip SPI Flash o sustituir chip corrupto.',
+        whatItProves: 'Descarta corrupción de BIOS o incompatibilidad de versión con el procesador.',
+        nextStep: 'Paso 08: Fase SEC & PEI (Cache-as-RAM)',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 8:
+      simpleExplanation = 'Como la memoria RAM todavía no está configurada, el procesador usa su memoria caché interna como memoria provisional.';
+      technicalDetail = 'Fase SEC & PEI de UEFI: La CPU configura registros MTRR para usar caché L2/L3 como pila de ejecución (Cache-as-RAM).',
+      signalTraveling = 'UEFI PEI Core → Registros MTRR de CPU → Caché L2/L3 (Pila de ejecución CAR)';
+      visibleSymptoms = 'El procesador ejecuta código C de inicialización sin requerir módulos RAM físicos.';
+      whatToVerify = [
+        '1. Si el equipo se congela en este punto, sospechar de incompatibilidad de stepping de CPU.',
+        '2. Verificar integridad del firmware y versiones soportadas por la placa.',
+        '3. Comprobar que la presión del disipador no sea excesiva sobre el encapsulado.',
+      ];
+      structuredVerification = {
+        testName: 'Validación de fase PEI y Cache-as-RAM',
+        objective: 'Confirmar que el firmware puede establecer el stack temporal en la caché del CPU.',
+        tools: 'Manual de la placa base y verificación de versión de BIOS.',
+        procedure: 'Confirmar versión de microcódigo compatible con el stepping del procesador.',
+        expectedResult: 'Creación exitosa del entorno CAR y avance hacia la inicialización de núcleos.',
+        ifCorrect: 'Avanzar al Paso 09 (Sincronización de núcleos y microcódigo).',
+        ifIncorrect: 'Actualizar firmware o verificar montaje físico del procesador.',
+        whatItProves: 'Demuestra la integridad del silicio interno de la CPU en sus etapas más tempranas.',
+        nextStep: 'Paso 09: Inicialización de núcleos de CPU',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 9:
+      simpleExplanation = 'El firmware aplica parches de fábrica al procesador y sincroniza todos sus núcleos de cómputo.',
+      technicalDetail = 'Carga de parches MSR, activación del Bootstrap Processor (BSP) y colocación de núcleos secundarios (AP) en estado de espera.',
+      signalTraveling = 'UEFI PEI Core → Registros MSR / CPU Patch Loader → Núcleos de CPU';
+      visibleSymptoms = 'LED de CPU en la placa madre se apaga o avanza al siguiente bloque.';
+      whatToVerify = [
+        '1. Inspeccionar pines del socket LGA con lupa por posibles pines doblados.',
+        '2. Aflojar ligeramente los tornillos del disipador si existía torque excesivo.',
+        '3. Limpiar restos de pasta térmica conductora que puedan tocar contactos del sustrato.',
+      ];
+      structuredVerification = {
+        testName: 'Inspección física del socket y asentamiento de CPU',
+        objective: 'Descartar contactos imperfectos o pines doblados en las líneas de control del socket.',
+        tools: 'Lupa de aumento o microscopio con equipo desenergizado.',
+        procedure: 'Retirar el disipador y procesador; inspeccionar la cuadrícula de pines del socket.',
+        expectedResult: 'Pines perfectamente alineados sin sulfato ni deformaciones mecánicas.',
+        ifCorrect: 'Avanzar al Paso 10 (Activación del controlador de memoria IMC).',
+        ifIncorrect: 'Enderezar pines con precisión o reparar socket en banco técnico.',
+        whatItProves: 'Diferencia una falla de procesador dañado de un mal contacto en el socket.',
+        nextStep: 'Paso 10: Activación del IMC',
+        safetyLevel: 'TECNICO',
+        safetyRequirement: 'Requiere conocimiento, instrumental adecuado y procedimiento seguro.',
+      };
+      break;
+
+    case 10:
+      simpleExplanation = 'Se enciende el controlador de memoria integrado (IMC) dentro del procesador y se energizan los slots de memoria RAM.',
+      technicalDetail = 'Configuración de registros del IMC y estabilización del regulador de voltaje secundario de memoria (VDD/VDDQ/VDD2).',
+      signalTraveling = 'Firmware PEI → Registros de control IMC en CPU → VRM Secundario de Memoria';
+      visibleSymptoms = 'Alimentación presente en los slots DIMM. El IMC inicia escucha en el bus SMBus.';
+      whatToVerify = [
+        '1. Comprobar que los módulos de memoria estén firmemente trabados en sus ranuras.',
+        '2. En banco técnico, verificar tensiones de memoria (VDD/VDDQ) con multímetro.',
+        '3. Descartar cortocircuitos en condensadores SMD cercanos a los slots DIMM.',
+      ];
+      structuredVerification = {
+        testName: 'Comprobación de alimentación del subsistema de memoria',
+        objective: 'Verificar que los rieles de voltaje de los slots DIMM entreguen los valores nominales.',
+        tools: 'Multímetro en banco de pruebas o inspección visual de ranuras.',
+        procedure: 'Medir tensión de alimentación en condensadores de desacoplo del slot de memoria.',
+        expectedResult: 'Tensión nominal estabilizada según estándar de memoria (DDR4 / DDR5).',
+        ifCorrect: 'Avanzar al Paso 11 (Lectura de chips SPD de los módulos).',
+        ifIncorrect: 'Revisar regulador de voltaje de RAM en la placa base.',
+        whatItProves: 'Demuestra si los módulos reciben energía para poder ser detectados.',
+        nextStep: 'Paso 11: Lectura de chips SPD',
+        safetyLevel: 'TECNICO',
+        safetyRequirement: 'Requiere conocimiento, instrumental adecuado y procedimiento seguro.',
+      };
+      break;
+
+    case 11:
+      simpleExplanation = 'El sistema lee la etiqueta electrónica (chip SPD) de cada barra de memoria para conocer sus capacidades y velocidades de fábrica.',
+      technicalDetail = 'Comunicación serie por bus SMBus (I2C/I3C). Lectura de bytes con parámetros JEDEC, perfiles XMP/EXPO y fabricante.',
+      signalTraveling = 'Controlador SMBus (Plataforma/CPU) → Bus Serie I2C → Chip EEPROM SPD del Módulo DIMM';
+      visibleSymptoms = 'El firmware identifica cuántas barras hay puestas y en qué canales (A/B).';
+      whatToVerify = [
+        '1. Retirar los módulos con equipo apagado y limpiar los contactos dorados con alcohol isopropílico.',
+        '2. Instalar los módulos en los slots preferenciales indicados en el manual de la placa madre.',
+        '3. Probar con un único módulo para descartar una barra con EEPROM SPD dañada.',
+      ];
+      structuredVerification = {
+        testName: 'Limpieza de contactos y reasentamiento de módulos RAM',
+        objective: 'Asegurar continuidad en los pines de comunicación serie SMBus de la memoria.',
+        tools: 'Alcohol isopropílico de alta pureza y paño de microfibra.',
+        procedure: 'Limpiar pines dorados del módulo, dejar evaporar y reinsertar con traba firme.',
+        expectedResult: 'El firmware detecta la presencia y parámetros de cada barra de memoria.',
+        ifCorrect: 'Avanzar al Paso 12 (Entrenamiento de memoria).',
+        ifIncorrect: 'Probar con otro módulo funcional o en otra ranura DIMM.',
+        whatItProves: 'Distingue una falla de suciedad en contactos de un módulo físicamente quemado.',
+        nextStep: 'Paso 12: Memory Training',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 12:
+      simpleExplanation = 'El procesador calibra con extrema precisión los tiempos de envío y recepción de datos con la memoria RAM (Memory Training).';
+      technicalDetail = 'El IMC envía patrones de prueba por las pistas DQ/DQS, ajustando temporización, terminación y fase. El tiempo es variable según plataforma y densidad.',
+      signalTraveling = 'Motor de Calibración IMC ↔ Ráfagas de Prueba DQ/DQS ↔ Chips DRAM';
+      visibleSymptoms = 'Ventiladores pueden variar de velocidad. La pantalla aún no emite video durante la calibración.';
+      whatToVerify = [
+        '1. No interrumpir el proceso de inmediato: en DDR5 el primer entrenamiento puede tomar varios segundos.',
+        '2. Si entra en reinicio continuo (bootloop), realizar Clear CMOS para volver a valores JEDEC base.',
+        '3. Probar con un solo módulo en la ranura principal recomendada por el fabricante.',
+      ];
+      structuredVerification = {
+        testName: 'Aislamiento de canal de memoria y Clear CMOS',
+        objective: 'Restablecer perfiles de memoria a valores seguros de fábrica para superar el entrenamiento.',
+        tools: 'Puente en pines CLRTC o retirada de pila CR2032 con equipo desenchufado.',
+        procedure: 'Desenergizar el equipo, realizar Clear CMOS y encender con un solo módulo en slot primario.',
+        expectedResult: 'Entrenamiento completado sin errores y avance inmediato al siguiente paso.',
+        ifCorrect: 'Avanzar al Paso 13 (Inicialización de buses y traspaso a RAM física).',
+        ifIncorrect: 'Incompatibilidad de memoria con el IMC o pista de datos dañada en PCB.',
+        whatItProves: 'Demuestra si la falla era por perfil XMP/EXPO inestable o por hardware defectuoso.',
+        nextStep: 'Paso 13: Traspaso a RAM física',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 13:
+      simpleExplanation = 'El procesador abandona el uso de la memoria provisional interna y transfiere la ejecución del sistema a la memoria RAM principal.';
+      technicalDetail = 'Sincronización de enlaces de alta velocidad con el Chipset (PCH). Cierre de Cache-as-RAM y migración del stack a memoria DRAM física.',
+      signalTraveling = 'Fase DXE de UEFI → Enlace CPU-Chipset → PCH & Controladoras Secundarias';
+      visibleSymptoms = 'El código del firmware se ejecuta ahora a máxima velocidad desde la memoria RAM física.';
+      whatToVerify = [
+        '1. Comprobar que el disipador del Chipset (PCH) no presente temperaturas anormalmente elevadas.',
+        '2. Descartar cortocircuitos en puertos periféricos (SATA / USB traseros).',
+        '3. Verificar que la memoria RAM mantenga estabilidad en ejecución continua.',
+      ];
+      structuredVerification = {
+        testName: 'Inspección térmica y funcional del Chipset (PCH)',
+        objective: 'Confirmar que el concentrador de plataforma responda a la sincronización con el CPU.',
+        tools: 'Inspección táctil/visual de fijación del disipador del chipset.',
+        procedure: 'Comprobar el montaje firme del disipador del chipset con el equipo apagado.',
+        expectedResult: 'Enlace de comunicación establecido sin sobrecalentamiento.',
+        ifCorrect: 'Avanzar al Paso 14 (Enumeración de buses PCIe).',
+        ifIncorrect: 'Falla en chipset o interfaz térmica degradada.',
+        whatItProves: 'Diferencia un problema de chipset de una falla en el procesador central.',
+        nextStep: 'Paso 14: Scanning de buses PCIe',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 14:
+      simpleExplanation = 'La placa base explora todas sus ranuras de expansión para identificar qué tarjetas accesorias o placas están conectadas.';
+      technicalDetail = 'El despachador DXE recorre el árbol de buses PCIe (Bus/Device/Function) asignando espacios MMIO e interrupciones a cada dispositivo.',
+      signalTraveling = 'PCI Host Bridge Driver UEFI → Árbol de Buses PCIe → Ranuras de Expansión & M.2';
+      visibleSymptoms = 'Detección secuencial de tarjetas gráficas, controladoras y adaptadores de red/sonido.';
+      whatToVerify = [
+        '1. Retirar todas las tarjetas de expansión accesorias dejando únicamente la GPU principal.',
+        '2. Inspeccionar que las ranuras PCIe no tengan suciedad ni pines doblados.',
+        '3. Comprobar que la placa de video esté asentada con la traba plástica encajada.',
+      ];
+      structuredVerification = {
+        testName: 'Descarte por retiro de tarjetas de expansión secundarias',
+        objective: 'Eliminar conflictos de asignación MMIO provocados por placas accesorias defectuosas.',
+        tools: 'Destornillador aislado e inspección visual con equipo apagado.',
+        procedure: 'Desconectar placas capturadoras, sonido o adaptadores de los slots PCIe secundarios.',
+        expectedResult: 'El sistema supera la enumeración de buses sin bloqueos.',
+        ifCorrect: 'Avanzar al Paso 15 (Inicialización de salida de video GOP).',
+        ifIncorrect: 'Conflicto en la ranura principal o en la propia tarjeta gráfica.',
+        whatItProves: 'Aísla si una tarjeta accesoria secundaria era la causante del cuelgue.',
+        nextStep: 'Paso 15: Inicialización GPU (GOP)',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 15:
+      simpleExplanation = 'Se enciende la tarjeta gráfica (integrada o dedicada) y se envía la primera señal de imagen al monitor.';
+      technicalDetail = 'El firmware ejecuta el controlador GOP (Graphics Output Protocol) del VBIOS de la GPU y configura el Framebuffer de salida.',
+      signalTraveling = 'UEFI Video DXE Driver → GPU (GOP / VBIOS) → Salida DisplayPort / HDMI → Monitor';
+      visibleSymptoms = 'El monitor despierta de reposo y muestra el logo de la placa madre o texto de diagnóstico.';
+      whatToVerify = [
+        '1. Comprobar que el cable de video esté conectado a la tarjeta gráfica dedicada (si el CPU no tiene iGPU).',
+        '2. Verificar conectores de alimentación auxiliar PCIe en la placa de video.',
+        '3. Probar con otro cable DisplayPort o HDMI y verificar selector de entrada en el monitor.',
+      ];
+      structuredVerification = {
+        testName: 'Verificación de conexiones de video y alimentación de GPU',
+        objective: 'Asegurar que la tarjeta gráfica reciba energía y entregue señal de sincronismo al monitor.',
+        tools: 'Inspección visual de conectores PCIe auxiliares y cable de pantalla.',
+        procedure: 'Comprobar cable de video en la salida correcta y cables de energía firmemente conectados.',
+        expectedResult: 'El monitor muestra el logo del fabricante o pantalla de inicio.',
+        ifCorrect: 'Avanzar al Paso 16 (Inicialización de controladores de almacenamiento).',
+        ifIncorrect: 'Revisar alimentación de la GPU o probar salida integrada si existe.',
+        whatItProves: 'Distingue una PC que no da video de una que no arranca por completo.',
+        nextStep: 'Paso 16: Controladores de almacenamiento',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 16:
+      simpleExplanation = 'El firmware inicializa los circuitos controladores para poder comunicarse con los discos SSD y discos duros.';
+      technicalDetail = 'Carga de controladores DXE para el protocolo NVMe (PCIe) y para la controladora SATA (AHCI). Creación de colas de comandos I/O.',
+      signalTraveling = 'UEFI NVMe / AHCI Drivers → Controladora de Disco → Preparación de Colas I/O';
+      visibleSymptoms = 'Las controladoras de almacenamiento quedan en estado listas para consultar las unidades.';
+      whatToVerify = [
+        '1. Si la máquina se congela antes de entrar a BIOS, retirar temporalmente el SSD M.2.',
+        '2. Comprobar que el SSD M.2 esté correctamente fijado con su tornillo o traba plástica.',
+        '3. Probar la unidad en otra ranura M.2 si la placa dispone de más de un puerto.',
+      ];
+      structuredVerification = {
+        testName: 'Aislamiento de unidades de almacenamiento masivo',
+        objective: 'Comprobar si una unidad en cortocircuito bloquea la inicialización de buses de almacenamiento.',
+        tools: 'Destornillador pequeño para slot M.2 con equipo apagado.',
+        procedure: 'Retirar la unidad SSD M.2 y encender el equipo para comprobar si accede al BIOS.',
+        expectedResult: 'Acceso limpio y fluido al menú de configuración UEFI.',
+        ifCorrect: 'Avanzar al Paso 17 (Detección física de medios de almacenamiento).',
+        ifIncorrect: 'Falla en la propia placa base o líneas PCIe del zócalo.',
+        whatItProves: 'Determina si un SSD con controlador dañado colgaba la secuencia de inicio.',
+        nextStep: 'Paso 17: Detección física de unidades',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 17:
+      simpleExplanation = 'La placa base pregunta a cada disco su modelo, capacidad y estado de salud para confirmar que están conectados físicamente.';
+      technicalDetail = 'Envío de comandos Identify Device / NVMe Identify Controller. Registro de modelo, número de serie, tamaño LBA y parámetros S.M.A.R.T.',
+      signalTraveling = 'Subcapa de Almacenamiento UEFI ↔ Consultas Identify ↔ Firmware del Disco / SSD';
+      visibleSymptoms = 'Los discos aparecen listados por su nombre comercial y capacidad en la sección de hardware de la BIOS.';
+      whatToVerify = [
+        '1. Ingresar al Setup UEFI y verificar si el SSD figura detectado físicamente con su nombre correcto.',
+        '2. Si aparece con 0 MB o nombre genérico, su firmware interno puede estar en modo recuperación.',
+        '3. En discos SATA, verificar tanto el cable de datos como el conector de energía.',
+      ];
+      structuredVerification = {
+        testName: 'Comprobación de detección física en el Setup UEFI',
+        objective: 'Verificar la presencia y reconocimiento físico del medio de almacenamiento.',
+        tools: 'Menú de configuración UEFI / BIOS Setup.',
+        procedure: 'Ingresar al BIOS pulsando Del/F2 y revisar la sección de almacenamiento.',
+        expectedResult: 'SSD/HDD reconocido con su capacidad y modelo de fábrica.',
+        ifCorrect: 'Avanzar al Paso 18 (Inicialización de puertos USB y seguridad TPM).',
+        ifIncorrect: 'Revisar conexión física, cable SATA o sustituir unidad no detectada.',
+        whatItProves: 'Confirma la integridad física del medio antes de evaluar archivos de arranque.',
+        nextStep: 'Paso 18: USB & TPM',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 18:
+      simpleExplanation = 'Se encienden los puertos USB para reconocer teclado y mouse, y se activa el chip de seguridad (TPM 2.0).';
+      technicalDetail = 'Inicialización del controlador xHCI (USB), enumeración de dispositivos HID y sincronización con el coprocesador de seguridad TPM/fTPM.',
+      signalTraveling = 'UEFI xHCI & TPM Drivers → Puertos USB & Bus de Seguridad → Teclado/Mouse & TPM';
+      visibleSymptoms = 'Las luces del teclado responden y el cursor del mouse puede moverse en el Setup UEFI.';
+      whatToVerify = [
+        '1. Si el equipo se congela en el logo, desconectar periféricos USB externos no esenciales.',
+        '2. Inspeccionar puertos USB del gabinete por posibles pines doblados haciendo contacto con el chasis.',
+        '3. Si se cambió de procesador, confirmar solicitud de reinicio de claves fTPM en pantalla.',
+      ];
+      structuredVerification = {
+        testName: 'Descarte de sobrecorriente en puertos USB y accesorios',
+        objective: 'Eliminar bloqueos causados por puertos USB en cortocircuito o periféricos dañados.',
+        tools: 'Inspección visual de puertos USB externos y desconexión de cables frontales.',
+        procedure: 'Desconectar accesorios USB secundarios y revisar que no haya lengüetas plásticas rotas.',
+        expectedResult: 'El teclado responde con normalidad y el POST continúa.',
+        ifCorrect: 'Avanzar al Paso 19 (Certificación final del POST).',
+        ifIncorrect: 'Desconectar header USB frontal de la placa madre.',
+        whatItProves: 'Diferencia un problema de placa de un cortocircuito mecánico en puertos USB.',
+        nextStep: 'Paso 19: Certificación POST SUCCESS',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 19:
+      simpleExplanation = 'La computadora certifica que todo el hardware básico funciona y da por terminado el auto-diagnóstico (POST).';
+      technicalDetail = 'El POST Master de la UEFI valida el estado de todos los subsistemas. Los LEDs de diagnóstico se apagan y se transfiere el control a la capa BDS.',
+      signalTraveling = 'POST Master UEFI → Validación de Subsistemas → Reporte POST SUCCESS';
+      visibleSymptoms = 'Los LEDs de diagnóstico de la placa se apagan. En placas con altavoz puede escucharse un beep corto de éxito.';
+      whatToVerify = [
+        '1. Confirmar que los 4 testigos de diagnóstico (CPU, DRAM, VGA, BOOT) completen su ciclo.',
+        '2. Si el LED de BOOT queda encendido, indica que el hardware está sano pero falta medio de arranque.',
+        '3. Verificar que la pantalla pase de la etapa de hardware a la búsqueda del sistema operativo.',
+      ];
+      structuredVerification = {
+        testName: 'Auditoría de testigos luminosos de diagnóstico (Debug LEDs)',
+        objective: 'Confirmar que todos los chequeos de hardware físico se hayan completado satisfactoriamente.',
+        tools: 'Inspección visual del panel de LEDs de la placa base.',
+        procedure: 'Observar la secuencia de apagado de los LEDs: CPU -> DRAM -> VGA -> BOOT.',
+        expectedResult: 'Todos los LEDs de hardware se apagan, indicando éxito del POST.',
+        ifCorrect: 'Avanzar al Paso 20 (Selección de dispositivo de arranque BDS).',
+        ifIncorrect: 'Focalizar el diagnóstico en el componente cuyo LED quede encendido fijo.',
+        whatItProves: 'Demuestra que todo el hardware esencial funciona antes de buscar el sistema operativo.',
+        nextStep: 'Paso 20: Selección de orden de arranque',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 20:
+      simpleExplanation = 'La placa base consulta su memoria de configuración para saber desde qué disco debe arrancar Windows.';
+      technicalDetail = 'Fase BDS (Boot Device Selection): Lectura de variables NVRAM (BootOrder y Boot####) para determinar la prioridad de arranque configurada.',
+      signalTraveling = 'UEFI BDS Dispatcher → Variables BootOrder en NVRAM → Selección de Dispositivo Primario';
+      visibleSymptoms = 'El sistema elige la entrada de arranque "Windows Boot Manager" para iniciar la carga.';
+      whatToVerify = [
+        '1. Entrar al BIOS y comprobar que "Windows Boot Manager" figure en el primer lugar de prioridad.',
+        '2. Verificar que el modo UEFI nativo esté activado (desactivar CSM si la instalación es GPT).',
+        '3. Si la configuración se borra tras apagar la zapatilla, comprobar la pila botón CR2032.',
+      ];
+      structuredVerification = {
+        testName: 'Configuración de prioridad de arranque en BIOS Setup',
+        objective: 'Asegurar que el firmware apunte a la entrada de arranque correcta del sistema operativo.',
+        tools: 'Setup del BIOS / Menú de configuración.',
+        procedure: 'Revisar la pestaña Boot y ubicar "Windows Boot Manager" como primera opción.',
+        expectedResult: 'Guardar configuración (F10) e iniciar el gestor de arranque de Windows.',
+        ifCorrect: 'Avanzar al Paso 21 (Montaje de la partición EFI).',
+        ifIncorrect: 'Reordenar prioridades o regenerar la entrada NVRAM.',
+        whatItProves: 'Distingue una falla de disco roto de una simple desconfiguración en el orden de inicio.',
+        nextStep: 'Paso 21: Montaje de partición EFI',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 21:
+      simpleExplanation = 'La placa base abre la pequeña partición de arranque (Partición EFI) para buscar el programa iniciador de Windows.';
+      technicalDetail = 'El controlador de sistema de archivos FAT de UEFI monta la ESP (EFI System Partition FAT32) y localiza \\EFI\\Microsoft\\Boot\\bootmgfw.efi.',
+      signalTraveling = 'UEFI FAT Driver → Partición EFI FAT32 → Archivo \\EFI\\Microsoft\\Boot\\bootmgfw.efi';
+      visibleSymptoms = 'Acceso a la partición de sistema sin errores de particionamiento.';
+      whatToVerify = [
+        '1. Si aparece "No bootable device found", comprobar con medio de instalación si existe la partición EFI.',
+        '2. Verificar con la herramienta diskpart que la partición EFI (100 MB FAT32) esté presente.',
+        '3. Reparar la partición con el comando "bcdboot C:\\Windows /s S: /f UEFI" desde consola.',
+      ];
+      structuredVerification = {
+        testName: 'Auditoría de la partición de sistema EFI (ESP)',
+        objective: 'Comprobar la existencia e integridad de la partición FAT32 que aloja los archivos EFI.',
+        tools: 'Medio de instalación USB de Windows y símbolo del sistema (Shift+F10).',
+        procedure: 'Ejecutar diskpart -> list volume para verificar la presencia de la partición EFI.',
+        expectedResult: 'Partición de 100 MB en formato FAT32 identificada en el disco de sistema.',
+        ifCorrect: 'Avanzar al Paso 22 (Ejecución de Windows Boot Manager).',
+        ifIncorrect: 'Regenerar la partición EFI y los archivos de arranque con bcdboot.',
+        whatItProves: 'Diferencia una partición eliminada de un problema físico en la unidad de almacenamiento.',
+        nextStep: 'Paso 22: Windows Boot Manager',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 22:
+      simpleExplanation = 'El Gestor de Arranque de Windows (Boot Manager) lee el archivo de configuración BCD y comprueba la seguridad de inicio (Secure Boot).';
+      technicalDetail = 'bootmgfw.efi procesa el almacén BCD (Boot Configuration Data), valida firmas digitales con las claves Secure Boot y localiza winload.efi.',
+      signalTraveling = 'bootmgfw.efi → Almacén BCD binario → Validación Secure Boot → Localización de winload.efi';
+      visibleSymptoms = 'Transición hacia la carga del cargador del sistema operativo.';
+      whatToVerify = [
+        '1. Si aparece pantalla azul 0xc000000e o 0xc0000034, el archivo BCD tiene rutas desactualizadas.',
+        '2. Ejecutar "bootrec /rebuildbcd" o "bcdboot" desde entorno de recuperación para reconstruir el BCD.',
+        '3. Si hay error de firma digital, auditar claves de Secure Boot en el BIOS.',
+      ];
+      structuredVerification = {
+        testName: 'Reconstrucción del almacén de configuración de arranque (BCD)',
+        objective: 'Reparar las rutas y descriptores de arranque dañados en el archivo BCD.',
+        tools: 'Consola de comandos en entorno de recuperación WinRE.',
+        procedure: 'Ejecutar bcdboot C:\\Windows /l es-es para generar un almacén BCD limpio.',
+        expectedResult: 'Mensaje "Archivos de arranque creados correctamente".',
+        ifCorrect: 'Avanzar al Paso 23 (Cargador winload.efi).',
+        ifIncorrect: 'Verificar la letra asignada a la partición de Windows con diskpart.',
+        whatItProves: 'Demuestra que los archivos de configuración de arranque son coherentes.',
+        nextStep: 'Paso 23: winload.efi',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 23:
+      simpleExplanation = 'El cargador winload.efi prepara la memoria, lee el Registro de Windows (SYSTEM) y alista el terreno para despertar el Kernel.';
+      technicalDetail = 'winload.efi activa el direccionamiento paginado de 64 bits, carga en RAM la colmena SYSTEM del Registro y construye el LoaderBlock.',
+      signalTraveling = 'winload.efi → C:\\Windows\\System32\\config\\SYSTEM → Mapeo de Tablas de Páginas en RAM';
+      visibleSymptoms = 'La computadora pasa formalmente del entorno de firmware al entorno de sistema operativo.';
+      whatToVerify = [
+        '1. Si arroja error en System32\\config\\system, la colmena del Registro puede estar dañada.',
+        '2. Ejecutar "chkdsk C: /f" para reparar posibles inconsistencias del sistema de archivos NTFS.',
+        '3. Ejecutar SFC desde entorno de recuperación para verificar la integridad de winload.efi.',
+      ];
+      structuredVerification = {
+        testName: 'Comprobación de integridad de archivos de inicio y Registro',
+        objective: 'Verificar que la colmena SYSTEM y el binario winload.efi no estén corruptos.',
+        tools: 'Consola de recuperación WinRE (chkdsk y sfc /scannow).',
+        procedure: 'Ejecutar sfc /scannow /offbootdir=C:\\ /offwindir=C:\\Windows en la consola.',
+        expectedResult: 'Reparación de archivos dañados o verificación limpia al 100%.',
+        ifCorrect: 'Avanzar al Paso 24 (Carga de ntoskrnl.exe y fin de servicios UEFI).',
+        ifIncorrect: 'Restaurar copia de seguridad del Registro o reinstalar sistema.',
+        whatItProves: 'Confirma la integridad de los binarios esenciales previos al inicio del kernel.',
+        nextStep: 'Paso 24: Carga del Kernel NT',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 24:
+      simpleExplanation = 'Se carga en memoria el núcleo maestro de Windows (ntoskrnl.exe) y se apaga definitivamente el firmware UEFI (ExitBootServices).';
+      technicalDetail = 'winload.efi carga ntoskrnl.exe y hal.dll en memoria física. Invoca ExitBootServices() en la UEFI; a partir de este instante el kernel toma el control absoluto.',
+      signalTraveling = 'winload.efi → RAM → ntoskrnl.exe & hal.dll → ExitBootServices()';
+      visibleSymptoms = 'La pantalla del firmware se desvanece y comienza el control del sistema operativo.';
+      whatToVerify = [
+        '1. Si el equipo se reinicia abruptamente aquí, comprobar estabilidad de memoria RAM.',
+        '2. Descartar sectores defectuosos en el disco donde residen los binarios de Windows.',
+        '3. Comprobar que no existan perfiles de overclock inestables en el procesador.',
+      ];
+      structuredVerification = {
+        testName: 'Diagnóstico de estabilidad de memoria durante la carga del kernel',
+        objective: 'Confirmar que la memoria RAM pueda sostener las estructuras de datos del núcleo de Windows.',
+        tools: 'Herramienta de diagnóstico de memoria de Windows o MemTest86.',
+        procedure: 'Ejecutar un test de memoria para verificar ausencia de errores de bit.',
+        expectedResult: 'Cero errores de memoria detectados en los pases de prueba.',
+        ifCorrect: 'Avanzar al Paso 25 (Inicialización de la capa HAL).',
+        ifIncorrect: 'Reemplazar módulo de RAM inestable o ajustar frecuencias.',
+        whatItProves: 'Determina si los reinicios tempranos se deben a celdas de RAM defectuosas.',
+        nextStep: 'Paso 25: Capa HAL',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 25:
+      simpleExplanation = 'La capa de abstracción de hardware (HAL) adapta el sistema operativo a la placa madre concreta y sincroniza los relojes de cómputo.';
+      technicalDetail = 'hal.dll toma el control de los controladores de interrupción APIC / IO-APIC, temporizadores HPET y tablas ACPI de gestión de energía.',
+      signalTraveling = 'hal.dll → Controladores APIC / HPET → Sincronización de Tablas ACPI de la Motherboard';
+      visibleSymptoms = 'El sistema operativo gobierna la sincronización de hardware con independencia del fabricante.';
+      whatToVerify = [
+        '1. Si aparece BSOD HAL_INITIALIZATION_FAILED (0x5C) o ACPI_BIOS_ERROR (0xA5), actualizar la BIOS.',
+        '2. Restablecer valores de fábrica en BIOS para evitar tablas ACPI personalizadas corruptas.',
+        '3. Deshabilitar opciones experimentales de virtualización o energía en el setup.',
+      ];
+      structuredVerification = {
+        testName: 'Actualización y restablecimiento de tablas ACPI en BIOS',
+        objective: 'Asegurar que la motherboard entregue descriptores ACPI válidos a la capa HAL de Windows.',
+        tools: 'Setup UEFI y actualización de firmware oficial.',
+        procedure: 'Cargar valores optimizados por defecto (Load Optimized Defaults) en el BIOS.',
+        expectedResult: 'Inicialización limpia de la capa HAL sin pantallas azules.',
+        ifCorrect: 'Avanzar al Paso 26 (Carga de controladores indispensables BOOT_START).',
+        ifIncorrect: 'Actualizar a la última versión de BIOS estable del fabricante.',
+        whatItProves: 'Descarta incompatibilidades entre la capa HAL de Windows y las tablas ACPI de la placa.',
+        nextStep: 'Paso 26: Drivers BOOT_START',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 26:
+      simpleExplanation = 'Windows carga los controladores indispensables de disco (stornvme, storahci, ntfs) para poder leer su propia partición C:.';
+      technicalDetail = 'Carga de drivers con Start=0 (BOOT_START). Montaje del sistema de archivos NTFS para permitir operaciones nativas de lectura/escritura.',
+      signalTraveling = 'Kernel Loader → C:\\Windows\\System32\\drivers\\ (stornvme.sys / storahci.sys) → Montaje de C:\\';
+      visibleSymptoms = 'Comienza la animación de los puntos girando bajo el logo en pantalla.';
+      whatToVerify = [
+        '1. Si aparece BSOD 0x7B (INACCESSIBLE_BOOT_DEVICE), verificar el modo de la controladora en BIOS (AHCI/VMD).',
+        '2. Si se cambió de placa madre, arrancar en Modo Seguro para que Windows instale el driver adecuado.',
+        '3. Descartar antivirus o controladores de filtro de terceros dañados.',
+      ];
+      structuredVerification = {
+        testName: 'Ajuste del modo de controladora de almacenamiento en BIOS',
+        objective: 'Hacer coincidir el modo de la controladora (AHCI vs Intel VMD/RAID) con la instalación original.',
+        tools: 'Setup UEFI (sección Storage Configuration).',
+        procedure: 'Verificar si la opción VMD o RAID está activa y alternar a AHCI/NVMe estándar.',
+        expectedResult: 'Windows monta el disco C: y avanza sin pantalla azul 0x7B.',
+        ifCorrect: 'Avanzar al Paso 27 (Inicialización completa del Kernel).',
+        ifIncorrect: 'Inyectar el controlador de almacenamiento mediante consola WinRE.',
+        whatItProves: 'Demuestra si la falla era un desajuste de driver de almacenamiento en el arranque.',
+        nextStep: 'Paso 27: Proceso System (PID 4)',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 27:
+      simpleExplanation = 'El núcleo de Windows se inicializa por completo, activa las interrupciones y crea el proceso maestro "System" (PID 4).';
+      technicalDetail = 'Ejecución de KiSystemStartup(), inicialización de Fase 0 y Fase 1 del Kernel, y creación del proceso System (PID 4) con sus hilos de trabajo.',
+      signalTraveling = 'ntoskrnl.exe → Inicialización de Subsistemas de Kernel → Creación de Proceso System (PID 4)';
+      visibleSymptoms = 'Animación de puntos girando con fluidez en pantalla.';
+      whatToVerify = [
+        '1. Si hay pantallas azules aleatorias durante los puntos girando, sospechar de memoria RAM inestable.',
+        '2. Descartar sobrecalentamiento del CPU revisando que el disipador esté correctamente colocado.',
+        '3. Arrancar en Modo Seguro para aislar si el fallo ocurre en controladores de terceros.',
+      ];
+      structuredVerification = {
+        testName: 'Comprobación de booteo en Modo Seguro',
+        objective: 'Aislar si la inestabilidad del kernel proviene de drivers de terceros o de hardware básico.',
+        tools: 'Menú de opciones de inicio avanzadas de Windows (Modo Seguro).',
+        procedure: 'Forzar acceso al entorno de recuperación y seleccionar "Habilitar Modo Seguro".',
+        expectedResult: 'Arranque exitoso en Modo Seguro confirmando que el núcleo básico está sano.',
+        ifCorrect: 'Avanzar al Paso 28 (Session Manager Subsystem smss.exe).',
+        ifIncorrect: 'Revisar hardware principal (RAM/CPU/Almacenamiento).',
+        whatItProves: 'Diferencia un conflicto de controladores de una avería en el procesador o memoria.',
+        nextStep: 'Paso 28: Session Manager (smss.exe)',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 28:
+      simpleExplanation = 'Se inicia el Gestor de Sesiones (smss.exe), que monta el archivo de memoria virtual y crea los espacios para servicios y usuarios.';
+      technicalDetail = 'smss.exe crea variables de entorno del sistema, inicializa pagefile.sys y bifurca el entorno en Sesión 0 (servicios) y Sesión 1 (usuario interactivo).';
+      signalTraveling = 'Proceso System (PID 4) → C:\\Windows\\System32\\smss.exe → Creación de Sesión 0 y Sesión 1';
+      visibleSymptoms = 'El sistema prepara la separación entre servicios protegidos y la pantalla de usuario.';
+      whatToVerify = [
+        '1. Si aparece BSOD 0xC000021A, un proceso crítico del subsistema de usuario fue terminado.',
+        '2. Verificar que la unidad C: tenga espacio libre suficiente para alojar el archivo de paginación.',
+        '3. Ejecutar comprobación SFC para descartar corrupción en smss.exe.',
+      ];
+      structuredVerification = {
+        testName: 'Auditoría de espacio en disco y archivos del subsistema de sesión',
+        objective: 'Asegurar que el volumen de sistema tenga capacidad para crear la memoria virtual pagefile.sys.',
+        tools: 'Símbolo del sistema en WinRE.',
+        procedure: 'Comprobar espacio libre en C: con dir C:\\ y ejecutar chkdsk si existen errores.',
+        expectedResult: 'Espacio libre superior a 5 GB y archivos de subsistema íntegros.',
+        ifCorrect: 'Avanzar al Paso 29 (Subsistemas Win32 de Sesión 0).',
+        ifIncorrect: 'Liberar espacio eliminando archivos temporales desde la consola.',
+        whatItProves: 'Descarta que la falta de espacio en disco bloquee el montaje de sesiones.',
+        nextStep: 'Paso 29: Subsistema Win32 (csrss / win32k)',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 29:
+      simpleExplanation = 'Se cargan los componentes gráficos y de control de Sesión 0 (csrss, win32k, wininit) para habilitar el entorno de ventanas.';
+      technicalDetail = 'smss.exe lanza csrss.exe y wininit.exe en Sesión 0. win32k.sys se vincula con el driver de video para conmutar a la resolución nativa de pantalla.',
+      signalTraveling = 'smss.exe (Sesión 0) → csrss.exe & wininit.exe → win32k.sys enlazado con Driver de GPU';
+      visibleSymptoms = 'La resolución de pantalla cambia momentáneamente de escala al conmutar al driver de video.';
+      whatToVerify = [
+        '1. Si la pantalla queda en negro justo aquí, el driver de video instalado está en conflicto.',
+        '2. Iniciar en Modo Seguro y utilizar DDU (Display Driver Uninstaller) para limpiar el driver gráfico.',
+        '3. Reinstalar el controlador gráfico oficial más reciente desde la web del fabricante.',
+      ];
+      structuredVerification = {
+        testName: 'Limpieza y reinstalación limpia de controladores de video con DDU',
+        objective: 'Eliminar controladores gráficos corruptos que provocan pantalla negra al cargar win32k.sys.',
+        tools: 'Modo Seguro y software Display Driver Uninstaller (DDU).',
+        procedure: 'Arrancar en Modo Seguro, ejecutar DDU y reiniciar en modo normal con driver básico.',
+        expectedResult: 'Arranque con resolución básica limpia sin pantallas negras.',
+        ifCorrect: 'Avanzar al Paso 30 (Service Control Manager services.exe).',
+        ifIncorrect: 'Revisar la salida física del monitor o sospechar de la GPU.',
+        whatItProves: 'Demuestra si la pantalla negra era causada por el driver gráfico o por hardware.',
+        nextStep: 'Paso 30: Servicios del sistema (services.exe)',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 30:
+      simpleExplanation = 'Se inicia el Administrador de Servicios (services.exe) y el subsistema de seguridad (lsass.exe) para levantar los procesos de fondo.';
+      technicalDetail = 'wininit.exe ejecuta services.exe (SCM) y lsass.exe. El SCM lanza instancias de svchost.exe para servicios automáticos (Audio, Red, PlugPlay).';
+      signalTraveling = 'wininit.exe → services.exe (SCM) & lsass.exe → Instancias de svchost.exe';
+      visibleSymptoms = 'Los servicios de red, audio y administración de dispositivos quedan listos en segundo plano.';
+      whatToVerify = [
+        '1. Si los puntos giran indefinidamente, un servicio de terceros puede estar bloqueando el inicio.',
+        '2. Iniciar en Modo Seguro y revisar el Visor de Eventos (eventvwr.msc) por errores de timeout (7000/7009).',
+        '3. Utilizar msconfig para realizar un inicio limpio deshabilitando servicios no esenciales.',
+      ];
+      structuredVerification = {
+        testName: 'Diagnóstico de inicio limpio de servicios con MSCONFIG',
+        objective: 'Aislar servicios de terceros que bloquean la inicialización del Service Control Manager.',
+        tools: 'Herramienta msconfig en Modo Seguro.',
+        procedure: 'Ocultar todos los servicios de Microsoft y deshabilitar los servicios de terceros restantes.',
+        expectedResult: 'Arranque fluido y rápido sin demoras en la animación de carga.',
+        ifCorrect: 'Avanzar al Paso 31 (Sesión interactiva winlogon & LogonUI).',
+        ifIncorrect: 'Revisar servicios esenciales del sistema operativo con SFC.',
+        whatItProves: 'Diferencia un servicio de terceros atascado de una falla en Windows.',
+        nextStep: 'Paso 31: Sesión interactiva y LogonUI',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 31:
+      simpleExplanation = 'Se crea la sesión del usuario, se arranca el compositor visual (DWM) y aparece la pantalla de bienvenida o bloqueo (LogonUI).';
+      technicalDetail = 'smss.exe crea la Sesión 1 interactiva. winlogon.exe inicia dwm.exe (Desktop Window Manager acelerado) y ejecuta LogonUI.exe.';
+      signalTraveling = 'smss.exe (Sesión 1) → winlogon.exe → dwm.exe (Compositor GPU) & LogonUI.exe';
+      visibleSymptoms = 'Aparición nítida de la pantalla de bienvenida o bloqueo con campo para ingresar clave o PIN.';
+      whatToVerify = [
+        '1. Si la pantalla de bienvenida parpadea, desinstalar programas de personalización visual de terceros.',
+        '2. Si no aparece el cuadro de contraseña, arrancar en Modo Seguro con funciones de red.',
+        '3. Descartar conflictos con lectores de huella o cámaras de reconocimiento facial.',
+      ];
+      structuredVerification = {
+        testName: 'Comprobación del subsistema de inicio de sesión en Modo Seguro',
+        objective: 'Verificar la capacidad del sistema para presentar la interfaz de autenticación interactiva.',
+        tools: 'Opciones de inicio avanzadas / Modo Seguro.',
+        procedure: 'Iniciar sesión con una cuenta de administrador local en Modo Seguro.',
+        expectedResult: 'Acceso a la pantalla de bienvenida con campo de credenciales operativo.',
+        ifCorrect: 'Avanzar al Paso 32 (Autenticación y carga de perfil de usuario).',
+        ifIncorrect: 'Reparar subsistema Winlogon desde símbolo del sistema.',
+        whatItProves: 'Demuestra si la falla era por proveedores de credenciales de terceros.',
+        nextStep: 'Paso 32: Autenticación y perfil de usuario',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 32:
+      simpleExplanation = 'El usuario ingresa su contraseña/PIN, la seguridad valida los datos y se carga su configuración personal (NTUSER.DAT).';
+      technicalDetail = 'winlogon envía las credenciales a lsass.exe. Tras validarse, ProfSvc monta la colmena C:\\Users\\Usuario\\NTUSER.DAT en HKEY_CURRENT_USER.';
+      signalTraveling = 'Usuario ingresa credenciales → winlogon.exe → Validación LSASS → ProfSvc monta NTUSER.DAT';
+      visibleSymptoms = 'Mensaje "Bienvenido" o "Cargando perfil de usuario" en pantalla.';
+      whatToVerify = [
+        '1. Si aparece "Has iniciado sesión con un perfil temporal", el archivo NTUSER.DAT no pudo montarse.',
+        '2. Revisar el Registro en HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList.',
+        '3. Si existe una clave duplicada con extensión .bak, restaurar el puntero del perfil.',
+      ];
+      structuredVerification = {
+        testName: 'Reparación de puntero de perfil en el Registro de Windows',
+        objective: 'Restablecer el acceso a la cuenta de usuario principal eliminando la clave .bak del perfil.',
+        tools: 'Editor del Registro (regedit.exe) desde cuenta con permisos de administrador.',
+        procedure: 'Revisar ProfileList, eliminar la clave temporal y quitar la extensión .bak de la clave original.',
+        expectedResult: 'Inicio de sesión exitoso con el perfil de usuario personal completo.',
+        ifCorrect: 'Avanzar al Paso 33 (Lanzamiento del Shell explorer.exe).',
+        ifIncorrect: 'Crear un nuevo perfil de usuario local y transferir los datos personales.',
+        whatItProves: 'Distingue una pérdida de archivos de un error de bloqueo en NTUSER.DAT.',
+        nextStep: 'Paso 33: Lanzamiento del Shell explorer.exe',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 33:
+      simpleExplanation = 'Se ejecuta el programa del escritorio (explorer.exe), apareciendo la barra de tareas, el menú inicio y los iconos de trabajo.';
+      technicalDetail = 'userinit.exe lee la clave de Registro "Shell" (HKLM\\Software\\...\\Winlogon) y ejecuta C:\\Windows\\explorer.exe bajo el token de usuario autenticado.',
+      signalTraveling = 'winlogon / userinit → Consulta de clave "Shell" en Registro → Ejecución de explorer.exe';
+      visibleSymptoms = 'Despliegue interactivo de la barra de tareas, bandeja de sistema y área de escritorio.';
+      whatToVerify = [
+        '1. Si la pantalla queda en negro tras el mensaje Bienvenido pero el cursor se mueve, presionar Ctrl+Shift+Esc.',
+        '2. En el Administrador de Tareas, ir a Archivo -> Ejecutar nueva tarea y escribir "explorer.exe".',
+        '3. Si el escritorio abre manualmente, restaurar el valor de la clave Shell a "explorer.exe" en Winlogon.',
+      ];
+      structuredVerification = {
+        testName: 'Lanzamiento manual y verificación de la clave Shell de explorer.exe',
+        objective: 'Comprobar si el proceso del explorador responde a comandos y restaurar su autoinicio.',
+        tools: 'Teclado (Ctrl+Shift+Esc / Administrador de Tareas) y Editor del Registro.',
+        procedure: 'Ejecutar explorer.exe manualmente y comprobar el valor "Shell" en Winlogon.',
+        expectedResult: 'Aparición inmediata del escritorio, barra de tareas e iconos de usuario.',
+        ifCorrect: 'Avanzar al Paso 34 (Sistema operativo 100% listo en reposo activo).',
+        ifIncorrect: 'Revisar extensiones de shell de terceros con la herramienta ShellExView.',
+        whatItProves: 'Diferencia un bloqueo completo de Windows de un simple fallo de lanzamiento del shell.',
+        nextStep: 'Paso 34: Sistema 100% Operativo en Reposo (Idle)',
+        safetyLevel: 'USUARIO',
+      };
+      break;
+
+    case 34:
+      simpleExplanation = 'La secuencia de arranque se ha completado con éxito: la computadora se encuentra lista para trabajar en estado de reposo activo.';
+      technicalDetail = 'Todos los subsistemas de Hardware, Firmware, Kernel, Servicios y Shell se encuentran sincronizados y estables en estado Idle.',
+      signalTraveling = 'Todos los Subsistemas Sincronizados // Estado de Reposo Activo (CPU Idle & DWM)';
+      visibleSymptoms = 'Escritorio responsivo, uso de CPU bajo (<5% en reposo) y memoria disponible normal.';
+      whatToVerify = [
+        '1. Abrir el Administrador de Tareas y verificar que ningún proceso parásito consuma CPU en reposo.',
+        '2. Comprobar que las temperaturas de procesador y placa gráfica se mantengan en niveles óptimos.',
+        '3. Verificar la ausencia de errores críticos en el Visor de Eventos de Windows.',
+      ];
+      structuredVerification = {
+        testName: 'Auditoría de estado de reposo activo y rendimiento del sistema',
+        objective: 'Certificar que la computadora opera de manera estable sin procesos no deseados ni demoras DPC.',
+        tools: 'Administrador de Tareas (Ctrl+Shift+Esc) y Monitor de Rendimiento.',
+        procedure: 'Monitorear uso de CPU, memoria y temperaturas en reposo durante 2 minutos.',
+        expectedResult: 'Uso de procesador bajo, frecuencias dinámicas y sistema 100% responsivo.',
+        ifCorrect: 'Secuencia completa de 35 eslabones superada con éxito.',
+        ifIncorrect: 'Optimizar programas de inicio y auditar controladores de fondo.',
+        whatItProves: 'Demuestra la salud integral de la computadora desde el botón POWER hasta Windows.',
+        nextStep: 'Secuencia Completada con Éxito (35/35 Estados)',
+        safetyLevel: 'USUARIO',
+      };
+      break;
   }
 
   return {

@@ -629,70 +629,122 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
             {/* Stage Forensic Context Panel (Right 5 Cols) */}
             <div className="lg:col-span-5 bg-[#0b0e14] border border-zinc-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between space-y-4 shadow-xl">
               <div className="space-y-3.5">
-                {/* Stage Header Badge */}
-                <div className="flex items-center justify-between pb-2 border-b border-zinc-800/80">
-                  <span
-                    className="text-[10px] px-2 py-0.5 rounded font-bold uppercase"
-                    style={{
-                      backgroundColor: `${currentStep.layerColor}20`,
-                      color: currentStep.layerColor,
-                      border: `1px solid ${currentStep.layerColor}50`,
-                    }}
-                  >
-                    CAPA {currentStep.layer}
-                  </span>
-                  <span className="text-[10px] text-zinc-500 font-mono-tech">
-                    PASO {String(currentStep.stepNumber).padStart(2, '0')}
-                  </span>
-                </div>
-
-                {/* Stage Title */}
-                <h2 className="text-base font-bold text-white font-display leading-tight">
-                  {currentStep.name}
-                </h2>
-
-                {/* What is happening */}
-                <div>
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
-                    ¿QUÉ ESTÁ PASANDO?
-                  </span>
-                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
-                    {currentStep.whatIsHappening}
-                  </p>
-                </div>
-
-                {/* Purpose */}
-                <div>
-                  <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1">
-                    ¿PARA QUÉ SIRVE?
-                  </span>
-                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
-                    {forensicDetails.purpose || currentStep.purpose || 'Coordinar la inicialización de hardware y preparar la transición al siguiente eslabón.'}
-                  </p>
-                </div>
-
-                {/* Signal Flow */}
-                <div className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 text-[11px] space-y-1">
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase">FLUJO DE SEÑAL:</div>
-                  <div className="text-zinc-200 font-sans-editorial">
-                    {forensicDetails.signalFlow || `${currentStep.initiator} → ${currentStep.responder}`}
+                {/* Stage Header Badge with Explicit Step Info */}
+                <div className="pb-2 border-b border-zinc-800/80 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="text-[10px] px-2 py-0.5 rounded font-bold uppercase"
+                      style={{
+                        backgroundColor: `${currentStep.layerColor}20`,
+                        color: currentStep.layerColor,
+                        border: `1px solid ${currentStep.layerColor}50`,
+                      }}
+                    >
+                      CAPA {currentStep.layer}
+                    </span>
+                    <span className="text-[10.5px] font-bold text-amber-400 font-mono-tech">
+                      ETAPA ACTUAL: PASO {String(currentStep.stepNumber).padStart(2, '0')} / {totalSteps}
+                    </span>
                   </div>
-                  <div className="text-[10px] text-emerald-400 pt-1 border-t border-zinc-800/60 font-sans-editorial">
-                    <strong>Si todo va bien:</strong> {currentStep.expectedResponse}
+
+                  <div className="pt-1">
+                    <div className="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wide">
+                      NOMBRE DE ETAPA:
+                    </div>
+                    <h2 className="text-base font-bold text-white font-display leading-tight">
+                      {currentStep.name}
+                    </h2>
+                    <div className="text-[10.5px] text-cyan-300 font-mono-tech mt-0.5">
+                      ESTA ETAPA SE LLAMA: <strong className="text-white">{currentStep.name}</strong>
+                    </div>
                   </div>
                 </div>
 
-                {/* Possible Failures & Detection */}
+                {/* Section A: What is happening / Simple Explanation */}
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
+                    A. ¿QUÉ ESTÁ PASANDO? // EXPLICACIÓN SIMPLE
+                  </span>
+                  <p className="text-xs text-zinc-200 font-sans-editorial leading-relaxed bg-zinc-950/70 p-2.5 rounded-xl border border-zinc-800/80">
+                    {forensicDetails.simpleExplanation || currentStep.whatIsHappening}
+                  </p>
+                </div>
+
+                {/* Section B: Technical Detail */}
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block">
+                    B. DETALLE TÉCNICO // ARQUITECTURA & REPARADOR
+                  </span>
+                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed bg-zinc-950/40 p-2 rounded-lg border border-zinc-800/60">
+                    {forensicDetails.technicalDetail || currentStep.technicalObservation}
+                  </p>
+                </div>
+
+                {/* Section C, D, E, F: Interveners, Signal, Expected Next, Visible Symptoms */}
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-zinc-800/80 text-[11px] space-y-2.5">
+                  {/* C. Who intervenes */}
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="font-bold text-amber-400 uppercase">C. ¿QUIÉN INTERVIENE?</span>
+                    <span className="text-zinc-300 font-semibold">{currentStep.initiator} ➔ {currentStep.responder}</span>
+                  </div>
+                  
+                  {/* D. Tracked Signal */}
+                  <div>
+                    <div className="text-[10px] font-bold text-zinc-400 uppercase mb-0.5">D. ¿QUÉ SEÑAL ESTAMOS SIGUIENDO?</div>
+                    <div className="text-cyan-300 font-mono text-[10.5px] bg-cyan-950/40 px-2 py-1 rounded border border-cyan-500/30">
+                      ⚡ {forensicDetails.signalTraveling || forensicDetails.signalFlow || `${currentStep.initiator} → ${currentStep.responder}`}
+                    </div>
+                  </div>
+
+                  {/* E. What should happen next */}
+                  <div className="text-[10.5px] text-emerald-300 pt-1.5 border-t border-zinc-800/70 font-sans-editorial">
+                    <strong className="text-emerald-400 uppercase text-[9.5px] block mb-0.5">E. ¿QUÉ DEBERÍA PASAR DESPUÉS?</strong>
+                    {currentStep.expectedResponse}
+                  </div>
+
+                  {/* F. Observable Symptoms */}
+                  <div className="text-[10.5px] text-zinc-300 font-sans-editorial pt-1.5 border-t border-zinc-800/70">
+                    <strong className="text-zinc-400 uppercase text-[9.5px] block mb-0.5">F. ¿QUÉ VE EL USUARIO DESDE AFUERA?</strong>
+                    {forensicDetails.visibleSymptoms || currentStep.technicalObservation}
+                  </div>
+                </div>
+
+                {/* Section G: Possible Failures & Detection */}
                 <div className="space-y-2 pt-2 border-t border-zinc-800/80">
-                  <div className="text-[10px] font-bold text-rose-400 uppercase">FALLAS POSIBLES:</div>
+                  <div className="text-[10px] font-bold text-rose-400 uppercase flex items-center justify-between">
+                    <span>POSIBLES FALLAS DE ESTA ETAPA:</span>
+                    <span className="text-[9px] text-zinc-500 font-normal">INDICIOS DE TALLER</span>
+                  </div>
                   <ul className="space-y-1 text-[11px] text-zinc-300 font-sans-editorial list-disc list-inside">
                     {(forensicDetails.possibleFailures || []).map((f, i) => (
                       <li key={i}>{f}</li>
                     ))}
                   </ul>
+                  {forensicDetails.detectionClues && forensicDetails.detectionClues.length > 0 && (
+                    <div className="mt-1.5 p-2 rounded-lg bg-rose-950/20 border border-rose-500/20 text-[10px] text-rose-200">
+                      <strong>Indicios de detección:</strong> {forensicDetails.detectionClues.join(' • ')}
+                    </div>
+                  )}
                 </div>
 
-                {/* Truco EVO */}
+                {/* Section H: What to verify now (3-5 checkpoints) */}
+                {forensicDetails.whatToVerify && forensicDetails.whatToVerify.length > 0 && (
+                  <div className="space-y-1.5 pt-2 border-t border-zinc-800/80">
+                    <span className="text-[10px] font-bold text-amber-400 uppercase block">
+                      QUÉ VERIFICAR AHORA // PUNTOS DE CONTROL:
+                    </span>
+                    <ul className="space-y-1 text-[11px] text-zinc-300 font-sans-editorial">
+                      {forensicDetails.whatToVerify.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5 bg-zinc-900/40 px-2 py-1 rounded border border-zinc-800/40">
+                          <span className="text-amber-400 font-bold">✓</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Section I: Truco EVO */}
                 <div className="p-3 rounded-xl bg-cyan-950/20 border border-cyan-500/30 text-xs">
                   <span className="text-[10px] font-bold text-cyan-400 uppercase block mb-1">TRUCO EVO:</span>
                   <p className="text-cyan-200 font-sans-editorial leading-relaxed text-[11px]">
@@ -701,30 +753,78 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
                 </div>
               </div>
 
-              {/* Suggested Safe Test */}
-              <div className="pt-3 border-t border-zinc-800/80 text-xs">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase">PRUEBA RECOMENDADA:</span>
-                  <span
-                    className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
-                      currentStep.safetyLevel === 'USUARIO'
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                        : currentStep.safetyLevel === 'TECNICO'
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                        : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                    }`}
-                  >
-                    NIVEL: {currentStep.safetyLevel}
-                  </span>
+              {/* Complete Structured Workshop Verification Card */}
+              {forensicDetails.structuredVerification ? (
+                <div className="pt-3 border-t border-zinc-800/80 text-xs bg-zinc-950/90 p-3.5 rounded-xl border border-zinc-800 space-y-2.5">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <Wrench className="w-3.5 h-3.5 text-cyan-400" />
+                      <span className="text-[10px] font-bold text-white uppercase">
+                        CÓMO VERIFICARLO // PRUEBA DE TALLER: {forensicDetails.structuredVerification.testName}
+                      </span>
+                    </div>
+                    <span
+                      className={`text-[8.5px] px-1.5 py-0.5 rounded font-bold ${
+                        forensicDetails.structuredVerification.safetyLevel === 'USUARIO'
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          : forensicDetails.structuredVerification.safetyLevel === 'TECNICO'
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                          : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                      }`}
+                    >
+                      NIVEL {forensicDetails.structuredVerification.safetyLevel}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10.5px]">
+                    <div>
+                      <span className="text-[9px] font-bold text-zinc-400 uppercase block">OBJETIVO:</span>
+                      <p className="text-zinc-300 font-sans-editorial">{forensicDetails.structuredVerification.objective}</p>
+                    </div>
+                    <div>
+                      <span className="text-[9px] font-bold text-zinc-400 uppercase block">HERRAMIENTAS:</span>
+                      <p className="text-zinc-300 font-sans-editorial">{forensicDetails.structuredVerification.tools}</p>
+                    </div>
+                  </div>
+
+                  <div className="text-[10.5px]">
+                    <span className="text-[9px] font-bold text-zinc-400 uppercase block">PROCEDIMIENTO:</span>
+                    <p className="text-zinc-300 font-sans-editorial">{forensicDetails.structuredVerification.procedure}</p>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-zinc-900/90 border border-zinc-800 text-[10px] space-y-1.5">
+                    <div>
+                      <strong className="text-emerald-400">Resultado esperado:</strong>{' '}
+                      <span className="text-zinc-300">{forensicDetails.structuredVerification.expectedResult}</span>
+                    </div>
+                    <div>
+                      <strong className="text-cyan-400">Si es correcto:</strong>{' '}
+                      <span className="text-zinc-300">{forensicDetails.structuredVerification.ifCorrect}</span>
+                    </div>
+                    <div>
+                      <strong className="text-rose-400">Si es incorrecto:</strong>{' '}
+                      <span className="text-zinc-300">{forensicDetails.structuredVerification.ifIncorrect}</span>
+                    </div>
+                    <div>
+                      <strong className="text-amber-400">¿Qué demuestra?</strong>{' '}
+                      <span className="text-zinc-300">{forensicDetails.structuredVerification.whatItProves}</span>
+                    </div>
+                    <div>
+                      <strong className="text-indigo-400">Siguiente paso:</strong>{' '}
+                      <span className="text-zinc-300">{forensicDetails.structuredVerification.nextStep}</span>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-zinc-300 font-sans-editorial text-[11px] leading-relaxed">
-                  {currentStep.suggestedSafeTest}
-                </p>
-                {currentStep.safetyRequirement && (
-                  <p className="text-[10px] text-amber-400 font-bold mt-1">
-                    ⚠️ {currentStep.safetyRequirement}
-                  </p>
-                )}
+              ) : null}
+
+              {/* EVO Methodology Footer Motto */}
+              <div className="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80 text-[9.5px] text-zinc-400 text-center font-mono-tech space-y-1">
+                <div className="text-cyan-300 font-bold">
+                  OBSERVÁ → IDENTIFICÁ LA ETAPA → CONFIRMÁ QUÉ YA FUNCIONÓ → DETECTÁ EL PRIMER EVENTO QUE FALTA → FORMULÁ HIPÓTESIS → COMPROBÁ
+                </div>
+                <div className="text-amber-400 font-bold uppercase tracking-wider text-[10px]">
+                  NO LO CREAS. COMPROBALO.
+                </div>
               </div>
             </div>
           </div>
