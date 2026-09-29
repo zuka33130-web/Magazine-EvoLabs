@@ -96,6 +96,30 @@ const COMPONENT_EDU_INFO: Record<string, ComponentEduModalData> = {
       'Desgaste de celdas NAND o firmware del SSD bloqueado en modo de solo lectura.',
     ],
   },
+  pch: {
+    title: 'PCH // PLATFORM CONTROLLER HUB (CHIPSET)',
+    category: 'CONTROLADOR DE BUSES & PERIFÉRICOS',
+    queEs: 'Circuito integrado concentrador que gestiona líneas PCIe secundarias, puertos SATA, controladoras USB, audio y el enlace DMI/LPC al procesador.',
+    queHace: 'Distribuye el tráfico periférico, participa en la gestión de estados de energía ACPI (S0–S5) y coordina señales con el Super I/O y el firmware.',
+    cuandoInterviene: 'Paso 02 (Enrutamiento de standby y buses), Paso 17 (Detección de almacenamiento/USB) y ejecución permanente en tiempo de ejecución.',
+    fallasPosibles: [
+      'Sobrecalentamiento del silicio PCH por disipador flojo, sucio o almohadilla térmica degradada.',
+      'Líneas USB o puertos SATA en cortocircuito que bloquean la secuencia de encendido en reposo.',
+      'Pérdida de enlace DMI con la CPU impidiendo la detección de unidades y puertos.',
+    ],
+  },
+  fpanel: {
+    title: 'HEADER PANEL FRONTAL // F_PANEL & PWR_SW',
+    category: 'INTERFAZ DE CONTROL FÍSICO',
+    queEs: 'Bloque de pines estandarizado en la esquina de la placa base para pulsadores (PWR_SW, RESET_SW) y testigos luminosos (PWR_LED, HDD_LED).',
+    queHace: 'Al cerrarse momentáneamente el contacto entre los pines PWR_SW, envía un pulso a masa que la lógica de la motherboard interpreta para activar PS_ON#.',
+    cuandoInterviene: 'Paso 01 (Pulsación física del botón de encendido) y Paso 02 (Detección de flanco por Super I/O / EC / PCH).',
+    fallasPosibles: [
+      'Pulsador físico del gabinete trabado o sulfatado (provoca apagado forzado tras 4 segundos).',
+      'Conectores invertidos o colocados en pines equivocados (ej. pulsar reset en lugar de power).',
+      'Pines doblados o sulfato en el header impidiendo el cierre de contacto a tierra.',
+    ],
+  },
   bios: {
     title: 'SPI FLASH // CHIP FIRMWARE UEFI',
     category: 'FIRMWARE & NVRAM',
@@ -202,151 +226,177 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
         {/* ========================================================================= */}
         {/* LEFT / CENTER: GABINETE ABIERTO CON MOTHERBOARD REAL (COL 1-8)            */}
         {/* ========================================================================= */}
-        <div className="xl:col-span-8 bg-[#0b0e14] border border-zinc-800 rounded-xl p-3 sm:p-4 relative overflow-hidden shadow-inner flex flex-col justify-between min-h-[460px]">
+        <div className="xl:col-span-8 bg-[#0b0e14] border border-zinc-800 rounded-xl p-3 sm:p-4 relative overflow-hidden shadow-inner flex flex-col justify-between min-h-[470px]">
           
-          {/* Cabinet Top Header */}
-          <div className="flex items-center justify-between pb-2 mb-3 border-b border-zinc-800/60 text-[10px] text-zinc-400">
+          {/* Cabinet Top Header with Live Signal Traveling */}
+          <div className="flex flex-wrap items-center justify-between pb-2 mb-2.5 border-b border-zinc-800/60 text-[10px] gap-2">
             <span className="flex items-center gap-1.5 font-bold text-zinc-300">
-              <span className="w-2 h-2 rounded-full bg-cyan-400/80" />
+              <span className="w-2 h-2 rounded-full bg-cyan-400/80 animate-pulse" />
               CHASIS EVO // CORTE LATERAL ABIERTO
             </span>
-            <span className="text-[9px] text-zinc-500 hidden sm:inline">
-              CLIC EN UN COMPONENTE PARA AUDITORÍA EDUCATIVA
+            <span className="text-[9px] px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-cyan-300 font-mono-tech flex items-center gap-1">
+              <Zap className="w-3 h-3 text-amber-400 animate-bounce" />
+              <span>SEÑAL EN TRÁNSITO: <strong>{currentStep.activeConnections?.[0] || 'REPOSO / LÓGICA PASIVA'}</strong></span>
             </span>
           </div>
 
-          {/* MOTHERBOARD AREA (PCB) */}
-          <div className="w-full bg-[#111622] border-2 border-zinc-700/80 rounded-xl p-3.5 relative overflow-hidden shadow-2xl flex-1 flex flex-col justify-between">
-            {/* PCB Texture & Standoffs */}
-            <div className="absolute top-2 left-2 w-2 h-2 rounded-full border border-amber-500/40 bg-zinc-800" />
-            <div className="absolute top-2 right-2 w-2 h-2 rounded-full border border-amber-500/40 bg-zinc-800" />
-            <div className="absolute bottom-2 left-2 w-2 h-2 rounded-full border border-amber-500/40 bg-zinc-800" />
-            <div className="absolute bottom-2 right-2 w-2 h-2 rounded-full border border-amber-500/40 bg-zinc-800" />
+          {/* MOTHERBOARD AREA (PCB) - FLEXBOX SCHEMATIC ARCHITECTURE */}
+          <div className="w-full bg-[#0d121c] border-2 border-zinc-700/80 rounded-xl p-3 sm:p-3.5 relative overflow-hidden shadow-2xl flex-1 flex flex-col justify-between gap-2.5">
+            {/* PCB Texture & Mounting Standoffs */}
+            <div className="absolute top-2 left-2 w-2 h-2 rounded-full border border-amber-500/50 bg-zinc-800 shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
+            <div className="absolute top-2 right-2 w-2 h-2 rounded-full border border-amber-500/50 bg-zinc-800 shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
+            <div className="absolute bottom-2 left-2 w-2 h-2 rounded-full border border-amber-500/50 bg-zinc-800 shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
+            <div className="absolute bottom-2 right-2 w-2 h-2 rounded-full border border-amber-500/50 bg-zinc-800 shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
 
-            {/* Motherboard Header Info */}
-            <div className="flex items-center justify-between text-[9px] text-zinc-500 mb-2">
+            {/* Motherboard Header Info & Architecture Legend */}
+            <div className="flex flex-wrap items-center justify-between text-[9px] text-zinc-500 pb-1.5 border-b border-zinc-800/70 gap-2">
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.motherboard)}
-                className="hover:text-cyan-300 transition-colors flex items-center gap-1 text-zinc-400 font-bold"
+                className="hover:text-cyan-300 transition-colors flex items-center gap-1.5 text-zinc-300 font-bold"
               >
-                <Sliders className="w-3 h-3 text-cyan-400" />
-                <span>PLACA BASE EVO ATX (PCB)</span>
+                <Sliders className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="tracking-wide">MOTHERBOARD EVO ATX // ESQUEMA DE SILICIO Y ZONAS</span>
                 <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
               </button>
-              <span className="text-[8.5px] text-zinc-600 font-mono-tech">
-                {isComponentActive('motherboard') ? '● BUSES & ENLACES ACTIVOS' : '○ REPOSO'}
-              </span>
+              <div className="flex items-center gap-1.5 text-[8px] font-mono-tech">
+                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300">Z1: VRM</span>
+                <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">Z2: CPU</span>
+                <span className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-300">Z3: RAM</span>
+                <span className="px-1.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">Z4: PCH</span>
+                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300">Z5: F_PANEL</span>
+              </div>
             </div>
 
-            {/* MOTHERBOARD TOP SECTION: VRM + CPU SOCKET + RAM SLOTS */}
-            <div className="grid grid-cols-12 gap-2.5 mb-3">
-              {/* VRM Area (Left of Socket) */}
+            {/* FLEXBOX ROW 1: VRM + CPU SOCKET + RAM SLOTS */}
+            <div className="flex flex-col md:flex-row gap-2.5 items-stretch">
+              {/* ZONA 1: VRM & ALIMENTACIÓN */}
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.vrm)}
-                className={`col-span-3 p-2 rounded-lg border text-left transition-all ${
+                className={`flex-1 md:basis-1/4 p-2.5 rounded-lg border text-left transition-all flex flex-col justify-between ${
                   isComponentActive('motherboard') && currentStep.stepNumber >= 4
-                    ? 'bg-amber-500/10 border-amber-400/80 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                    ? 'bg-amber-500/15 border-amber-400/90 shadow-[0_0_15px_rgba(245,158,11,0.25)] ring-1 ring-amber-400/50'
                     : isComponentEverReached(4)
                     ? 'bg-zinc-900/70 border-zinc-700/80 text-zinc-300'
                     : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-600'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1">
-                    <Flame className="w-3 h-3 text-amber-400" />
-                    <span className="text-[10px] font-bold text-white">VRM PHASES</span>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <Flame className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="text-[10px] font-bold text-white tracking-wide">ZONA VRM</span>
+                    </div>
+                    <span className="text-[7.5px] px-1 py-0.2 rounded bg-amber-950/80 border border-amber-700/50 text-amber-300 font-mono">
+                      Z1
+                    </span>
                   </div>
-                  <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
+                  <div className="text-[8px] text-zinc-400 leading-tight">
+                    {currentStep.stepNumber < 4 ? '0V Standby' : 'VCore ~1.2V Regulado'}
+                  </div>
                 </div>
-                <div className="text-[8px] text-zinc-400 leading-tight">
-                  {currentStep.stepNumber < 4 ? '0V Standby' : 'VCore ~1.2V Regulado'}
-                </div>
-                {/* Visual Inductor coils */}
-                <div className="flex gap-0.5 mt-1.5 opacity-60">
-                  <span className="w-2 h-2 rounded-sm bg-zinc-700 border border-zinc-600" />
-                  <span className="w-2 h-2 rounded-sm bg-zinc-700 border border-zinc-600" />
-                  <span className="w-2 h-2 rounded-sm bg-zinc-700 border border-zinc-600" />
+                {/* Visual Inductor coils & Mosfets */}
+                <div className="flex items-center gap-1 mt-2 pt-1 border-t border-zinc-800/60">
+                  <div className="flex gap-0.5 opacity-80">
+                    <span className={`w-2 h-2 rounded-sm border ${isComponentActive('motherboard') && currentStep.stepNumber >= 4 ? 'bg-amber-400 border-amber-300' : 'bg-zinc-700 border-zinc-600'}`} />
+                    <span className={`w-2 h-2 rounded-sm border ${isComponentActive('motherboard') && currentStep.stepNumber >= 4 ? 'bg-amber-400 border-amber-300' : 'bg-zinc-700 border-zinc-600'}`} />
+                    <span className={`w-2 h-2 rounded-sm border ${isComponentActive('motherboard') && currentStep.stepNumber >= 4 ? 'bg-amber-400 border-amber-300' : 'bg-zinc-700 border-zinc-600'}`} />
+                  </div>
+                  <span className="text-[7.5px] text-zinc-500 font-mono">PWM 8+2</span>
                 </div>
               </button>
 
-              {/* CPU Socket in Center */}
+              {/* ZONA 2: CPU SOCKET & IMC */}
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.cpu)}
-                className={`col-span-5 p-2.5 rounded-lg border text-left transition-all relative ${
+                className={`flex-1 md:basis-2/4 p-2.5 rounded-lg border text-left transition-all relative flex flex-col justify-between ${
                   isComponentActive('cpu')
-                    ? 'bg-emerald-500/10 border-emerald-400/90 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
+                    ? 'bg-emerald-500/15 border-emerald-400/90 shadow-[0_0_20px_rgba(16,185,129,0.35)] ring-1 ring-emerald-400/50'
                     : isComponentEverReached(6)
                     ? 'bg-zinc-900/70 border-zinc-700/80 text-zinc-300'
                     : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-600'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1.5">
-                    <Cpu className={`w-3.5 h-3.5 ${isComponentActive('cpu') ? 'text-emerald-400 animate-pulse' : 'text-zinc-500'}`} />
-                    <span className="text-[11px] font-bold text-white">SOCKET / CPU</span>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <Cpu className={`w-4 h-4 ${isComponentActive('cpu') ? 'text-emerald-400 animate-pulse' : 'text-zinc-500'}`} />
+                      <span className="text-[11px] font-bold text-white tracking-wide">SOCKET CPU & IMC</span>
+                    </div>
+                    <span className="text-[7.5px] px-1 py-0.2 rounded bg-emerald-950/80 border border-emerald-700/50 text-emerald-300 font-mono">
+                      Z2
+                    </span>
                   </div>
-                  <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
+                  <p className="text-[8.5px] text-zinc-400 leading-tight">
+                    {currentStep.stepNumber < 6
+                      ? 'Reset Activo (0V) • Esperando PWR_OK'
+                      : currentStep.stepNumber < 13
+                      ? 'Vector FFFF_FFF0h • Microcódigo & IMC'
+                      : 'Pipeline x86-64 Operativo • Ring 0'}
+                  </p>
                 </div>
-                <p className="text-[9px] text-zinc-400 leading-tight">
-                  {currentStep.stepNumber < 6
-                    ? 'Reset Activo (0V)'
-                    : currentStep.stepNumber < 13
-                    ? 'Microcódigo & IMC Activo'
-                    : 'x86-64 Pipeline Operativo'}
-                </p>
-                <div className="mt-1 text-[8px] font-bold text-emerald-400/80">
-                  {isComponentActive('cpu') ? '● PROCESANDO' : ''}
+                <div className="flex items-center justify-between mt-2 pt-1 border-t border-zinc-800/60 text-[8px]">
+                  <span className="text-zinc-500 font-mono">LGA / AM SOCKET</span>
+                  <span className={`font-bold ${isComponentActive('cpu') ? 'text-emerald-400 animate-pulse' : 'text-zinc-600'}`}>
+                    {isComponentActive('cpu') ? '● PROCESANDO' : 'PASIVO'}
+                  </span>
                 </div>
               </button>
 
-              {/* RAM Slots (Right of Socket) */}
+              {/* ZONA 3: SLOTS RAM DIMM */}
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.ram)}
-                className={`col-span-4 p-2 rounded-lg border text-left transition-all ${
+                className={`flex-1 md:basis-1/4 p-2.5 rounded-lg border text-left transition-all flex flex-col justify-between ${
                   isComponentActive('ram')
-                    ? 'bg-blue-500/10 border-blue-400/90 shadow-[0_0_20px_rgba(59,130,246,0.3)]'
+                    ? 'bg-blue-500/15 border-blue-400/90 shadow-[0_0_20px_rgba(59,130,246,0.35)] ring-1 ring-blue-400/50'
                     : isComponentEverReached(10)
                     ? 'bg-zinc-900/70 border-zinc-700/80 text-zinc-300'
                     : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-600'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1">
-                    <Activity className="w-3 h-3 text-blue-400" />
-                    <span className="text-[10px] font-bold text-white">BANCOS RAM</span>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <Activity className="w-3.5 h-3.5 text-blue-400" />
+                      <span className="text-[10px] font-bold text-white tracking-wide">SLOTS RAM</span>
+                    </div>
+                    <span className="text-[7.5px] px-1 py-0.2 rounded bg-blue-950/80 border border-blue-700/50 text-blue-300 font-mono">
+                      Z3
+                    </span>
                   </div>
-                  <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
+                  <div className="text-[8px] text-zinc-400 leading-tight">
+                    {currentStep.stepNumber < 10
+                      ? 'Sin Inicializar'
+                      : currentStep.stepNumber < 13
+                      ? 'SPD / Memory Training'
+                      : 'DRAM Calibrada'}
+                  </div>
                 </div>
-                <div className="text-[8px] text-zinc-400 leading-tight">
-                  {currentStep.stepNumber < 10
-                    ? 'Sin Inicializar'
-                    : currentStep.stepNumber < 13
-                    ? 'SPD / Memory Training'
-                    : 'DRAM Inicializada'}
-                </div>
-                {/* 4 DIMM Slots visualization */}
-                <div className="flex gap-1 mt-1.5 justify-center">
-                  <span className={`h-3.5 w-1 rounded-sm ${isComponentActive('ram') ? 'bg-blue-400 animate-pulse' : 'bg-zinc-700'}`} />
-                  <span className={`h-3.5 w-1 rounded-sm ${isComponentActive('ram') ? 'bg-blue-400 animate-pulse' : 'bg-zinc-700'}`} />
-                  <span className="h-3.5 w-1 rounded-sm bg-zinc-800" />
-                  <span className="h-3.5 w-1 rounded-sm bg-zinc-800" />
+                {/* 4 DIMM Slots visualization (Canal A / Canal B) */}
+                <div className="flex items-center justify-between mt-2 pt-1 border-t border-zinc-800/60">
+                  <div className="flex gap-1 justify-center">
+                    <span className={`h-3 w-1 rounded-xs ${isComponentActive('ram') ? 'bg-blue-400 animate-pulse' : 'bg-zinc-700'}`} />
+                    <span className={`h-3 w-1 rounded-xs ${isComponentActive('ram') ? 'bg-blue-400 animate-pulse' : 'bg-zinc-700'}`} />
+                    <span className="h-3 w-1 rounded-xs bg-zinc-800" />
+                    <span className="h-3 w-1 rounded-xs bg-zinc-800" />
+                  </div>
+                  <span className="text-[7.5px] text-zinc-500 font-mono">CANAL A/B</span>
                 </div>
               </button>
             </div>
 
-            {/* MOTHERBOARD MID / BOTTOM SECTION: PCIe/GPU + NVMe M.2 + CHIPSET + BIOS SPI */}
-            <div className="grid grid-cols-12 gap-2.5">
+            {/* FLEXBOX ROW 2: PCIe/GPU + NVMe M.2 */}
+            <div className="flex flex-col md:flex-row gap-2.5 items-stretch">
               {/* Dedicated PCIe GPU slot and card */}
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.gpu)}
-                className={`col-span-7 p-2.5 rounded-lg border text-left transition-all ${
+                className={`flex-1 md:basis-7/12 p-2.5 rounded-lg border text-left transition-all ${
                   isComponentActive('gpu')
-                    ? 'bg-indigo-500/10 border-indigo-400/90 shadow-[0_0_20px_rgba(99,102,241,0.3)]'
+                    ? 'bg-indigo-500/15 border-indigo-400/90 shadow-[0_0_20px_rgba(99,102,241,0.35)] ring-1 ring-indigo-400/50'
                     : isComponentEverReached(14)
                     ? 'bg-zinc-900/70 border-zinc-700/80 text-zinc-300'
                     : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-600'
@@ -359,14 +409,14 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
                   </div>
                   <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
                 </div>
-                <div className="text-[8.5px] text-zinc-400 leading-tight font-sans-editorial">
+                <div className="text-[8px] text-zinc-400 leading-tight">
                   {currentStep.stepNumber < 14
-                    ? 'Bus en reposo'
+                    ? 'Bus PCIe en reposo'
                     : currentStep.stepNumber < 16
                     ? 'GOP / VBIOS Handshake'
                     : 'Enlace PCIe Activo (Salida de Video)'}
                 </div>
-                <div className="w-full bg-zinc-900 h-1.5 rounded-full mt-2 overflow-hidden">
+                <div className="w-full bg-zinc-900 h-1 rounded-full mt-2 overflow-hidden">
                   <div
                     className={`h-full ${
                       isComponentActive('gpu')
@@ -383,17 +433,17 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.storage)}
-                className={`col-span-5 p-2 rounded-lg border text-left transition-all ${
+                className={`flex-1 md:basis-5/12 p-2.5 rounded-lg border text-left transition-all ${
                   isComponentActive('storage')
-                    ? 'bg-emerald-500/10 border-emerald-400/90 shadow-[0_0_15px_rgba(16,185,129,0.25)]'
+                    ? 'bg-emerald-500/15 border-emerald-400/90 shadow-[0_0_15px_rgba(16,185,129,0.3)] ring-1 ring-emerald-400/50'
                     : isComponentEverReached(17)
                     ? 'bg-zinc-900/70 border-zinc-700/80 text-zinc-300'
                     : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-600'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1">
-                    <HardDrive className="w-3 h-3 text-emerald-400" />
+                  <div className="flex items-center gap-1.5">
+                    <HardDrive className="w-3.5 h-3.5 text-emerald-400" />
                     <span className="text-[10px] font-bold text-white">NVMe M.2 (SSD)</span>
                   </div>
                   <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
@@ -408,13 +458,13 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
               </button>
             </div>
 
-            {/* Motherboard Lower Bar: Chipset PCH & SPI Flash BIOS */}
-            <div className="flex items-center justify-between pt-2.5 mt-2 border-t border-zinc-800/70 text-[8.5px]">
+            {/* FLEXBOX ROW 3: SPI FLASH BIOS + ZONA 4: PCH/CHIPSET + ZONA 5: HEADER PANEL FRONTAL */}
+            <div className="flex flex-col sm:flex-row gap-2 items-stretch pt-2 border-t border-zinc-800/70 text-[8.5px]">
               {/* SPI BIOS Chip */}
               <button
                 type="button"
                 onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.bios)}
-                className={`flex items-center gap-1 px-2 py-1 rounded border transition-all ${
+                className={`flex-1 p-2 rounded-lg border transition-all text-left flex items-center justify-between ${
                   isComponentActive('firmware')
                     ? 'bg-purple-500/20 border-purple-400 text-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.3)]'
                     : isComponentEverReached(7)
@@ -422,22 +472,74 @@ export const EvoBootMachineVisual: React.FC<EvoBootMachineVisualProps> = ({
                     : 'bg-zinc-950 border-zinc-900 text-zinc-600'
                 }`}
               >
-                <Shield className="w-2.5 h-2.5 text-purple-400" />
-                <span>CHIP SPI FLASH (UEFI / NVRAM)</span>
-                <HelpCircle className="w-2 h-2 text-zinc-500 ml-0.5" />
+                <div className="flex items-center gap-1.5">
+                  <Shield className="w-3 h-3 text-purple-400" />
+                  <div>
+                    <div className="font-bold text-white text-[9px]">SPI FLASH (UEFI)</div>
+                    <div className="text-[7.5px] text-zinc-400">Microcódigo & NVRAM</div>
+                  </div>
+                </div>
+                <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
               </button>
 
-              {/* Front Panel & 24p ATX indicator */}
-              <span className="text-zinc-500 flex items-center gap-1">
-                <span>ATX 24-PIN & PWR_SW</span>
-                <span
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    isComponentActive('psu') || currentStep.stepNumber >= 1
-                      ? 'bg-amber-400 animate-pulse'
-                      : 'bg-zinc-700'
-                  }`}
-                />
-              </span>
+              {/* ZONA 4: PCH / CHIPSET */}
+              <button
+                type="button"
+                onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.pch)}
+                className={`flex-1 p-2 rounded-lg border transition-all text-left flex items-center justify-between ${
+                  isComponentActive('motherboard') && currentStep.stepNumber >= 2
+                    ? 'bg-cyan-500/15 border-cyan-400/90 text-cyan-200 shadow-[0_0_10px_rgba(6,182,212,0.25)] ring-1 ring-cyan-400/40'
+                    : isComponentEverReached(2)
+                    ? 'bg-zinc-900 border-zinc-700 text-zinc-300'
+                    : 'bg-zinc-950 border-zinc-900 text-zinc-600'
+                }`}
+              >
+                <div className="flex items-center gap-1.5">
+                  <Sliders className="w-3 h-3 text-cyan-400" />
+                  <div>
+                    <div className="flex items-center gap-1">
+                      <span className="font-bold text-white text-[9px]">PCH / CHIPSET</span>
+                      <span className="text-[7px] px-1 py-0.2 rounded bg-cyan-950 border border-cyan-700/50 text-cyan-300 font-mono">Z4</span>
+                    </div>
+                    <div className="text-[7.5px] text-zinc-400">Enlace DMI & Periféricos</div>
+                  </div>
+                </div>
+                <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
+              </button>
+
+              {/* ZONA 5: HEADER PANEL FRONTAL (F_PANEL & PWR_SW) */}
+              <button
+                type="button"
+                onClick={() => setInspectedComponent(COMPONENT_EDU_INFO.fpanel)}
+                className={`flex-1 p-2 rounded-lg border transition-all text-left flex items-center justify-between ${
+                  isComponentActive('psu') || currentStep.stepNumber === 1 || currentStep.stepNumber === 2
+                    ? 'bg-amber-500/15 border-amber-400/90 text-amber-200 shadow-[0_0_10px_rgba(245,158,11,0.25)] ring-1 ring-amber-400/40'
+                    : currentStep.stepNumber >= 1
+                    ? 'bg-zinc-900 border-zinc-700 text-zinc-300'
+                    : 'bg-zinc-950 border-zinc-900 text-zinc-600'
+                }`}
+              >
+                <div className="flex items-center gap-1.5">
+                  <Power className="w-3 h-3 text-amber-400" />
+                  <div>
+                    <div className="flex items-center gap-1">
+                      <span className="font-bold text-white text-[9px]">F_PANEL HEADER</span>
+                      <span className="text-[7px] px-1 py-0.2 rounded bg-amber-950 border border-amber-700/50 text-amber-300 font-mono">Z5</span>
+                    </div>
+                    <div className="text-[7.5px] text-zinc-400">PWR_SW / RESET / LEDs</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      isComponentActive('psu') || currentStep.stepNumber >= 1
+                        ? 'bg-amber-400 animate-pulse'
+                        : 'bg-zinc-700'
+                    }`}
+                  />
+                  <HelpCircle className="w-2.5 h-2.5 text-zinc-500" />
+                </div>
+              </button>
             </div>
           </div>
 
