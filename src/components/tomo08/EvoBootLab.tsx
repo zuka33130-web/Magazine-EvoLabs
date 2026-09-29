@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   BOOT_SEQUENCE_STEPS,
   BootStep,
@@ -11,6 +11,7 @@ import {
   MysteryComponentKey,
   MysteryHypothesisState,
   ALL_MYSTERY_COMPONENTS,
+  getStepForensicDetails,
 } from './bootSequenceData';
 import { EvoBootMachineVisual } from './EvoBootMachineVisual';
 import {
@@ -37,7 +38,6 @@ import {
   Search,
   CheckCircle,
   Sparkles,
-  HelpCircle as QuestionIcon,
   Compass,
   History,
   Check,
@@ -60,11 +60,13 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
   const [maxUnlockedStep, setMaxUnlockedStep] = useState<number>(0);
   const [isPoweredOn, setIsPoweredOn] = useState<boolean>(false);
   const [simulatedFailureStep, setSimulatedFailureStep] = useState<number | null>(null);
+  const [isSimulatingFailureRun, setIsSimulatingFailureRun] = useState<boolean>(false);
 
   // CASO EVO Mode States
   const [selectedCaseIndex, setSelectedCaseIndex] = useState<number>(0);
   const [caseRunning, setCaseRunning] = useState<boolean>(false);
   const [caseStepReached, setCaseStepReached] = useState<number>(0);
+  const [isCaseBooting, setIsCaseBooting] = useState<boolean>(false);
   const [executedTestIds, setExecutedTestIds] = useState<string[]>([]);
   const [caseHypotheses, setCaseHypotheses] = useState<CaseHypothesis[]>(
     EVO_CASES[0].hypotheses
@@ -77,6 +79,8 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
   // PC MISTERIOSA Mode States
   const [mysteryCaseIndex, setMysteryCaseIndex] = useState<number>(0);
   const [mysteryRunning, setMysteryRunning] = useState<boolean>(false);
+  const [mysteryStepReached, setMysteryStepReached] = useState<number>(0);
+  const [isMysteryBooting, setIsMysteryBooting] = useState<boolean>(false);
   const [mysteryActiveTab, setMysteryActiveTab] = useState<MysteryTab>('EVIDENCIAS');
   const [mysteryExecutedTests, setMysteryExecutedTests] = useState<string[]>([]);
   const [mysteryExpandedWhy, setMysteryExpandedWhy] = useState<string | null>(null);
@@ -101,25 +105,126 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
   } | null>(null);
   const [isMysteryResolved, setIsMysteryResolved] = useState<boolean>(false);
 
-  const currentCase: EvoCase = EVO_CASES[selectedCaseIndex];
-  const currentMystery: MysteryCase = MYSTERY_CASES_POOL[mysteryCaseIndex];
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  const currentCase: EvoCase = EVO_CASES[selectedCaseIndex] || EVO_CASES[0];
+  const currentMystery: MysteryCase = MYSTERY_CASES_POOL[mysteryCaseIndex] || MYSTERY_CASES_POOL[0];
 
   // Active step for machine visual depending on mode
-  let currentStep: BootStep = BOOT_SEQUENCE_STEPS[currentStepIndex];
-  if (activeMode === 'CASO_EVO' && caseRunning) {
-    currentStep = BOOT_SEQUENCE_STEPS[caseStepReached];
-  } else if (activeMode === 'PC_MISTERIOSA' && mysteryRunning) {
-    currentStep = BOOT_SEQUENCE_STEPS[currentMystery.stopStep];
+  let activeVisualStepIndex = currentStepIndex;
+  if (activeMode === 'CASO_EVO') {
+    activeVisualStepIndex = caseRunning ? caseStepReached : 0;
+  } else if (activeMode === 'PC_MISTERIOSA') {
+    activeVisualStepIndex = mysteryRunning ? mysteryStepReached : 0;
+  } else if (activeMode === 'FALLA_SIMULADA') {
+    activeVisualStepIndex = currentStepIndex;
   }
 
+  const currentStep: BootStep =
+    BOOT_SEQUENCE_STEPS[activeVisualStepIndex] || BOOT_SEQUENCE_STEPS[0];
+  const forensicDetails = getStepForensicDetails(currentStep.stepNumber);
   const totalSteps = BOOT_SEQUENCE_STEPS.length - 1; // 0 to 34
 
-  // Switch Case in CASO EVO
+  // =========================================================================
+  // APRENDER & BASIC CONTROLS
+  // =========================================================================
+
+  const handlePowerOn = () => {
+    setIsPoweredOn(true);
+    setCurrentStepIndex(1);
+    setMaxUnlockedStep((prev) => Math.max(prev, 1));
+  };
+
+  const handlePowerOff = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setIsPoweredOn(false);
+    setCurrentStepIndex(0);
+    setIsSimulatingFailureRun(false);
+  };
+
+  const handleNextStep = () => {
+    if (currentStepIndex < totalSteps) {
+      if (activeMode === 'FALLA_SIMULADA' && simulatedFailureStep !== null && currentStepIndex >= simulatedFailureStep) {
+        return; // Locked at failure point
+      }
+      const nextIdx = currentStepIndex + 1;
+      setCurrentStepIndex(nextIdx);
+      setMaxUnlockedStep((prev) => Math.max(prev, nextIdx));
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStepIndex > 1) {
+      setCurrentStepIndex((prev) => prev - 1);
+    } else if (currentStepIndex === 1) {
+      handlePowerOff();
+    }
+  };
+
+  const handleJumpToStep = (index: number) => {
+    if (index === 0) {
+      handlePowerOff();
+      return;
+    }
+    if (index <= maxUnlockedStep) {
+      if (activeMode === 'FALLA_SIMULADA' && simulatedFailureStep !== null && index > simulatedFailureStep) {
+        return; // Locked beyond failure point
+      }
+      setIsPoweredOn(true);
+      setCurrentStepIndex(index);
+    }
+  };
+
+  // =========================================================================
+  // FALLA SIMULADA RUNNER
+  // =========================================================================
+
+  const handleSelectSimulatedFailure = (stepNum: number) => {
+    setSimulatedFailureStep(stepNum);
+    if (timerRef.current) clearInterval(timerRef.current);
+    setIsPoweredOn(false);
+    setCurrentStepIndex(0);
+    setIsSimulatingFailureRun(false);
+  };
+
+  const handleStartSimulatedFailureRun = () => {
+    if (simulatedFailureStep === null) return;
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    setIsPoweredOn(true);
+    setIsSimulatingFailureRun(true);
+    setCurrentStepIndex(0);
+
+    let step = 0;
+    timerRef.current = setInterval(() => {
+      step += 1;
+      if (step <= simulatedFailureStep) {
+        setCurrentStepIndex(step);
+        setMaxUnlockedStep((prev) => Math.max(prev, step));
+      } else {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setIsSimulatingFailureRun(false);
+      }
+    }, 120);
+  };
+
+  // =========================================================================
+  // CASO EVO HANDLERS
+  // =========================================================================
+
   const handleSelectCase = (caseIndex: number) => {
+    if (timerRef.current) clearInterval(timerRef.current);
     setSelectedCaseIndex(caseIndex);
     const targetCase = EVO_CASES[caseIndex];
     setCaseRunning(false);
     setCaseStepReached(0);
+    setIsCaseBooting(false);
     setExecutedTestIds([]);
     setCaseHypotheses(targetCase.hypotheses);
     setAccumulatedEvidence([]);
@@ -128,19 +233,30 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
     setIsCaseResolved(false);
   };
 
-  // Launch Diagnostic Sequence in CASO EVO
   const handleStartCaseDiagnostic = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
     setCaseRunning(true);
-    setCaseStepReached(currentCase.stopStep);
+    setIsCaseBooting(true);
+    setCaseStepReached(0);
     setCaseHypotheses(currentCase.hypotheses);
     setAccumulatedEvidence([...currentCase.evidenciaInicial]);
     setExecutedTestIds([]);
     setSelectedHypothesisId(null);
     setUserDiagnosticFeedback(null);
     setIsCaseResolved(false);
+
+    let step = 0;
+    timerRef.current = setInterval(() => {
+      step += 1;
+      if (step <= currentCase.stopStep) {
+        setCaseStepReached(step);
+      } else {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setIsCaseBooting(false);
+      }
+    }, 100);
   };
 
-  // Execute Safe Test in CASO EVO
   const handleExecuteTest = (testId: string) => {
     if (executedTestIds.includes(testId)) return;
 
@@ -158,9 +274,9 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
       prevHypotheses.map((hyp) => {
         let newStatus: HypothesisStatus = hyp.initialStatus;
         if (test.hipotesisFortalece.includes(hyp.id)) {
-          newStatus = test.esPruebaConfirmatoria ? 'CONFIRMED' : 'SUPPORTED';
+          newStatus = test.esPruebaConfirmatoria ? 'CONFIRMADA' : 'SOSTENIDA';
         } else if (test.hipotesisDebilita.includes(hyp.id)) {
-          newStatus = 'WEAKENED';
+          newStatus = 'DEBILITADA';
         }
         return { ...hyp, initialStatus: newStatus };
       })
@@ -169,28 +285,29 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
     setUserDiagnosticFeedback(null);
   };
 
-  // Confirm Diagnosis in CASO EVO
   const handleConfirmHypothesis = (hypId: string) => {
     const isCorrect = hypId === currentCase.correctDiagnosis;
-    const hasTested = executedTestIds.length > 0;
+    const hasExecutedConfirmingTest = currentCase.tests.some(
+      (t) => t.esPruebaConfirmatoria && executedTestIds.includes(t.id)
+    );
 
-    if (isCorrect && hasTested) {
+    if (isCorrect && hasExecutedConfirmingTest) {
       setIsCaseResolved(true);
       setUserDiagnosticFeedback(null);
       setCaseHypotheses((prev) =>
         prev.map((h) =>
           h.id === hypId
-            ? { ...h, initialStatus: 'CONFIRMED' }
-            : { ...h, initialStatus: 'DISCARDED' }
+            ? { ...h, initialStatus: 'CONFIRMADA' }
+            : { ...h, initialStatus: 'DESCARTADA' }
         )
       );
-    } else if (isCorrect && !hasTested) {
+    } else if (isCorrect && !hasExecutedConfirmingTest) {
       setUserDiagnosticFeedback(
-        'LA EVIDENCIA TODAVÍA NO SOSTIENE ESTA HIPÓTESIS: Ejecuta al menos una prueba segura para comprobar metódicamente antes de concluir.'
+        'DIAGNÓSTICO NO DEMOSTRADO: La hipótesis puede ser correcta, pero todavía no fue comprobada con evidencia decisiva.'
       );
     } else {
       setUserDiagnosticFeedback(
-        'LA EVIDENCIA TODAVÍA NO SOSTIENE ESTA HIPÓTESIS: La etapa de detención y los resultados de las pruebas descartan este componente en la cadena de arranque.'
+        'DIAGNÓSTICO NO DEMOSTRADO: La evidencia reunida y la etapa de detención descartan esta hipótesis como la causa raíz.'
       );
     }
   };
@@ -200,9 +317,12 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
   // =========================================================================
 
   const handleGenerateMysteryCase = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
     const nextIndex = (mysteryCaseIndex + 1) % MYSTERY_CASES_POOL.length;
     setMysteryCaseIndex(nextIndex);
     setMysteryRunning(false);
+    setMysteryStepReached(0);
+    setIsMysteryBooting(false);
     setMysteryActiveTab('EVIDENCIAS');
     setMysteryExecutedTests([]);
     setMysteryExpandedWhy(null);
@@ -225,29 +345,41 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
   };
 
   const handleStartMysteryPowerOn = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
     setMysteryRunning(true);
+    setIsMysteryBooting(true);
+    setMysteryStepReached(0);
     setMysteryEvidenceLog([
-      `SÍNTOMA: ${currentMystery.sintomaObservado}`,
-      `DETENCIÓN: La secuencia se detuvo en ${currentMystery.etapaProducida}.`,
-      `OBSERVACIÓN: ${currentMystery.observacionTecnica}`,
+      `SÍNTOMA INICIAL: ${currentMystery.sintomaObservado}`,
+      `OBSERVACIÓN TÉCNICA: ${currentMystery.observacionTecnica}`,
     ]);
     setMysteryHistoryLog((prev) => [
       ...prev,
       {
         timestamp: '00:02',
         action: 'ENCENDIDO DE PC',
-        note: `PC encendida. La secuencia avanzó normalmente y se detuvo en ${currentMystery.ultimoEstadoConfirmado}.`,
+        note: `PC encendida. La secuencia de arranque avanzó y se detuvo en ${currentMystery.ultimoEstadoConfirmado}.`,
       },
     ]);
 
-    // Initial deduction logic: mark components before stopStep as possible, others with no evidence or weakened
     setMysteryHypothesisStates((prev) => {
       const updated = { ...prev };
       ALL_MYSTERY_COMPONENTS.forEach((comp) => {
-        updated[comp.key] = 'POSSIBLE';
+        updated[comp.key] = 'POSIBLE';
       });
       return updated;
     });
+
+    let step = 0;
+    timerRef.current = setInterval(() => {
+      step += 1;
+      if (step <= currentMystery.stopStep) {
+        setMysteryStepReached(step);
+      } else {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setIsMysteryBooting(false);
+      }
+    }, 100);
   };
 
   const handleExecuteMysteryTest = (test: (typeof currentMystery.pruebasDisponibles)[0]) => {
@@ -261,1459 +393,980 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
     setMysteryHistoryLog((prev) => [
       ...prev,
       {
-        timestamp: '00:05',
-        action: `PRUEBA EJECUTADA: ${test.nombre}`,
-        note: test.resultadoObservado,
+        timestamp: '00:15',
+        action: `EJECUCIÓN DE PRUEBA: ${test.nombre}`,
+        note: test.evidenciaDescubierta,
       },
     ]);
 
-    // Update hypothesis states without fake percentages
     setMysteryHypothesisStates((prev) => {
       const updated = { ...prev };
-
-      // Strengthen hypotheses
       test.hipotesisFortalece.forEach((key) => {
         updated[key] = test.esDecisiva ? 'CONFIRMADA' : 'SOSTENIDA';
       });
-
-      // Weaken hypotheses
       test.hipotesisDebilita.forEach((key) => {
-        if (updated[key] !== 'CONFIRMADA') {
-          updated[key] = 'DEBILITADA';
-        }
+        if (updated[key] !== 'CONFIRMADA') updated[key] = 'DEBILITADA';
       });
-
-      // Discard hypotheses
       test.hipotesisDescarta.forEach((key) => {
-        if (updated[key] !== 'CONFIRMADA') {
-          updated[key] = 'DESCARTADA';
-        }
+        updated[key] = 'DESCARTADA';
       });
-
       return updated;
     });
 
     setMysteryDiagnosticMessage(null);
   };
 
-  const handleConfirmMysteryDiagnosis = (componentKey: MysteryComponentKey) => {
-    const isCorrect = componentKey === currentMystery.correctComponent;
-    const hasExecutedTests = mysteryExecutedTests.length > 0;
-
-    if (!hasExecutedTests) {
+  const handleEmitMysteryDiagnosis = () => {
+    if (!mysterySelectedComponent) {
       setMysteryDiagnosticMessage({
         type: 'ERROR',
-        text: 'DIAGNÓSTICO NO DEMOSTRADO: No has realizado ninguna prueba segura aún. La metodología EVO exige comprobar la hipótesis antes de emitir un dictamen.',
+        text: 'Seleccioná un componente en la pestaña HIPÓTESIS antes de emitir diagnóstico.',
       });
       return;
     }
 
-    if (isCorrect) {
+    const isCorrectComponent = mysterySelectedComponent === currentMystery.correctComponent;
+    const hasDecisiveEvidence = currentMystery.pruebasDisponibles.some(
+      (t) => t.esDecisiva && mysteryExecutedTests.includes(t.id)
+    );
+
+    if (isCorrectComponent && hasDecisiveEvidence) {
       setIsMysteryResolved(true);
       setMysteryDiagnosticMessage({
         type: 'SUCCESS',
-        text: '¡DIAGNÓSTICO CONFIRMADO! Has localizado con éxito la causa raíz mediante deducción y evidencia concluyente.',
+        text: '¡DIAGNÓSTICO CONFIRMADO! Has respaldado la causa raíz con evidencia decisiva.',
       });
       setMysteryHypothesisStates((prev) => {
         const updated = { ...prev };
         ALL_MYSTERY_COMPONENTS.forEach((c) => {
-          updated[c.key] = c.key === componentKey ? 'CONFIRMADA' : 'DESCARTADA';
+          if (c.key === currentMystery.correctComponent) {
+            updated[c.key] = 'CONFIRMADA';
+          } else {
+            updated[c.key] = 'DESCARTADA';
+          }
         });
         return updated;
       });
-      setMysteryHistoryLog((prev) => [
-        ...prev,
-        {
-          timestamp: '00:10',
-          action: 'DICTAMEN EMITIDO',
-          note: `Diagnóstico confirmado con éxito: ${currentMystery.causaRaiz}`,
-        },
-      ]);
+    } else if (isCorrectComponent && !hasDecisiveEvidence) {
+      setMysteryDiagnosticMessage({
+        type: 'ERROR',
+        text: 'DIAGNÓSTICO NO DEMOSTRADO: La hipótesis puede ser correcta, pero todavía no fue comprobada con evidencia decisiva.',
+      });
     } else {
       setMysteryDiagnosticMessage({
         type: 'ERROR',
-        text: 'DIAGNÓSTICO NO DEMOSTRADO: La evidencia actual no sostiene este componente como causa raíz de la falla. Revisa la etapa de detención y las pruebas realizadas.',
+        text: 'DIAGNÓSTICO NO DEMOSTRADO: Las pruebas y la evidencia observable no respaldan a este componente como la causa raíz.',
       });
-      setMysteryHypothesisStates((prev) => ({
-        ...prev,
-        [componentKey]: 'DEBILITADA',
-      }));
-      setMysteryHistoryLog((prev) => [
-        ...prev,
-        {
-          timestamp: '00:08',
-          action: 'HIPÓTESIS RECHAZADA',
-          note: `Se evaluó ${componentKey} pero la evidencia acumulada no demostró causalidad.`,
-        },
-      ]);
     }
   };
-
-  // Standard Learn Mode controls
-  const handlePowerOn = () => {
-    setIsPoweredOn(true);
-    setCurrentStepIndex(1);
-    setMaxUnlockedStep((prev) => Math.max(prev, 1));
-  };
-
-  const handlePowerOff = () => {
-    setIsPoweredOn(false);
-    setCurrentStepIndex(0);
-    setSimulatedFailureStep(null);
-  };
-
-  const handleNextStep = () => {
-    if (!isPoweredOn || currentStepIndex === 0) {
-      handlePowerOn();
-      return;
-    }
-    if (currentStepIndex < totalSteps) {
-      const nextIndex = currentStepIndex + 1;
-      setCurrentStepIndex(nextIndex);
-      setMaxUnlockedStep((prev) => Math.max(prev, nextIndex));
-    }
-  };
-
-  const handlePrevStep = () => {
-    if (currentStepIndex > 1) {
-      setCurrentStepIndex((prev) => prev - 1);
-    } else if (currentStepIndex === 1) {
-      handlePowerOff();
-    }
-  };
-
-  const handleSelectStep = (index: number) => {
-    if (activeMode === 'APRENDER') {
-      if (index > maxUnlockedStep) return;
-      if (index === 0) {
-        handlePowerOff();
-      } else {
-        setIsPoweredOn(true);
-        setCurrentStepIndex(index);
-      }
-    } else if (activeMode === 'FALLA_SIMULADA') {
-      setIsPoweredOn(true);
-      setCurrentStepIndex(index);
-      setSimulatedFailureStep(index);
-    }
-  };
-
-  const getSafetyBadge = (level: 'USUARIO' | 'TECNICO' | 'BANCO') => {
-    switch (level) {
-      case 'USUARIO':
-        return {
-          label: 'NIVEL: USUARIO',
-          subtitle: 'Prueba segura / No invasiva',
-          icon: <UserCheck className="w-3.5 h-3.5 text-emerald-400" />,
-          badgeClass: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300',
-        };
-      case 'TECNICO':
-        return {
-          label: 'NIVEL: TÉCNICO',
-          subtitle: 'Requiere conocimiento e instrumental adecuado',
-          icon: <Wrench className="w-3.5 h-3.5 text-amber-400" />,
-          badgeClass: 'bg-amber-500/15 border-amber-500/40 text-amber-300',
-        };
-      case 'BANCO':
-        return {
-          label: 'NIVEL: BANCO DE PRUEBAS',
-          subtitle: 'Requiere instrumental adecuado / Banco aislado desenergizado',
-          icon: <ShieldAlert className="w-3.5 h-3.5 text-orange-400" />,
-          badgeClass: 'bg-orange-500/15 border-orange-500/40 text-orange-300',
-        };
-    }
-  };
-
-  const currentSafetyInfo = getSafetyBadge(currentStep.safetyLevel);
 
   return (
-    <div className="w-full min-h-screen bg-[#06080b] text-zinc-100 flex flex-col font-mono-tech select-none">
-      {/* Top Banner & Navigation Header */}
-      <header className="border-b border-zinc-800/80 bg-[#080b10]/95 backdrop-blur-xl sticky top-0 z-40 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
+    <div className="w-full max-w-7xl mx-auto space-y-4 font-mono-tech select-none">
+      {/* Top Header / Mode Switcher Tabs */}
+      <div className="bg-[#0a0d14] border border-zinc-800 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-xl">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center font-black text-black text-sm shadow-md font-display">
-            T08
+          <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-400/40 flex items-center justify-center text-cyan-400">
+            <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">
-                TOMO 08 // DEL BOTÓN POWER A WINDOWS
-              </span>
-              <span className="text-[9px] px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
-                REV. 2026
-              </span>
+            <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">
+              TOMO 08 // LABORATORIO VIRTUAL DE ARRANQUE & DIAGNÓSTICO
             </div>
-            <h1 className="text-sm sm:text-base font-black text-white uppercase font-display tracking-tight">
-              LABORATORIO VIRTUAL DE ARRANQUE Y DIAGNÓSTICO EVO
+            <h1 className="text-base sm:text-lg font-bold text-white font-display">
+              DEL BOTÓN POWER A WINDOWS
             </h1>
           </div>
         </div>
 
-        {/* Provenance and Close */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-[10px]">
-            <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-            <span>SIMULATED / EXPECTED BEHAVIOR</span>
-          </div>
-
-          {onClose && (
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
-              title="Cerrar Laboratorio de Arranque"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      </header>
-
-      {/* Mode Selector Navigation (4 MODES) */}
-      <div className="bg-[#080b10] border-b border-zinc-800/80 px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4 overflow-x-auto">
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold hidden md:inline">
-            MODO DE LABORATORIO:
-          </span>
-          <div className="flex items-center gap-1.5 bg-zinc-950 p-1 rounded-xl border border-zinc-800">
-            <button
-              type="button"
-              onClick={() => setActiveMode('APRENDER')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                activeMode === 'APRENDER'
-                  ? 'bg-emerald-500 text-black shadow-md'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>APRENDER</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setActiveMode('FALLA_SIMULADA');
-                setIsPoweredOn(true);
-                if (currentStepIndex === 0) setCurrentStepIndex(12);
-                setSimulatedFailureStep(currentStepIndex === 0 ? 12 : currentStepIndex);
-              }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                activeMode === 'FALLA_SIMULADA'
-                  ? 'bg-rose-500 text-white shadow-md'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>FALLA SIMULADA</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setActiveMode('CASO_EVO');
-                handleSelectCase(0);
-              }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                activeMode === 'CASO_EVO'
-                  ? 'bg-cyan-500 text-black shadow-md'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span>CASO EVO</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setActiveMode('PC_MISTERIOSA');
-                handleGenerateMysteryCase();
-              }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                activeMode === 'PC_MISTERIOSA'
-                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black shadow-md'
-                  : 'text-amber-400/80 hover:text-amber-300'
-              }`}
-            >
-              <Compass className="w-3.5 h-3.5" />
-              <span>PC MISTERIOSA</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="text-[11px] text-zinc-400 font-mono-tech hidden sm:flex items-center gap-2 shrink-0">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>EVO FORENSICS // “NO LO CREAS. COMPROBALO.”</span>
+        {/* 4 Mode Tabs */}
+        <div className="flex flex-wrap items-center gap-1.5 bg-zinc-950/80 p-1 rounded-xl border border-zinc-800/80 text-xs">
+          <button
+            type="button"
+            onClick={() => setActiveMode('APRENDER')}
+            className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+              activeMode === 'APRENDER'
+                ? 'bg-cyan-500 text-black shadow-[0_0_12px_rgba(6,182,212,0.4)]'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+            }`}
+          >
+            [ APRENDER ]
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveMode('FALLA_SIMULADA')}
+            className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+              activeMode === 'FALLA_SIMULADA'
+                ? 'bg-amber-500 text-black shadow-[0_0_12px_rgba(245,158,11,0.4)]'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+            }`}
+          >
+            [ FALLA SIMULADA ]
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveMode('CASO_EVO')}
+            className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+              activeMode === 'CASO_EVO'
+                ? 'bg-indigo-500 text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+            }`}
+          >
+            [ CASO EVO ]
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveMode('PC_MISTERIOSA')}
+            className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+              activeMode === 'PC_MISTERIOSA'
+                ? 'bg-purple-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.4)]'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+            }`}
+          >
+            [ PC MISTERIOSA ]
+          </button>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
-        {/* ========================================================================= */}
-        {/* MODE 4: PC MISTERIOSA (BLIND REALISTIC DIAGNOSTICS) */}
-        {/* ========================================================================= */}
-        {activeMode === 'PC_MISTERIOSA' ? (
-          <div className="space-y-6">
-            {/* Top Bar for Mystery Mode */}
-            <section className="bg-[#0b0e14] border border-zinc-800/80 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/40">
-                      MODO CIEGO // DIAGNÓSTICO EN TIEMPO REAL
-                    </span>
-                    <span className="text-[10px] text-zinc-500">
-                      {currentMystery.codigoCaso}
-                    </span>
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-black text-white uppercase font-display tracking-tight">
-                    PC MISTERIOSA // EXPEDIENTE DESCONOCIDO
-                  </h2>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleGenerateMysteryCase}
-                    className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-bold text-xs uppercase flex items-center gap-2 transition-all cursor-pointer"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
-                    <span>GENERAR NUEVO CASO</span>
-                  </button>
-
-                  {!mysteryRunning && !isMysteryResolved && (
-                    <button
-                      type="button"
-                      onClick={handleStartMysteryPowerOn}
-                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.35)] cursor-pointer"
-                    >
-                      <Power className="w-4 h-4 text-black" />
-                      <span>[ ENCENDER PC ]</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Patient Machine Description & Symptom */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-black/50 border border-zinc-800/80 space-y-1">
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                    DESCRIPCIÓN DEL EQUIPO
-                  </span>
-                  <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial">
-                    {currentMystery.descripcionPC}
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-xl bg-amber-950/20 border border-amber-500/30 space-y-1">
-                  <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block flex items-center gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                    <span>SÍNTOMA REPORTADO INICIAL</span>
-                  </span>
-                  <p className="text-xs sm:text-sm text-amber-200/90 font-sans-editorial">
-                    {currentMystery.sintomaObservado}
-                  </p>
-                </div>
-              </div>
-
-              {/* Mystery Execution State */}
-              {mysteryRunning && (
-                <div className="space-y-6 pt-2">
-                  {/* Visual Machine Representation at stop point */}
-                  <EvoBootMachineVisual
-                    currentStep={BOOT_SEQUENCE_STEPS[currentMystery.stopStep]}
-                    isPoweredOn={true}
-                  />
-
-                  {/* Observable Forensic Metrics */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-1">
-                      <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
-                        ÚLTIMO ESTADO CONFIRMADO
-                      </span>
-                      <p className="text-xs font-bold text-zinc-200 font-display">
-                        {currentMystery.ultimoEstadoConfirmado}
-                      </p>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-rose-950/20 border border-rose-500/30 space-y-1">
-                      <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block">
-                        SIGUIENTE ETAPA
-                      </span>
-                      <p className="text-xs font-bold text-rose-200 font-display">
-                        {currentMystery.siguienteEtapa}
-                      </p>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-blue-950/20 border border-blue-500/30 space-y-1">
-                      <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider block">
-                        OBSERVACIÓN TÉCNICA
-                      </span>
-                      <p className="text-xs font-bold text-blue-200 font-display">
-                        {currentMystery.observacionTecnica}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Investigation Panel Tabs */}
-                  <div className="bg-[#07090e] border border-zinc-800 rounded-2xl p-4 sm:p-6 space-y-5">
-                    <div className="flex items-center justify-between pb-3 border-b border-zinc-800 overflow-x-auto">
-                      <div className="flex items-center gap-2">
-                        {(
-                          ['EVIDENCIAS', 'HIPOTESIS', 'PRUEBAS', 'HISTORIAL'] as MysteryTab[]
-                        ).map((tab) => {
-                          const isActive = mysteryActiveTab === tab;
-                          return (
-                            <button
-                              key={tab}
-                              type="button"
-                              onClick={() => setMysteryActiveTab(tab)}
-                              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                                isActive
-                                  ? 'bg-amber-400 text-black shadow-md'
-                                  : 'text-zinc-400 hover:text-white bg-zinc-900/60 border border-zinc-800'
-                              }`}
-                            >
-                              {tab === 'HIPOTESIS' ? 'HIPÓTESIS' : tab}
-                              {tab === 'EVIDENCIAS' && ` (${mysteryEvidenceLog.length})`}
-                              {tab === 'PRUEBAS' &&
-                                ` (${mysteryExecutedTests.length}/${currentMystery.pruebasDisponibles.length})`}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <span className="text-[10px] text-zinc-500 font-mono-tech hidden sm:inline">
-                        MÉTODO EVO: OBSERVAR → FORMULAR → COMPROBAR
-                      </span>
-                    </div>
-
-                    {/* TAB: EVIDENCIAS */}
-                    {mysteryActiveTab === 'EVIDENCIAS' && (
-                      <div className="space-y-3">
-                        <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider block">
-                          REGISTRO DE EVIDENCIAS DESCUBIERTAS
-                        </span>
-                        {mysteryEvidenceLog.length === 0 ? (
-                          <p className="text-xs text-zinc-500 italic">
-                            Aún no se han descubierto evidencias. Enciende la PC o ejecuta pruebas.
-                          </p>
-                        ) : (
-                          <div className="space-y-2">
-                            {mysteryEvidenceLog.map((ev, idx) => (
-                              <div
-                                key={idx}
-                                className="p-3 rounded-xl bg-black/40 border border-zinc-800/80 text-xs text-zinc-200 font-sans-editorial flex items-start gap-2.5"
-                              >
-                                <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                                <span>{ev}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* TAB: HIPÓTESIS */}
-                    {mysteryActiveTab === 'HIPOTESIS' && (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">
-                            MATRIZ DE COMPONENTES E HIPÓTESIS
-                          </span>
-                          <span className="text-[10px] text-zinc-500">
-                            SELECCIONA UN COMPONENTE PARA EMITIR DICTAMEN
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {ALL_MYSTERY_COMPONENTS.map((comp) => {
-                            const state = mysteryHypothesisStates[comp.key];
-                            const isSelected = mysterySelectedComponent === comp.key;
-
-                            return (
-                              <div
-                                key={comp.key}
-                                onClick={() => setMysterySelectedComponent(comp.key)}
-                                className={`p-3.5 rounded-xl border transition-all cursor-pointer space-y-2 ${
-                                  isSelected
-                                    ? 'bg-amber-950/30 border-amber-400/80 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
-                                    : 'bg-black/40 border-zinc-800 hover:border-zinc-700'
-                                }`}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs font-bold text-white uppercase">
-                                    {comp.label}
-                                  </span>
-                                  <span
-                                    className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
-                                      state === 'CONFIRMADA'
-                                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
-                                        : state === 'SOSTENIDA'
-                                        ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50'
-                                        : state === 'DEBILITADA'
-                                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/50'
-                                        : state === 'DESCARTADA'
-                                        ? 'bg-rose-500/20 text-rose-300 border-rose-500/50 line-through'
-                                        : state === 'POSSIBLE'
-                                        ? 'bg-blue-500/20 text-blue-300 border-blue-500/50'
-                                        : 'bg-zinc-800 text-zinc-500 border-zinc-700'
-                                    }`}
-                                  >
-                                    {state.replace('_', ' ')}
-                                  </span>
-                                </div>
-
-                                {isSelected && !isMysteryResolved && (
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleConfirmMysteryDiagnosis(comp.key);
-                                    }}
-                                    className="w-full mt-2 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-black text-[11px] uppercase tracking-wider transition-colors cursor-pointer"
-                                  >
-                                    [ EMITIR DIAGNÓSTICO: {comp.label.split('/')[0]} ]
-                                  </button>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {mysteryDiagnosticMessage && (
-                          <div
-                            className={`p-3.5 rounded-xl border text-xs font-sans-editorial leading-relaxed ${
-                              mysteryDiagnosticMessage.type === 'SUCCESS'
-                                ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-200'
-                                : 'bg-rose-950/30 border-rose-500/50 text-rose-200'
-                            }`}
-                          >
-                            {mysteryDiagnosticMessage.text}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* TAB: PRUEBAS */}
-                    {mysteryActiveTab === 'PRUEBAS' && (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">
-                            PRUEBAS DE DIAGNÓSTICO Y COMPROBACIÓN
-                          </span>
-                          <span className="text-[10px] text-zinc-500">
-                            EVALUACIÓN METÓDICA DE HIPÓTESIS
-                          </span>
-                        </div>
-
-                        <div className="space-y-3">
-                          {currentMystery.pruebasDisponibles.map((test) => {
-                            const isExecuted = mysteryExecutedTests.includes(test.id);
-                            const isWhyOpen = mysteryExpandedWhy === test.id;
-                            const sInfo = getSafetyBadge(test.nivel);
-
-                            return (
-                              <div
-                                key={test.id}
-                                className={`p-4 rounded-xl border space-y-3 transition-all ${
-                                  isExecuted
-                                    ? 'bg-zinc-950 border-emerald-500/40'
-                                    : 'bg-black/40 border-zinc-800 hover:border-zinc-700'
-                                }`}
-                              >
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                  <span className="text-xs font-bold text-white">
-                                    {test.nombre}
-                                  </span>
-                                  <div
-                                    className={`px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1 self-start sm:self-auto ${sInfo.badgeClass}`}
-                                  >
-                                    {sInfo.icon}
-                                    <span>{sInfo.label}</span>
-                                  </div>
-                                </div>
-
-                                <p className="text-xs text-zinc-400 font-sans-editorial">
-                                  <strong className="text-zinc-300 font-mono-tech uppercase">
-                                    Qué intenta comprobar:{' '}
-                                  </strong>
-                                  {test.queIntentaComprobar}
-                                </p>
-
-                                {test.riesgoAdvertencia && (
-                                  <div className="px-3 py-1 rounded bg-amber-950/20 border border-amber-500/30 text-[10px] text-amber-300">
-                                    {test.riesgoAdvertencia}
-                                  </div>
-                                )}
-
-                                {!isExecuted ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleExecuteMysteryTest(test)}
-                                    className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
-                                  >
-                                    [ EJECUTAR PRUEBA ]
-                                  </button>
-                                ) : (
-                                  <div className="space-y-2">
-                                    <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/30 text-xs text-emerald-200 font-sans-editorial">
-                                      <strong className="text-emerald-400 font-mono-tech uppercase block">
-                                        Resultado Observado:
-                                      </strong>
-                                      {test.resultadoObservado}
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-1">
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          setMysteryExpandedWhy(isWhyOpen ? null : test.id)
-                                        }
-                                        className="text-[11px] font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors cursor-pointer"
-                                      >
-                                        <QuestionIcon className="w-3.5 h-3.5" />
-                                        <span>[ {isWhyOpen ? 'OCULTAR' : '¿POR QUÉ?'} ]</span>
-                                      </button>
-                                    </div>
-
-                                    {isWhyOpen && (
-                                      <div className="p-3 rounded-lg bg-[#070b12] border border-cyan-500/30 text-xs text-cyan-200 font-sans-editorial leading-relaxed animate-in fade-in duration-150">
-                                        <strong className="text-cyan-400 font-mono-tech uppercase block">
-                                          Razonamiento Técnico de Evidencia:
-                                        </strong>
-                                        {test.porQueExplicacion}
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* TAB: HISTORIAL */}
-                    {mysteryActiveTab === 'HISTORIAL' && (
-                      <div className="space-y-3">
-                        <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider block">
-                          LÍNEA DE ACCIONES DE INVESTIGACIÓN
-                        </span>
-                        <div className="space-y-2">
-                          {mysteryHistoryLog.map((h, idx) => (
-                            <div
-                              key={idx}
-                              className="p-3 rounded-xl bg-black/40 border border-zinc-800 text-xs space-y-1"
-                            >
-                              <div className="flex items-center justify-between text-[10px]">
-                                <span className="font-bold text-amber-400">{h.action}</span>
-                                <span className="text-zinc-500">{h.timestamp}</span>
-                              </div>
-                              <p className="text-zinc-300 font-sans-editorial">{h.note}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* ========================================================= */}
-                  {/* EXPEDIENTE FINAL RESUELTO FOR PC MISTERIOSA */}
-                  {/* ========================================================= */}
-                  {isMysteryResolved && (
-                    <section className="bg-[#080d14] border-2 border-emerald-500/80 rounded-2xl p-6 sm:p-8 shadow-[0_0_40px_rgba(16,185,129,0.2)] space-y-6 animate-in fade-in zoom-in-95 duration-200">
-                      <div className="flex items-center justify-between pb-4 border-b border-emerald-500/30">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-emerald-400 text-black flex items-center justify-center font-black">
-                            <CheckCircle className="w-6 h-6" />
-                          </div>
-                          <div>
-                            <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">
-                              DICTAMEN PERICIAL FINALIZADO
-                            </span>
-                            <h3 className="text-xl sm:text-2xl font-black text-white uppercase font-display">
-                              EXPEDIENTE EVO // RESUELTO
-                            </h3>
-                          </div>
-                        </div>
-
-                        <div className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500 text-emerald-300 text-xs font-bold">
-                          {currentMystery.codigoCaso}
-                        </div>
-                      </div>
-
-                      {/* Expediente Fields Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1">
-                          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                            SÍNTOMA INICIAL
-                          </span>
-                          <p className="text-zinc-200 font-sans-editorial">
-                            {currentMystery.sintomaObservado}
-                          </p>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1">
-                          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                            PUNTO DE DETENCIÓN OBSERVADO
-                          </span>
-                          <p className="text-zinc-200 font-sans-editorial">
-                            {currentMystery.etapaProducida}
-                          </p>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1 md:col-span-2">
-                          <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
-                            CAUSA RAÍZ
-                          </span>
-                          <p className="text-sm font-bold text-emerald-200 font-sans-editorial">
-                            {currentMystery.causaRaiz}
-                          </p>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1">
-                          <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block">
-                            PRUEBA DECISIVA
-                          </span>
-                          <p className="text-zinc-200 font-sans-editorial">
-                            {currentMystery.pruebaDecisivaNombre}
-                          </p>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1">
-                          <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
-                            ACCIÓN RECOMENDADA
-                          </span>
-                          <p className="text-zinc-200 font-sans-editorial">
-                            {currentMystery.accionRecomendada}
-                          </p>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1 md:col-span-2">
-                          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                            VERIFICACIÓN POSTERIOR DE INTEGRIDAD
-                          </span>
-                          <p className="text-zinc-200 font-sans-editorial">
-                            {currentMystery.verificacionPosterior}
-                          </p>
-                        </div>
-
-                        {/* RUTA DE RAZONAMIENTO */}
-                        <div className="p-4 rounded-xl bg-black/70 border border-zinc-800 space-y-2 md:col-span-2">
-                          <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">
-                            RUTA DE RAZONAMIENTO FORENSE
-                          </span>
-                          <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-300 font-mono-tech">
-                            {currentMystery.rutaRazonamiento.map((stepTxt, sIdx) => (
-                              <React.Fragment key={sIdx}>
-                                <span className="px-2 py-1 rounded bg-zinc-900 border border-zinc-700">
-                                  {stepTxt}
-                                </span>
-                                {sIdx < currentMystery.rutaRazonamiento.length - 1 && (
-                                  <ArrowRight className="w-3 h-3 text-amber-400" />
-                                )}
-                              </React.Fragment>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Footer Philosophy */}
-                      <div className="p-3.5 rounded-xl bg-black/80 border border-zinc-800 text-center space-y-1">
-                        <span className="text-[10px] text-zinc-500 uppercase font-mono-tech">
-                          FILOSOFÍA EVO DE DIAGNÓSTICO
-                        </span>
-                        <div className="text-xs font-bold text-amber-300 tracking-wider font-mono-tech">
-                          “NO LO CREAS. COMPROBALO.”
-                        </div>
-                      </div>
-                    </section>
-                  )}
-                </div>
-              )}
-            </section>
-          </div>
-        ) : activeMode === 'CASO_EVO' ? (
-          /* ========================================================================= */
-          /* MODE 3: CASO EVO */
-          /* ========================================================================= */
-          <div className="space-y-6">
-            {/* Case Picker Strip */}
-            <div className="bg-[#0b0e14] border border-zinc-800/80 rounded-2xl p-4 shadow-xl space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>SELECCIÓN DE CASO FORENSE EVO</span>
-                </span>
-                <span className="text-[10px] text-zinc-500">
-                  {EVO_CASES.length} CASOS DE DIAGNÓSTICO
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
-                {EVO_CASES.map((caso, cIdx) => {
-                  const isSelected = selectedCaseIndex === cIdx;
-                  return (
-                    <button
-                      key={caso.id}
-                      type="button"
-                      onClick={() => handleSelectCase(cIdx)}
-                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer space-y-1 ${
-                        isSelected
-                          ? 'bg-cyan-950/40 border-cyan-500/80 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
-                          : 'bg-black/40 border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-200'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`text-[10px] font-black ${
-                            isSelected ? 'text-cyan-400' : 'text-zinc-500'
-                          }`}
-                        >
-                          {caso.number}
-                        </span>
-                        {isSelected && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-                        )}
-                      </div>
-                      <p className="text-[11px] font-bold line-clamp-2 leading-tight">
-                        {caso.titulo}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Case Overview & Launch Section */}
-            <section className="bg-[#0b0e14] border border-zinc-800/80 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800/80">
-                <div>
-                  <div className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">
-                    {currentCase.number} // EXPEDIENTE DE DIAGNÓSTICO
-                  </div>
-                  <h2 className="text-lg sm:text-xl font-black text-white uppercase font-display">
-                    {currentCase.titulo}
-                  </h2>
-                </div>
-
-                {!caseRunning && !isCaseResolved ? (
-                  <button
-                    type="button"
-                    onClick={handleStartCaseDiagnostic}
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.35)] cursor-pointer"
-                  >
-                    <Power className="w-4 h-4 text-black" />
-                    <span>[ INICIAR DIAGNÓSTICO ]</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => handleSelectCase(selectedCaseIndex)}
-                    className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold text-xs uppercase flex items-center gap-2 cursor-pointer"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>REINICIAR CASO</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Initial Symptom Overview */}
-              <div className="p-4 rounded-xl bg-black/50 border border-zinc-800 space-y-1.5">
-                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                  <span>SÍNTOMA OBSERVADO POR EL USUARIO</span>
-                </span>
-                <p className="text-xs sm:text-sm text-zinc-200 font-sans-editorial leading-relaxed">
-                  {currentCase.descripcionInicial}
-                </p>
-              </div>
-
-              {/* Case Diagnostic Dashboard when Running */}
-              {caseRunning && (
-                <div className="space-y-6 pt-2">
-                  <EvoBootMachineVisual
-                    currentStep={BOOT_SEQUENCE_STEPS[caseStepReached]}
-                    isPoweredOn={true}
-                  />
-
-                  {/* Sequential Chain Failure Summary Card */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-1">
-                      <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
-                        ÚLTIMO PASO CONFIRMADO
-                      </span>
-                      <p className="text-xs font-bold text-zinc-200 font-display">
-                        Paso {currentCase.ultimoPasoConfirmado.toString().padStart(2, '0')}:{' '}
-                        {BOOT_SEQUENCE_STEPS[currentCase.ultimoPasoConfirmado]?.name}
-                      </p>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-rose-950/20 border border-rose-500/30 space-y-1">
-                      <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block">
-                        PRIMER PASO NO COMPLETADO
-                      </span>
-                      <p className="text-xs font-bold text-rose-200 font-display">
-                        Paso {currentCase.primerPasoNoCompletado.toString().padStart(2, '0')}:{' '}
-                        {currentCase.falloEnPasoNombre}
-                      </p>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-blue-950/20 border border-blue-500/30 space-y-1">
-                      <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider block">
-                        ESTADO DE LA SECUENCIA
-                      </span>
-                      <p className="text-xs font-bold text-blue-200 font-display">
-                        DETENIDO EN PASO {currentCase.stopStep.toString().padStart(2, '0')} / 34
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Evidence Box */}
-                  <div className="p-4 rounded-xl bg-black/40 border border-zinc-800 space-y-2">
-                    <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <FileText className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>EVIDENCIA DISPONIBLE ({accumulatedEvidence.length} REGISTROS)</span>
-                    </span>
-                    <ul className="space-y-1.5">
-                      {accumulatedEvidence.map((ev, idx) => (
-                        <li
-                          key={idx}
-                          className="text-xs text-zinc-300 font-sans-editorial flex items-start gap-2 bg-[#07090e] p-2 rounded-lg border border-zinc-800/80"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
-                          <span>{ev}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Two Column Layout: Hypotheses vs Tests */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Left: Hypotheses Engine */}
-                    <div className="bg-[#07090e] border border-zinc-800 rounded-2xl p-4 sm:p-5 space-y-4">
-                      <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
-                        <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
-                          <HelpCircle className="w-3.5 h-3.5 text-cyan-400" />
-                          <span>FORMULACIÓN DE HIPÓTESIS</span>
-                        </span>
-                        <span className="text-[10px] text-zinc-500">
-                          SELECCIONA PARA COMPROBAR
-                        </span>
-                      </div>
-
-                      <div className="space-y-2.5">
-                        {caseHypotheses.map((hyp) => {
-                          const isSelected = selectedHypothesisId === hyp.id;
-                          return (
-                            <div
-                              key={hyp.id}
-                              onClick={() => setSelectedHypothesisId(hyp.id)}
-                              className={`p-3.5 rounded-xl border transition-all cursor-pointer space-y-2 ${
-                                isSelected
-                                  ? 'bg-cyan-950/30 border-cyan-500/80 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
-                                  : 'bg-black/40 border-zinc-800 hover:border-zinc-700'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between gap-2">
-                                <span className="text-xs font-bold text-white uppercase">
-                                  {hyp.component}
-                                </span>
-                                <span
-                                  className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
-                                    hyp.initialStatus === 'CONFIRMED'
-                                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
-                                      : hyp.initialStatus === 'SUPPORTED'
-                                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50'
-                                      : hyp.initialStatus === 'WEAKENED'
-                                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/50'
-                                      : hyp.initialStatus === 'DISCARDED'
-                                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/50 line-through'
-                                      : 'bg-zinc-800 text-zinc-400 border-zinc-700'
-                                  }`}
-                                >
-                                  ESTADO: {hyp.initialStatus}
-                                </span>
-                              </div>
-                              <p className="text-xs text-zinc-300 font-sans-editorial">
-                                {hyp.name}
-                              </p>
-
-                              {isSelected && !isCaseResolved && (
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleConfirmHypothesis(hyp.id);
-                                  }}
-                                  className="w-full mt-2 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-[11px] uppercase tracking-wider transition-colors cursor-pointer"
-                                >
-                                  [ CONFIRMAR ESTE DIAGNÓSTICO ]
-                                </button>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {userDiagnosticFeedback && (
-                        <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/40 text-amber-200 text-xs font-sans-editorial leading-relaxed">
-                          {userDiagnosticFeedback}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right: Diagnostic Tests */}
-                    <div className="bg-[#07090e] border border-zinc-800 rounded-2xl p-4 sm:p-5 space-y-4">
-                      <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
-                        <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
-                          <Activity className="w-3.5 h-3.5 text-amber-400" />
-                          <span>PRUEBAS DE COMPROBACIÓN SEGURA</span>
-                        </span>
-                        <span className="text-[10px] text-zinc-500">
-                          {executedTestIds.length}/{currentCase.tests.length} EJECUTADAS
-                        </span>
-                      </div>
-
-                      <div className="space-y-3">
-                        {currentCase.tests.map((test) => {
-                          const isExecuted = executedTestIds.includes(test.id);
-                          const sInfo = getSafetyBadge(test.level);
-
-                          return (
-                            <div
-                              key={test.id}
-                              className={`p-3.5 rounded-xl border space-y-2.5 transition-all ${
-                                isExecuted
-                                  ? 'bg-zinc-950 border-emerald-500/40'
-                                  : 'bg-black/40 border-zinc-800 hover:border-zinc-700'
-                              }`}
-                            >
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                <span className="text-xs font-bold text-white">
-                                  {test.name}
-                                </span>
-                                <div
-                                  className={`px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1 self-start sm:self-auto ${sInfo.badgeClass}`}
-                                >
-                                  {sInfo.icon}
-                                  <span>{sInfo.label}</span>
-                                </div>
-                              </div>
-
-                              <p className="text-xs text-zinc-400 font-sans-editorial">
-                                <strong className="text-zinc-300 font-mono-tech uppercase">
-                                  Qué comprueba:{' '}
-                                </strong>
-                                {test.queComprueba}
-                              </p>
-
-                              {!isExecuted ? (
-                                <button
-                                  type="button"
-                                  onClick={() => handleExecuteTest(test.id)}
-                                  className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
-                                >
-                                  [ EJECUTAR PRUEBA SEGURA ]
-                                </button>
-                              ) : (
-                                <div className="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/30 text-xs text-emerald-200 font-sans-editorial leading-relaxed">
-                                  <strong className="text-emerald-400 font-mono-tech uppercase block">
-                                    Resultado Obtenido:
-                                  </strong>
-                                  {test.resultadoObtenido}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Expediente EVO Resolved in CASO EVO */}
-                  {isCaseResolved && (
-                    <section className="bg-[#080d14] border-2 border-emerald-500/80 rounded-2xl p-6 sm:p-8 shadow-[0_0_40px_rgba(16,185,129,0.2)] space-y-6 animate-in fade-in zoom-in-95 duration-200">
-                      <div className="flex items-center justify-between pb-4 border-b border-emerald-500/30">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-emerald-400 text-black flex items-center justify-center font-black">
-                            <CheckCircle className="w-6 h-6" />
-                          </div>
-                          <div>
-                            <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">
-                              DICTAMEN PERICIAL FINALIZADO
-                            </span>
-                            <h3 className="text-xl sm:text-2xl font-black text-white uppercase font-display">
-                              EXPEDIENTE EVO // DIAGNÓSTICO CONFIRMADO
-                            </h3>
-                          </div>
-                        </div>
-
-                        <div className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500 text-emerald-300 text-xs font-bold">
-                          CASO RESUELTO CON ÉXITO
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1">
-                          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                            CASO & SÍNTOMA INICIAL
-                          </span>
-                          <p className="text-zinc-200 font-sans-editorial">
-                            {currentCase.number}: {currentCase.sintomaPrincipal}
-                          </p>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1">
-                          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                            ESLABÓN DE DETENCIÓN
-                          </span>
-                          <p className="text-zinc-200 font-sans-editorial">
-                            {currentCase.diagnosticoFinal.pasoDetencion} (Último paso OK:{' '}
-                            {currentCase.ultimoPasoConfirmado})
-                          </p>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1 md:col-span-2">
-                          <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
-                            CAUSA RAÍZ CONFIRMADA
-                          </span>
-                          <p className="text-sm font-bold text-emerald-200 font-sans-editorial">
-                            {currentCase.diagnosticoFinal.causa}
-                          </p>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1">
-                          <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block">
-                            PRUEBA QUE CONFIRMÓ LA HIPÓTESIS
-                          </span>
-                          <p className="text-zinc-200 font-sans-editorial">
-                            {currentCase.diagnosticoFinal.pruebaConfirmatoria}
-                          </p>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1">
-                          <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
-                            ACCIÓN RECOMENDADA
-                          </span>
-                          <p className="text-zinc-200 font-sans-editorial">
-                            {currentCase.diagnosticoFinal.accionRecomendada}
-                          </p>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 space-y-1 md:col-span-2">
-                          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                            VERIFICACIÓN POSTERIOR DE INTEGRIDAD
-                          </span>
-                          <p className="text-zinc-200 font-sans-editorial">
-                            {currentCase.diagnosticoFinal.verificacionPosterior}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="p-3.5 rounded-xl bg-black/80 border border-zinc-800 text-center space-y-1">
-                        <span className="text-[10px] text-zinc-500 uppercase font-mono-tech">
-                          FILOSOFÍA EVO DE DIAGNÓSTICO
-                        </span>
-                        <div className="text-xs font-bold text-amber-300 tracking-wider font-mono-tech">
-                          “NO LO CREAS. COMPROBALO.”
-                        </div>
-                      </div>
-                    </section>
-                  )}
-                </div>
-              )}
-            </section>
-          </div>
-        ) : (
-          /* ========================================================================= */
-          /* MODES 1 & 2: APRENDER / FALLA SIMULADA */
-          /* ========================================================================= */
-          <>
-            {/* Top Control & Progress Section */}
-            <section className="bg-[#0b0e14] border border-zinc-800/80 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-xl">
-              <div className="flex items-center gap-3 sm:gap-4">
-                {!isPoweredOn ? (
-                  <button
-                    type="button"
-                    onClick={handlePowerOn}
-                    className="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-xs sm:text-sm tracking-wider uppercase flex items-center gap-2.5 shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    <Power className="w-5 h-5 text-black" />
-                    <span>[ ENCENDER PC ]</span>
-                  </button>
-                ) : (
+      {/* ======================================================================= */}
+      {/* MODE 1: APRENDER & MODE 2: FALLA SIMULADA                               */}
+      {/* ======================================================================= */}
+      {(activeMode === 'APRENDER' || activeMode === 'FALLA_SIMULADA') && (
+        <div className="space-y-4">
+          {/* Top Controls Bar */}
+          <div className="bg-[#0b0e14] border border-zinc-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-lg">
+            <div className="flex items-center gap-2 sm:gap-3">
+              {!isPoweredOn ? (
+                <button
+                  type="button"
+                  onClick={activeMode === 'FALLA_SIMULADA' ? handleStartSimulatedFailureRun : handlePowerOn}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-black font-bold text-xs flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:brightness-110 active:scale-95 transition-all"
+                >
+                  <Power className="w-4 h-4" />
+                  <span>ENCENDER PC</span>
+                </button>
+              ) : (
+                <>
                   <button
                     type="button"
                     onClick={handlePowerOff}
-                    className="px-4 py-3 rounded-xl bg-zinc-900 hover:bg-red-500/20 border border-zinc-700 hover:border-red-500/50 text-zinc-300 hover:text-red-300 font-bold text-xs tracking-wider uppercase flex items-center gap-2 transition-all cursor-pointer"
-                    title="Apagar y volver a paso 00"
+                    className="px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-rose-500/60 text-zinc-300 hover:text-rose-400 text-xs font-bold flex items-center gap-1.5 transition-all"
                   >
-                    <RotateCcw className="w-4 h-4" />
-                    <span>APAGAR / REINICIAR</span>
+                    <Power className="w-3.5 h-3.5" />
+                    <span>APAGAR</span>
                   </button>
-                )}
 
+                  {activeMode === 'APRENDER' && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handlePrevStep}
+                        disabled={currentStepIndex <= 0}
+                        className="px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-zinc-500 disabled:opacity-40 disabled:pointer-events-none text-zinc-200 text-xs font-bold flex items-center gap-1 transition-all"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        <span className="hidden sm:inline">ANTERIOR</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleNextStep}
+                        disabled={currentStepIndex >= totalSteps}
+                        className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs flex items-center gap-1 shadow-[0_0_15px_rgba(6,182,212,0.3)] disabled:opacity-40 disabled:pointer-events-none transition-all"
+                      >
+                        <span>SIGUIENTE PASO</span>
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* In Falla Simulada: Selector of failure step */}
+            {activeMode === 'FALLA_SIMULADA' && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-zinc-400 font-bold text-[11px]">PUNTO DE FALLA:</span>
+                <select
+                  aria-label="Seleccionar punto de detención de falla simulada"
+                  value={simulatedFailureStep ?? 12}
+                  onChange={(e) => handleSelectSimulatedFailure(Number(e.target.value))}
+                  className="bg-zinc-900 border border-amber-500/40 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-bold outline-none cursor-pointer"
+                >
+                  <option value={1}>Paso 01: Fuente Standby (+5VSB)</option>
+                  <option value={5}>Paso 05: Estabilización PWR_OK</option>
+                  <option value={7}>Paso 07: Microcódigo SPI Firmware</option>
+                  <option value={12}>Paso 12: Memory Training (RAM)</option>
+                  <option value={15}>Paso 15: Inicialización GPU (GOP)</option>
+                  <option value={20}>Paso 20: Boot Order / NVRAM</option>
+                  <option value={22}>Paso 22: Windows Boot Manager</option>
+                  <option value={26}>Paso 26: Drivers BOOT_START</option>
+                  <option value={30}>Paso 30: Servicios de Windows</option>
+                  <option value={33}>Paso 33: explorer.exe (Desktop)</option>
+                </select>
+              </div>
+            )}
+
+            {/* Current Step Counter */}
+            <div className="text-right">
+              <div className="text-[10px] text-zinc-500 font-bold uppercase">ETAPA ACTUAL</div>
+              <div className="text-sm font-bold text-white">
+                PASO {String(currentStep.stepNumber).padStart(2, '0')} / {totalSteps}
+              </div>
+            </div>
+          </div>
+
+          {/* Machine Schematic & Stage Context Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            {/* Visual Machine Cabinet (Left 7 Cols) */}
+            <div className="lg:col-span-7">
+              <EvoBootMachineVisual
+                currentStep={currentStep}
+                isPoweredOn={isPoweredOn}
+                isFailed={activeMode === 'FALLA_SIMULADA' && currentStepIndex === simulatedFailureStep}
+              />
+            </div>
+
+            {/* Stage Forensic Context Panel (Right 5 Cols) */}
+            <div className="lg:col-span-5 bg-[#0b0e14] border border-zinc-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between space-y-4 shadow-xl">
+              <div className="space-y-3.5">
+                {/* Stage Header Badge */}
+                <div className="flex items-center justify-between pb-2 border-b border-zinc-800/80">
+                  <span
+                    className="text-[10px] px-2 py-0.5 rounded font-bold uppercase"
+                    style={{
+                      backgroundColor: `${currentStep.layerColor}20`,
+                      color: currentStep.layerColor,
+                      border: `1px solid ${currentStep.layerColor}50`,
+                    }}
+                  >
+                    CAPA {currentStep.layer}
+                  </span>
+                  <span className="text-[10px] text-zinc-500 font-mono-tech">
+                    PASO {String(currentStep.stepNumber).padStart(2, '0')}
+                  </span>
+                </div>
+
+                {/* Stage Title */}
+                <h2 className="text-base font-bold text-white font-display leading-tight">
+                  {currentStep.name}
+                </h2>
+
+                {/* What is happening */}
                 <div>
-                  <div className="text-[10px] text-zinc-500 uppercase tracking-widest">
-                    {activeMode === 'FALLA_SIMULADA'
-                      ? 'INSPECCIÓN DE FALLA'
-                      : 'PROGRESO DEL ARRANQUE'}
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
+                    ¿QUÉ ESTÁ PASANDO?
+                  </span>
+                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
+                    {currentStep.whatIsHappening}
+                  </p>
+                </div>
+
+                {/* Purpose */}
+                <div>
+                  <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1">
+                    ¿PARA QUÉ SIRVE?
+                  </span>
+                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
+                    {forensicDetails.purpose || currentStep.purpose || 'Coordinar la inicialización de hardware y preparar la transición al siguiente eslabón.'}
+                  </p>
+                </div>
+
+                {/* Signal Flow */}
+                <div className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 text-[11px] space-y-1">
+                  <div className="text-[10px] font-bold text-zinc-400 uppercase">FLUJO DE SEÑAL:</div>
+                  <div className="text-zinc-200 font-sans-editorial">
+                    {forensicDetails.signalFlow || `${currentStep.initiator} → ${currentStep.responder}`}
                   </div>
-                  <div className="text-xl sm:text-2xl font-black text-white font-display tracking-tight">
-                    PASO {currentStep.stepNumber.toString().padStart(2, '0')} /{' '}
-                    <span className="text-zinc-500">{totalSteps}</span>
+                  <div className="text-[10px] text-emerald-400 pt-1 border-t border-zinc-800/60 font-sans-editorial">
+                    <strong>Si todo va bien:</strong> {currentStep.expectedResponse}
                   </div>
+                </div>
+
+                {/* Possible Failures & Detection */}
+                <div className="space-y-2 pt-2 border-t border-zinc-800/80">
+                  <div className="text-[10px] font-bold text-rose-400 uppercase">FALLAS POSIBLES:</div>
+                  <ul className="space-y-1 text-[11px] text-zinc-300 font-sans-editorial list-disc list-inside">
+                    {(forensicDetails.possibleFailures || []).map((f, i) => (
+                      <li key={i}>{f}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Truco EVO */}
+                <div className="p-3 rounded-xl bg-cyan-950/20 border border-cyan-500/30 text-xs">
+                  <span className="text-[10px] font-bold text-cyan-400 uppercase block mb-1">TRUCO EVO:</span>
+                  <p className="text-cyan-200 font-sans-editorial leading-relaxed text-[11px]">
+                    {forensicDetails.evoTip || 'Comprobá siempre el último eslabón confirmado antes de sospechar de software o Windows.'}
+                  </p>
                 </div>
               </div>
 
-              {activeMode === 'APRENDER' ? (
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handlePrevStep}
-                    disabled={currentStepIndex === 0}
-                    className={`flex-1 md:flex-initial px-4 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
-                      currentStepIndex === 0
-                        ? 'bg-zinc-950 border-zinc-900 text-zinc-700 cursor-not-allowed'
-                        : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-700 text-zinc-200 cursor-pointer shadow'
+              {/* Suggested Safe Test */}
+              <div className="pt-3 border-t border-zinc-800/80 text-xs">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase">PRUEBA RECOMENDADA:</span>
+                  <span
+                    className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                      currentStep.safetyLevel === 'USUARIO'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                        : currentStep.safetyLevel === 'TECNICO'
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                        : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
                     }`}
                   >
-                    <ChevronLeft className="w-4 h-4" />
-                    <span>ANTERIOR</span>
-                  </button>
+                    NIVEL: {currentStep.safetyLevel}
+                  </span>
+                </div>
+                <p className="text-zinc-300 font-sans-editorial text-[11px] leading-relaxed">
+                  {currentStep.suggestedSafeTest}
+                </p>
+                {currentStep.safetyRequirement && (
+                  <p className="text-[10px] text-amber-400 font-bold mt-1">
+                    ⚠️ {currentStep.safetyRequirement}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
 
+          {/* Bottom Timeline 00 to 34 */}
+          <div className="bg-[#0b0e14] border border-zinc-800 rounded-2xl p-4 shadow-xl">
+            <div className="flex items-center justify-between mb-3 text-xs">
+              <span className="font-bold text-zinc-300 uppercase tracking-wider">
+                LÍNEA TEMPORAL DE ARRANQUE // 35 ESTADOS SECUENCIALES
+              </span>
+              <span className="text-[11px] text-zinc-500">
+                DESCUBIERTOS: {maxUnlockedStep + 1} / 35
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-thin">
+              {BOOT_SEQUENCE_STEPS.map((step, idx) => {
+                const isCurrent = currentStepIndex === idx;
+                const isUnlocked = idx <= maxUnlockedStep;
+                const isFailureLocked =
+                  activeMode === 'FALLA_SIMULADA' &&
+                  simulatedFailureStep !== null &&
+                  idx > simulatedFailureStep;
+
+                return (
                   <button
+                    key={step.id}
                     type="button"
-                    onClick={handleNextStep}
-                    disabled={currentStepIndex === totalSteps}
-                    className={`flex-1 md:flex-initial px-5 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
-                      currentStepIndex === totalSteps
-                        ? 'bg-zinc-950 border-zinc-900 text-zinc-700 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black border-transparent font-black shadow-[0_0_20px_rgba(16,185,129,0.35)] cursor-pointer'
+                    onClick={() => handleJumpToStep(idx)}
+                    disabled={!isUnlocked || isFailureLocked}
+                    className={`min-w-[38px] h-9 rounded-lg border text-xs font-bold transition-all flex flex-col items-center justify-center relative ${
+                      isCurrent
+                        ? 'bg-cyan-500 text-black border-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.6)] scale-105 z-10'
+                        : isUnlocked && !isFailureLocked
+                        ? 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:border-zinc-500'
+                        : 'bg-zinc-950 border-zinc-900 text-zinc-700 opacity-40 cursor-not-allowed'
                     }`}
                   >
-                    <span>{currentStepIndex === 0 ? 'ENCENDER' : 'SIGUIENTE PASO'}</span>
-                    <ChevronRight className="w-4 h-4 text-current" />
+                    <span>{String(idx).padStart(2, '0')}</span>
+                    {!isUnlocked || isFailureLocked ? (
+                      <Lock className="w-2 h-2 text-zinc-600" />
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================================= */}
+      {/* MODE 3: CASO EVO (DIAGNÓSTICO GUIADO)                                  */}
+      {/* ======================================================================= */}
+      {activeMode === 'CASO_EVO' && (
+        <div className="space-y-4">
+          {/* Case Selection Bar */}
+          <div className="bg-[#0b0e14] border border-zinc-800 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-lg">
+            <div className="flex flex-wrap items-center gap-2">
+              {EVO_CASES.map((c, idx) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => handleSelectCase(idx)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    selectedCaseIndex === idx
+                      ? 'bg-indigo-500 text-white shadow-[0_0_10px_rgba(99,102,241,0.4)]'
+                      : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  {c.number}
+                </button>
+              ))}
+            </div>
+
+            {!caseRunning ? (
+              <button
+                type="button"
+                onClick={handleStartCaseDiagnostic}
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:brightness-110 active:scale-95 transition-all"
+              >
+                <Power className="w-4 h-4" />
+                <span>ENCENDER PC CASO</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleSelectCase(selectedCaseIndex)}
+                className="px-3.5 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>REINICIAR CASO</span>
+              </button>
+            )}
+          </div>
+
+          {/* Case Visual + Diagnostic Engine */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            {/* Visual (Left 6 Cols) */}
+            <div className="lg:col-span-6 space-y-4">
+              <EvoBootMachineVisual
+                currentStep={currentStep}
+                isPoweredOn={caseRunning}
+                isFailed={caseRunning && !isCaseBooting}
+              />
+
+              {/* Initial Case dossier */}
+              <div className="bg-[#0b0e14] border border-zinc-800 rounded-2xl p-4 space-y-3">
+                <div className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">
+                  {currentCase.number} // EXPEDIENTE INICIAL
+                </div>
+                <h3 className="text-sm font-bold text-white font-display">
+                  {currentCase.titulo}
+                </h3>
+                <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
+                  {currentCase.descripcionInicial}
+                </p>
+                <div className="p-3 rounded-xl bg-zinc-950/70 border border-zinc-800/80 text-xs space-y-1">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase">SÍNTOMA OBSERVADO:</span>
+                  <div className="text-amber-300 font-sans-editorial">{currentCase.sintomaPrincipal}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Diagnostic Matrix & Tests (Right 6 Cols) */}
+            <div className="lg:col-span-6 space-y-4">
+              {/* Hypotheses Matrix */}
+              <div className="bg-[#0b0e14] border border-zinc-800 rounded-2xl p-4 space-y-3 shadow-xl">
+                <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+                  <span className="text-xs font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <Compass className="w-4 h-4 text-indigo-400" />
+                    <span>MATRIZ DE HIPÓTESIS</span>
+                  </span>
+                  <span className="text-[10px] text-zinc-500">EVALUÁ CON PRUEBAS</span>
+                </div>
+
+                <div className="space-y-2">
+                  {caseHypotheses.map((hyp) => (
+                    <div
+                      key={hyp.id}
+                      onClick={() => setSelectedHypothesisId(hyp.id)}
+                      className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                        selectedHypothesisId === hyp.id
+                          ? 'bg-indigo-500/15 border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]'
+                          : 'bg-zinc-900/60 border-zinc-800 hover:border-zinc-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-white">{hyp.name}</span>
+                        <span
+                          className={`text-[9px] px-2 py-0.5 rounded font-bold ${
+                            hyp.initialStatus === 'CONFIRMADA'
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                              : hyp.initialStatus === 'SOSTENIDA'
+                              ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                              : hyp.initialStatus === 'DEBILITADA'
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                              : hyp.initialStatus === 'DESCARTADA'
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                              : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                          }`}
+                        >
+                          {hyp.initialStatus}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-400 font-sans-editorial leading-tight">
+                        {hyp.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Confirm Diagnosis button */}
+                <div className="pt-2 flex items-center justify-between">
+                  <span className="text-[10px] text-zinc-500">
+                    {selectedHypothesisId ? 'HIPÓTESIS SELECCIONADA' : 'SELECCIONÁ UNA HIPÓTESIS'}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={!selectedHypothesisId || !caseRunning || isCaseResolved}
+                    onClick={() => selectedHypothesisId && handleConfirmHypothesis(selectedHypothesisId)}
+                    className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:pointer-events-none text-black font-bold text-xs flex items-center gap-1.5 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>EMITIR DIAGNÓSTICO</span>
                   </button>
                 </div>
-              ) : (
-                <div className="text-xs text-rose-300 font-bold flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30">
-                  <AlertTriangle className="w-4 h-4 text-rose-400" />
-                  <span>SIMULANDO COMPORTAMIENTO DE FALLA EN PASO ACTUAL</span>
+
+                {/* Feedback message */}
+                {userDiagnosticFeedback && (
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/40 text-amber-300 text-xs font-sans-editorial leading-relaxed animate-in fade-in">
+                    ⚠️ {userDiagnosticFeedback}
+                  </div>
+                )}
+              </div>
+
+              {/* Diagnostic Tests Panel */}
+              <div className="bg-[#0b0e14] border border-zinc-800 rounded-2xl p-4 space-y-3 shadow-xl">
+                <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+                  <span className="text-xs font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <Wrench className="w-4 h-4 text-cyan-400" />
+                    <span>PRUEBAS DE BANCO DISPONIBLES</span>
+                  </span>
+                  <span className="text-[10px] text-zinc-500">EVALUÁ SEGURIDAD</span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {currentCase.tests.map((test) => {
+                    const isExecuted = executedTestIds.includes(test.id);
+
+                    return (
+                      <div
+                        key={test.id}
+                        className={`p-3 rounded-xl border text-xs transition-all ${
+                          isExecuted
+                            ? 'bg-emerald-950/20 border-emerald-500/40'
+                            : 'bg-zinc-900/60 border-zinc-800'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="font-bold text-white">{test.name}</span>
+                          <span
+                            className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                              test.level === 'USUARIO'
+                                ? 'bg-emerald-500/20 text-emerald-300'
+                                : test.level === 'TECNICO'
+                                ? 'bg-amber-500/20 text-amber-300'
+                                : 'bg-rose-500/20 text-rose-300'
+                            }`}
+                          >
+                            {test.level}
+                          </span>
+                        </div>
+
+                        <p className="text-[11px] text-zinc-400 font-sans-editorial mb-2">
+                          <strong>Comprueba:</strong> {test.queComprueba}
+                        </p>
+
+                        {!isExecuted ? (
+                          <button
+                            type="button"
+                            disabled={!caseRunning}
+                            onClick={() => handleExecuteTest(test.id)}
+                            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40 text-cyan-300 font-bold text-[11px] flex items-center gap-1 transition-colors"
+                          >
+                            <Activity className="w-3 h-3" />
+                            <span>EJECUTAR PRUEBA</span>
+                          </button>
+                        ) : (
+                          <div className="p-2.5 rounded-lg bg-black/50 border border-emerald-500/30 text-[11px] text-emerald-200 font-sans-editorial space-y-1">
+                            <div>
+                              <strong>Resultado:</strong> {test.resultadoObtenido}
+                            </div>
+                            <div className="text-[10px] text-zinc-400">
+                              <strong>Evidencia:</strong> {test.evidenciaGenerada}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Resolved Case Dossier */}
+              {isCaseResolved && (
+                <div className="bg-[#0b0e14] border-2 border-emerald-500/60 rounded-2xl p-5 space-y-3.5 shadow-[0_0_30px_rgba(16,185,129,0.2)] animate-in fade-in">
+                  <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-widest">
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span>EXPEDIENTE EVO // RESUELTO CON ÉXITO</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-white font-display">
+                    CAUSA RAÍZ CONFIRMADA:
+                  </h4>
+                  <p className="text-xs text-zinc-200 font-sans-editorial leading-relaxed">
+                    {currentCase.diagnosticoFinal.causa}
+                  </p>
+                  <div className="space-y-1.5 text-xs text-zinc-300 font-sans-editorial">
+                    <div>
+                      <strong className="text-cyan-400">Acción recomendada:</strong>{' '}
+                      {currentCase.diagnosticoFinal.accionRecomendada}
+                    </div>
+                    <div>
+                      <strong className="text-emerald-400">Verificación posterior:</strong>{' '}
+                      {currentCase.diagnosticoFinal.verificacionPosterior}
+                    </div>
+                  </div>
                 </div>
               )}
-            </section>
+            </div>
+          </div>
+        </div>
+      )}
 
-            {/* Machine Visual Display Component */}
-            <EvoBootMachineVisual
-              currentStep={currentStep}
-              isPoweredOn={isPoweredOn}
-            />
+      {/* ======================================================================= */}
+      {/* MODE 4: PC MISTERIOSA (DIAGNÓSTICO A CIEGAS)                           */}
+      {/* ======================================================================= */}
+      {activeMode === 'PC_MISTERIOSA' && (
+        <div className="space-y-4">
+          {/* Mystery Case Bar */}
+          <div className="bg-[#0b0e14] border border-purple-500/30 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-400/40 flex items-center justify-center text-purple-400">
+                <FileText className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] text-purple-400 font-bold uppercase tracking-widest">
+                  EXPEDIENTE ANÓNIMO // {currentMystery.codigoCaso}
+                </span>
+                <h3 className="text-sm font-bold text-white font-display">
+                  PC MISTERIOSA // AUDITORÍA A CIEGAS
+                </h3>
+              </div>
+            </div>
 
-            {/* Deep-Dive Pedagogical Step Dossier */}
-            <section className="bg-[#0b0e14] border border-zinc-800/90 rounded-2xl p-5 sm:p-6 lg:p-7 shadow-2xl relative overflow-hidden">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-800/80">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"
-                      style={{
-                        backgroundColor: `${currentStep.layerColor}20`,
-                        color: currentStep.layerColor,
-                        border: `1px solid ${currentStep.layerColor}50`,
-                      }}
-                    >
-                      CAPA: {currentStep.layer}
-                    </span>
-                    <span className="text-zinc-500 text-xs">
-                      PASO {currentStep.stepNumber.toString().padStart(2, '0')} DE {totalSteps}
-                    </span>
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-black text-white uppercase font-display tracking-tight">
-                    {currentStep.name}
-                  </h2>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleGenerateMysteryCase}
+                className="px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-zinc-500 text-zinc-200 text-xs font-bold flex items-center gap-1.5 transition-all"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>GENERAR NUEVO CASO</span>
+              </button>
+
+              {!mysteryRunning ? (
+                <button
+                  type="button"
+                  onClick={handleStartMysteryPowerOn}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:brightness-110 active:scale-95 transition-all"
+                >
+                  <Power className="w-4 h-4" />
+                  <span>ENCENDER PC</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleGenerateMysteryCase}
+                  className="px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-400 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>REINICIAR</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Mystery Visual + 4 Tabs Workspace */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            {/* Visual on Left 6 Cols */}
+            <div className="lg:col-span-6 space-y-4">
+              <EvoBootMachineVisual
+                currentStep={currentStep}
+                isPoweredOn={mysteryRunning}
+                isFailed={mysteryRunning && !isMysteryBooting}
+              />
+
+              {/* Case Symptoms overview */}
+              <div className="bg-[#0b0e14] border border-zinc-800 rounded-2xl p-4 space-y-2.5">
+                <div className="text-[10px] text-purple-400 font-bold uppercase tracking-widest">
+                  DESCRIPCIÓN DEL EQUIPO RECEPCIONADO
                 </div>
-
-                <div className="px-3 py-1 rounded-full bg-black/60 border border-zinc-800 text-[10px] text-zinc-400 flex items-center gap-2 self-start sm:self-auto">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                  <span>EVO: OBSERVAR → ENTENDER → COMPROBAR</span>
+                <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
+                  {currentMystery.descripcionPC}
+                </p>
+                <div className="p-3 rounded-xl bg-zinc-950/70 border border-zinc-800/80 text-xs space-y-1">
+                  <span className="text-[10px] font-bold text-zinc-400 uppercase">SÍNTOMA OBSERVED:</span>
+                  <div className="text-amber-300 font-sans-editorial">
+                    {currentMystery.sintomaObservado}
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 pt-5">
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-                      <Info className="w-3.5 h-3.5" />
-                      <span>¿QUÉ ESTÁ PASANDO?</span>
-                    </div>
-                    <p className="text-xs sm:text-sm text-zinc-200 font-sans-editorial leading-relaxed bg-[#07090e] p-3.5 rounded-xl border border-zinc-800/80">
-                      {currentStep.whatIsHappening}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="p-3 rounded-xl bg-black/40 border border-zinc-800/80 space-y-1">
-                      <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                        QUIÉN INICIA LA ACCIÓN
-                      </span>
-                      <p className="text-xs text-zinc-300 font-sans-editorial">
-                        {currentStep.initiator}
-                      </p>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-black/40 border border-zinc-800/80 space-y-1">
-                      <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                        QUÉ COMPONENTE RESPONDE
-                      </span>
-                      <p className="text-xs text-zinc-300 font-sans-editorial">
-                        {currentStep.responder}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-black/40 border border-zinc-800/80 space-y-1">
-                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                      <span>QUÉ ESPERA RECIBIR EL SISTEMA</span>
-                    </span>
-                    <p className="text-xs text-zinc-300 font-sans-editorial">
-                      {currentStep.expectedResponse}
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-black/40 border border-zinc-800/80 space-y-1">
-                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <Eye className="w-3 h-3 text-zinc-400" />
-                      <span>QUÉ PUEDE OBSERVAR EL USUARIO / TÉCNICO</span>
-                    </span>
-                    <p className="text-xs text-zinc-300 font-sans-editorial">
-                      {currentStep.technicalObservation}
-                    </p>
-                  </div>
+            {/* Diagnostic Tabs on Right 6 Cols */}
+            <div className="lg:col-span-6 bg-[#0b0e14] border border-zinc-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between space-y-4 shadow-xl">
+              <div className="space-y-3">
+                {/* 4 Tabs Selector */}
+                <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-xl border border-zinc-800 text-xs">
+                  {(['EVIDENCIAS', 'HIPOTESIS', 'PRUEBAS', 'HISTORIAL'] as MysteryTab[]).map((tab) => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setMysteryActiveTab(tab)}
+                      className={`flex-1 py-1.5 rounded-lg font-bold text-[11px] transition-all ${
+                        mysteryActiveTab === tab
+                          ? 'bg-purple-500 text-white shadow-[0_0_10px_rgba(168,85,247,0.3)]'
+                          : 'text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
                 </div>
 
-                <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-rose-950/20 border border-rose-500/30 space-y-2">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
-                      <span>SI ESTE PASO FALLA (EVIDENCIA & SÍNTOMA)</span>
+                {/* TAB 1: EVIDENCIAS */}
+                {mysteryActiveTab === 'EVIDENCIAS' && (
+                  <div className="space-y-2.5">
+                    <div className="text-[10px] font-bold text-zinc-400 uppercase">
+                      REGISTRO DE EVIDENCIAS OBSERVABLES
                     </div>
-                    <p className="text-xs sm:text-sm text-rose-200/90 font-sans-editorial leading-relaxed">
-                      {currentStep.ifFails}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-amber-950/20 border border-amber-500/30 space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
-                        <Activity className="w-3.5 h-3.5 text-amber-400" />
-                        <span>PRUEBA SEGURA SUGERIDA</span>
-                      </div>
-
-                      <div
-                        className={`px-2.5 py-1 rounded-lg border text-[10px] font-bold flex items-center gap-1.5 self-start sm:self-auto ${currentSafetyInfo.badgeClass}`}
-                      >
-                        {currentSafetyInfo.icon}
-                        <span>{currentSafetyInfo.label}</span>
-                      </div>
-                    </div>
-
-                    {currentStep.safetyRequirement && (
-                      <div className="px-3 py-1.5 rounded-lg bg-black/50 border border-amber-500/30 text-[11px] text-amber-200/90 font-medium flex items-center gap-2">
-                        <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span>{currentStep.safetyRequirement}</span>
+                    {mysteryEvidenceLog.length === 0 ? (
+                      <p className="text-xs text-zinc-500 font-sans-editorial p-4 text-center">
+                        Pulsa [ ENCENDER PC ] para observar el comportamiento y recopilar las primeras evidencias.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {mysteryEvidenceLog.map((ev, i) => (
+                          <div
+                            key={i}
+                            className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800 text-xs text-zinc-200 font-sans-editorial leading-relaxed"
+                          >
+                            {ev}
+                          </div>
+                        ))}
                       </div>
                     )}
-
-                    <p className="text-xs sm:text-sm text-amber-200/90 font-sans-editorial leading-relaxed">
-                      {currentStep.suggestedSafeTest}
-                    </p>
                   </div>
+                )}
 
-                  <div className="p-3.5 rounded-xl bg-blue-950/20 border border-blue-500/30 space-y-1">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-blue-300 flex items-center gap-1.5">
-                      <ArrowRight className="w-3.5 h-3.5 text-blue-400" />
-                      <span>SIGUIENTE ESLABÓN DE LA CADENA</span>
+                {/* TAB 2: HIPÓTESIS */}
+                {mysteryActiveTab === 'HIPOTESIS' && (
+                  <div className="space-y-2.5">
+                    <div className="text-[10px] font-bold text-zinc-400 uppercase">
+                      MATRIZ DE COMPONENTES E HIPÓTESIS
                     </div>
-                    <p className="text-xs text-blue-200/90 font-sans-editorial">
-                      {currentStep.nextStep}
-                    </p>
-                  </div>
+                    <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto pr-1">
+                      {ALL_MYSTERY_COMPONENTS.map((comp) => {
+                        const status = mysteryHypothesisStates[comp.key] || 'SIN_EVIDENCIA';
+                        const isSelected = mysterySelectedComponent === comp.key;
 
-                  <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800 text-center space-y-1">
-                    <span className="text-[10px] text-zinc-500 font-mono-tech uppercase">
-                      LEMA FORENSE EVO
-                    </span>
-                    <div className="text-xs font-bold text-amber-300 tracking-wider font-mono-tech">
-                      “NO LO CREAS. COMPROBALO.”
+                        return (
+                          <div
+                            key={comp.key}
+                            onClick={() => setMysterySelectedComponent(comp.key)}
+                            className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all ${
+                              isSelected
+                                ? 'bg-purple-500/15 border-purple-400 shadow-[0_0_10px_rgba(168,85,247,0.2)]'
+                                : 'bg-zinc-900/60 border-zinc-800 hover:border-zinc-700'
+                            }`}
+                          >
+                            <div className="font-bold text-white text-[11px] mb-1">{comp.label}</div>
+                            <span
+                              className={`text-[8.5px] px-1.5 py-0.5 rounded font-bold ${
+                                status === 'CONFIRMADA'
+                                  ? 'bg-emerald-500/20 text-emerald-300'
+                                  : status === 'SOSTENIDA'
+                                  ? 'bg-indigo-500/20 text-indigo-300'
+                                  : status === 'DEBILITADA'
+                                  ? 'bg-amber-500/20 text-amber-300'
+                                  : status === 'DESCARTADA'
+                                  ? 'bg-rose-500/20 text-rose-300'
+                                  : 'bg-zinc-800 text-zinc-400'
+                              }`}
+                            >
+                              {status}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-                </div>
+                )}
+
+                {/* TAB 3: PRUEBAS */}
+                {mysteryActiveTab === 'PRUEBAS' && (
+                  <div className="space-y-3">
+                    <div className="text-[10px] font-bold text-zinc-400 uppercase">
+                      PRUEBAS DE DIAGNÓSTICO FORENSE
+                    </div>
+                    <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                      {currentMystery.pruebasDisponibles.map((test) => {
+                        const isExecuted = mysteryExecutedTests.includes(test.id);
+                        const isWhyOpen = mysteryExpandedWhy === test.id;
+
+                        return (
+                          <div
+                            key={test.id}
+                            className={`p-3 rounded-xl border text-xs transition-all ${
+                              isExecuted
+                                ? 'bg-emerald-950/20 border-emerald-500/40'
+                                : 'bg-zinc-900/60 border-zinc-800'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="font-bold text-white">{test.nombre}</span>
+                              <span
+                                className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                                  test.nivel === 'USUARIO'
+                                    ? 'bg-emerald-500/20 text-emerald-300'
+                                    : test.nivel === 'TECNICO'
+                                    ? 'bg-amber-500/20 text-amber-300'
+                                    : 'bg-rose-500/20 text-rose-300'
+                                }`}
+                              >
+                                {test.nivel}
+                              </span>
+                            </div>
+
+                            <p className="text-[11px] text-zinc-400 font-sans-editorial mb-2">
+                              {test.queIntentaComprobar}
+                            </p>
+
+                            <div className="flex items-center gap-2">
+                              {!isExecuted ? (
+                                <button
+                                  type="button"
+                                  disabled={!mysteryRunning}
+                                  onClick={() => handleExecuteMysteryTest(test)}
+                                  className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40 text-purple-300 font-bold text-[11px] flex items-center gap-1 transition-colors"
+                                >
+                                  <Activity className="w-3 h-3" />
+                                  <span>EJECUTAR PRUEBA</span>
+                                </button>
+                              ) : (
+                                <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                                  <CheckCircle className="w-3.5 h-3.5" />
+                                  <span>EJECUTADA</span>
+                                </span>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setMysteryExpandedWhy(isWhyOpen ? null : test.id)
+                                }
+                                className="px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-zinc-200 text-[10.5px] flex items-center gap-1 transition-colors"
+                              >
+                                <HelpCircle className="w-3 h-3" />
+                                <span>¿POR QUÉ?</span>
+                              </button>
+                            </div>
+
+                            {/* Why explanation accordion */}
+                            {isWhyOpen && (
+                              <div className="mt-2 p-2.5 rounded-lg bg-black/60 border border-zinc-800 text-[11px] text-zinc-300 font-sans-editorial leading-relaxed animate-in fade-in">
+                                {test.porQueExplicacion}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 4: HISTORIAL */}
+                {mysteryActiveTab === 'HISTORIAL' && (
+                  <div className="space-y-2.5">
+                    <div className="text-[10px] font-bold text-zinc-400 uppercase">
+                      LÍNEA DE ACCIONES FORENSES
+                    </div>
+                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                      {mysteryHistoryLog.map((log, i) => (
+                        <div
+                          key={i}
+                          className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800 text-xs space-y-0.5 font-sans-editorial"
+                        >
+                          <div className="flex items-center justify-between text-[10px] text-purple-400 font-mono-tech">
+                            <span>{log.action}</span>
+                            <span>{log.timestamp}</span>
+                          </div>
+                          <div className="text-zinc-300 text-[11px]">{log.note}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </section>
 
-            {/* Bottom Timeline Step Selector */}
-            <section className="bg-[#0b0e14] border border-zinc-800/80 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>
-                    LÍNEA TEMPORAL COMPLETA DE ARRANQUE (35 ESTADOS) —{' '}
-                    {activeMode === 'FALLA_SIMULADA' ? 'MODO FALLA LIBRE' : 'MODO SECUENCIAL'}
+              {/* Bottom Emit Diagnosis Area */}
+              <div className="pt-3 border-t border-zinc-800/80 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-zinc-400">
+                    {mysterySelectedComponent ? (
+                      <span>
+                        HIPÓTESIS SELECCIONADA:{' '}
+                        <strong className="text-white">
+                          {ALL_MYSTERY_COMPONENTS.find((c) => c.key === mysterySelectedComponent)?.label}
+                        </strong>
+                      </span>
+                    ) : (
+                      'SELECCIONÁ UN COMPONENTE EN LA PESTAÑA HIPÓTESIS'
+                    )}
                   </span>
-                </span>
-                <span className="text-[10px] text-zinc-500 font-mono-tech hidden sm:inline">
-                  {activeMode === 'APRENDER'
-                    ? `PASOS DESBLOQUEADOS (${maxUnlockedStep + 1}/35)`
-                    : 'SELECCIONA CUALQUIER PASO PARA ANALIZAR SU FALLA'}
-                </span>
-              </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-2 pt-1 scrollbar-thin scrollbar-thumb-zinc-700">
-                {BOOT_SEQUENCE_STEPS.map((step, idx) => {
-                  const isSelected = currentStepIndex === idx;
-                  const isUnlocked = activeMode === 'FALLA_SIMULADA' || idx <= maxUnlockedStep;
-                  const isPassed = isPoweredOn && currentStepIndex >= idx;
+                  <button
+                    type="button"
+                    disabled={!mysterySelectedComponent || !mysteryRunning || isMysteryResolved}
+                    onClick={handleEmitMysteryDiagnosis}
+                    className="px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 disabled:opacity-40 disabled:pointer-events-none text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>EMITIR DIAGNÓSTICO</span>
+                  </button>
+                </div>
 
-                  return (
-                    <button
-                      key={step.id}
-                      type="button"
-                      onClick={() => handleSelectStep(idx)}
-                      disabled={!isUnlocked}
-                      className={`shrink-0 w-8 h-8 rounded-lg font-mono-tech text-[10px] font-bold flex items-center justify-center transition-all ${
-                        isSelected
-                          ? activeMode === 'FALLA_SIMULADA'
-                            ? 'bg-rose-500 text-white scale-110 shadow-[0_0_12px_#f43f5e] cursor-pointer'
-                            : 'bg-amber-400 text-black scale-110 shadow-[0_0_12px_#f59e0b] cursor-pointer'
-                          : !isUnlocked
-                          ? 'bg-zinc-950/80 border border-zinc-900 text-zinc-700 cursor-not-allowed opacity-50'
-                          : isPassed
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 cursor-pointer'
-                          : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700 cursor-pointer'
-                      }`}
-                      title={
-                        isUnlocked
-                          ? `${step.stepNumber.toString().padStart(2, '0')}: ${step.name} (${step.layer}) [${step.safetyLevel}]`
-                          : `Paso ${step.stepNumber.toString().padStart(2, '0')} bloqueado. Avanza secuencialmente para desbloquear.`
-                      }
-                    >
-                      {!isUnlocked ? (
-                        <Lock className="w-3 h-3 text-zinc-700" />
-                      ) : (
-                        step.stepNumber
-                      )}
-                    </button>
-                  );
-                })}
+                {mysteryDiagnosticMessage && (
+                  <div
+                    className={`p-3 rounded-xl border text-xs font-sans-editorial leading-relaxed animate-in fade-in ${
+                      mysteryDiagnosticMessage.type === 'SUCCESS'
+                        ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300'
+                        : 'bg-amber-500/10 border-amber-500/40 text-amber-300'
+                    }`}
+                  >
+                    {mysteryDiagnosticMessage.text}
+                  </div>
+                )}
+
+                {/* Resolved Mystery Dossier */}
+                {isMysteryResolved && (
+                  <div className="bg-[#0b0e14] border-2 border-purple-500/60 rounded-2xl p-5 space-y-3 shadow-[0_0_30px_rgba(168,85,247,0.2)] animate-in fade-in">
+                    <div className="flex items-center gap-2 text-purple-400 font-bold text-xs uppercase tracking-widest">
+                      <CheckCircle2 className="w-5 h-5" />
+                      <span>EXPEDIENTE EVO // RESUELTO CON ÉXITO</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-white font-display">
+                      CAUSA RAÍZ: {currentMystery.causaRaiz}
+                    </h4>
+                    <div className="space-y-1 text-xs text-zinc-300 font-sans-editorial">
+                      <div>
+                        <strong className="text-purple-400">Acción:</strong> {currentMystery.accionRecomendada}
+                      </div>
+                      <div>
+                        <strong className="text-emerald-400">Verificación:</strong> {currentMystery.verificacionPosterior}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-zinc-800 text-[11px] text-zinc-400 font-sans-editorial space-y-1">
+                      <span className="font-bold text-zinc-300 block text-[10px] uppercase">RUTA DE RAZONAMIENTO:</span>
+                      <ul className="list-disc list-inside space-y-0.5">
+                        {currentMystery.rutaRazonamiento.map((r, idx) => (
+                          <li key={idx}>{r}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </div>
-            </section>
-          </>
-        )}
-      </main>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -924,9 +924,9 @@ export const EvoSingleTruthSurface: React.FC<EvoSingleTruthSurfaceProps> = ({
     const coolingObj = SANDBOX_OPTIONS.cooling.find(cl => cl.id === selectedCooling) || SANDBOX_OPTIONS.cooling[0];
 
     const isPhysicalCurrentSetup = cpuObj.isPhysicalCurrentHardware && gpuObj.isPhysicalCurrentHardware && ramObj.isPhysicalCurrentHardware && coolingObj.isPhysicalCurrentHardware;
-    const currentProvenance: EpistemicProvenance = isPhysicalCurrentSetup ? 'MEASURED' : 'SIMULATED';
+    const currentProvenance: EpistemicProvenance = isPhysicalCurrentSetup ? 'ESTIMATED' : 'SIMULATED';
 
-    // Para el hardware físico detectado, tomamos la medición de laboratorio exacta
+    // Para el hardware físico detectado, tomamos la estimación de modelo empírico de laboratorio
     if (isPhysicalCurrentSetup) {
       const empirical = userModeTweaksActive ? currentGame.empiricalTweaked : currentGame.empiricalBaseline;
       return {
@@ -1005,7 +1005,7 @@ export const EvoSingleTruthSurface: React.FC<EvoSingleTruthSurfaceProps> = ({
         deltaGain,
         gainPercent: gainPercent >= 0 ? `+${gainPercent}%` : `${gainPercent}%`,
         isSelected: game.id === selectedGameId,
-        provenance: (isPhysicalCurrentSetup ? 'MEASURED' : 'SIMULATED') as EpistemicProvenance
+        provenance: (isPhysicalCurrentSetup ? 'ESTIMATED' : 'SIMULATED') as EpistemicProvenance
       };
     });
   }, [selectedCpu, selectedGpu, selectedRam, selectedCooling, userModeTweaksActive, selectedGameId]);

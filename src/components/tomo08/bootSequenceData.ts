@@ -745,11 +745,12 @@ export const BOOT_SEQUENCE_STEPS: BootStep[] = [
 // ============================================================================
 
 export type HypothesisStatus =
-  | 'POSSIBLE'
-  | 'SUPPORTED'
-  | 'WEAKENED'
-  | 'DISCARDED'
-  | 'CONFIRMED';
+  | 'SIN_EVIDENCIA'
+  | 'POSIBLE'
+  | 'SOSTENIDA'
+  | 'DEBILITADA'
+  | 'DESCARTADA'
+  | 'CONFIRMADA';
 
 export interface CaseHypothesis {
   id: string;
@@ -824,7 +825,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Inestabilidad en el entrenamiento de memoria RAM / Perfil inestable',
         component: 'RAM / IMC',
         description: 'Falla en el bus de datos de memoria o perfil de latencias inestable impidiendo la calibración de picosegundos.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El sistema se detiene en el paso 12 tras haber detectado los módulos en el bus SMBus.'],
       },
       {
@@ -832,7 +833,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Falla en procesador gráfico (GPU) o bus PCIe de video',
         component: 'GPU',
         description: 'La placa de video no responde o existe un cortocircuito en las líneas PCIe.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['La pantalla no muestra señal, pero el flujo todavía no llegó a la fase de enumeración PCIe.'],
       },
       {
@@ -840,7 +841,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Unidad de almacenamiento SSD M.2 dañada o en cortocircuito',
         component: 'ALMACENAMIENTO',
         description: 'Falla en el controlador SSD bloqueando el bus principal.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El SSD no ha sido interrogado aún en la secuencia temporal de arranque.'],
       },
       {
@@ -848,7 +849,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Corrupción del gestor de arranque (bootmgfw.efi / BCD)',
         component: 'BOOTLOADER',
         description: 'Archivos de arranque de Windows ilegibles en el almacenamiento masivo.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El firmware UEFI no ha alcanzado la fase de selección de dispositivo de arranque (BDS).'],
       },
     ],
@@ -922,7 +923,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Falta de alimentación auxiliar PCIe en la GPU o falla en controlador GOP',
         component: 'GPU',
         description: 'La tarjeta gráfica dedicada no recibe energía suficiente en sus conectores auxiliares o su firmware GOP no responde.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El sistema se frena en el paso 15 tras haber completado el entrenamiento de memoria y enumeración PCIe.'],
       },
       {
@@ -930,7 +931,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Falla o incompatibilidad en módulos de memoria RAM',
         component: 'RAM',
         description: 'Corrupción de datos en DRAM impidiendo continuar el arranque.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['Los módulos RAM ya fueron detectados y entrenados satisfactoriamente en los pasos 11 y 12.'],
       },
       {
@@ -938,7 +939,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Controlador de gráficos de Windows incompatible',
         component: 'DRIVER',
         description: 'Driver de video corrupto en el sistema operativo.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El sistema aún se encuentra en nivel firmware UEFI; Windows y sus drivers no han sido cargados.'],
       },
       {
@@ -946,7 +947,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'SSD NVMe dañado impidiendo la carga del sistema',
         component: 'ALMACENAMIENTO',
         description: 'Unidad de almacenamiento en corte impidiendo el paso de video.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['La detección de almacenamiento es posterior o paralela y no condiciona la señal gráfica básica del BIOS.'],
       },
     ],
@@ -1020,7 +1021,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Orden de arranque desconfigurado en NVRAM o partición EFI (ESP) eliminada/dañada',
         component: 'BOOTLOADER / NVRAM',
         description: 'El firmware no encuentra el archivo bootmgfw.efi en la partición FAT32 del disco de sistema.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El hardware completó el POST pero el arranque se frena al buscar el cargador de sistema operativo.'],
       },
       {
@@ -1028,7 +1029,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Falla en la memoria RAM impidiendo la carga del gestor de arranque',
         component: 'RAM',
         description: 'Módulos de memoria inestables impidiendo la ejecución de código.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['La RAM ya fue completamente validada en las pruebas POST previas.'],
       },
       {
@@ -1036,7 +1037,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Servicio crítico de Windows bloqueando el inicio',
         component: 'SERVICIOS',
         description: 'Servicio de sistema en Sesión 0 con fallas de arranque.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['Windows ni siquiera ha comenzado a cargarse en memoria RAM.'],
       },
       {
@@ -1044,7 +1045,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Incompatibilidad de resolución en la placa de video',
         component: 'GPU',
         description: 'Falla gráfica impidiendo mostrar el menú de arranque.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El monitor muestra claramente el mensaje de error de texto o el menú BIOS.'],
       },
     ],
@@ -1118,7 +1119,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Incompatibilidad en controlador BOOT_START por cambio de modo SATA/NVMe (VMD / RAID vs AHCI)',
         component: 'DRIVER / CONTROLADORA',
         description: 'El modo de operación de la controladora en BIOS no coincide con los drivers cargados en la fase temprana de arranque.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El fallo ocurre exactamente en el Paso 26 con el código BSOD 0x7B INACCESSIBLE_BOOT_DEVICE.'],
       },
       {
@@ -1126,7 +1127,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Corrupción en el proceso explorer.exe',
         component: 'DESKTOP / SHELL',
         description: 'Falla en el entorno gráfico de usuario.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['La secuencia se interrumpe mucho antes de que se creen las sesiones de usuario.'],
       },
       {
@@ -1134,7 +1135,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Falla física en los chips de memoria RAM',
         component: 'RAM',
         description: 'Celdas de memoria defectuosas provocando la pantalla azul.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El código 0x7B es específico de acceso a dispositivo de almacenamiento de arranque, no de paridad de memoria.'],
       },
       {
@@ -1142,7 +1143,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Caída de voltaje en el riel de +12V de la fuente',
         component: 'PSU',
         description: 'Inestabilidad eléctrica al exigir carga al procesador.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['La fuente mantiene alimentación estable y el BSOD es generado por el software del kernel.'],
       },
     ],
@@ -1217,7 +1218,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Falla en el inicio automático del shell (explorer.exe) o clave Shell del Registro alterada',
         component: 'DESKTOP / SHELL',
         description: 'La clave de Registro que define el shell de usuario está corrupta o el binario explorer.exe se encuentra bloqueado.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El fallo ocurre en el Paso 33 tras la autenticación exitosa del usuario.'],
       },
       {
@@ -1225,7 +1226,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Falla física en las fases VRM de la placa madre',
         component: 'HARDWARE / VRM',
         description: 'Caída de potencia en el regulador de voltaje.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El hardware se encuentra completamente encendido y respondiendo al teclado y mouse.'],
       },
       {
@@ -1233,7 +1234,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Corrupción en winload.efi',
         component: 'BOOTLOADER',
         description: 'Cargador de sistema operativo defectuoso.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['winload.efi ya cumplió su función hace 10 pasos en la secuencia de arranque.'],
       },
       {
@@ -1241,7 +1242,7 @@ export const EVO_CASES: EvoCase[] = [
         name: 'Microcódigo de BIOS desactualizado',
         component: 'FIRMWARE',
         description: 'Incompatibilidad de firmware a nivel placa madre.',
-        initialStatus: 'POSSIBLE',
+        initialStatus: 'POSIBLE',
         evidenceNotes: ['El sistema operativo ya está en modo usuario interactivo en Sesión 1.'],
       },
     ],
@@ -1374,7 +1375,7 @@ export const ALL_MYSTERY_COMPONENTS: { key: MysteryComponentKey; label: string }
 export const MYSTERY_CASES_POOL: MysteryCase[] = [
   {
     id: 'myst-01',
-    codigoCaso: 'EXP-MIST-01-RAM',
+    codigoCaso: 'EXP-MIST-4821',
     descripcionPC: 'PC Desktop ATX ensamblada recientemente. Componentes de gama alta con iluminación y ventiladores conectados a la placa base.',
     sintomaObservado: 'Al presionar POWER, los ventiladores comienzan a girar a alta velocidad de forma sostenida. No hay señal en el monitor y el equipo se reinicia solo a los pocos segundos.',
     estadoInicial: 'Equipo en reposo, enchufado a la toma de corriente.',
@@ -1444,7 +1445,7 @@ export const MYSTERY_CASES_POOL: MysteryCase[] = [
   },
   {
     id: 'myst-02',
-    codigoCaso: 'EXP-MIST-02-GPU',
+    codigoCaso: 'EXP-MIST-7193',
     descripcionPC: 'Equipo con tarjeta gráfica dedicada conectada en slot PCIe x16. El usuario reporta que tras mover el gabinete no obtiene imagen.',
     sintomaObservado: 'El equipo enciende, ventiladores giran estables y el teclado ilumina sus indicadores de bloqueo Num/Caps, pero el monitor indica "Sin Señal".',
     estadoInicial: 'Equipo apagado tras traslado del gabinete.',
@@ -1514,7 +1515,7 @@ export const MYSTERY_CASES_POOL: MysteryCase[] = [
   },
   {
     id: 'myst-03',
-    codigoCaso: 'EXP-MIST-03-STORAGE',
+    codigoCaso: 'EXP-MIST-3058',
     descripcionPC: 'Computadora de oficina que tras un reinicio inesperado muestra pantalla negra con texto blanco y no ingresa a Windows.',
     sintomaObservado: 'El equipo supera el logo de la motherboard y queda detenido con el mensaje "Reboot and Select proper Boot Device" o ingresa directamente al BIOS.',
     estadoInicial: 'Equipo encendido en bucle de selección de arranque.',
@@ -1584,7 +1585,7 @@ export const MYSTERY_CASES_POOL: MysteryCase[] = [
   },
   {
     id: 'myst-04',
-    codigoCaso: 'EXP-MIST-04-DRIVER',
+    codigoCaso: 'EXP-MIST-8290',
     descripcionPC: 'Equipo que tras una actualización de firmware BIOS se reinicia con Pantalla Azul antes de llegar a la pantalla de bienvenida.',
     sintomaObservado: 'Aparece el logo de Windows con los puntos girando por 2 segundos y se corta con BSOD: INACCESSIBLE_BOOT_DEVICE (0x0000007B).',
     estadoInicial: 'Equipo en bucle de reinicios por pantalla azul temprana.',
@@ -1654,7 +1655,7 @@ export const MYSTERY_CASES_POOL: MysteryCase[] = [
   },
   {
     id: 'myst-05',
-    codigoCaso: 'EXP-MIST-05-SESSION',
+    codigoCaso: 'EXP-MIST-1574',
     descripcionPC: 'Computadora portátil donde el usuario ingresa su contraseña, ve el mensaje "Bienvenido" y la pantalla queda en negro sin escritorio.',
     sintomaObservado: 'Tras autenticar en la pantalla de bloqueo, la pantalla permanece negra. El cursor del mouse se mueve y responde a Ctrl+Shift+Esc abriendo el Administrador de Tareas.',
     estadoInicial: 'Sesión iniciada con pantalla negra y cursor visible.',
@@ -1724,7 +1725,7 @@ export const MYSTERY_CASES_POOL: MysteryCase[] = [
   },
   {
     id: 'myst-06',
-    codigoCaso: 'EXP-MIST-06-SERVICES',
+    codigoCaso: 'EXP-MIST-6412',
     descripcionPC: 'Equipo de trabajo corporativo que se queda con el círculo de puntos girando de Windows por más de 20 minutos sin llegar a la pantalla de bienvenida.',
     sintomaObservado: 'El sistema supera el POST, carga el kernel, pero el círculo de puntos gira indefinidamente sin mostrar la pantalla de bloqueo.',
     estadoInicial: 'Equipo atascado en pantalla de carga de Windows.',

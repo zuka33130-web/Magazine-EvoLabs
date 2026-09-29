@@ -116,9 +116,43 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (method === 'GET' && cleanPath === '/v1/machine') {
-      const machineInventory = await inventoryCollector.collectInventory();
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(machineInventory, null, 2));
+      if (process.platform !== 'win32') {
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify(
+            {
+              error: 'AUTODETECTION_FAILED',
+              code: 'PLATFORM_NOT_SUPPORTED',
+              message:
+                'EVO Local Agent requiere Windows nativo para consultar proveedores CIM/WMI (Win32_*).',
+              platform: process.platform,
+              hardware: null,
+            },
+            null,
+            2
+          )
+        );
+        return;
+      }
+
+      try {
+        const machineInventory = await inventoryCollector.collectInventory();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(machineInventory, null, 2));
+      } catch (err: any) {
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify(
+            {
+              error: 'AUTODETECTION_FAILED',
+              message: err?.message || 'Error al recolectar inventario.',
+              hardware: null,
+            },
+            null,
+            2
+          )
+        );
+      }
       return;
     }
 

@@ -18,10 +18,15 @@ export class AgentSecurityManager {
     return this.sessionToken;
   }
 
+  private static readonly ALLOWED_EXACT_ORIGINS = new Set([
+    'https://ais-dev-ozfhvuxwnhwwzmlhkvf4sw-135361764474.us-east1.run.app',
+    'https://ais-pre-ozfhvuxwnhwwzmlhkvf4sw-135361764474.us-east1.run.app',
+  ]);
+
   /**
    * Verifies if an origin is permitted:
-   * Permitted: localhost, 127.0.0.1, or verified EVO/AI Studio cloud domains.
-   * Prohibited: open or reflective CORS for any arbitrary web origin.
+   * Permitted: localhost, 127.0.0.1, or exact authorized preview origins.
+   * Prohibited: open wildcards, *.run.app, *.google.com, or reflective CORS.
    */
   public isOriginAllowed(originHeader: string | undefined): { allowed: boolean; originBase?: string } {
     if (!originHeader) {
@@ -35,12 +40,9 @@ export class AgentSecurityManager {
       const hostname = parsed.hostname.toLowerCase();
 
       const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
-      const isAiStudio =
-        hostname.endsWith('.run.app') ||
-        hostname.endsWith('.google.com') ||
-        hostname.endsWith('.aistudio.google');
+      const isAllowedExact = AgentSecurityManager.ALLOWED_EXACT_ORIGINS.has(originBase);
 
-      if (isLocalHost || isAiStudio) {
+      if (isLocalHost || isAllowedExact) {
         return { allowed: true, originBase };
       }
 

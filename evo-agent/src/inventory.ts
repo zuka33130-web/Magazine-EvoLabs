@@ -6,7 +6,6 @@
 // ============================================================================
 
 import { execFile } from 'child_process';
-import os from 'os';
 import {
   AgentMachineInventoryResponse,
   WindowsProcessorInventory,
@@ -123,13 +122,16 @@ $os = Get-CimInstance Win32_OperatingSystem | Select-Object -First 1
 `.trim();
 
   /**
-   * Executes the predefined CIM script using execFile on Windows or generates a clean fallback for non-Windows host.
+   * Executes the predefined CIM script using execFile on Windows.
+   * If process.platform !== 'win32', fails with PLATFORM_NOT_SUPPORTED and AUTODETECTION_FAILED.
    */
   public async collectInventory(): Promise<AgentMachineInventoryResponse> {
     const isWindows = process.platform === 'win32';
 
     if (!isWindows) {
-      return this.generateNonWindowsDiagnosticInventory();
+      throw new Error(
+        'PLATFORM_NOT_SUPPORTED: EVO Local Agent requiere Windows nativo con proveedores CIM/WMI (Win32_*). AUTODETECTION_FAILED.'
+      );
     }
 
     return new Promise<AgentMachineInventoryResponse>((resolve, reject) => {
@@ -517,110 +519,5 @@ $os = Get-CimInstance Win32_OperatingSystem | Select-Object -First 1
     }
 
     return false;
-  }
-
-  /**
-   * Diagnostic response when running agent in non-Windows environment (e.g. Linux container)
-   */
-  private generateNonWindowsDiagnosticInventory(): AgentMachineInventoryResponse {
-    const timestamp = new Date().toISOString();
-    const cpus = os.cpus();
-    const totalMemBytes = os.totalmem();
-    const totalMemGB = Number((totalMemBytes / (1024 * 1024 * 1024)).toFixed(2));
-    const cpuModel = cpus[0]?.model || 'UNKNOWN';
-
-    return {
-      protocol: 'EVO_LOCAL_AGENT_V1',
-      source: 'WINDOWS_CIM_WMI_DIRECT',
-      overallProvenance: 'SYSTEM_REPORTED',
-      timestamp,
-      machineId: `MCH-DEV-NONWIN-${Date.now()}`,
-      alias: `${cpuModel} // Host (${process.platform})`,
-
-      cpu: {
-        name: cpuModel,
-        numberOfCores: cpus.length,
-        numberOfLogicalProcessors: cpus.length,
-        maxClockSpeedMhz: cpus[0]?.speed || 0,
-        currentClockSpeedMhz: cpus[0]?.speed || 0,
-        provenance: 'SYSTEM_REPORTED',
-      },
-      motherboard: {
-        product: 'UNKNOWN',
-        provenance: 'UNKNOWN',
-      },
-      bios: {
-        provenance: 'UNKNOWN',
-      },
-      ram: {
-        totalCapacityBytes: totalMemBytes,
-        totalCapacityGB: totalMemGB,
-        modulesCount: 1,
-        modules: [
-          {
-            capacityBytes: totalMemBytes,
-            capacityGB: totalMemGB,
-            provenance: 'SYSTEM_REPORTED',
-          },
-        ],
-        channels: 0,
-        type: 'UNKNOWN',
-        provenance: 'SYSTEM_REPORTED',
-      },
-      gpu: [],
-      primaryGpu: {
-        name: 'UNKNOWN',
-        isDedicated: false,
-        vramReliable: false,
-        provenance: 'UNKNOWN',
-      },
-      storage: [],
-      network: [],
-      os: {
-        caption: `${os.type()} ${os.release()}`,
-        version: os.release(),
-        buildNumber: os.version ? os.version() : 'UNKNOWN',
-        osArchitecture: os.arch(),
-        provenance: 'SYSTEM_REPORTED',
-      },
-
-      psu: {
-        status: 'UNKNOWN',
-        reason: 'PSU no detectable por software.',
-        wattageW: 0,
-        rating: 'UNKNOWN',
-        provenance: 'UNKNOWN',
-      },
-      cooling: {
-        status: 'UNKNOWN',
-        reason: 'Cooling no detectable por software.',
-        type: 'UNKNOWN',
-        tdpCapacityW: 0,
-        provenance: 'UNKNOWN',
-      },
-      chassis: {
-        status: 'UNKNOWN',
-        reason: 'Chassis no detectable por software.',
-        model: 'UNKNOWN',
-        formFactor: 'UNKNOWN',
-        provenance: 'UNKNOWN',
-      },
-      fans: {
-        status: 'UNKNOWN',
-        reason: 'Fans no detectables por software.',
-        count: 0,
-        sizeMm: 0,
-        provenance: 'UNKNOWN',
-      },
-
-      epistemicAudit: {
-        prohibitedInventionsEnforced: true,
-        realDetectedSubsystems: ['Node.js Host OS Fallback'],
-        unknownSubsystems: ['PSU', 'Cooling', 'Chassis', 'Fans', 'Win32 CIM Classes (Requires Windows Host)'],
-        rulesSummary: [
-          'Agente ejecutado en entorno no-Windows. Las clases Win32_* se ejecutan nativamente en Windows.',
-        ],
-      },
-    };
   }
 }
