@@ -26,7 +26,7 @@ import { EvoBootLab } from '../tomo08/EvoBootLab';
 export interface ForensicBenchTarget {
   tomoId: string;
   moduleNumber: string;
-  labView: 'hotswap-lab' | 'windows-matrix' | 'motherboard-canvas' | 'incident-central';
+  labView: 'hotswap-lab' | 'windows-matrix' | 'motherboard-canvas' | 'incident-central' | 'boot-lab';
   scenario?: string;
   station?: string;
 }
@@ -76,8 +76,8 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     primaryColor: '#f59e0b',
     accentGradient: 'from-amber-500/20 via-yellow-500/10 to-transparent',
     glowShadow: 'rgba(245, 158, 11, 0.28)',
-    tagline: 'ARQUITECTURA DE COMPUTADORAS // TOPOLOGÍA FÍSICA',
-    title: 'TU PC NO ES LO QUE DICEN LOS FPS',
+    tagline: '“Entendé tu máquina desde adentro.”',
+    title: 'EVO LABS // CONOCÉ TU PC',
     editorialSubtitle:
       'La velocidad real se define en el silicio y la sincronía de buses mucho antes de que se renderice un fotograma. Análisis forense de topología de componentes y límites de diseño.',
     pagesBadge: '46 PÁGINAS A4',
@@ -117,8 +117,8 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     primaryColor: '#00d2ff',
     accentGradient: 'from-cyan-500/20 via-blue-600/10 to-transparent',
     glowShadow: 'rgba(0, 210, 255, 0.28)',
-    tagline: 'INGENIERÍA DE SISTEMAS KERNEL // MICROSOFT SYSINTERNALS',
-    title: 'EL KERNEL AL DESNUDO: RING 0, DPC Y SOBERANÍA DEL SISTEMA',
+    tagline: '“El lado oculto de Windows. Descubrilo.”',
+    title: 'EVO LABS // LA BIBLIA NEGRA DE WINDOWS',
     editorialSubtitle:
       'Desmitificación absoluta del sistema operativo Windows: arquitectura NTOSKRNL, colas DPC diferidas, temporizadores de alta precisión y control total de la telemetría.',
     pagesBadge: '48 PÁGINAS A4 // 26 ÁREAS',
@@ -158,8 +158,8 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     primaryColor: '#10b981',
     accentGradient: 'from-emerald-500/20 via-green-500/10 to-transparent',
     glowShadow: 'rgba(16, 185, 129, 0.28)',
-    tagline: 'SERVICIO TÉCNICO DE ESCRITORIO // METROLOGÍA DE BANCO',
-    title: 'DIAGNÓSTICO EN BANCO: LA CADENA FÍSICA DE FALLAS',
+    tagline: '“Nunca estuviste mejor guiado.”',
+    title: 'REPARACIÓN DE PC // SISTEMA EVO LABS',
     editorialSubtitle:
       'Protocolos periciales de laboratorio para PC de escritorio: multímetro en fuentes ATX, diagnóstico oscilográfico de rieles, estados de POST y triaje deductivo de BugChecks.',
     pagesBadge: '122 PÁGINAS A4 // 35 MÓDULOS',
@@ -199,8 +199,8 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     primaryColor: '#d946ef',
     accentGradient: 'from-pink-500/20 via-purple-600/10 to-transparent',
     glowShadow: 'rgba(217, 70, 239, 0.28)',
-    tagline: 'REPARACIÓN DE NOTEBOOKS // MICROELECTRÓNICA APLICADA',
-    title: 'CIRUGÍA DE SILICIO: RIELES DE PODER Y MICROSOLDADURA',
+    tagline: '“Diagnóstico real, paso a paso.”',
+    title: 'REPARACIÓN DE NOTEBOOKS // SISTEMA EVO LABS',
     editorialSubtitle:
       'Ingeniería inversa de placas portátiles: mapas Boardview, inyección de corriente térmica, lectura de esquemáticos PDF, circuitos integrados de carga y líneas Always-On.',
     pagesBadge: '22 PÁGINAS // ROADMAP INTEGRAL',
@@ -240,8 +240,8 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     primaryColor: '#06b6d4',
     accentGradient: 'from-cyan-500/20 via-sky-600/10 to-transparent',
     glowShadow: 'rgba(6, 182, 212, 0.28)',
-    tagline: 'REDES, ETHERNET, WI-FI, IP, DNS, TCP/UDP, ROUTING & WIRESHARK',
-    title: 'LA RED INVISIBLE',
+    tagline: '“Entendé cómo se comunica tu PC, cómo viaja Internet y descubrí secretos PRO.”',
+    title: 'SISTEMA EVO LABS DE REDES',
     editorialSubtitle:
       'De cero a entender y dominar cómo viajan los datos. Redes, Ethernet, Wi-Fi, IP, DNS, TCP/UDP, routing, puertos, Wireshark, paquetes y análisis de tráfico.',
     pagesBadge: '190 PÁGINAS A4 // 7 MÓDULOS',
@@ -281,8 +281,8 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     primaryColor: '#ef4444',
     accentGradient: 'from-rose-600/25 via-red-600/10 to-transparent',
     glowShadow: 'rgba(239, 68, 68, 0.28)',
-    tagline: 'APRENDIZAJE PROGRESIVO // PRÁCTICAS Y EJERCICIOS VIRTUALES',
-    title: 'CIBERSEGURIDAD: DEL CERO AL CONTROL TOTAL',
+    tagline: '“Desde cero hasta dominar tu red.”',
+    title: 'CIBERSEGURIDAD // SISTEMA EVO LABS',
     editorialSubtitle:
       'Laboratorios virtuales incluidos por niveles. Aprendizaje progresivo, prácticas y ejercicios virtuales desde base hasta avanzado. Metodología de ataque y defensa, análisis dinámico y mitigación.',
     pagesBadge: 'LABORATORIOS VIRTUALES POR NIVELES',
@@ -322,8 +322,8 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     primaryColor: '#f59e0b',
     accentGradient: 'from-amber-500/25 via-orange-600/10 to-transparent',
     glowShadow: 'rgba(245, 158, 11, 0.28)',
-    tagline: 'METROLOGÍA DE RENDIMIENTO // FPS, FRAMETIME & LATENCIA',
-    title: 'GAMING PERFORMANCE',
+    tagline: '“Optimizamos de verdad. Sin secretos.”',
+    title: 'SISTEMA EVO LABS // GAMING PRO',
     editorialSubtitle:
       'FPS, frametime, latencia, estabilidad y rendimiento medido.',
     pagesBadge: 'EN DESARROLLO // INVESTIGACIÓN TÉCNICA',
@@ -359,15 +359,15 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     tomoKey: 'tomo-08',
     number: '08',
     volumeLabel: 'TOMO 08',
-    editionLabel: 'EN DESARROLLO // DIAGNÓSTICO EVO 2026',
+    editionLabel: 'EDICIÓN MAESTRA // ARRANQUE & FALLAS 2026',
     primaryColor: '#10b981',
     accentGradient: 'from-emerald-500/25 via-teal-600/10 to-transparent',
     glowShadow: 'rgba(16, 185, 129, 0.28)',
-    tagline: 'LABORATORIO VIRTUAL DE ARRANQUE Y DIAGNÓSTICO EVO',
-    title: 'DEL BOTÓN POWER A WINDOWS',
+    tagline: '“Del botón POWER al escritorio: arranque, diagnóstico y reparación como nunca te lo explicaron.”',
+    title: 'SISTEMA EVO LABS DE ARRANQUE Y FALLAS',
     editorialSubtitle:
       'Laboratorio Virtual de Arranque y Diagnóstico EVO. Recorrido visual, guiado y paso a paso desde presionar POWER hasta llegar al escritorio de Windows, atravesando hardware, firmware, POST, BIOS/UEFI, memoria, GPU, almacenamiento, bootloader, kernel, drivers, servicios y sesión.',
-    pagesBadge: 'EN DESARROLLO // LABORATORIO VIRTUAL GUIADO',
+    pagesBadge: '16 PÁGINAS A4 // EDICIÓN TÉCNICA MAESTRA',
     systemStandard: 'UEFI SPECIFICATION & WINDOWS BOOT EXECUTION PATH',
     keyTopics: [
       {
@@ -404,8 +404,8 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     primaryColor: '#38bdf8',
     accentGradient: 'from-sky-500/25 via-blue-600/10 to-transparent',
     glowShadow: 'rgba(56, 189, 248, 0.28)',
-    tagline: 'PROCESOS, MEMORIA, VIRTUALIZACIÓN Y FUNCIONAMIENTO INTERNO',
-    title: 'SISTEMAS, LINUX & KERNEL',
+    tagline: '“Entendé qué pasa debajo del sistema operativo.”',
+    title: 'SISTEMA EVO LABS DE SISTEMAS Y KERNEL',
     editorialSubtitle:
       'Procesos, memoria, virtualización y funcionamiento interno del sistema.',
     pagesBadge: 'EN DESARROLLO // ARQUITECTURA DE SISTEMAS',
@@ -445,8 +445,8 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     primaryColor: '#a855f7',
     accentGradient: 'from-purple-600/25 via-fuchsia-600/10 to-transparent',
     glowShadow: 'rgba(168, 85, 247, 0.28)',
-    tagline: 'ANÁLISIS PROFUNDO, EVIDENCIA, MEMORIA, BINARIOS E INVESTIGACIÓN TÉCNICA',
-    title: 'INGENIERÍA INVERSA & FORENSE',
+    tagline: '“No mires sólo el resultado. Reconstruí lo que pasó.”',
+    title: 'SISTEMA EVO LABS // FORENSE E INGENIERÍA INVERSA',
     editorialSubtitle:
       'Análisis profundo, evidencia, memoria, binarios e investigación técnica.',
     pagesBadge: 'EN DESARROLLO // PERITAJE TÉCNICO',
@@ -490,7 +490,7 @@ const TOMO_EXTENDED_DATA: Record<
       title: string;
       desc: string;
       benchConfig?: {
-        labView: 'hotswap-lab' | 'windows-matrix' | 'motherboard-canvas' | 'incident-central';
+        labView: 'hotswap-lab' | 'windows-matrix' | 'motherboard-canvas' | 'incident-central' | 'boot-lab';
         scenario?: string;
         station?: string;
         badgeLabel?: string;
@@ -781,10 +781,71 @@ const TOMO_EXTENDED_DATA: Record<
     modules: [],
   },
   'tomo-08': {
-    pages: 'En desarrollo',
-    modulesCount: 'En fase de modelado de laboratorio',
-    targetAudience: 'Técnicos de diagnóstico, especialistas en firmware y depuradores de arranque',
-    modules: [],
+    pages: '16 páginas A4',
+    modulesCount: '10 módulos de secuencia de energía, POST, firmware y kernel',
+    targetAudience: 'Técnicos de diagnóstico, especialistas en firmware, reparadores de placas y depuradores de arranque',
+    modules: [
+      {
+        number: 'M01',
+        title: 'Standby, +5VSB & Circuito de Encendido',
+        desc: 'El estado de reposo activo, medición en pin 9 ATX y detección del pulso de panel frontal en el Super I/O.',
+        benchConfig: { labView: 'boot-lab', scenario: 'step-01', badgeLabel: 'STANDBY +5VSB' },
+      },
+      {
+        number: 'M02',
+        title: 'Arranque de PSU, PS_ON# & Rieles Principales',
+        desc: 'Negociación entre motherboard y fuente: caída de PS_ON#, estabilización de rieles y confirmación Power Good (PWR_OK).',
+        benchConfig: { labView: 'boot-lab', scenario: 'step-03', badgeLabel: 'PS_ON & PWR_OK' },
+      },
+      {
+        number: 'M03',
+        title: 'Despertar del CPU, Vector de Reset & Lectura SPI',
+        desc: 'Liberación de CPU_RESET#, salto al vector 0xFFFFFFF0 y primeros pulsos de lectura en el bus SPI de la flash BIOS.',
+        benchConfig: { labView: 'boot-lab', scenario: 'step-06', badgeLabel: 'CPU RESET & SPI' },
+      },
+      {
+        number: 'M04',
+        title: 'Secuencia POST & Diagnóstico por Q-LED',
+        desc: 'El escaneo secuencial de subsistemas críticos mediante código SEC/PEI y códigos hexadecimales de Port 80h.',
+        benchConfig: { labView: 'boot-lab', scenario: 'step-07', badgeLabel: 'POST & Q-LEDS' },
+      },
+      {
+        number: 'M05',
+        title: 'Entrenamiento de Memoria RAM & Memory Reference Code',
+        desc: 'Lectura de EEPROM SPD, calibración eléctrica MRC, ajustes de impedancia ODT y reinicios controlados.',
+        benchConfig: { labView: 'boot-lab', scenario: 'step-08', badgeLabel: 'ENTRENAMIENTO RAM' },
+      },
+      {
+        number: 'M06',
+        title: 'Inicialización de Video, PCIe & GOP / VBIOS',
+        desc: 'Handshake en bus PCI Express, carga del Graphics Output Protocol (GOP) y primer cuadro de video en pantalla.',
+        benchConfig: { labView: 'boot-lab', scenario: 'step-09', badgeLabel: 'SALIDA DE VIDEO' },
+      },
+      {
+        number: 'M07',
+        title: 'Hand-off UEFI, Búsqueda de Disco & Partición ESP',
+        desc: 'Selección de dispositivo de arranque (BDS), lectura de tabla GPT y localización de bootmgfw.efi en partición EFI.',
+        benchConfig: { labView: 'boot-lab', scenario: 'step-10', badgeLabel: 'DISCO & ESP' },
+      },
+      {
+        number: 'M08',
+        title: 'Bootloader Winload, BCD & Verificación Secure Boot',
+        desc: 'Validación de firmas digitales con TPM 2.0, lectura del hive BCD y descarte de manipulaciones por bootkits.',
+        benchConfig: { labView: 'boot-lab', scenario: 'step-10', badgeLabel: 'WINLOAD & BCD' },
+      },
+      {
+        number: 'M09',
+        title: 'Carga del Kernel NT, HAL & Drivers Boot-Start',
+        desc: 'Inicialización de ntoskrnl.exe y hal.dll, carga de drivers Start=0 y llamada a ExitBootServices().',
+        benchConfig: { labView: 'boot-lab', scenario: 'step-10', badgeLabel: 'KERNEL NT' },
+      },
+      {
+        number: 'M10',
+        title: 'Inicialización de Subsistemas, SMSS, Winlogon & Sesión',
+        desc: 'Lanzamiento de smss.exe, csrss.exe, winlogon.exe, LogonUI y renderizado final del escritorio Explorer.',
+        benchConfig: { labView: 'boot-lab', scenario: 'step-10', badgeLabel: 'SESIÓN DE USUARIO' },
+      },
+    ],
   },
   'tomo-09': {
     pages: 'En desarrollo',
@@ -928,6 +989,16 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
       }
     } else {
       target = chapterIdOrTarget;
+    }
+
+    if (target.labView === 'boot-lab') {
+      if (onOpenForensicBench) {
+        onOpenForensicBench(target);
+        onClose();
+      } else {
+        setIsBootLabOpen(true);
+      }
+      return;
     }
 
     if (onOpenForensicBench) {
@@ -1102,14 +1173,25 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
                 {/* Botones de Acción de Portada */}
                 <div className="pt-2 flex flex-wrap items-center gap-3">
                   {tomoId === 'tomo-08' ? (
-                    <button
-                      type="button"
-                      onClick={() => setIsBootLabOpen(true)}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono-tech font-black text-xs tracking-wider uppercase text-black bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 hover:brightness-110 shadow-[0_0_25px_rgba(16,185,129,0.45)] transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      <Power className="w-4 h-4 text-black" />
-                      <span>INICIAR LABORATORIO DE ARRANQUE</span>
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleOpenInteractive}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono-tech font-black text-xs tracking-wider uppercase text-black bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 hover:brightness-110 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                      >
+                        <BookOpen className="w-4 h-4 text-black" />
+                        <span>ABRIR REVISTA TOMO 08</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsBootLabOpen(true)}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase text-emerald-300 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 shadow-lg transition-all cursor-pointer"
+                      >
+                        <Power className="w-4 h-4 text-emerald-400" />
+                        <span>LABORATORIO DE ARRANQUE</span>
+                      </button>
+                    </>
                   ) : ['tomo-07', 'tomo-09', 'tomo-10'].includes(tomoId) ? (
                     <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase border border-amber-400/40 bg-amber-400/10 text-amber-300 shadow-lg">
                       <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />

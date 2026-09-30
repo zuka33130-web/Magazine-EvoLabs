@@ -27,6 +27,8 @@ import { EvoMagazineView } from './components/magazine/EvoMagazineView';
 import { Tomo02MagazineView } from './components/tomo02/Tomo02MagazineView';
 import { Tomo03MagazineView } from './components/tomo03/Tomo03MagazineView';
 import { Tomo04MagazineView } from './components/tomo04/Tomo04MagazineView';
+import { Tomo08MagazineView } from './components/tomo08/Tomo08MagazineView';
+import { EvoBootLab } from './components/tomo08/EvoBootLab';
 import { EvoMasterLabSuite } from './components/world/labs/EvoMasterLabSuite';
 import { EvoWindowsMatrixLab } from './components/world/labs/windowsMatrix/EvoWindowsMatrixLab';
 import { EvoLabCore } from './components/evoLabCore/EvoLabCore';
@@ -41,7 +43,26 @@ import { CheckCircle2, X, History } from 'lucide-react';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<
-    'magazine' | 'tomo-02' | 'tomo-03' | 'tomo-04' | 'world-map' | 'archivo' | 'cover' | 'index' | 'chapter-01' | 'chapter-02' | 'chapter-03' | 'chapter-04' | 'chapter-05' | 'chapter-06' | 'chapter-07' | 'hotswap-lab' | 'windows-matrix-lab' | 'lab-core'
+    | 'magazine'
+    | 'tomo-02'
+    | 'tomo-03'
+    | 'tomo-04'
+    | 'tomo-08'
+    | 'boot-lab'
+    | 'world-map'
+    | 'archivo'
+    | 'cover'
+    | 'index'
+    | 'chapter-01'
+    | 'chapter-02'
+    | 'chapter-03'
+    | 'chapter-04'
+    | 'chapter-05'
+    | 'chapter-06'
+    | 'chapter-07'
+    | 'hotswap-lab'
+    | 'windows-matrix-lab'
+    | 'lab-core'
   >('lab-core');
 
   // Sub-panel & Lab states
@@ -95,6 +116,12 @@ export default function App() {
         setIsIntroActive(false);
       } else if (vol === '04') {
         setCurrentView('tomo-04');
+      } else if (vol === '08') {
+        setCurrentView('tomo-08');
+        setIsIntroActive(false);
+      } else if (viewParam === 'boot' || viewParam === 'boot-lab') {
+        setCurrentView('boot-lab');
+        setIsIntroActive(false);
       } else if (
         url.searchParams.get('print') === 'true' ||
         url.searchParams.get('mode') === 'magazine' ||
@@ -650,16 +677,30 @@ export default function App() {
     );
   }
 
-  const handleNavigateTomo = (tomo: '01' | '02' | '03' | '04') => {
+  const handleNavigateTomo = (tomo: '01' | '02' | '03' | '04' | '08') => {
     if (tomo === '01') setCurrentView('magazine');
     else if (tomo === '02') setCurrentView('tomo-02');
     else if (tomo === '03') setCurrentView('tomo-03');
     else if (tomo === '04') setCurrentView('tomo-04');
+    else if (tomo === '08') setCurrentView('tomo-08');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  const handleNavigateTomo08 = () => {
+    setCurrentView('tomo-08');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  const handleNavigateBootLab = () => {
+    setCurrentView('boot-lab');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const handleOpenForensicBench = (target: ForensicBenchTarget) => {
-    if (target.labView === 'windows-matrix') {
+    if (target.labView === 'boot-lab') {
+      setCurrentView('boot-lab');
+      setActiveNotice(`Cargando Laboratorio de Arranque y Fallas: ${target.moduleNumber}`);
+    } else if (target.labView === 'windows-matrix') {
       setMatrixInitialScenario(target.scenario);
       setCurrentView('windows-matrix-lab');
       setActiveNotice(`Cargando banco de pruebas de Kernel NT: ${target.moduleNumber} (${target.scenario || 'Diagnóstico'})`);
@@ -686,6 +727,8 @@ export default function App() {
         onNavigateTomo04={handleNavigateTomo04}
         onNavigateTomo05={() => setDossierModalTomoId('tomo-05')}
         onNavigateTomo06={() => setDossierModalTomoId('tomo-06')}
+        onNavigateTomo08={handleNavigateTomo08}
+        onNavigateBootLab={handleNavigateBootLab}
         onNavigateMagazine={() => setCurrentView('magazine')}
         onNavigateHotSwapLab={handleNavigateHotSwapLab}
         onNavigateLabCore={handleNavigateLabCore}
@@ -743,6 +786,23 @@ export default function App() {
             />
           )}
 
+          {currentView === 'tomo-08' && (
+            <Tomo08MagazineView
+              onBackToApp={handleNavigateHome}
+              onNavigateTomo={handleNavigateTomo}
+              onOpenLab={handleNavigateBootLab}
+            />
+          )}
+
+          {currentView === 'boot-lab' && (
+            <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
+              <EvoBootLab
+                onClose={handleNavigateHome}
+                onOpenTomo08={handleNavigateTomo08}
+              />
+            </div>
+          )}
+
           {currentView === 'lab-core' && (
             <EvoLabCore
               initialPhase={labCorePhase}
@@ -786,6 +846,18 @@ export default function App() {
               activeProfile={activeProfile}
               onChangeProfile={handleChangeProfile}
               onOpenTomo={handleNavigateTomo}
+              onNavigateBootLab={handleNavigateBootLab}
+              onNavigateHotSwapLab={handleNavigateHotSwapLab}
+              onNavigateWindowsMatrixLab={(scenario) => {
+                setMatrixInitialScenario(scenario);
+                setCurrentView('windows-matrix-lab');
+              }}
+              onNavigateLabCore={handleNavigateLabCore}
+              onOpenForensicBench={handleOpenForensicBench}
+              onOpenDossier={(tomoId) => setDossierModalTomoId(tomoId)}
+              onNavigateMagazine={() => setCurrentView('magazine')}
+              onNavigateTomo01={handleNavigateTomo01}
+              onOpenCaseHistory={handleOpenCaseHistory}
             />
           )}
 
@@ -797,6 +869,8 @@ export default function App() {
               onEnterTome02={handleNavigateTomo02}
               onEnterTome03={handleNavigateTomo03}
               onEnterTome04={handleNavigateTomo04}
+              onEnterTome08={handleNavigateTomo08}
+              onEnterBootLab={handleNavigateBootLab}
               onBackToMap={handleNavigateHome}
             />
           )}

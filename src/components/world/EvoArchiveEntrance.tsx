@@ -18,6 +18,8 @@ interface EvoArchiveEntranceProps {
   onEnterTome02?: () => void;
   onEnterTome03?: () => void;
   onEnterTome04?: () => void;
+  onEnterTome08?: () => void;
+  onEnterBootLab?: () => void;
   onBackToMap: () => void;
   dossierSummary: Tome01DossierSummary;
 }
@@ -28,6 +30,8 @@ export const EvoArchiveEntrance: React.FC<EvoArchiveEntranceProps> = ({
   onEnterTome02,
   onEnterTome03,
   onEnterTome04,
+  onEnterTome08,
+  onEnterBootLab,
   onBackToMap,
   dossierSummary,
 }) => {
@@ -263,6 +267,44 @@ export const EvoArchiveEntrance: React.FC<EvoArchiveEntranceProps> = ({
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
+          </div>
+
+          {/* TOMO 08 */}
+          <div className="p-5 rounded-xl border border-emerald-500/40 bg-zinc-950/80 hover:border-emerald-400 transition-all flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center justify-between font-mono-tech text-[10px] text-emerald-400 uppercase mb-1">
+                <span className="font-bold">TOMO 08 // DISPONIBLE</span>
+                <span className="px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-[9px]">REVISTA A4 + LAB</span>
+              </div>
+              <div className="font-display font-bold text-lg text-white">
+                DEL BOTÓN POWER A WINDOWS
+              </div>
+              <p className="font-sans-editorial text-xs text-zinc-400 mt-1 leading-relaxed">
+                Secuencia completa de arranque: +5VSB, PWR_SW, PS_ON#, VRM, reset de CPU, SPI, POST, RAM, PCIe, UEFI, winload y kernel NT.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              {onEnterTome08 && (
+                <button
+                  type="button"
+                  onClick={onEnterTome08}
+                  className="flex-1 py-2 px-3 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-black font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+                >
+                  <span>REVISTA A4</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+              {onEnterBootLab && (
+                <button
+                  type="button"
+                  onClick={onEnterBootLab}
+                  className="flex-1 py-2 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-emerald-500/40 text-emerald-300 font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>LABORATORIO</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

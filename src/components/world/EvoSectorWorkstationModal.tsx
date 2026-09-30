@@ -35,7 +35,7 @@ interface EvoSectorWorkstationModalProps {
   zone: EvoLabZone | null;
   passport: UserHardwarePassport | null;
   onClose: () => void;
-  onOpenTomo: (tomoId: '01' | '02' | '03' | '04') => void;
+  onOpenTomo: (tomoId: '01' | '02' | '03' | '04' | '08') => void;
   onOpenConsoleZone?: (zoneId: string) => void;
   activeProfile: EvoNarrativeProfile;
   onChangeProfile: (profile: EvoNarrativeProfile) => void;

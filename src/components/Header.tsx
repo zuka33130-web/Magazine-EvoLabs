@@ -41,6 +41,8 @@ export interface HeaderProps {
   onNavigateTomo04?: () => void;
   onNavigateTomo05?: () => void;
   onNavigateTomo06?: () => void;
+  onNavigateTomo08?: () => void;
+  onNavigateBootLab?: () => void;
   onNavigateMagazine?: () => void;
   onNavigateHotSwapLab?: (subPanel?: 'sandbox' | 'hardware' | 'software' | 'telemetry' | 'all') => void;
   onNavigateWindowsMatrixLab?: () => void;
@@ -68,6 +70,8 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigateTomo04,
   onNavigateTomo05,
   onNavigateTomo06,
+  onNavigateTomo08,
+  onNavigateBootLab,
   onNavigateMagazine,
   onNavigateHotSwapLab,
   onNavigateWindowsMatrixLab,
@@ -120,6 +124,8 @@ export const Header: React.FC<HeaderProps> = ({
       onNavigateTomo05();
     } else if (id === 'tomo-06' && onNavigateTomo06) {
       onNavigateTomo06();
+    } else if (id === 'tomo-08' && onNavigateTomo08) {
+      onNavigateTomo08();
     }
   };
 
@@ -132,7 +138,8 @@ export const Header: React.FC<HeaderProps> = ({
   const isLabsActive =
     currentView === 'lab-core' ||
     currentView === 'hotswap-lab' ||
-    currentView === 'windows-matrix-lab';
+    currentView === 'windows-matrix-lab' ||
+    currentView === 'boot-lab';
 
   const isInvestigacionActive = currentView === 'archivo';
 
@@ -239,8 +246,8 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <BookOpen className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 01: Conocé tu PC</div>
-                      <div className="text-[10px] text-zinc-400">Arquitectura física & topología de componentes</div>
+                      <div className="font-bold text-white">Tomo 01: EVO LABS // CONOCÉ TU PC</div>
+                      <div className="text-[10px] text-zinc-400">“Entendé tu máquina desde adentro.”</div>
                     </div>
                   </button>
 
@@ -255,8 +262,8 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <BookOpen className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 02: La Biblia Negra de Windows</div>
-                      <div className="text-[10px] text-zinc-400">El manual forense definitivo del sistema operativo</div>
+                      <div className="font-bold text-white">Tomo 02: EVO LABS // LA BIBLIA NEGRA DE WINDOWS</div>
+                      <div className="text-[10px] text-zinc-400">“El lado oculto de Windows. Descubrilo.”</div>
                     </div>
                   </button>
 
@@ -271,8 +278,8 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <BookOpen className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 03: Repará tu PC</div>
-                      <div className="text-[10px] text-zinc-400">La biblia del servicio técnico de escritorio</div>
+                      <div className="font-bold text-white">Tomo 03: REPARACIÓN DE PC // SISTEMA EVO LABS</div>
+                      <div className="text-[10px] text-zinc-400">“Nunca estuviste mejor guiado.”</div>
                     </div>
                   </button>
 
@@ -287,8 +294,8 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <BookOpen className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 04: Repará tu Notebook</div>
-                      <div className="text-[10px] text-zinc-400">La biblia del reparador de portátiles</div>
+                      <div className="font-bold text-white">Tomo 04: REPARACIÓN DE NOTEBOOKS // SISTEMA EVO LABS</div>
+                      <div className="text-[10px] text-zinc-400">“Diagnóstico real, paso a paso.”</div>
                     </div>
                   </button>
 
@@ -304,8 +311,8 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <Network className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 05: La Red Invisible</div>
-                      <div className="text-[10px] text-zinc-400">De cero a entender y dominar cómo viajan los datos</div>
+                      <div className="font-bold text-white">Tomo 05: SISTEMA EVO LABS DE REDES</div>
+                      <div className="text-[10px] text-zinc-400">“Entendé cómo se comunica tu PC, cómo viaja Internet y descubrí secretos PRO.”</div>
                     </div>
                   </button>
 
@@ -321,8 +328,8 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <Shield className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                     <div>
-                      <div className="font-bold text-white">Tomo 06: Ciberseguridad: del Cero al Control Total</div>
-                      <div className="text-[10px] text-rose-300 font-medium">Laboratorios virtuales incluidos por niveles</div>
+                      <div className="font-bold text-white">Tomo 06: CIBERSEGURIDAD // SISTEMA EVO LABS</div>
+                      <div className="text-[10px] text-rose-300 font-medium">“Desde cero hasta dominar tu red.”</div>
                     </div>
                   </button>
 
@@ -338,12 +345,12 @@ export const Header: React.FC<HeaderProps> = ({
                     <Gauge className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="font-bold text-white flex items-center justify-between gap-1.5">
-                        <span className="truncate">Tomo 07: Gaming Performance</span>
+                        <span className="truncate">Tomo 07: SISTEMA EVO LABS // GAMING PRO</span>
                         <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-amber-400/10 text-amber-300 border border-amber-400/30 shrink-0">
                           EN DESARROLLO
                         </span>
                       </div>
-                      <div className="text-[10px] text-zinc-400 truncate">FPS, frametime, latencia, estabilidad y rendimiento medido</div>
+                      <div className="text-[10px] text-zinc-400 truncate">“Optimizamos de verdad. Sin secretos.”</div>
                     </div>
                   </button>
 
@@ -352,19 +359,20 @@ export const Header: React.FC<HeaderProps> = ({
                     type="button"
                     onClick={() => {
                       setOpenDropdown(null);
-                      setInternalDossierTomoId('tomo-08');
+                      if (onNavigateTomo08) onNavigateTomo08();
+                      else setInternalDossierTomoId('tomo-08');
                     }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors"
                   >
-                    <Power className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="font-bold text-white flex items-center justify-between gap-1.5">
-                        <span className="truncate">Tomo 08: Del Botón Power a Windows</span>
+                        <span className="truncate">Tomo 08: SISTEMA EVO LABS DE ARRANQUE Y DIAGNÓSTICO</span>
                         <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-emerald-400/10 text-emerald-300 border border-emerald-400/30 shrink-0">
-                          EN DESARROLLO
+                          REVISTA A4
                         </span>
                       </div>
-                      <div className="text-[10px] text-zinc-400 truncate">Laboratorio Virtual de Arranque y Diagnóstico EVO</div>
+                      <div className="text-[10px] text-zinc-400 truncate">“Del botón POWER a Windows, paso a paso.”</div>
                     </div>
                   </button>
 
@@ -380,12 +388,12 @@ export const Header: React.FC<HeaderProps> = ({
                     <Terminal className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="font-bold text-white flex items-center justify-between gap-1.5">
-                        <span className="truncate">Tomo 09: Sistemas, Linux & Kernel</span>
+                        <span className="truncate">Tomo 09: SISTEMA EVO LABS DE SISTEMAS Y KERNEL</span>
                         <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-sky-400/10 text-sky-300 border border-sky-400/30 shrink-0">
                           EN DESARROLLO
                         </span>
                       </div>
-                      <div className="text-[10px] text-zinc-400 truncate">Procesos, memoria, virtualización y funcionamiento interno del sistema</div>
+                      <div className="text-[10px] text-zinc-400 truncate">“Entendé qué pasa debajo del sistema operativo.”</div>
                     </div>
                   </button>
 
@@ -401,12 +409,12 @@ export const Header: React.FC<HeaderProps> = ({
                     <FileSearch className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="font-bold text-white flex items-center justify-between gap-1.5">
-                        <span className="truncate">Tomo 10: Ingeniería Inversa & Forense</span>
+                        <span className="truncate">Tomo 10: SISTEMA EVO LABS // FORENSE E INGENIERÍA INVERSA</span>
                         <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-purple-400/10 text-purple-300 border border-purple-400/30 shrink-0">
                           EN DESARROLLO
                         </span>
                       </div>
-                      <div className="text-[10px] text-zinc-400 truncate">Análisis profundo, evidencia, memoria, binarios e investigación técnica</div>
+                      <div className="text-[10px] text-zinc-400 truncate">“No mires sólo el resultado. Reconstruí lo que pasó.”</div>
                     </div>
                   </button>
                 </div>
@@ -524,6 +532,27 @@ export const Header: React.FC<HeaderProps> = ({
                     <div>
                       <div className="font-bold text-white">Laboratorio de Windows y Kernel</div>
                       <div className="text-[10px] text-zinc-400">Versiones, scheduler, memoria, servicios y latencia.</div>
+                    </div>
+                  </button>
+
+                  {/* LABORATORIO DE ARRANQUE Y FALLAS GUIADO */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenDropdown(null);
+                      if (onNavigateBootLab) onNavigateBootLab();
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-emerald-500/10 text-zinc-200 hover:text-white flex items-center gap-2.5 transition-colors border border-transparent hover:border-emerald-500/30"
+                  >
+                    <Power className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <div>
+                      <div className="font-bold text-emerald-300 flex items-center justify-between gap-1.5">
+                        <span>Laboratorio de Arranque y Fallas</span>
+                        <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-emerald-400/15 text-emerald-300 border border-emerald-400/30">
+                          HERRAMIENTA
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-zinc-400">Gabinete abierto, multímetro, tester digital y diagnóstico físico de fallas.</div>
                     </div>
                   </button>
                 </div>
@@ -756,6 +785,21 @@ export const Header: React.FC<HeaderProps> = ({
                 type="button"
                 onClick={() => {
                   setIsMobileMenuOpen(false);
+                  if (onNavigateBootLab) onNavigateBootLab();
+                }}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-white border border-emerald-500/30"
+              >
+                <Power className="w-4 h-4 text-emerald-400" />
+                <div>
+                  <div className="font-bold text-emerald-300 text-xs">Laboratorio de Arranque y Fallas</div>
+                  <div className="text-[10px] text-zinc-400">Gabinete abierto & diagnóstico físico</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
                   if (onNavigateMagazine) onNavigateMagazine();
                 }}
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/[0.06] text-white"
@@ -864,16 +908,17 @@ export const Header: React.FC<HeaderProps> = ({
                 type="button"
                 onClick={() => {
                   setIsMobileMenuOpen(false);
-                  setInternalDossierTomoId('tomo-08');
+                  if (onNavigateTomo08) onNavigateTomo08();
+                  else setInternalDossierTomoId('tomo-08');
                 }}
                 className="flex items-center justify-between px-3 py-1.5 rounded-xl hover:bg-white/[0.06] text-zinc-300"
               >
                 <div className="flex items-center gap-2.5">
-                  <Power className="w-3.5 h-3.5 text-emerald-400" />
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Tomo 08: Del Botón Power a Windows</span>
                 </div>
                 <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-emerald-400/10 text-emerald-300 border border-emerald-400/30">
-                  EN DESARROLLO
+                  REVISTA A4
                 </span>
               </button>
 

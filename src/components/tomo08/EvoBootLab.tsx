@@ -46,17 +46,25 @@ import {
 
 interface EvoBootLabProps {
   onClose?: () => void;
+  onOpenTomo08?: () => void;
+  initialStepIndex?: number;
+  initialMode?: 'APRENDER' | 'FALLA_SIMULADA' | 'CASO_EVO' | 'PC_MISTERIOSA';
 }
 
 type LabMode = 'APRENDER' | 'FALLA_SIMULADA' | 'CASO_EVO' | 'PC_MISTERIOSA';
 type MysteryTab = 'EVIDENCIAS' | 'HIPOTESIS' | 'PRUEBAS' | 'HISTORIAL';
 
-export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
+export const EvoBootLab: React.FC<EvoBootLabProps> = ({
+  onClose,
+  onOpenTomo08,
+  initialStepIndex = 0,
+  initialMode = 'APRENDER',
+}) => {
   // Global Mode switcher
-  const [activeMode, setActiveMode] = useState<LabMode>('APRENDER');
+  const [activeMode, setActiveMode] = useState<LabMode>(initialMode);
 
   // APRENDER & FALLA SIMULADA Mode States
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(initialStepIndex);
   const [maxUnlockedStep, setMaxUnlockedStep] = useState<number>(0);
   const [isPoweredOn, setIsPoweredOn] = useState<boolean>(false);
   const [simulatedFailureStep, setSimulatedFailureStep] = useState<number | null>(null);
@@ -465,65 +473,96 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({ onClose }) => {
       {/* Top Header / Mode Switcher Tabs */}
       <div className="bg-[#0a0d14] border border-zinc-800 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-xl">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-400/40 flex items-center justify-center text-cyan-400">
-            <Sparkles className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-400/40 flex items-center justify-center text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+            <Power className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">
-              TOMO 08 // LABORATORIO VIRTUAL DE ARRANQUE & DIAGNÓSTICO
+            <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest flex items-center gap-1.5">
+              <span>EVO LABS</span>
+              <span className="text-zinc-600">•</span>
+              <span className="text-zinc-400 font-normal">RECURSO INTERACTIVO DEL TOMO 08</span>
             </div>
-            <h1 className="text-base sm:text-lg font-bold text-white font-display">
-              DEL BOTÓN POWER A WINDOWS
+            <h1 className="text-base sm:text-lg font-bold text-white font-display uppercase tracking-tight">
+              LABORATORIO DE ARRANQUE Y FALLAS GUIADO
             </h1>
+            <div className="text-[11px] text-emerald-400/90 font-mono-tech">
+              SISTEMA EVO LABS DE ARRANQUE Y DIAGNÓSTICO
+            </div>
           </div>
         </div>
 
-        {/* 4 Mode Tabs */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-zinc-950/80 p-1 rounded-xl border border-zinc-800/80 text-xs">
-          <button
-            type="button"
-            onClick={() => setActiveMode('APRENDER')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-              activeMode === 'APRENDER'
-                ? 'bg-cyan-500 text-black shadow-[0_0_12px_rgba(6,182,212,0.4)]'
-                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
-            }`}
-          >
-            [ APRENDER ]
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveMode('FALLA_SIMULADA')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-              activeMode === 'FALLA_SIMULADA'
-                ? 'bg-amber-500 text-black shadow-[0_0_12px_rgba(245,158,11,0.4)]'
-                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
-            }`}
-          >
-            [ FALLA SIMULADA ]
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveMode('CASO_EVO')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-              activeMode === 'CASO_EVO'
-                ? 'bg-indigo-500 text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]'
-                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
-            }`}
-          >
-            [ CASO EVO ]
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveMode('PC_MISTERIOSA')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-              activeMode === 'PC_MISTERIOSA'
-                ? 'bg-purple-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.4)]'
-                : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
-            }`}
-          >
-            [ PC MISTERIOSA ]
-          </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* 4 Mode Tabs */}
+          <div className="flex flex-wrap items-center gap-1.5 bg-zinc-950/80 p-1 rounded-xl border border-zinc-800/80 text-xs">
+            <button
+              type="button"
+              onClick={() => setActiveMode('APRENDER')}
+              className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                activeMode === 'APRENDER'
+                  ? 'bg-cyan-500 text-black shadow-[0_0_12px_rgba(6,182,212,0.4)]'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+              }`}
+            >
+              [ APRENDER ]
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveMode('FALLA_SIMULADA')}
+              className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                activeMode === 'FALLA_SIMULADA'
+                  ? 'bg-amber-500 text-black shadow-[0_0_12px_rgba(245,158,11,0.4)]'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+              }`}
+            >
+              [ FALLA SIMULADA ]
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveMode('CASO_EVO')}
+              className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                activeMode === 'CASO_EVO'
+                  ? 'bg-indigo-500 text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+              }`}
+            >
+              [ CASO EVO ]
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveMode('PC_MISTERIOSA')}
+              className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                activeMode === 'PC_MISTERIOSA'
+                  ? 'bg-purple-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.4)]'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+              }`}
+            >
+              [ PC MISTERIOSA ]
+            </button>
+          </div>
+
+          {/* Action buttons: Ver Revista Tomo 08 and/or Salir */}
+          {onOpenTomo08 && (
+            <button
+              type="button"
+              onClick={onOpenTomo08}
+              className="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono-tech font-bold text-emerald-400 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
+              title="Ir a la edición editorial A4 de Tomo 08"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">REVISTA TOMO 08</span>
+            </button>
+          )}
+
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white transition-all cursor-pointer"
+              title="Cerrar laboratorio"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
