@@ -30,18 +30,31 @@ import { Station02CpuGpuCadence } from './chapter04/Station02CpuGpuCadence';
 import { Station03OtherLimiters } from './chapter04/Station03OtherLimiters';
 import { Station04ControlledExperiment } from './chapter04/Station04ControlledExperiment';
 import { Station05LimitationMatrix } from './chapter04/Station05LimitationMatrix';
+import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
+import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
 
 interface Chapter04ViewProps {
   onBackToIndex: () => void;
   onOpenChapter03?: () => void;
+  onOpenChapter05?: () => void;
   onChapterCompleted?: () => void;
 }
 
 export const Chapter04View: React.FC<Chapter04ViewProps> = ({
   onBackToIndex,
   onOpenChapter03,
+  onOpenChapter05,
   onChapterCompleted,
 }) => {
+  // Mark chapter 04 as started
+  useEffect(() => {
+    try {
+      localStorage.setItem('evo_c04_started', 'true');
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // 1. Inherited Evidence from C01, C02 and C03
   const [specs] = useState<Partial<UserPcSpec>>(() => {
     try {
@@ -298,6 +311,27 @@ export const Chapter04View: React.FC<Chapter04ViewProps> = ({
           onBackToIndex={onBackToIndex}
         />
 
+        {/* ACTIVIDAD DE COMPROBACIÓN // COMPROBÁ LO QUE APRENDISTE */}
+        <EvoChapterCheckSection
+          chapterNumber="04"
+          chapterTitle="ENCONTRÁ EL LÍMITE"
+          isAlreadyCompleted={isCompleted}
+          onPassCheck={handleConsolidate}
+        />
+
+        {/* NAVEGACIÓN PEDAGÓGICA DEFINITIVA */}
+        <EvoChapterNavigationFooter
+          currentChapterNumber="04"
+          currentChapterTitle="ENCONTRÁ EL LÍMITE"
+          isCompleted={isCompleted}
+          onMarkCompleted={handleConsolidate}
+          onBackToIndex={onBackToIndex}
+          onPreviousChapter={onOpenChapter03 || onBackToIndex}
+          onNextChapter={onOpenChapter05 || handleOpenChapter05}
+          previousChapterLabel="CAPÍTULO 03: CUANDO LOS FPS MIENTEN"
+          nextChapterLabel="CAPÍTULO 05: WINDOWS Y SERVICIOS"
+          isNextAvailable={true}
+        />
       </div>
     </div>
   );

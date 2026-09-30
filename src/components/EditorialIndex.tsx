@@ -1,5 +1,16 @@
 import React from 'react';
-import { ArrowLeft, ArrowRight, Lock, CheckCircle2, BookOpen, Sparkles } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Lock,
+  CheckCircle2,
+  BookOpen,
+  Sparkles,
+  Award,
+  FlaskConical,
+  RotateCcw,
+  Check,
+} from 'lucide-react';
 import { ChapterItem } from '../types';
 
 interface EditorialIndexProps {
@@ -16,6 +27,8 @@ interface EditorialIndexProps {
   onStartChapter06?: () => void;
   onStartChapter07?: () => void;
   onSelectLockedChapter?: (chapter: ChapterItem) => void;
+  onStartFinalExam?: () => void;
+  onOpenCompletionScreen?: () => void;
 }
 
 export const EditorialIndex: React.FC<EditorialIndexProps> = ({
@@ -32,7 +45,32 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
   onStartChapter06,
   onStartChapter07,
   onSelectLockedChapter,
+  onStartFinalExam,
+  onOpenCompletionScreen,
 }) => {
+  const completedCount = chapters.filter((c) => c.status === 'COMPLETADO').length;
+  const isAllChaptersDone = completedCount >= 7;
+  const hasPassedFinalExam =
+    typeof window !== 'undefined' && localStorage.getItem('evo_tomo01_completed') === 'true';
+
+  const getChapterDisplayStatus = (cap: ChapterItem) => {
+    if (cap.status === 'COMPLETADO') {
+      return { label: 'TERMINADO ✓', style: 'bg-zinc-900 border border-emerald-500/60 text-emerald-400' };
+    }
+    const isStarted =
+      typeof window !== 'undefined' &&
+      localStorage.getItem(`evo_c${cap.number}_started`) === 'true';
+
+    if (isStarted) {
+      return { label: 'EN CURSO', style: 'bg-yellow-400/20 border border-yellow-400 text-yellow-300' };
+    }
+
+    if (cap.status === 'DISPONIBLE') {
+      return { label: 'NO INICIADO', style: 'bg-zinc-900 border border-zinc-700 text-zinc-300' };
+    }
+
+    return { label: 'BLOQUEADO', style: 'bg-black/60 border border-zinc-800 text-zinc-500' };
+  };
   return (
     <div id="pantalla-indice-editorial" className="w-full min-h-screen py-6 sm:py-10 lg:py-14">
       
@@ -91,7 +129,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
 
       {/* Direct A4 Magazine Access Banner */}
       {onOpenA4Magazine && (
-        <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-yellow-400/15 via-[#141720] to-[#10121a] border border-yellow-400/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 shadow-xl">
+        <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-yellow-400/15 via-[#141720] to-[#10121a] border border-yellow-400/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 shadow-xl">
           <div className="flex items-center gap-3.5">
             <span className="w-3 h-3 bg-yellow-400 inline-block shadow-[0_0_10px_#facc15]" />
             <div>
@@ -116,6 +154,67 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
         </div>
       )}
 
+      {/* FINAL EXAM & COMPLETION HANDOFF BANNER */}
+      {(isAllChaptersDone || hasPassedFinalExam) && (
+        <div className="p-6 rounded-2xl bg-gradient-to-r from-yellow-400/20 via-[#181a24] to-[#10121a] border-2 border-yellow-400 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-10 shadow-2xl">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs font-mono-tech uppercase font-bold text-yellow-400 tracking-widest">
+              <Award className="w-4 h-4 text-yellow-400" />
+              <span>
+                {hasPassedFinalExam
+                  ? 'TOMO 01 // COMPLETADO Y CERTIFICADO'
+                  : 'FASE FINAL // EVALUACIÓN DISPONIBLE'}
+              </span>
+            </div>
+            <h3 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight">
+              {hasPassedFinalExam ? '¡TOMO 01 SUPERADO CON ÉXITO!' : 'TOMO 01 // PRUEBA FINAL EVO'}
+            </h3>
+            <p className="font-sans-editorial text-xs sm:text-sm text-zinc-300 max-w-2xl leading-relaxed">
+              {hasPassedFinalExam
+                ? 'Has demostrado dominio de los conceptos y metodología de este Tomo. Podés acceder al cierre oficial y al laboratorio práctico asociado.'
+                : 'Completaste los 7 capítulos del Tomo 01. Demostrá tus conocimientos en la prueba final con método pericial.'}
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            {hasPassedFinalExam && onOpenCompletionScreen && (
+              <button
+                type="button"
+                onClick={onOpenCompletionScreen}
+                className="px-6 py-3.5 rounded-xl bg-yellow-400 text-black hover:bg-yellow-300 font-mono-tech font-black text-xs uppercase tracking-wider transition-all shadow-xl hover:shadow-yellow-400/25 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <FlaskConical className="w-4 h-4 text-black" />
+                <span>VER CIERRE Y LABORATORIO →</span>
+              </button>
+            )}
+
+            {onStartFinalExam && (
+              <button
+                type="button"
+                onClick={onStartFinalExam}
+                className={`px-6 py-3.5 rounded-xl font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  hasPassedFinalExam
+                    ? 'bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white hover:border-yellow-400'
+                    : 'bg-yellow-400 text-black hover:bg-yellow-300 shadow-xl'
+                }`}
+              >
+                {hasPassedFinalExam ? (
+                  <>
+                    <RotateCcw className="w-4 h-4" />
+                    <span>REPETIR PRUEBA FINAL</span>
+                  </>
+                ) : (
+                  <>
+                    <Award className="w-4 h-4" />
+                    <span>REALIZAR PRUEBA FINAL EVO →</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Two Column Layout: Main Chapters Stream vs. Lateral Key Takeaways */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
         
@@ -124,13 +223,14 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
           
           <div className="flex items-center justify-between pb-3 border-b border-zinc-800/60 text-[11px] font-mono-tech uppercase tracking-widest text-zinc-400">
             <span>MAPA DE INVESTIGACIÓN // 7 CAPÍTULOS</span>
-            <span className="text-yellow-400 font-semibold">01 ACTIVO • 02 AL 07 EN PROGRESIÓN</span>
+            <span className="text-yellow-400 font-semibold">{completedCount} / 7 CAPÍTULOS TERMINADOS</span>
           </div>
 
           <div className="space-y-6">
             {chapters.map((cap) => {
               const isAvailable = cap.status === 'DISPONIBLE';
               const isCompleted = cap.status === 'COMPLETADO';
+              const statusObj = getChapterDisplayStatus(cap);
 
               if (cap.number === '01') {
                 /* CAPÍTULO 01 - PROTAGONISTA / PUNTO DE ENTRADA HERO */
@@ -155,17 +255,10 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
                         </span>
                       </div>
 
-                      {isCompleted ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono-tech uppercase font-bold tracking-widest bg-zinc-900 border border-yellow-400/60 text-yellow-400">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-yellow-400" />
-                          <span>COMPLETADO</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono-tech uppercase font-bold tracking-widest bg-yellow-400 text-black shadow-md">
-                          <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
-                          <span>DISPONIBLE</span>
-                        </span>
-                      )}
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono-tech uppercase font-bold tracking-widest ${statusObj.style}`}>
+                        {isCompleted && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                        <span>{statusObj.label}</span>
+                      </span>
                     </div>
 
                     {/* Main content grid for Chapter 01 */}
@@ -292,14 +385,14 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
                     </span>
 
                     {isCompleted ? (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono-tech uppercase font-bold tracking-widest bg-zinc-900 border border-yellow-400/60 text-yellow-400">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-yellow-400" />
-                        <span>COMPLETADO</span>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono-tech uppercase font-bold tracking-widest ${statusObj.style}`}>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>{statusObj.label}</span>
                       </span>
                     ) : isAvailable ? (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono-tech uppercase font-bold tracking-widest bg-yellow-400 text-black shadow-sm">
-                        <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
-                        <span>DESBLOQUEADO</span>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono-tech uppercase font-bold tracking-widest ${statusObj.style}`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
+                        <span>{statusObj.label}</span>
                       </span>
                     ) : (
                       <button
@@ -583,11 +676,24 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
             </div>
 
             {/* Mini Progress Counter */}
-            <div className="pt-2 flex items-center justify-between text-[11px] font-mono-tech text-zinc-400">
-              <span>PROGRESO TOMO 01</span>
-              <span className="text-white font-bold">
-                {chapters.filter((c) => c.status === 'COMPLETADO').length} / 7 COMPLETADOS
-              </span>
+            <div className="pt-2 space-y-3">
+              <div className="flex items-center justify-between text-[11px] font-mono-tech text-zinc-400">
+                <span>PROGRESO TOMO 01</span>
+                <span className="text-yellow-400 font-bold">
+                  {completedCount} / 7 CAPÍTULOS TERMINADOS
+                </span>
+              </div>
+
+              {(isAllChaptersDone || hasPassedFinalExam) && onStartFinalExam && (
+                <button
+                  type="button"
+                  onClick={hasPassedFinalExam && onOpenCompletionScreen ? onOpenCompletionScreen : onStartFinalExam}
+                  className="w-full py-2.5 px-3 rounded-xl bg-yellow-400 text-black hover:bg-yellow-300 font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow"
+                >
+                  <Award className="w-3.5 h-3.5" />
+                  <span>{hasPassedFinalExam ? 'VER CIERRE DEL TOMO' : 'PRUEBA FINAL EVO'}</span>
+                </button>
+              )}
             </div>
 
           </div>

@@ -363,8 +363,8 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     primaryColor: '#10b981',
     accentGradient: 'from-emerald-500/25 via-teal-600/10 to-transparent',
     glowShadow: 'rgba(16, 185, 129, 0.28)',
-    tagline: '“Del botón POWER al escritorio: arranque, diagnóstico y reparación como nunca te lo explicaron.”',
-    title: 'SISTEMA EVO LABS DE ARRANQUE Y FALLAS',
+    tagline: '“Del botón POWER a Windows, paso a paso.”',
+    title: 'SISTEMA EVO LABS DE ARRANQUE Y DIAGNÓSTICO',
     editorialSubtitle:
       'Laboratorio Virtual de Arranque y Diagnóstico EVO. Recorrido visual, guiado y paso a paso desde presionar POWER hasta llegar al escritorio de Windows, atravesando hardware, firmware, POST, BIOS/UEFI, memoria, GPU, almacenamiento, bootloader, kernel, drivers, servicios y sesión.',
     pagesBadge: '16 PÁGINAS A4 // EDICIÓN TÉCNICA MAESTRA',

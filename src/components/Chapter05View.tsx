@@ -41,6 +41,8 @@ import { Station07ControlledIntervention } from './chapter05/Station07Controlled
 import { Station08NormalVsClean } from './chapter05/Station08NormalVsClean';
 import { ActivityMapArtifact } from './chapter05/ActivityMapArtifact';
 import { OptimizationLogArtifact } from './chapter05/OptimizationLogArtifact';
+import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
+import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
 
 interface Chapter05ViewProps {
   onBackToIndex: () => void;
@@ -55,6 +57,15 @@ export const Chapter05View: React.FC<Chapter05ViewProps> = ({
   onOpenChapter06,
   onChapterCompleted,
 }) => {
+  // Mark chapter 05 as started
+  useEffect(() => {
+    try {
+      localStorage.setItem('evo_c05_started', 'true');
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // 1. Inherited Evidence from Chapters 01-04
   const [specs] = useState<Partial<UserPcSpec>>(() => {
     try {
@@ -728,6 +739,27 @@ export const Chapter05View: React.FC<Chapter05ViewProps> = ({
             </div>
           </div>
         )}
+        {/* ACTIVIDAD DE COMPROBACIÓN // COMPROBÁ LO QUE APRENDISTE */}
+        <EvoChapterCheckSection
+          chapterNumber="05"
+          chapterTitle="WINDOWS TAMBIÉN ES HARDWARE"
+          isAlreadyCompleted={isCompleted}
+          onPassCheck={handleFinishLaboratorio}
+        />
+
+        {/* NAVEGACIÓN PEDAGÓGICA DEFINITIVA */}
+        <EvoChapterNavigationFooter
+          currentChapterNumber="05"
+          currentChapterTitle="WINDOWS Y PROCESOS"
+          isCompleted={isCompleted}
+          onMarkCompleted={handleFinishLaboratorio}
+          onBackToIndex={onBackToIndex}
+          onPreviousChapter={onOpenChapter04 || onBackToIndex}
+          onNextChapter={onOpenChapter06 || onBackToIndex}
+          previousChapterLabel="CAPÍTULO 04: ENCONTRÁ EL LÍMITE"
+          nextChapterLabel="CAPÍTULO 06: TALLER DE DIAGNÓSTICO"
+          isNextAvailable={true}
+        />
       </div>
     </div>
   );

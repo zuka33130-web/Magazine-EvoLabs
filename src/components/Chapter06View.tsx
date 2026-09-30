@@ -49,18 +49,31 @@ import { InterventionStation } from './chapter06/InterventionStation';
 import { CloseInvestigationStation } from './chapter06/CloseInvestigationStation';
 import { WorkshopCasesLibrary } from './chapter06/WorkshopCasesLibrary';
 import { DiagnosticExpedienteModal } from './chapter06/DiagnosticExpedienteModal';
+import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
+import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
 
 interface Chapter06ViewProps {
   onBackToIndex: () => void;
+  onOpenChapter05?: () => void;
   onOpenChapter07?: () => void;
   onChapterCompleted?: () => void;
 }
 
 export const Chapter06View: React.FC<Chapter06ViewProps> = ({
   onBackToIndex,
+  onOpenChapter05,
   onOpenChapter07,
   onChapterCompleted,
 }) => {
+  // Mark chapter 06 as started
+  useEffect(() => {
+    try {
+      localStorage.setItem('evo_c06_started', 'true');
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // 1. Inherited Evidence from Chapters 01-05
   const [specs] = useState<Partial<UserPcSpec>>(() => {
     try {
@@ -1302,6 +1315,31 @@ export const Chapter06View: React.FC<Chapter06ViewProps> = ({
             )}
           </div>
         )}
+        {/* ACTIVIDAD DE COMPROBACIÓN // COMPROBÁ LO QUE APRENDISTE */}
+        <EvoChapterCheckSection
+          chapterNumber="06"
+          chapterTitle="TALLER EVO // ENCONTRÁ LA FALLA"
+          isAlreadyCompleted={isChapterCompleted}
+          onPassCheck={() => {
+            if (onChapterCompleted) onChapterCompleted();
+          }}
+        />
+
+        {/* NAVEGACIÓN PEDAGÓGICA DEFINITIVA */}
+        <EvoChapterNavigationFooter
+          currentChapterNumber="06"
+          currentChapterTitle="DIAGNÓSTICO EN PROFUNDIDAD"
+          isCompleted={isChapterCompleted}
+          onMarkCompleted={() => {
+            if (onChapterCompleted) onChapterCompleted();
+          }}
+          onBackToIndex={onBackToIndex}
+          onPreviousChapter={onOpenChapter05 || onBackToIndex}
+          onNextChapter={onOpenChapter07 || onBackToIndex}
+          previousChapterLabel="CAPÍTULO 05: WINDOWS Y SERVICIOS"
+          nextChapterLabel="CAPÍTULO 07: LABORATORIO FINAL"
+          isNextAvailable={true}
+        />
       </div>
     </div>
   );

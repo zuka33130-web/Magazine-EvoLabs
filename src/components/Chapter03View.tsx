@@ -29,18 +29,31 @@ import { FlowMapModal } from './FlowMapModal';
 import { FpsLabStation } from './chapter03/FpsLabStation';
 import { InterpretationStation } from './chapter03/InterpretationStation';
 import { FluidezProfileArtifact } from './chapter03/FluidezProfileArtifact';
+import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
+import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
 
 interface Chapter03ViewProps {
   onBackToIndex: () => void;
   onOpenChapter02?: () => void;
+  onOpenChapter04?: () => void;
   onChapterCompleted?: () => void;
 }
 
 export const Chapter03View: React.FC<Chapter03ViewProps> = ({
   onBackToIndex,
   onOpenChapter02,
+  onOpenChapter04,
   onChapterCompleted,
 }) => {
+  // Mark chapter 03 as started
+  useEffect(() => {
+    try {
+      localStorage.setItem('evo_c03_started', 'true');
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // Load inherited specs and flow map data
   const [specs] = useState<Partial<UserPcSpec>>(() => {
     try {
@@ -596,6 +609,28 @@ export const Chapter03View: React.FC<Chapter03ViewProps> = ({
           onResetTest={handleResetTest}
           onOpenChapter04={handleOpenChapter04}
           onBackToIndex={onBackToIndex}
+        />
+
+        {/* ACTIVIDAD DE COMPROBACIÓN // COMPROBÁ LO QUE APRENDISTE */}
+        <EvoChapterCheckSection
+          chapterNumber="03"
+          chapterTitle="CUANDO LOS FPS MIENTEN"
+          isAlreadyCompleted={isCompleted}
+          onPassCheck={handleConsolidateProfile}
+        />
+
+        {/* NAVEGACIÓN PEDAGÓGICA DEFINITIVA */}
+        <EvoChapterNavigationFooter
+          currentChapterNumber="03"
+          currentChapterTitle="FLUIDEZ Y RENDIMIENTO"
+          isCompleted={isCompleted}
+          onMarkCompleted={handleConsolidateProfile}
+          onBackToIndex={onBackToIndex}
+          onPreviousChapter={onOpenChapter02 || onBackToIndex}
+          onNextChapter={onOpenChapter04 || handleOpenChapter04}
+          previousChapterLabel="CAPÍTULO 02: CÓMO TRABAJAN JUNTOS"
+          nextChapterLabel="CAPÍTULO 04: ENCONTRÁ EL LÍMITE"
+          isNextAvailable={true}
         />
 
         {/* Bottom Bar Controls */}

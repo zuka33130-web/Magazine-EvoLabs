@@ -21,12 +21,15 @@ import { Station02Memory } from './chapter02/Station02Memory';
 import { Station03Graphics } from './chapter02/Station03Graphics';
 import { Station04Storage } from './chapter02/Station04Storage';
 import { Station05Lab } from './chapter02/Station05Lab';
+import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
+import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
 
 interface Chapter02ViewProps {
   onBackToIndex: () => void;
   onChapterCompleted: () => void;
   isCompleted?: boolean;
   initialStation?: Chapter02Station;
+  onOpenChapter01?: () => void;
   onOpenChapter03?: () => void;
 }
 
@@ -56,8 +59,18 @@ export const Chapter02View: React.FC<Chapter02ViewProps> = ({
   onBackToIndex,
   onChapterCompleted,
   initialStation,
+  onOpenChapter01,
   onOpenChapter03,
 }) => {
+  // Mark chapter 02 as started
+  useEffect(() => {
+    try {
+      localStorage.setItem('evo_c02_started', 'true');
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // Load inherited specs from Chapter 01
   const [specs, setSpecs] = useState<UserPcSpec>(() => {
     try {
@@ -433,6 +446,30 @@ export const Chapter02View: React.FC<Chapter02ViewProps> = ({
             />
           )}
         </main>
+
+        {/* ACTIVIDAD DE COMPROBACIÓN // COMPROBÁ LO QUE APRENDISTE */}
+        <EvoChapterCheckSection
+          chapterNumber="02"
+          chapterTitle="CÓMO TRABAJAN JUNTOS"
+          isAlreadyCompleted={isChapterFinished}
+          onPassCheck={() => {
+            handleFinishLab();
+          }}
+        />
+
+        {/* NAVEGACIÓN PEDAGÓGICA DEFINITIVA */}
+        <EvoChapterNavigationFooter
+          currentChapterNumber="02"
+          currentChapterTitle="CÓMO TRABAJAN JUNTOS"
+          isCompleted={isChapterFinished}
+          onMarkCompleted={handleFinishLab}
+          onBackToIndex={onBackToIndex}
+          onPreviousChapter={onOpenChapter01 || onBackToIndex}
+          onNextChapter={onOpenChapter03 || onBackToIndex}
+          previousChapterLabel="CAPÍTULO 01: CONOCÉ TU PC"
+          nextChapterLabel="CAPÍTULO 03: CUANDO LOS FPS MIENTEN"
+          isNextAvailable={true}
+        />
       </div>
     </div>
   );

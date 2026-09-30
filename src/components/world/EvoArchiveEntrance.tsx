@@ -277,10 +277,10 @@ export const EvoArchiveEntrance: React.FC<EvoArchiveEntranceProps> = ({
                 <span className="px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-[9px]">REVISTA A4 + LAB</span>
               </div>
               <div className="font-display font-bold text-lg text-white">
-                DEL BOTÓN POWER A WINDOWS
+                SISTEMA EVO LABS DE ARRANQUE Y DIAGNÓSTICO
               </div>
               <p className="font-sans-editorial text-xs text-zinc-400 mt-1 leading-relaxed">
-                Secuencia completa de arranque: +5VSB, PWR_SW, PS_ON#, VRM, reset de CPU, SPI, POST, RAM, PCIe, UEFI, winload y kernel NT.
+                “Del botón POWER a Windows, paso a paso.” Recorrido guiado de 35 estados desde la alimentación de espera (+5VSB) hasta el escritorio de Windows.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">

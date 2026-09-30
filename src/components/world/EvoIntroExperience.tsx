@@ -10,103 +10,129 @@ import {
 } from '../../assets/evo-world/LabIllustrations';
 import {
   Cpu,
-  Activity,
-  Terminal,
   Layers,
-  Wrench,
-  Search,
   ArrowRight,
-  FastForward,
+  BookOpen,
+  Zap,
+  FolderGit2,
+  Compass,
+  CheckCircle2,
+  ChevronRight,
   Play,
   Pause,
-  ChevronRight,
+  Sparkles,
+  Shield,
+  Activity,
+  BookmarkCheck,
+  Check,
+  Flame,
 } from 'lucide-react';
 
-interface EvoIntroExperienceProps {
-  onComplete: () => void;
+export interface EvoIntroExperienceProps {
+  onEnterCampus: () => void;
+  onStartTomo01: () => void;
+  onSkipAndRemember?: () => void;
+  onComplete?: () => void;
+  onSkip?: () => void;
 }
 
-export const EvoIntroExperience: React.FC<EvoIntroExperienceProps> = ({ onComplete }) => {
+export const EvoIntroExperience: React.FC<EvoIntroExperienceProps> = ({
+  onEnterCampus,
+  onStartTomo01,
+  onSkipAndRemember,
+  onComplete,
+  onSkip,
+}) => {
   const [currentScene, setCurrentScene] = useState<number>(1);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [activeWordIndex, setActiveWordIndex] = useState<number>(0);
+  const [rememberPreference, setRememberPreference] = useState<boolean>(false);
 
-  const sceneDurations = [10000, 11000, 11000, 12000]; // ms per scene (~44s total)
+  const sceneDurations = [14000, 16000, 16000]; // ms per scene
 
   // Auto progression
   useEffect(() => {
     if (!isPlaying) return;
 
     const timer = setTimeout(() => {
-      if (currentScene < 4) {
+      if (currentScene < 3) {
         setCurrentScene((prev) => prev + 1);
-      } else {
-        // Stay on scene 4 waiting for button click
       }
     }, sceneDurations[currentScene - 1]);
 
     return () => clearTimeout(timer);
   }, [currentScene, isPlaying]);
 
-  // Scene 2 sequential verbs timing
-  useEffect(() => {
-    if (currentScene === 2) {
-      setActiveWordIndex(0);
-      const interval = setInterval(() => {
-        setActiveWordIndex((prev) => (prev < 5 ? prev + 1 : prev));
-      }, 1200);
-      return () => clearInterval(interval);
+  const handleEnterCampusAction = () => {
+    if (rememberPreference) {
+      try {
+        localStorage.setItem('evo_academia_intro_dismissed', 'true');
+      } catch {
+        // ignore
+      }
     }
-  }, [currentScene]);
+    if (onEnterCampus) onEnterCampus();
+    else if (onComplete) onComplete();
+  };
 
-  const verbs = [
-    { text: 'REPARAMOS.', icon: Wrench, detail: 'Diagnóstico en circuito' },
-    { text: 'OPTIMIZAMOS.', icon: Activity, detail: 'Frametimes & voltajes' },
-    { text: 'EXPERIMENTAMOS.', icon: Layers, detail: 'Matrices A/B sin ruido' },
-    { text: 'COMPARAMOS.', icon: Cpu, detail: 'OS & microcódigos' },
-    { text: 'CONSTRUIMOS.', icon: Terminal, detail: 'Scripts livianos propios' },
-    { text: 'INVESTIGAMOS.', icon: Search, detail: 'Forense causal profunda' },
-  ];
-
-  const handleNext = () => {
-    if (currentScene < 4) {
-      setCurrentScene((prev) => prev + 1);
-    } else {
-      onComplete();
+  const handleStartTomo01Action = () => {
+    if (rememberPreference) {
+      try {
+        localStorage.setItem('evo_academia_intro_dismissed', 'true');
+      } catch {
+        // ignore
+      }
     }
+    if (onStartTomo01) onStartTomo01();
+    else if (onComplete) onComplete();
+  };
+
+  const handleSkipAndRememberAction = () => {
+    try {
+      localStorage.setItem('evo_academia_intro_dismissed', 'true');
+    } catch {
+      // ignore
+    }
+    if (onSkipAndRemember) onSkipAndRemember();
+    else if (onSkip) onSkip();
+    else if (onEnterCampus) onEnterCampus();
+    else if (onComplete) onComplete();
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#09090b] text-[#f4f4f5] flex flex-col justify-between overflow-hidden select-none font-sans-editorial">
+    <div className="fixed inset-0 z-50 bg-[#07090f] text-[#f4f4f5] flex flex-col justify-between overflow-x-hidden overflow-y-auto select-none font-sans-editorial">
       {/* Background Architectural Grid & Subtle Vignette */}
-      <div className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none" />
-      <div className="absolute inset-0 bg-radial from-transparent via-[#09090b]/60 to-[#09090b] pointer-events-none" />
+      <div className="fixed inset-0 bg-tech-grid opacity-15 pointer-events-none" />
+      <div className="fixed inset-0 bg-radial from-transparent via-[#07090f]/70 to-[#07090f] pointer-events-none" />
 
-      {/* Top Header Controls */}
-      <header className="relative z-20 flex items-center justify-between px-6 sm:px-12 py-6 border-b border-zinc-900/80 bg-zinc-950/40 backdrop-blur-md">
+      {/* Top Institutional Header Controls */}
+      <header className="relative z-20 flex items-center justify-between px-4 sm:px-10 py-4 border-b border-zinc-900/90 bg-[#07090f]/85 backdrop-blur-xl shrink-0">
         <div className="flex items-center gap-3">
-          <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
-          <span className="font-mono-tech text-xs tracking-widest text-amber-400 font-semibold uppercase">
-            EVO LABS // SECUENCIA DE INGRESO
-          </span>
-          <span className="hidden sm:inline-block font-mono-tech text-xs text-zinc-600">
-            [ESCENA 0{currentScene}/04]
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_#fbbf24]" />
+            <div className="flex flex-col">
+              <span className="font-display font-black text-sm sm:text-base tracking-wider text-white uppercase">
+                ACADEMIA <span className="text-amber-400">EVO LABS</span>
+              </span>
+              <span className="font-mono-tech text-[10px] text-zinc-400 tracking-wider hidden sm:inline-block">
+                SISTEMA DE APRENDIZAJE TECNOLÓGICO
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Progress indicators & Skip */}
-        <div className="flex items-center gap-4">
+        {/* Scene stepper & Skip controls */}
+        <div className="flex items-center gap-3 sm:gap-5">
           <div className="flex items-center gap-1.5">
-            {[1, 2, 3, 4].map((idx) => (
+            {[1, 2, 3].map((idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentScene(idx)}
-                className={`h-1.5 transition-all duration-300 rounded-full ${
+                className={`h-1.5 transition-all duration-300 rounded-full cursor-pointer ${
                   currentScene === idx
-                    ? 'w-8 bg-amber-400'
+                    ? 'w-7 sm:w-10 bg-amber-400 shadow-[0_0_8px_#fbbf24]'
                     : currentScene > idx
-                    ? 'w-4 bg-zinc-600'
-                    : 'w-4 bg-zinc-800'
+                    ? 'w-3.5 bg-zinc-600'
+                    : 'w-3.5 bg-zinc-800'
                 }`}
                 title={`Ir a escena ${idx}`}
                 aria-label={`Escena ${idx}`}
@@ -116,389 +142,422 @@ export const EvoIntroExperience: React.FC<EvoIntroExperienceProps> = ({ onComple
 
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="p-1.5 text-zinc-500 hover:text-zinc-300 transition-colors"
-            title={isPlaying ? 'Pausar' : 'Reproducir'}
+            className="p-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            title={isPlaying ? 'Pausar auto-reproducción' : 'Reproducir'}
           >
-            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 text-amber-400" />}
           </button>
 
           <button
-            onClick={onComplete}
-            className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded border border-zinc-800 hover:border-amber-400/60 bg-zinc-900/80 hover:bg-zinc-800 text-xs font-mono-tech text-zinc-400 hover:text-amber-400 transition-all cursor-pointer"
+            onClick={handleSkipAndRememberAction}
+            className="group flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-800 hover:border-amber-400/60 bg-zinc-900/80 hover:bg-zinc-800 text-[11px] font-mono-tech text-zinc-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm"
+            title="Saltar intro y guardar para no volver a mostrar al iniciar"
           >
-            <span>SALTAR INTRO</span>
-            <FastForward className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+            <span className="hidden sm:inline">Saltar intro y recordar</span>
+            <span className="sm:hidden">Saltar</span>
+            <BookmarkCheck className="w-3.5 h-3.5 text-amber-400" />
           </button>
         </div>
       </header>
 
-      {/* Main Cinematic Stage */}
-      <main className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-10 max-w-6xl mx-auto w-full">
+      {/* Main Cinematic Presentation Stage */}
+      <main className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-8 max-w-6xl mx-auto w-full my-auto">
         <AnimatePresence mode="wait">
           {/* ========================================================
-              ESCENA 01 // EL DESPERTAR DEL LABORATORIO
+              ESCENA 01 // BIENVENIDO A LA ACADEMIA EVO LABS
              ======================================================== */}
           {currentScene === 1 && (
             <motion.div
               key="scene-1"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.2 }}
-              className="w-full flex flex-col items-center justify-center text-center relative"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.6 }}
+              className="w-full flex flex-col items-center justify-center text-center space-y-6"
             >
-              {/* Background ambient silhouettes: fans, cables, open rig */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20 filter blur-xs scale-105">
-                <EvoOpenPcWorkstationSvg className="max-w-2xl text-zinc-700" />
-              </div>
-
-              {/* Slow turning fans on sides */}
-              <div className="absolute -left-4 top-10 opacity-30 hidden md:block">
-                <EvoFanSvg size={68} speed="slow" />
-              </div>
-              <div className="absolute -right-4 bottom-12 opacity-30 hidden md:block">
-                <EvoFanSvg size={84} speed="slow" />
-              </div>
-
-              {/* Main Visual: Technical Workbench with low-key lighting */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 0.9, scale: 1 }}
-                transition={{ duration: 1.8, delay: 0.3 }}
-                className="w-full max-w-xl mx-auto mb-8 border border-zinc-800/80 rounded-lg p-6 bg-zinc-950/60 backdrop-blur-sm shadow-2xl relative overflow-hidden"
-              >
-                <div className="absolute top-2 right-3 font-mono-tech text-[10px] text-zinc-600">
-                  SYSTEM_STATUS: POWER_RAILS_ACTIVE
+              {/* Discrete Institutional Diagram & Subtle Pulses */}
+              <div className="relative max-w-xl mx-auto flex items-center justify-center py-2">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20 filter blur-xs">
+                  <EvoOpenPcWorkstationSvg className="max-w-md text-zinc-700" />
                 </div>
-                <EvoOpenPcWorkstationSvg className="max-w-md mx-auto drop-shadow-[0_10px_25px_rgba(0,0,0,0.8)]" />
-              </motion.div>
+                <div className="absolute -left-6 top-2 opacity-35 hidden md:block">
+                  <EvoFanSvg size={60} speed="slow" />
+                </div>
+                <div className="absolute -right-6 bottom-2 opacity-35 hidden md:block">
+                  <EvoFanSvg size={70} speed="slow" />
+                </div>
 
-              {/* Titles appearing smoothly */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, delay: 1 }}
-                className="space-y-3"
-              >
-                <h1 className="text-4xl sm:text-6xl md:text-7xl font-display font-black tracking-tight text-white uppercase">
-                  EVO LABS
+                <div className="relative z-10 inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 backdrop-blur-md shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span className="font-mono-tech text-xs tracking-widest text-amber-300 font-bold uppercase">
+                    ACADEMIA EVO LABS // SISTEMA DE APRENDIZAJE TECNOLÓGICO
+                  </span>
+                </div>
+              </div>
+
+              {/* Title & Official Motto */}
+              <div className="space-y-3 max-w-3xl mx-auto">
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-black tracking-tight text-white uppercase leading-none">
+                  BIENVENIDO A LA <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">
+                    ACADEMIA EVO LABS
+                  </span>
                 </h1>
-                <div className="h-0.5 w-16 bg-amber-400 mx-auto" />
-                <div className="font-mono-tech text-sm sm:text-base md:text-lg tracking-widest text-zinc-400 uppercase font-medium space-x-2 sm:space-x-4">
-                  <span>TU TÉCNICO.</span>
-                  <span className="text-zinc-600">//</span>
-                  <span className="text-amber-400 font-semibold">TU LABORATORIO.</span>
-                  <span className="text-zinc-600">//</span>
-                  <span>TU MUNDO TECNOLÓGICO.</span>
-                </div>
-              </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.6 }}
-                transition={{ delay: 2.5, duration: 1 }}
-                className="mt-8 font-mono-tech text-xs text-zinc-500 flex items-center gap-2"
+                {/* Motto */}
+                <div className="py-1">
+                  <div className="inline-block px-4 py-1 rounded-lg bg-zinc-900/90 border border-zinc-700/80 font-mono-tech text-xs sm:text-sm font-bold text-amber-400 tracking-widest uppercase shadow-md">
+                    LEMA: NO LO CREAS. COMPROBALO.
+                  </div>
+                </div>
+              </div>
+
+              {/* Official Welcome Copy (Exact Requirements) */}
+              <div className="max-w-2xl mx-auto space-y-4 text-zinc-300 font-sans-editorial text-sm sm:text-base leading-relaxed p-6 rounded-2xl bg-zinc-950/70 border border-zinc-800/80 shadow-2xl backdrop-blur-md">
+                <p className="font-medium text-white sm:text-lg italic">
+                  “No importa si estás dando tus primeros pasos en informática o si ya trabajás profesionalmente con computadoras. EVO LABS fue creado para acompañarte durante todo el recorrido.”
+                </p>
+                <div className="h-px w-20 bg-amber-400/40 mx-auto" />
+                <p className="text-zinc-300">
+                  “Acá no vas a encontrar solamente información. <br />
+                  Vas a aprender a <strong className="text-amber-300 font-bold">entender qué ocurre, observarlo, experimentarlo, diagnosticarlo y comprobarlo</strong>.”
+                </p>
+              </div>
+
+              {/* Primary Entrance Action Buttons */}
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-lg mx-auto">
+                <button
+                  type="button"
+                  onClick={handleEnterCampusAction}
+                  className="w-full sm:w-auto flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-400 via-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-display font-black text-sm uppercase tracking-wider transition-all shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.5)] flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>ENTRAR A LA ACADEMIA</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleStartTomo01Action}
+                  className="w-full sm:w-auto flex-1 py-3.5 px-6 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white hover:text-amber-300 border border-zinc-700 hover:border-amber-400/50 font-display font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                >
+                  <BookOpen className="w-4 h-4 text-cyan-400" />
+                  <span>COMENZAR POR EL TOMO 01</span>
+                </button>
+              </div>
+
+              {/* Navigation cue */}
+              <button
+                onClick={() => setCurrentScene(2)}
+                className="inline-flex items-center gap-1.5 text-xs font-mono-tech text-zinc-500 hover:text-amber-400 transition-colors pt-1 cursor-pointer"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                <span>Inicializando banco de pruebas y telemetría de hardware...</span>
-              </motion.div>
+                <span>Descubrí qué encontrás en EVO LABS</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </motion.div>
           )}
 
           {/* ========================================================
-              ESCENA 02 // ACÁ NO VENÍS A MIRAR. VENÍS A HACER.
+              ESCENA 02 // QUÉ ENCONTRÁS EN EVO LABS (LOS 4 PILARES)
              ======================================================== */}
           {currentScene === 2 && (
             <motion.div
               key="scene-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1 }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.6 }}
               className="w-full flex flex-col items-center text-center space-y-6"
             >
-              {/* Technical Situation Mosaic Preview */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-4xl opacity-85">
-                <div className="border border-zinc-800 rounded p-2 bg-zinc-950/80 flex flex-col items-center">
-                  <span className="font-mono-tech text-[10px] text-zinc-500 mb-1">TELEMETRÍA // FRAMETIMES</span>
-                  <PerformanceBenchSvg className="w-24 h-24" isHovered />
+              {/* Headline */}
+              <div className="space-y-1">
+                <div className="font-mono-tech text-xs tracking-widest text-amber-400 font-bold uppercase">
+                  CONTENIDOS & CAPACIDADES
                 </div>
-                <div className="border border-zinc-800 rounded p-2 bg-zinc-950/80 flex flex-col items-center">
-                  <span className="font-mono-tech text-[10px] text-zinc-500 mb-1">FORENSE // TRIAGE BSOD</span>
-                  <CircuitDiagnosticSvg className="w-24 h-24" isHovered />
+                <h2 className="text-3xl sm:text-5xl font-display font-black tracking-tight text-white uppercase">
+                  QUÉ ENCONTRÁS EN EVO LABS
+                </h2>
+                <p className="text-xs sm:text-sm text-zinc-400 font-sans-editorial">
+                  Todo lo necesario para formarte como un técnico de clase mundial.
+                </p>
+              </div>
+
+              {/* Visual Grid of the 4 Pillars */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-5xl text-left">
+                {/* 1. 10 TOMOS EVO LABS */}
+                <div className="p-5 rounded-2xl bg-zinc-950/80 border border-cyan-500/40 hover:border-cyan-400 transition-all shadow-xl flex flex-col justify-between space-y-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono-tech bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase tracking-wider">
+                        BIBLIOTECA EDITORIAL
+                      </span>
+                      <BookOpen className="w-5 h-5 text-cyan-400" />
+                    </div>
+                    <h3 className="font-display font-bold text-lg text-white">
+                      10 TOMOS EVO LABS
+                    </h3>
+                    <p className="text-xs text-zinc-300 font-sans-editorial">
+                      Revistas técnicas en formato Magazine que recorren:
+                    </p>
+                    {/* The 10 subjects */}
+                    <div className="grid grid-cols-2 gap-1 text-[11px] font-mono-tech text-zinc-300 pt-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400" />
+                        <span>Hardware</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400" />
+                        <span>Windows</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400" />
+                        <span>Reparación de PC</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400" />
+                        <span>Reparación Notebooks</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400" />
+                        <span>Redes</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400" />
+                        <span>Ciberseguridad</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400" />
+                        <span>Gaming & Optimización</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400" />
+                        <span>Arquitectura x86</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400" />
+                        <span>Diagnóstico Avanzado</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400" />
+                        <span>Forense de Hardware</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="border border-zinc-800 rounded p-2 bg-zinc-950/80 flex flex-col items-center">
-                  <span className="font-mono-tech text-[10px] text-zinc-500 mb-1">MÉTODO // ENSAYO A/B</span>
-                  <ExperimentsBenchSvg className="w-24 h-24" isHovered />
+
+                {/* 2. LABORATORIOS GUIADOS Y TÉCNICOS */}
+                <div className="p-5 rounded-2xl bg-zinc-950/80 border border-emerald-500/40 hover:border-emerald-400 transition-all shadow-xl flex flex-col justify-between space-y-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono-tech bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 uppercase tracking-wider">
+                        EXPERIMENTACIÓN SEGURA
+                      </span>
+                      <Zap className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <h3 className="font-display font-bold text-lg text-white">
+                      LABORATORIOS GUIADOS Y TÉCNICOS
+                    </h3>
+                    <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
+                      Herramientas reales y simulaciones para experimentar sin miedo a romper nada.
+                    </p>
+                    <div className="space-y-1.5 pt-2 text-xs text-zinc-400">
+                      <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+                        <span className="text-zinc-200 font-semibold">Lab de Arranque y Fallas (Tomo 08)</span>
+                        <span className="text-[9px] font-mono-tech text-emerald-400 font-bold">35 ESTADOS</span>
+                      </div>
+                      <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+                        <span className="text-zinc-200 font-semibold">Windows Matrix & Kernel NT</span>
+                        <span className="text-[9px] font-mono-tech text-emerald-400 font-bold">DPC & SCHEDULER</span>
+                      </div>
+                      <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+                        <span className="text-zinc-200 font-semibold">Banco Hot-Swap de Hardware</span>
+                        <span className="text-[9px] font-mono-tech text-emerald-400 font-bold">TELEMETRÍA REAL</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="border border-zinc-800 rounded p-2 bg-zinc-950/80 flex flex-col items-center">
-                  <span className="font-mono-tech text-[10px] text-zinc-500 mb-1">CÓDIGO // SCRIPTS PWSH</span>
-                  <MachineWorkshopSvg className="w-24 h-24" isHovered />
+
+                {/* 3. TALLER DE CASOS Y EXPEDIENTES */}
+                <div className="p-5 rounded-2xl bg-zinc-950/80 border border-purple-500/40 hover:border-purple-400 transition-all shadow-xl flex flex-col justify-between space-y-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono-tech bg-purple-500/20 text-purple-300 border border-purple-500/40 uppercase tracking-wider">
+                        PERITAJE PROFESIONAL
+                      </span>
+                      <FolderGit2 className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <h3 className="font-display font-bold text-lg text-white">
+                      TALLER DE CASOS Y EXPEDIENTES
+                    </h3>
+                    <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
+                      Resolvé fallas y situaciones reales como un técnico profesional.
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 pt-2 text-[11px] font-mono-tech text-zinc-400">
+                      <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800">
+                        <span className="text-amber-400 font-bold block">// Evidencias</span>
+                        Logs, voltajes y síntomas iniciales
+                      </div>
+                      <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800">
+                        <span className="text-purple-400 font-bold block">// Dictamen</span>
+                        Causa raíz comprobable
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. UN SISTEMA PASO A PASO */}
+                <div className="p-5 rounded-2xl bg-zinc-950/80 border border-amber-400/40 hover:border-amber-400 transition-all shadow-xl flex flex-col justify-between space-y-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono-tech bg-amber-400/20 text-amber-300 border border-amber-400/40 uppercase tracking-wider">
+                        METODOLOGÍA DIDÁCTICA
+                      </span>
+                      <Compass className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <h3 className="font-display font-bold text-lg text-white">
+                      UN SISTEMA PASO A PASO
+                    </h3>
+                    <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
+                      Diseñado pedagógicamente para avanzar a tu propio ritmo.
+                    </p>
+                    <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] font-mono-tech text-zinc-300 space-y-1">
+                      <div className="flex items-center gap-1.5 text-amber-300 font-bold">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Ruta por 7 Niveles (0 al 6)</span>
+                      </div>
+                      <div className="text-zinc-400">
+                        Desde "Conocé tu PC" hasta "Forense e Ingeniería Inversa". Conexión directa entre lectura, práctica en laboratorio y validación pericial.
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Main Headline */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                className="space-y-2 pt-2"
-              >
-                <div className="font-mono-tech text-xs tracking-widest text-zinc-500 uppercase">
-                  MANIFIESTO OPERATIVO
-                </div>
-                <h2 className="text-3xl sm:text-5xl md:text-6xl font-display font-black tracking-tight text-white">
-                  ACÁ NO VENÍS A MIRAR.
-                </h2>
-                <h2 className="text-3xl sm:text-5xl md:text-6xl font-display font-black tracking-tight text-amber-400">
-                  VENÍS A HACER.
-                </h2>
-              </motion.div>
+              {/* Action Buttons */}
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-lg mx-auto">
+                <button
+                  type="button"
+                  onClick={handleEnterCampusAction}
+                  className="w-full sm:w-auto flex-1 py-3 px-6 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(245,158,11,0.35)] flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>ENTRAR A LA ACADEMIA</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
 
-              {/* Sequential Action Verbs */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 w-full max-w-5xl pt-3">
-                {verbs.map((verb, idx) => {
-                  const Icon = verb.icon;
-                  const isActive = idx <= activeWordIndex;
-                  const isCurrent = idx === activeWordIndex;
-
-                  return (
-                    <motion.div
-                      key={verb.text}
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={{
-                        opacity: isActive ? 1 : 0.25,
-                        y: 0,
-                        scale: isCurrent ? 1.04 : 1,
-                      }}
-                      transition={{ duration: 0.4 }}
-                      className={`p-3 rounded border text-left flex flex-col justify-between transition-all ${
-                        isCurrent
-                          ? 'border-amber-400 bg-amber-400/10 shadow-[0_0_15px_rgba(234,179,8,0.2)]'
-                          : isActive
-                          ? 'border-zinc-700 bg-zinc-900/60'
-                          : 'border-zinc-900 bg-zinc-950/40'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <Icon
-                          className={`w-4 h-4 ${
-                            isCurrent ? 'text-amber-400' : isActive ? 'text-zinc-300' : 'text-zinc-600'
-                          }`}
-                        />
-                        <span className="font-mono-tech text-[9px] text-zinc-500">0{idx + 1}</span>
-                      </div>
-                      <div className="font-display font-bold text-xs sm:text-sm tracking-tight text-white">
-                        {verb.text}
-                      </div>
-                      <div className="font-mono-tech text-[9px] text-zinc-400 mt-1 truncate">
-                        {verb.detail}
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                <button
+                  type="button"
+                  onClick={handleStartTomo01Action}
+                  className="w-full sm:w-auto flex-1 py-3 px-6 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white hover:text-amber-300 border border-zinc-700 hover:border-amber-400/50 font-display font-bold text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <BookOpen className="w-4 h-4 text-cyan-400" />
+                  <span>COMENZAR POR EL TOMO 01</span>
+                </button>
               </div>
             </motion.div>
           )}
 
           {/* ========================================================
-              ESCENA 03 // EN EVO LABS HACEMOS MILAGROS
+              ESCENA 03 // EL VIAJE DE APRENDIZAJE EVO & INGRESO
              ======================================================== */}
           {currentScene === 3 && (
             <motion.div
               key="scene-3"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1 }}
-              className="w-full flex flex-col items-center text-center max-w-4xl mx-auto space-y-6"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.6 }}
+              className="w-full flex flex-col items-center text-center space-y-6"
             >
-              {/* Protagonist Header */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="space-y-2"
-              >
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-400/30 bg-amber-400/10 font-mono-tech text-xs text-amber-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  MÁXIMA RECTORA DEL LABORATORIO
+              {/* Visual Bench */}
+              <div className="w-full max-w-lg mx-auto relative p-6 rounded-2xl bg-zinc-950/80 border border-amber-400/40 shadow-2xl backdrop-blur-md overflow-hidden">
+                <div className="absolute top-2 right-3 font-mono-tech text-[10px] text-amber-400 font-bold">
+                  SISTEMA_PEDAGÓGICO: ACTIVO
                 </div>
-                <h2 className="text-3xl sm:text-5xl md:text-6xl font-display font-black tracking-tight text-white">
-                  EN EVO LABS
-                </h2>
-                <h2 className="text-3xl sm:text-5xl md:text-6xl font-display font-black tracking-tight text-amber-400">
-                  HACEMOS MILAGROS.
-                </h2>
-                <p className="font-mono-tech text-xs sm:text-sm text-zinc-400 tracking-wider">
-                  Pero nunca por fe. Siempre con telemetría.
-                </p>
-              </motion.div>
-
-              {/* The Creed of Capabilities */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 1 }}
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 w-full text-left pt-2"
-              >
-                {[
-                  'Revivimos máquinas.',
-                  'Perseguimos FPS.',
-                  'Encontramos recursos escondidos.',
-                  'Investigamos problemas que nadie entiende.',
-                  'Comparamos sistemas operativos, drivers y configuraciones.',
-                  'Creamos herramientas.',
-                  'Reparamos hardware.',
-                  'Construimos experimentos.',
-                  'Y después mostramos qué ocurrió.',
-                ].map((statement, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 + idx * 0.08, duration: 0.4 }}
-                    className={`p-3.5 rounded border ${
-                      idx === 8
-                        ? 'border-amber-400 bg-amber-400/10 sm:col-span-2 md:col-span-1'
-                        : 'border-zinc-800/90 bg-zinc-950/70'
-                    }`}
-                  >
-                    <div className="font-mono-tech text-[10px] text-amber-400 mb-1">
-                      // {String(idx + 1).padStart(2, '0')}
-                    </div>
-                    <div
-                      className={`text-sm sm:text-base font-semibold ${
-                        idx === 8 ? 'text-amber-300 font-display' : 'text-zinc-200'
-                      }`}
-                    >
-                      {statement}
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* ========================================================
-              ESCENA 04 // TODO EMPIEZA CON UNA MÁQUINA. LA TUYA.
-             ======================================================== */}
-          {currentScene === 4 && (
-            <motion.div
-              key="scene-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1 }}
-              className="w-full flex flex-col items-center text-center max-w-4xl mx-auto space-y-6"
-            >
-              {/* Visual representation of user's PC with telemetry beams radiating to laboratory zones */}
-              <div className="relative w-full max-w-md h-52 sm:h-60 mx-auto flex items-center justify-center">
-                {/* Concentric telemetry circles */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-52 h-52 rounded-full border border-zinc-800 animate-ping opacity-20" />
-                  <div className="w-40 h-40 rounded-full border border-amber-400/20" />
-                  <div className="w-28 h-28 rounded-full border border-amber-400/40" />
-                </div>
-
-                {/* Core Workstation / TU PC */}
-                <div className="relative z-10 p-5 rounded-xl border border-amber-400 bg-zinc-950 shadow-[0_0_30px_rgba(234,179,8,0.25)] flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-lg bg-amber-400/10 border border-amber-400 flex items-center justify-center mb-2 text-amber-400">
-                    <Cpu className="w-6 h-6" />
-                  </div>
-                  <span className="font-display font-bold text-sm tracking-wider text-white">
-                    TU PC // NÚCLEO ACTIVO
-                  </span>
-                  <span className="font-mono-tech text-[10px] text-amber-400">
-                    SUJETO PRIMARIO DE INVESTIGACIÓN
-                  </span>
-                </div>
-
-                {/* Radial data vectors radiating outward */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 240">
-                  <line x1="200" y1="120" x2="60" y2="40" stroke="#eab308" strokeWidth="1.5" strokeDasharray="4 4" className="animate-evo-pulse-line" />
-                  <line x1="200" y1="120" x2="340" y2="40" stroke="#eab308" strokeWidth="1.5" strokeDasharray="4 4" className="animate-evo-pulse-line" />
-                  <line x1="200" y1="120" x2="50" y2="200" stroke="#eab308" strokeWidth="1.5" strokeDasharray="4 4" className="animate-evo-pulse-line" />
-                  <line x1="200" y1="120" x2="350" y2="200" stroke="#eab308" strokeWidth="1.5" strokeDasharray="4 4" className="animate-evo-pulse-line" />
-
-                  {/* Endpoint satellite nodes representing zones */}
-                  <circle cx="60" cy="40" r="4" fill="#eab308" />
-                  <circle cx="340" cy="40" r="4" fill="#eab308" />
-                  <circle cx="50" cy="200" r="4" fill="#eab308" />
-                  <circle cx="350" cy="200" r="4" fill="#eab308" />
-                </svg>
+                <EvoOpenPcWorkstationSvg className="max-w-xs mx-auto drop-shadow-[0_10px_25px_rgba(0,0,0,0.8)]" />
               </div>
 
-              {/* Key Headline */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="space-y-2"
-              >
-                <h2 className="text-3xl sm:text-5xl md:text-6xl font-display font-black tracking-tight text-white uppercase">
-                  TODO EMPIEZA CON UNA MÁQUINA.
+              {/* Headline */}
+              <div className="space-y-2 max-w-xl mx-auto">
+                <h2 className="text-3xl sm:text-4xl font-display font-black tracking-tight text-white uppercase">
+                  TU VIAJE COMIENZA AHORA
                 </h2>
-                <h2 className="text-4xl sm:text-6xl md:text-7xl font-display font-black tracking-tight text-amber-400 uppercase">
-                  LA TUYA.
-                </h2>
-              </motion.div>
-
-              {/* Subtext */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className="max-w-xl mx-auto space-y-1 text-sm sm:text-base text-zinc-300"
-              >
-                <p className="font-mono-tech text-xs sm:text-sm text-zinc-400">
-                  Cada prueba. Cada reparación. Cada experimento. Cada descubrimiento.
+                <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
+                  Podés explorar el Campus principal según tu propia curiosidad o iniciar la lectura interactiva del primer tomo formativo.
                 </p>
-                <p className="text-base sm:text-lg font-medium text-white">
-                  va construyendo <span className="text-amber-400 font-bold uppercase">TU LABORATORIO</span>.
-                </p>
-              </motion.div>
+              </div>
 
-              {/* Main Entrance Button */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
-                className="pt-4"
-              >
+              {/* The 2 Primary Entrance Action Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-xl mx-auto pt-2">
                 <button
-                  id="evo-btn-enter-world"
-                  onClick={onComplete}
-                  className="group relative inline-flex items-center gap-3 px-8 sm:px-12 py-4 rounded-md bg-amber-400 hover:bg-amber-300 text-zinc-950 font-display font-black text-base sm:text-lg tracking-wider uppercase transition-all shadow-[0_0_30px_rgba(234,179,8,0.4)] hover:shadow-[0_0_45px_rgba(234,179,8,0.6)] cursor-pointer"
+                  type="button"
+                  id="evo-btn-enter-academy"
+                  onClick={handleEnterCampusAction}
+                  className="w-full sm:w-auto flex-1 py-4 px-8 rounded-xl bg-gradient-to-r from-amber-400 via-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-display font-black text-sm uppercase tracking-wider transition-all shadow-[0_0_30px_rgba(245,158,11,0.4)] hover:shadow-[0_0_40px_rgba(245,158,11,0.6)] flex items-center justify-center gap-2.5 cursor-pointer"
                 >
-                  <span>ENTRAR A EVO LABS</span>
-                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                  <span>ENTRAR A LA ACADEMIA</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
-              </motion.div>
+
+                <button
+                  type="button"
+                  id="evo-btn-start-tomo01"
+                  onClick={handleStartTomo01Action}
+                  className="w-full sm:w-auto flex-1 py-4 px-8 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-cyan-300 hover:text-white border border-cyan-500/40 hover:border-cyan-400 font-display font-bold text-sm uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(6,182,212,0.2)] flex items-center justify-center gap-2.5 cursor-pointer"
+                >
+                  <BookOpen className="w-4 h-4 text-cyan-400" />
+                  <span>COMENZAR POR EL TOMO 01</span>
+                </button>
+              </div>
+
+              {/* Subtle Remember Setting */}
+              <div className="pt-2 flex items-center justify-center gap-2">
+                <label className="flex items-center gap-2 text-xs font-mono-tech text-zinc-400 hover:text-zinc-200 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberPreference}
+                    onChange={(e) => setRememberPreference(e.target.checked)}
+                    className="w-3.5 h-3.5 accent-amber-400 rounded bg-zinc-900 border-zinc-700 cursor-pointer"
+                  />
+                  <span>Recordar mi elección y no mostrar esta intro al iniciar</span>
+                </label>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </main>
 
-      {/* Bottom Status Bar / Navigation */}
-      <footer className="relative z-20 flex items-center justify-between px-6 sm:px-12 py-4 border-t border-zinc-900/80 bg-zinc-950/40 backdrop-blur-md text-xs font-mono-tech text-zinc-500">
-        <div className="flex items-center gap-4">
-          <span>PLATAFORMA_VER: EVO_WORLD_V1.0</span>
-          <span className="hidden sm:inline-block">//</span>
-          <span className="hidden sm:inline-block text-zinc-400">TELEMETRÍA LOCAL 100% PRIVADA</span>
+      {/* Bottom Technical Status Bar */}
+      <footer className="relative z-20 flex flex-wrap items-center justify-between gap-3 px-4 sm:px-10 py-3.5 border-t border-zinc-900/90 bg-[#07090f]/85 backdrop-blur-xl text-xs font-mono-tech text-zinc-500 shrink-0">
+        <div className="flex items-center gap-3">
+          <span className="text-zinc-400 font-bold">ACADEMIA EVO LABS // V1.0</span>
+          <span className="text-zinc-700">//</span>
+          <span className="text-amber-400/90 font-medium">TELEMETRÍA LOCAL 100% PRIVADA</span>
         </div>
 
-        <div className="flex items-center gap-3">
-          {currentScene < 4 ? (
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={handleSkipAndRememberAction}
+            className="text-[11px] text-zinc-400 hover:text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <span>Saltar intro y recordar mi elección</span>
+          </button>
+
+          {currentScene < 3 ? (
             <button
-              onClick={handleNext}
-              className="flex items-center gap-1 text-zinc-300 hover:text-amber-400 transition-colors cursor-pointer"
+              onClick={() => setCurrentScene((prev) => prev + 1)}
+              className="flex items-center gap-1 text-zinc-300 hover:text-amber-400 font-bold transition-colors cursor-pointer"
             >
-              <span>SIGUIENTE ESCENA</span>
+              <span>SIGUIENTE</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
-            <span className="text-amber-400 font-semibold animate-pulse">LISTO PARA EL DESPLIEGUE</span>
+            <button
+              onClick={handleEnterCampusAction}
+              className="flex items-center gap-1 text-amber-400 font-bold hover:text-amber-300 transition-colors cursor-pointer"
+            >
+              <span>IR AL CAMPUS</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           )}
         </div>
       </footer>

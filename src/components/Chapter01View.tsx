@@ -40,11 +40,14 @@ import {
   UserPcEvidenceMap,
   PassportJsonSchema
 } from '../types';
+import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
+import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
 
 interface Chapter01ViewProps {
   onBackToIndex: () => void;
   onChapterCompleted: () => void;
   isChapter02Unlocked: boolean;
+  onStartChapter02?: () => void;
 }
 
 type SectionKey =
@@ -92,7 +95,17 @@ export const Chapter01View: React.FC<Chapter01ViewProps> = ({
   onBackToIndex,
   onChapterCompleted,
   isChapter02Unlocked,
+  onStartChapter02,
 }) => {
+  // Mark chapter 01 as started
+  useEffect(() => {
+    try {
+      localStorage.setItem('evo_c01_started', 'true');
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // Load initial passport from localStorage if available
   const [activeSection, setActiveSection] = useState<SectionKey>('cover');
   const [completedSections, setCompletedSections] = useState<Set<SectionKey>>(() => {
@@ -2603,6 +2616,17 @@ Test-Path $Archivo`;
               </ul>
             </div>
 
+            {/* ACTIVIDAD DE COMPROBACIÓN // COMPROBÁ LO QUE APRENDISTE */}
+            <EvoChapterCheckSection
+              chapterNumber="01"
+              chapterTitle="CONOCÉ TU PC"
+              isAlreadyCompleted={completedSections.has('tu-pc')}
+              onPassCheck={() => {
+                markSectionCompleted('tu-pc');
+                onChapterCompleted();
+              }}
+            />
+
             {/* CLIFFHANGER // PRÓXIMO CAPÍTULO */}
             <div className="p-6 sm:p-8 rounded-2xl border-2 border-zinc-700 bg-gradient-to-r from-zinc-900 to-black space-y-6">
               <div className="space-y-2">
@@ -2633,6 +2657,7 @@ Test-Path $Archivo`;
                   onClick={() => {
                     markSectionCompleted('tu-pc');
                     onChapterCompleted();
+                    if (onStartChapter02) onStartChapter02();
                   }}
                   className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-yellow-400 text-black hover:bg-yellow-300 transition-all duration-200 cursor-pointer shadow-xl hover:shadow-yellow-400/20 group shrink-0"
                 >
@@ -2641,6 +2666,26 @@ Test-Path $Archivo`;
                 </button>
               </div>
             </div>
+
+            {/* BARRA DE NAVEGACIÓN PEDAGÓGICA DEFINITIVA */}
+            <EvoChapterNavigationFooter
+              currentChapterNumber="01"
+              currentChapterTitle="IDENTIDAD DE TU PC"
+              isCompleted={completedSections.has('tu-pc')}
+              onMarkCompleted={() => {
+                markSectionCompleted('tu-pc');
+                onChapterCompleted();
+              }}
+              onBackToIndex={onBackToIndex}
+              onNextChapter={() => {
+                markSectionCompleted('tu-pc');
+                onChapterCompleted();
+                if (onStartChapter02) onStartChapter02();
+                else onBackToIndex();
+              }}
+              nextChapterLabel="CAPÍTULO 02: CÓMO TRABAJAN JUNTOS"
+              isNextAvailable={true}
+            />
           </div>
         )}
       </main>

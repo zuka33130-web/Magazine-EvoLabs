@@ -39,6 +39,8 @@ import { EvoTelemetryIntegrityModal } from './components/evoLabCore/components/E
 import { TelemetryIntegrityService, LiveScanIntegrityResult } from './components/evoLabCore/services/telemetryIntegrityService';
 import { EvoCaseRepository } from './components/evoLabCore/services/caseRepository';
 import { EvoCase } from './components/evoLabCore/types';
+import { EvoTomo01FinalExam } from './components/tomo01/EvoTomo01FinalExam';
+import { EvoTomo01CompletionScreen } from './components/tomo01/EvoTomo01CompletionScreen';
 import { CheckCircle2, X, History } from 'lucide-react';
 
 export default function App() {
@@ -63,7 +65,9 @@ export default function App() {
     | 'hotswap-lab'
     | 'windows-matrix-lab'
     | 'lab-core'
-  >('lab-core');
+    | 'tomo01-quiz'
+    | 'tomo01-completion'
+  >('world-map');
 
   // Sub-panel & Lab states
   const [activeLabPanel, setActiveLabPanel] = useState<'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>('sandbox');
@@ -81,7 +85,27 @@ export default function App() {
   const [caseHistoryList, setCaseHistoryList] = useState<EvoCase[]>([]);
   const [dossierModalTomoId, setDossierModalTomoId] = useState<string | null>(null);
 
-  const [isIntroActive, setIsIntroActive] = useState<boolean>(false);
+  const [campusSection, setCampusSection] = useState<
+    'campus' | 'escuela' | 'biblioteca' | 'laboratorios' | 'diagnosticar' | 'progreso'
+  >('campus');
+
+  const [isIntroActive, setIsIntroActive] = useState<boolean>(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (
+        url.searchParams.get('volume') ||
+        url.searchParams.get('view') ||
+        url.searchParams.get('mode') ||
+        url.searchParams.get('pdf') ||
+        url.searchParams.get('print') === 'true'
+      ) {
+        return false;
+      }
+      return localStorage.getItem('evo_academia_intro_dismissed') !== 'true';
+    } catch {
+      return false;
+    }
+  });
   const [activeProfile, setActiveProfile] = useState<EvoNarrativeProfile>('investigador');
   const [activeNotice, setActiveNotice] = useState<string | null>(null);
   const [userPassport, setUserPassport] = useState<UserHardwarePassport | null>(() => {
@@ -174,28 +198,17 @@ export default function App() {
       const isC05Completed = localStorage.getItem('evo_c05_status') === 'completed';
       const isC05Unlocked = isC04Completed || localStorage.getItem('evo_c05_unlocked') === 'true';
 
-      let isC06Completed = false;
+      let isC06Completed = localStorage.getItem('evo_c06_status') === 'completed';
       try {
         const rawCases = localStorage.getItem('evo_c06_cases');
         if (rawCases) {
           const parsed = JSON.parse(rawCases);
-          if (Array.isArray(parsed)) {
-            isC06Completed = parsed.some(
-              (c: any) => c && c.completed === true && c.status !== 'INVESTIGANDO'
-            );
+          if (Array.isArray(parsed) && parsed.some((c: any) => c && c.completed === true && c.status !== 'INVESTIGANDO')) {
+            isC06Completed = true;
           }
         }
       } catch {
-        isC06Completed = false;
-      }
-
-      if (!isC06Completed) {
-        if (localStorage.getItem('evo_c06_status') === 'completed') {
-          localStorage.removeItem('evo_c06_status');
-        }
-        if (localStorage.getItem('evo_c07_unlocked') === 'true') {
-          localStorage.removeItem('evo_c07_unlocked');
-        }
+        // ignore
       }
 
       const isC06Unlocked = isC05Completed || localStorage.getItem('evo_c06_unlocked') === 'true';
@@ -516,6 +529,31 @@ export default function App() {
     );
   };
 
+  const handleStartFinalExam = () => {
+    setCurrentView('tomo01-quiz');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenCompletionScreen = () => {
+    setCurrentView('tomo01-completion');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCompleteExam = (score: number, total: number) => {
+    setChaptersList(computeChaptersList());
+    if (score >= 5) {
+      setCelebrationData({
+        completedNumber: 'TOMO 01',
+        completedTitle: 'CONOCÉ TU PC // CERTIFICACIÓN EVO',
+        unlockedNumber: 'LAB',
+        unlockedTitle: 'BANCO DE SILICIO & TELEMETRÍA (HOT-SWAP LAB)',
+      });
+      setActiveNotice(
+        `¡Prueba Final superada con ${score}/${total}! Tomo 01 acreditado con éxito. Habilitado el entorno práctico de laboratorio.`
+      );
+    }
+  };
+
   const handleEnterZone = (zone: EvoLabZone) => {
     if (zone.id === 'zona-3') {
       setCurrentView('archivo');
@@ -543,6 +581,15 @@ export default function App() {
   };
 
   const handleNavigateHome = () => {
+    setCampusSection('campus');
+    setCurrentView('world-map');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNavigateCampusSection = (
+    section: 'campus' | 'escuela' | 'biblioteca' | 'laboratorios' | 'diagnosticar' | 'progreso'
+  ) => {
+    setCampusSection(section);
     setCurrentView('world-map');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -652,26 +699,34 @@ export default function App() {
   if (isIntroActive) {
     return (
       <EvoIntroExperience
-        onComplete={(selectedProfile) => {
-          if (selectedProfile) {
-            handleChangeProfile(selectedProfile);
-          }
-          try {
-            localStorage.setItem('evo_intro_seen', 'true');
-          } catch {
-            // ignore
-          }
+        onEnterCampus={() => {
+          setIsIntroActive(false);
+          setCampusSection('campus');
+          setCurrentView('world-map');
+        }}
+        onStartTomo01={() => {
           setIsIntroActive(false);
           setCurrentView('magazine');
         }}
-        onSkip={() => {
+        onSkipAndRemember={() => {
           try {
-            localStorage.setItem('evo_intro_seen', 'true');
+            localStorage.setItem('evo_academia_intro_dismissed', 'true');
           } catch {
             // ignore
           }
           setIsIntroActive(false);
-          setCurrentView('magazine');
+          setCampusSection('campus');
+          setCurrentView('world-map');
+        }}
+        onComplete={() => {
+          setIsIntroActive(false);
+          setCampusSection('campus');
+          setCurrentView('world-map');
+        }}
+        onSkip={() => {
+          setIsIntroActive(false);
+          setCampusSection('campus');
+          setCurrentView('world-map');
         }}
       />
     );
@@ -717,9 +772,11 @@ export default function App() {
       {/* Streamlined Clean Header with Upper Navigation Bar */}
       <Header
         currentView={currentView}
+        campusSection={campusSection}
         activeLabPanel={activeLabPanel}
         activeLabMission={activeLabMission}
         onNavigateHome={handleNavigateHome}
+        onNavigateCampusSection={handleNavigateCampusSection}
         onNavigateArchive={handleNavigateArchive}
         onNavigateTomo01={handleNavigateTomo01}
         onNavigateTomo02={handleNavigateTomo02}
@@ -840,6 +897,8 @@ export default function App() {
 
           {currentView === 'world-map' && (
             <EvoWorldMap
+              initialIntention={campusSection}
+              onOpenIntroPresentation={() => setIsIntroActive(true)}
               passport={userPassport}
               completedChaptersCount={completedChaptersCount}
               onEnterZone={handleEnterZone}
@@ -906,6 +965,8 @@ export default function App() {
                 onStartChapter06={handleStartChapter06}
                 onStartChapter07={handleStartChapter07}
                 onSelectLockedChapter={handleSelectLockedChapter}
+                onStartFinalExam={handleStartFinalExam}
+                onOpenCompletionScreen={handleOpenCompletionScreen}
               />
             </div>
           )}
@@ -915,6 +976,7 @@ export default function App() {
               onBackToIndex={handleBackToIndex}
               onChapterCompleted={handleChapterCompleted}
               isChapter02Unlocked={!!isChapter02Unlocked}
+              onStartChapter02={handleStartChapter02}
             />
           )}
 
@@ -923,6 +985,7 @@ export default function App() {
               onBackToIndex={handleBackToIndex}
               onChapterCompleted={handleChapter02Completed}
               initialStation={c02TargetStation}
+              onOpenChapter01={handleStartChapter01}
               onOpenChapter03={handleStartChapter03}
             />
           )}
@@ -931,6 +994,7 @@ export default function App() {
             <Chapter03View
               onBackToIndex={handleBackToIndex}
               onOpenChapter02={handleStartChapter02}
+              onOpenChapter04={handleStartChapter04}
               onChapterCompleted={handleChapter03Completed}
             />
           )}
@@ -939,6 +1003,7 @@ export default function App() {
             <Chapter04View
               onBackToIndex={handleBackToIndex}
               onOpenChapter03={handleStartChapter03}
+              onOpenChapter05={handleStartChapter05}
               onChapterCompleted={handleChapter04Completed}
             />
           )}
@@ -955,6 +1020,7 @@ export default function App() {
           {currentView === 'chapter-06' && (
             <Chapter06View
               onBackToIndex={handleBackToIndex}
+              onOpenChapter05={handleStartChapter05}
               onOpenChapter07={handleStartChapter07}
               onChapterCompleted={handleChapter06Completed}
             />
@@ -963,8 +1029,36 @@ export default function App() {
           {currentView === 'chapter-07' && (
             <Chapter07View
               onBackToIndex={handleBackToIndex}
+              onOpenChapter06={handleStartChapter06}
+              onGoToFinalExam={handleStartFinalExam}
               onChapterCompleted={handleChapter07Completed}
             />
+          )}
+
+          {currentView === 'tomo01-quiz' && (
+            <div className="max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-12 py-6">
+              <EvoTomo01FinalExam
+                onBackToIndex={handleBackToIndex}
+                onGoToChapter={(ch) => handleGoToMissing(ch)}
+                onCompleteExam={handleCompleteExam}
+              />
+            </div>
+          )}
+
+          {currentView === 'tomo01-completion' && (
+            <div className="max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-12 py-6">
+              <EvoTomo01CompletionScreen
+                onBackToIndex={handleBackToIndex}
+                onGoToLab={() => {
+                  setActiveLabPanel('hardware');
+                  setCurrentView('hotswap-lab');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                onGoToCampusFormation={() => handleNavigateCampusSection('escuela')}
+                onGoToProgress={() => handleNavigateCampusSection('progreso')}
+                onReviewExam={handleStartFinalExam}
+              />
+            </div>
           )}
         </main>
 

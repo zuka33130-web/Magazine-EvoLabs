@@ -35,9 +35,13 @@ import { Phase07ComparisonStation } from './chapter07/Phase07ComparisonStation';
 import { LaboratoryReportModal } from './chapter07/LaboratoryReportModal';
 import { Tome01DossierView } from './chapter07/Tome01DossierView';
 import { AVAILABLE_METRICS } from './chapter07/abExperimentKnowledge';
+import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
+import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
 
 interface Chapter07ViewProps {
   onBackToIndex: () => void;
+  onOpenChapter06?: () => void;
+  onGoToFinalExam?: () => void;
   onChapterCompleted?: () => void;
 }
 
@@ -230,8 +234,19 @@ const computeInheritedProgress = () => {
 
 export const Chapter07View: React.FC<Chapter07ViewProps> = ({
   onBackToIndex,
+  onOpenChapter06,
+  onGoToFinalExam,
   onChapterCompleted,
 }) => {
+  // Mark chapter 07 as started
+  useEffect(() => {
+    try {
+      localStorage.setItem('evo_c07_started', 'true');
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // Navigation & Screen Mode
   const [currentPhase, setCurrentPhase] = useState<Chapter07Phase>(1);
   const [screenMode, setScreenMode] = useState<'experiment' | 'dossier'>('experiment');
@@ -957,6 +972,30 @@ export const Chapter07View: React.FC<Chapter07ViewProps> = ({
               </div>
             </div>
           )}
+
+          {/* ACTIVIDAD DE COMPROBACIÓN // COMPROBÁ LO QUE APRENDISTE */}
+          <EvoChapterCheckSection
+            chapterNumber="07"
+            chapterTitle="LABORATORIO FINAL // OPTIMIZACIÓN A/B"
+            isAlreadyCompleted={Boolean(summary.labReport)}
+            onPassCheck={() => {
+              if (onChapterCompleted) onChapterCompleted();
+            }}
+          />
+
+          {/* NAVEGACIÓN PEDAGÓGICA DEFINITIVA */}
+          <EvoChapterNavigationFooter
+            currentChapterNumber="07"
+            currentChapterTitle="LABORATORIO FINAL A/B"
+            isCompleted={Boolean(summary.labReport)}
+            onMarkCompleted={() => {
+              if (onChapterCompleted) onChapterCompleted();
+            }}
+            onBackToIndex={onBackToIndex}
+            onPreviousChapter={onOpenChapter06 || onBackToIndex}
+            onFinishTome={onGoToFinalExam || onBackToIndex}
+            previousChapterLabel="CAPÍTULO 06: TALLER DE DIAGNÓSTICO"
+          />
         </div>
       )}
 
