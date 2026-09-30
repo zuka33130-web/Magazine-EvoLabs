@@ -405,7 +405,7 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
               }`}
             >
               {activeIntention === 'escuela' && 'ESCUELA EVO'}
-              {activeIntention === 'biblioteca' && 'BIBLIOTECA EVO'}
+              {activeIntention === 'biblioteca' && 'TOMOS EVO LABS'}
               {activeIntention === 'laboratorios' && 'LABORATORIOS'}
               {activeIntention === 'diagnosticar' && 'TALLER DE CASOS Y EXPEDIENTES'}
               {activeIntention === 'progreso' && 'MI PROGRESO'}
@@ -451,33 +451,62 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
       )}
 
       {/* ========================================================================= */}
-      {/* 1. MUNDO EVO = CAMPUS PRINCIPAL (PRIMERO INTENCIÓN, DESPUÉS CONTENIDO)     */}
+      {/* 1. MUNDO EVO = CAMPUS PRINCIPAL (HERO + MODOS + 4 ACCESOS + CASOS SECUND)  */}
       {/* ========================================================================= */}
       {activeIntention === 'campus' && (
-        <div className="relative z-10 flex-1 max-w-6xl mx-auto w-full px-4 sm:px-8 py-8 sm:py-12 flex flex-col justify-center space-y-8">
+        <div className="relative z-10 flex-1 max-w-5xl mx-auto w-full px-4 sm:px-8 py-8 sm:py-12 flex flex-col justify-center space-y-8">
           
-          {/* Header principal */}
-          <div className="text-center space-y-3">
+          {/* Header institucional */}
+          <div className="text-center space-y-2.5">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-amber-400/40 bg-amber-400/10 text-amber-300 text-xs font-mono-tech uppercase font-bold tracking-widest shadow-[0_0_15px_rgba(234,179,8,0.2)]">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>CAMPUS CENTRAL EVO LABS // ESCUELA TECNOLÓGICA</span>
+              <span>ACADEMIA EVO LABS // CAMPUS CENTRAL</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black font-display tracking-tight text-white uppercase">
               MUNDO EVO
             </h1>
 
-            <p className="text-lg sm:text-xl text-zinc-300 font-sans-editorial italic font-medium">
-              “Elegí qué querés hacer.”
+            <p className="text-base sm:text-lg text-zinc-300 font-sans-editorial italic">
+              Tu campus dentro de la Academia EVO LABS
             </p>
+
+            {/* Lema institucional */}
+            <div className="pt-1 flex items-center justify-center gap-2 text-xs font-mono-tech text-amber-400 font-bold uppercase tracking-widest">
+              <span>NO LO CREAS. COMPROBALO.</span>
+            </div>
           </div>
 
-          {/* ACCESO PRIVILEGIADO: CONTINUAR MI FORMACIÓN (CARD DESTACADA) */}
+          {/* Selector de Modos de Uso: GUIADO vs LIBRE */}
+          <div className="flex items-center justify-center gap-2 sm:gap-3 p-1.5 rounded-2xl bg-zinc-950/90 border border-zinc-800 max-w-md mx-auto w-full font-mono-tech text-xs">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveIntention('escuela');
+                setSelectedLevelNumber(null);
+              }}
+              className="flex-1 py-2.5 px-3 rounded-xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-300 hover:text-white font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Compass className="w-4 h-4 text-amber-400" />
+              <span className="truncate">QUIERO QUE EVO ME GUÍE</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveIntention('biblioteca')}
+              className="flex-1 py-2.5 px-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <BookOpen className="w-4 h-4 text-cyan-400" />
+              <span className="truncate">EXPLORACIÓN LIBRE</span>
+            </button>
+          </div>
+
+          {/* 1. HERO CARD: CONTINUÁ DONDE QUEDASTE / EMPEZÁ TU RECORRIDO */}
           <div className="p-6 rounded-2xl bg-gradient-to-br from-[#0c1424] via-[#090e18] to-[#070910] border border-blue-500/40 hover:border-blue-400/80 transition-all duration-200 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
             <div className="space-y-2 max-w-2xl">
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded text-[10px] font-bold font-mono-tech bg-blue-500/20 text-blue-300 border border-blue-500/40 uppercase tracking-wider">
-                  CONTINUAR MI FORMACIÓN
+                  {realProgress.hasProgress ? 'CONTINUÁ DONDE QUEDASTE' : 'EMPEZÁ TU RECORRIDO EVO'}
                 </span>
                 {realProgress.hasProgress && realProgress.lastActivity && (
                   <span className="text-[10px] text-amber-400 font-mono-tech font-bold">
@@ -488,7 +517,7 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
 
               {realProgress.hasProgress && realProgress.lastActivity ? (
                 <div className="space-y-1">
-                  <h3 className="font-display font-black text-xl text-white group-hover:text-blue-300 transition-colors">
+                  <h3 className="font-display font-black text-xl sm:text-2xl text-white group-hover:text-blue-300 transition-colors">
                     {realProgress.lastActivity.title}
                   </h3>
                   <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
@@ -497,11 +526,11 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
                 </div>
               ) : (
                 <div className="space-y-1">
-                  <h3 className="font-display font-black text-xl text-white group-hover:text-blue-300 transition-colors">
-                    Todavía no comenzaste tu formación EVO.
+                  <h3 className="font-display font-black text-xl sm:text-2xl text-white group-hover:text-blue-300 transition-colors">
+                    Comenzá tu formación en la Academia EVO LABS
                   </h3>
-                  <p className="text-xs sm:text-sm text-zinc-400 font-sans-editorial">
-                    Comenzá desde los fundamentos del Nivel 0 para dominar la metodología y la anatomía de tu máquina.
+                  <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
+                    Seguí el recorrido paso a paso desde los fundamentos hasta herramientas y metodologías de análisis técnico avanzado.
                   </p>
                 </div>
               )}
@@ -512,7 +541,7 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
                 <button
                   type="button"
                   onClick={realProgress.lastActivity.onContinue}
-                  className="w-full sm:w-auto py-3.5 px-6 rounded-xl bg-blue-500 hover:bg-blue-400 text-black font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(59,130,246,0.35)]"
+                  className="w-full sm:w-auto py-3.5 px-7 rounded-xl bg-blue-500 hover:bg-blue-400 text-black font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(59,130,246,0.35)]"
                 >
                   <Play className="w-4 h-4 fill-current" />
                   <span>CONTINUAR</span>
@@ -520,208 +549,229 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
               ) : (
                 <button
                   type="button"
-                  onClick={() => setIsLevel0IntroOpen(true)}
-                  className="w-full sm:w-auto py-3.5 px-6 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(245,158,11,0.35)]"
+                  onClick={() => {
+                    setActiveIntention('escuela');
+                    setSelectedLevelNumber(null);
+                  }}
+                  className="w-full sm:w-auto py-3.5 px-7 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(245,158,11,0.35)]"
                 >
                   <Compass className="w-4 h-4 text-black" />
-                  <span>COMENZAR NIVEL 0</span>
+                  <span>COMENZAR</span>
                 </button>
               )}
             </div>
           </div>
 
-          {/* GRID DE LAS 4 ÁREAS PEDAGÓGICAS PRINCIPALES */}
+          {/* 2. LOS 4 ACCESOS PROTAGONISTAS */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             
-            {/* 1. ESCUELA EVO */}
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-[#14120a] to-[#090b10] border border-amber-400/40 hover:border-amber-400/80 transition-all duration-200 shadow-xl flex flex-col justify-between gap-5 group">
+            {/* 1. RECORRIDO GUIADO // ESCUELA EVO */}
+            <div
+              onClick={() => {
+                setActiveIntention('escuela');
+                setSelectedLevelNumber(null);
+              }}
+              className="p-6 rounded-2xl bg-gradient-to-br from-[#14120a] to-[#090b10] border border-amber-400/40 hover:border-amber-400 transition-all duration-200 shadow-xl flex flex-col justify-between gap-5 group cursor-pointer"
+            >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="px-2.5 py-0.5 rounded text-[10px] font-bold font-mono-tech bg-amber-400/20 text-amber-300 border border-amber-400/40 uppercase tracking-wider">
-                    FORMACIÓN RECOMENDADA
+                    RECORRIDO GUIADO
                   </span>
-                  <Compass className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <Compass className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <h3 className="font-display font-black text-2xl text-white group-hover:text-amber-300 transition-colors">
-                    ESCUELA EVO
+                    RECORRIDO GUIADO
                   </h3>
-                  <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
-                    “Empezá desde cero o seguí una ruta de aprendizaje por niveles (0 al 6).”
+                  <p className="text-sm text-zinc-200 font-sans-editorial leading-relaxed font-medium">
+                    “EVO te indica qué aprender y qué hacer después.”
                   </p>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 pt-1 text-[11px] font-mono-tech text-zinc-400">
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                    7 Niveles Pedagógicos
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                    Método 6 Fases
-                  </span>
+                  <p className="text-xs text-zinc-400 font-sans-editorial">
+                    Rutas formativas organizadas por niveles (0 al 6) con metodología paso a paso.
+                  </p>
                 </div>
               </div>
 
               <button
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setActiveIntention('escuela');
                   setSelectedLevelNumber(null);
                 }}
                 className="w-full py-3 px-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(234,179,8,0.35)]"
               >
-                <span>ENTRAR A LA ESCUELA EVO</span>
+                <span>ENTRAR AL RECORRIDO GUIADO</span>
                 <ArrowRight className="w-4 h-4 text-black" />
               </button>
             </div>
 
-            {/* 2. BIBLIOTECA EVO */}
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-[#0a111b] to-[#080b10] border border-cyan-500/40 hover:border-cyan-400/80 transition-all duration-200 shadow-xl flex flex-col justify-between gap-5 group">
+            {/* 2. LOS 10 TOMOS // TOMOS EVO LABS */}
+            <div
+              onClick={() => setActiveIntention('biblioteca')}
+              className="p-6 rounded-2xl bg-gradient-to-br from-[#0a111b] to-[#080b10] border border-cyan-500/40 hover:border-cyan-400 transition-all duration-200 shadow-xl flex flex-col justify-between gap-5 group cursor-pointer"
+            >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="px-2.5 py-0.5 rounded text-[10px] font-bold font-mono-tech bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase tracking-wider">
-                    CATÁLOGO EDITORIAL
+                    COLECCIÓN EDITORIAL
                   </span>
-                  <BookOpen className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
+                  <BookOpen className="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" />
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <h3 className="font-display font-black text-2xl text-white group-hover:text-cyan-300 transition-colors">
-                    BIBLIOTECA EVO
+                    LOS 10 TOMOS
                   </h3>
-                  <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
-                    “Sé lo que estoy buscando. Accedé directamente a los 10 Tomos Maestros.”
+                  <p className="text-sm text-zinc-200 font-sans-editorial leading-relaxed font-medium">
+                    “Elegí directamente un tema de la colección.”
                   </p>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 pt-1 text-[11px] font-mono-tech text-zinc-400">
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                    10 Tomos Maestros A4
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                    Manuales & Dossiers
-                  </span>
+                  <p className="text-xs text-zinc-400 font-sans-editorial">
+                    10 Magazines A4 coleccionables con teoría, comprobaciones y manuales de silicio.
+                  </p>
                 </div>
               </div>
 
               <button
                 type="button"
-                onClick={() => setActiveIntention('biblioteca')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIntention('biblioteca');
+                }}
                 className="w-full py-3 px-4 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(6,182,212,0.35)]"
               >
-                <span>EXPLORAR BIBLIOTECA</span>
+                <span>EXPLORAR LOS 10 TOMOS</span>
                 <ArrowRight className="w-4 h-4 text-black" />
               </button>
             </div>
 
-            {/* 3. LABORATORIOS */}
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-[#0a1512] to-[#080b10] border border-emerald-500/40 hover:border-emerald-400/80 transition-all duration-200 shadow-xl flex flex-col justify-between gap-5 group">
+            {/* 3. HERRAMIENTAS TÉCNICAS // LABORATORIOS */}
+            <div
+              onClick={() => {
+                setActiveIntention('laboratorios');
+                setLabSubTab('guiados');
+              }}
+              className="p-6 rounded-2xl bg-gradient-to-br from-[#0a1512] to-[#080b10] border border-emerald-500/40 hover:border-emerald-400 transition-all duration-200 shadow-xl flex flex-col justify-between gap-5 group cursor-pointer"
+            >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="px-2.5 py-0.5 rounded text-[10px] font-bold font-mono-tech bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 uppercase tracking-wider">
-                    PRÁCTICA & SIMULACIÓN
+                    PRÁCTICA & EXPERIMENTACIÓN
                   </span>
-                  <Zap className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <Zap className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <h3 className="font-display font-black text-2xl text-white group-hover:text-emerald-300 transition-colors">
-                    LABORATORIOS
+                    HERRAMIENTAS TÉCNICAS
                   </h3>
-                  <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
-                    “Entrá a laboratorios y comprobá lo aprendido en bancos interactivos.”
+                  <p className="text-sm text-zinc-200 font-sans-editorial leading-relaxed font-medium">
+                    “Accedé a laboratorios y herramientas especializadas.”
                   </p>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 pt-1 text-[11px] font-mono-tech text-zinc-400">
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                    Laboratorios Guiados
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                    Herramientas Técnicas
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                    Operaciones de Taller
-                  </span>
+                  <p className="text-xs text-zinc-400 font-sans-editorial">
+                    Laboratorios guiados por tomo, herramientas técnicas transversales y banco de operaciones.
+                  </p>
                 </div>
               </div>
 
               <button
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setActiveIntention('laboratorios');
                   setLabSubTab('guiados');
                 }}
                 className="w-full py-3 px-4 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.35)]"
               >
-                <span>ABRIR LABORATORIOS</span>
+                <span>ABRIR HERRAMIENTAS TÉCNICAS</span>
                 <ArrowRight className="w-4 h-4 text-black" />
               </button>
             </div>
 
-            {/* 4. TALLER DE CASOS Y EXPEDIENTES */}
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-[#160e18] to-[#080b10] border border-purple-500/40 hover:border-purple-400/80 transition-all duration-200 shadow-xl flex flex-col justify-between gap-5 group">
+            {/* 4. MI PROGRESO */}
+            <div
+              onClick={() => setActiveIntention('progreso')}
+              className="p-6 rounded-2xl bg-gradient-to-br from-[#121019] to-[#080b10] border border-indigo-500/40 hover:border-indigo-400 transition-all duration-200 shadow-xl flex flex-col justify-between gap-5 group cursor-pointer"
+            >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-0.5 rounded text-[10px] font-bold font-mono-tech bg-purple-500/20 text-purple-300 border border-purple-500/40 uppercase tracking-wider">
-                    FASE: DIAGNOSTICAR
+                  <span className="px-2.5 py-0.5 rounded text-[10px] font-bold font-mono-tech bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 uppercase tracking-wider">
+                    EXPEDIENTE ACADÉMICO
                   </span>
-                  <FolderGit2 className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+                  <Trophy className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />
                 </div>
 
-                <div className="space-y-1">
-                  <h3 className="font-display font-black text-2xl text-white group-hover:text-purple-300 transition-colors">
-                    TALLER DE CASOS Y EXPEDIENTES
+                <div className="space-y-1.5">
+                  <h3 className="font-display font-black text-2xl text-white group-hover:text-indigo-300 transition-colors">
+                    MI PROGRESO
                   </h3>
-                  <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
-                    “Recibí una falla, investigá la evidencia y llegá a un diagnóstico comprobable.”
+                  <p className="text-sm text-zinc-200 font-sans-editorial leading-relaxed font-medium">
+                    “Revisá tu recorrido dentro de EVO LABS.”
                   </p>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 pt-1 text-[11px] font-mono-tech text-zinc-400">
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                    Expedientes Reales
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                    Esquemático PCB
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                    8 Sectores de Taller
-                  </span>
+                  <p className="text-xs text-zinc-400 font-sans-editorial">
+                    Capítulos completados, certificaciones, horas de práctica y pasaporte de silicio.
+                  </p>
                 </div>
               </div>
 
               <button
                 type="button"
-                onClick={() => {
-                  setActiveIntention('diagnosticar');
-                  setDiagnoseTab('expedientes');
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIntention('progreso');
                 }}
-                className="w-full py-3 px-4 rounded-xl bg-purple-400 hover:bg-purple-300 text-black font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(168,85,247,0.35)]"
+                className="w-full py-3 px-4 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-black font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(99,102,241,0.35)]"
               >
-                <span>INGRESAR AL TALLER</span>
+                <span>VER MI PROGRESO</span>
                 <ArrowRight className="w-4 h-4 text-black" />
               </button>
             </div>
           </div>
 
-          {/* Accesos de Barra Inferior: MI PROGRESO, CÓMO FUNCIONA & PRESENTACIÓN INSTITUCIONAL */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => setActiveIntention('progreso')}
-              className="px-5 py-2.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white font-mono-tech text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-lg"
-            >
-              <Trophy className="w-4 h-4 text-amber-400" />
-              <span>CONSULTAR EXPEDIENTE ACADÉMICO (MI PROGRESO)</span>
-            </button>
+          {/* 3. ACCESO SECUNDARIO: TALLER DE CASOS Y EXPEDIENTES (MENOR PESO VISUAL) */}
+          <div className="p-4 sm:p-5 rounded-xl bg-[#090c13] border border-zinc-800 hover:border-purple-500/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0">
+                <FolderGit2 className="w-5 h-5" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="font-display font-bold text-sm text-white uppercase">
+                    TALLER DE CASOS Y EXPEDIENTES
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono-tech font-bold text-purple-400 bg-purple-950/60 border border-purple-800">
+                    PERITAJE
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-400 font-sans-editorial">
+                  Recibí una falla real, investigá la evidencia y llegá a un diagnóstico comprobable.
+                </p>
+              </div>
+            </div>
 
             <button
               type="button"
-              onClick={() => setIsLevel0IntroOpen(true)}
-              className="px-5 py-2.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-amber-400/40 text-amber-300 hover:text-amber-200 font-mono-tech text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-lg"
+              onClick={() => {
+                setActiveIntention('diagnosticar');
+                setDiagnoseTab('expedientes');
+              }}
+              className="px-4 py-2 rounded-lg bg-zinc-900 hover:bg-purple-900/60 border border-zinc-700 hover:border-purple-400 text-zinc-200 hover:text-white font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
             >
-              <Info className="w-4 h-4 text-amber-400" />
+              <span>INGRESAR AL TALLER</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* 4. ACCESOS DE APOYO: CÓMO FUNCIONA & PRESENTACIÓN INSTITUCIONAL */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsLevel0IntroOpen(true)}
+              className="px-4 py-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-amber-400/40 text-amber-300 hover:text-amber-200 font-mono-tech text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+            >
+              <Info className="w-3.5 h-3.5 text-amber-400" />
               <span>CÓMO FUNCIONA EVO LABS (NIVEL 0)</span>
             </button>
 
@@ -729,10 +779,10 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
               <button
                 type="button"
                 onClick={onOpenIntroPresentation}
-                className="px-5 py-2.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-cyan-400/40 text-zinc-300 hover:text-cyan-300 font-mono-tech text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-lg"
+                className="px-4 py-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 hover:border-cyan-400/40 text-zinc-400 hover:text-cyan-300 font-mono-tech text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                 title="Volver a ver la presentación animada de la Academia EVO Labs"
               >
-                <Play className="w-4 h-4 text-cyan-400" />
+                <Play className="w-3.5 h-3.5 text-cyan-400" />
                 <span>VER PRESENTACIÓN INSTITUCIONAL</span>
               </button>
             )}
@@ -751,11 +801,11 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                 <h2 className="text-2xl sm:text-3xl font-black font-display text-white uppercase">
-                  ESCUELA EVO // RUTA DE FORMACIÓN POR NIVELES
+                  ESCUELA EVO // RECORRIDO FORMATIVO GUIADO
                 </h2>
               </div>
               <p className="text-xs sm:text-sm text-zinc-400 font-sans-editorial">
-                Orden pedagógico recomendado. Podés seguir la ruta sugerida o entrar libremente a cualquier tomo.
+                Orden pedagógico recomendado por niveles (0 al 6). EVO te indica qué aprender y qué hacer después.
               </p>
             </div>
 
@@ -768,6 +818,47 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
                 <Compass className="w-3.5 h-3.5 text-amber-400" />
                 <span>NIVEL 0: CÓMO USAR EVO LABS</span>
               </button>
+            </div>
+          </div>
+
+          {/* Banner de la Cadena Pedagógica Oficial EVO */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#14120a] via-[#0d1017] to-[#080b12] border border-amber-400/40 space-y-3 shadow-lg">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800/80 pb-2.5">
+              <span className="font-mono-tech text-[10px] text-amber-400 font-bold uppercase tracking-widest flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                CADENA PEDAGÓGICA PRINCIPAL // MÉTODO EVO
+              </span>
+              <span className="font-mono-tech text-[10px] text-zinc-400">
+                “NO LO CREAS. COMPROBALO.”
+              </span>
+            </div>
+
+            {/* Fases secuenciales */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center font-mono-tech text-xs">
+              <div className="p-2 rounded-lg bg-zinc-950/80 border border-zinc-800">
+                <span className="text-amber-400 font-black block text-[10px]">1. ENTENDER</span>
+                <span className="text-[10px] text-zinc-400">¿Qué aprendo?</span>
+              </div>
+              <div className="p-2 rounded-lg bg-zinc-950/80 border border-zinc-800">
+                <span className="text-cyan-400 font-black block text-[10px]">2. OBSERVAR</span>
+                <span className="text-[10px] text-zinc-400">¿Por qué sirve?</span>
+              </div>
+              <div className="p-2 rounded-lg bg-zinc-950/80 border border-zinc-800">
+                <span className="text-emerald-400 font-black block text-[10px]">3. PRACTICAR</span>
+                <span className="text-[10px] text-zinc-400">Manual del Lab</span>
+              </div>
+              <div className="p-2 rounded-lg bg-zinc-950/80 border border-zinc-800">
+                <span className="text-purple-400 font-black block text-[10px]">4. DIAGNOSTICAR</span>
+                <span className="text-[10px] text-zinc-400">Descarte real</span>
+              </div>
+              <div className="p-2 rounded-lg bg-zinc-950/80 border border-zinc-800">
+                <span className="text-pink-400 font-black block text-[10px]">5. COMPROBAR</span>
+                <span className="text-[10px] text-zinc-400">Validá métrica</span>
+              </div>
+              <div className="p-2 rounded-lg bg-zinc-950/80 border border-zinc-800">
+                <span className="text-blue-400 font-black block text-[10px]">6. AVANZAR</span>
+                <span className="text-[10px] text-zinc-400">¿Qué hago después?</span>
+              </div>
             </div>
           </div>
 
@@ -881,7 +972,7 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
       )}
 
       {/* ========================================================================= */}
-      {/* 3. SECCIÓN: BIBLIOTECA EVO (CATÁLOGO DE LOS 10 TOMOS MAESTROS)            */}
+      {/* 3. SECCIÓN: TOMOS EVO LABS (COLECCIÓN DE LOS 10 TOMOS MAESTROS)           */}
       {/* ========================================================================= */}
       {activeIntention === 'biblioteca' && (
         <div className="relative z-10 flex-1 max-w-6xl mx-auto w-full px-4 sm:px-8 py-6 space-y-6">
@@ -890,65 +981,227 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
                 <h2 className="text-2xl sm:text-3xl font-black font-display text-white uppercase">
-                  BIBLIOTECA EVO // CATÁLOGO DE 10 TOMOS MAESTROS
+                  TOMOS EVO LABS // COLECCIÓN DE 10 MAGAZINES
                 </h2>
               </div>
               <p className="text-xs sm:text-sm text-zinc-400 font-sans-editorial italic">
-                “Sé lo que estoy buscando.” Accedé directamente a la colección editorial completa.
+                “Explorá los 10 magazines de la colección.” Manuales de silicio, experiencias interactivas y laboratorios asociados.
               </p>
             </div>
 
             <div className="text-xs font-mono-tech text-zinc-500">
-              COLECCIÓN COMPLETA A4
+              10 VOLÚMENES // FORMATO A4
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {VOLUMES_COLLECTION.map((v) => {
               const pedagogicalData = EVO_TOMES_PEDAGOGY[v.number];
+              const isTomo01 = v.number === '01';
+              const isTomo02 = v.number === '02';
+              const isTomo03 = v.number === '03';
+              const isTomo04 = v.number === '04';
+              const isTomo08 = v.number === '08';
+              const isAvailable = isTomo01 || isTomo02 || isTomo03 || isTomo04 || isTomo08;
+
               return (
                 <div
                   key={v.id}
-                  className="p-4 rounded-xl bg-[#090c13] border border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between gap-3 group"
+                  className="p-5 rounded-2xl bg-[#080b12] border border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between gap-4 group shadow-xl"
                 >
-                  <div className="space-y-2">
+                  <div className="space-y-3">
+                    {/* Header Card: Tomo Number + Real Availability Badge */}
                     <div className="flex items-center justify-between">
                       <span
-                        className="px-2 py-0.5 rounded text-[10px] font-mono-tech font-bold"
+                        className="px-2.5 py-0.5 rounded text-[11px] font-mono-tech font-black uppercase"
                         style={{
                           color: v.themeColor,
-                          backgroundColor: `${v.themeColor}15`,
+                          backgroundColor: `${v.themeColor}18`,
                           border: `1px solid ${v.themeColor}40`,
                         }}
                       >
                         TOMO {v.number}
                       </span>
-                      <span className="text-[10px] text-zinc-500 font-mono-tech">
-                        {v.editionLabel}
+
+                      <span
+                        className={`text-[9px] px-2 py-0.5 rounded font-bold font-mono-tech uppercase border ${
+                          isAvailable
+                            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
+                            : 'bg-zinc-900 text-zinc-500 border-zinc-800'
+                        }`}
+                      >
+                        {isAvailable ? 'DISPONIBLE' : 'EN DESARROLLO'}
                       </span>
                     </div>
 
-                    <h4 className="font-display font-bold text-sm text-white group-hover:text-amber-300 transition-colors">
-                      {v.title}
-                    </h4>
+                    {/* Cover / Title / Tagline */}
+                    <div className="space-y-1.5">
+                      <h3 className="font-display font-black text-lg text-white group-hover:text-amber-300 transition-colors uppercase leading-tight">
+                        {v.title}
+                      </h3>
 
-                    <p className="text-xs text-zinc-400 font-sans-editorial line-clamp-2 leading-relaxed">
-                      {v.tagline}
-                    </p>
+                      <p className="text-xs text-zinc-300 font-sans-editorial italic">
+                        “{v.tagline}”
+                      </p>
+
+                      <p className="text-xs text-zinc-400 font-sans-editorial line-clamp-2 leading-relaxed pt-1">
+                        {v.description}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="pt-2 border-t border-zinc-900 flex flex-col gap-2 mt-auto">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (pedagogicalData) setSelectedTomeProfile(pedagogicalData);
-                        else handleOpenTomoDirectly(v.number);
-                      }}
-                      className="w-full py-2 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 hover:text-white font-mono-tech text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <BookOpen className="w-3.5 h-3.5" style={{ color: v.themeColor }} />
-                      <span>ABRIR FICHA & LEER</span>
-                    </button>
+                  {/* Real Action Buttons based on actual availability */}
+                  <div className="pt-3 border-t border-zinc-900 flex flex-col gap-2 mt-auto font-mono-tech text-xs">
+                    {/* TOMO 01 ACTIONS */}
+                    {isTomo01 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onNavigateTomo01) onNavigateTomo01();
+                            else if (onOpenTomo) onOpenTomo('01');
+                          }}
+                          className="w-full py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(245,158,11,0.25)]"
+                        >
+                          <BookOpen className="w-3.5 h-3.5 text-black" />
+                          <span>ABRIR EXPERIENCIA INTERACTIVA</span>
+                        </button>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (onNavigateMagazine) onNavigateMagazine();
+                            }}
+                            className="py-2 px-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white font-bold text-[11px] transition-all flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <Layers className="w-3 h-3 text-amber-400" />
+                            <span>REVISTA A4</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (onNavigateHotSwapLab) onNavigateHotSwapLab('hardware');
+                            }}
+                            className="py-2 px-2.5 rounded-lg bg-zinc-900 hover:bg-emerald-950/60 border border-zinc-800 hover:border-emerald-500/50 text-emerald-300 font-bold text-[11px] transition-all flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <Zap className="w-3 h-3 text-emerald-400" />
+                            <span>LABORATORIO</span>
+                          </button>
+                        </div>
+                      </>
+                    )}
+
+                    {/* TOMO 02 ACTIONS */}
+                    {isTomo02 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onOpenTomo) onOpenTomo('02');
+                          }}
+                          className="w-full py-2.5 px-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(0,210,255,0.25)]"
+                        >
+                          <BookOpen className="w-3.5 h-3.5 text-black" />
+                          <span>LEER MAGAZINE // BIBLIA NEGRA</span>
+                        </button>
+
+                        {onNavigateWindowsMatrixLab && (
+                          <button
+                            type="button"
+                            onClick={() => onNavigateWindowsMatrixLab()}
+                            className="w-full py-2 px-3 rounded-lg bg-zinc-900 hover:bg-cyan-950/60 border border-zinc-800 hover:border-cyan-500/50 text-cyan-300 font-bold text-[11px] transition-all flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <Zap className="w-3 h-3 text-cyan-400" />
+                            <span>LABORATORIO: WINDOWS MATRIX</span>
+                          </button>
+                        )}
+                      </>
+                    )}
+
+                    {/* TOMO 03 ACTIONS */}
+                    {isTomo03 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onOpenTomo) onOpenTomo('03');
+                          }}
+                          className="w-full py-2.5 px-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.25)]"
+                        >
+                          <BookOpen className="w-3.5 h-3.5 text-black" />
+                          <span>LEER MAGAZINE // REPARACIÓN PC</span>
+                        </button>
+
+                        {onNavigateLabCore && (
+                          <button
+                            type="button"
+                            onClick={() => onNavigateLabCore()}
+                            className="w-full py-2 px-3 rounded-lg bg-zinc-900 hover:bg-emerald-950/60 border border-zinc-800 hover:border-emerald-500/50 text-emerald-300 font-bold text-[11px] transition-all flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <Wrench className="w-3 h-3 text-emerald-400" />
+                            <span>BANCO DE REPARACIÓN</span>
+                          </button>
+                        )}
+                      </>
+                    )}
+
+                    {/* TOMO 04 ACTIONS */}
+                    {isTomo04 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (onOpenTomo) onOpenTomo('04');
+                        }}
+                        className="w-full py-2.5 px-3 rounded-xl bg-purple-400 hover:bg-purple-300 text-black font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(168,85,247,0.25)]"
+                      >
+                        <BookOpen className="w-3.5 h-3.5 text-black" />
+                        <span>LEER MAGAZINE // NOTEBOOKS</span>
+                      </button>
+                    )}
+
+                    {/* TOMO 08 ACTIONS */}
+                    {isTomo08 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onOpenTomo) onOpenTomo('08');
+                          }}
+                          className="w-full py-2.5 px-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.25)]"
+                        >
+                          <BookOpen className="w-3.5 h-3.5 text-black" />
+                          <span>LEER MAGAZINE // ARRANQUE</span>
+                        </button>
+
+                        {onNavigateBootLab && (
+                          <button
+                            type="button"
+                            onClick={() => onNavigateBootLab()}
+                            className="w-full py-2 px-3 rounded-lg bg-zinc-900 hover:bg-emerald-950/60 border border-zinc-800 hover:border-emerald-500/50 text-emerald-300 font-bold text-[11px] transition-all flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <Power className="w-3 h-3 text-emerald-400" />
+                            <span>LABORATORIO DE ARRANQUE</span>
+                          </button>
+                        )}
+                      </>
+                    )}
+
+                    {/* TOMOS 05, 06, 07, 09, 10 ACTIONS */}
+                    {!isAvailable && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (pedagogicalData) setSelectedTomeProfile(pedagogicalData);
+                          else handleOpenTomoDirectly(v.number);
+                        }}
+                        className="w-full py-2.5 px-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Info className="w-3.5 h-3.5 text-zinc-400" />
+                        <span>VER FICHA PEDAGÓGICA</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -1742,37 +1995,145 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
                 VOLVER AL NIVEL
               </button>
 
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const num = selectedTomeProfile.tomoNumber;
-                    setSelectedTomeProfile(null);
-                    handleOpenTomoDirectly(num);
-                  }}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(245,158,11,0.3)]"
-                >
-                  <BookOpen className="w-4 h-4 text-black" />
-                  <span>LEER TOMO {selectedTomeProfile.tomoNumber}</span>
-                </button>
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                {selectedTomeProfile.tomoNumber === '01' ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedTomeProfile(null);
+                        if (onNavigateTomo01) onNavigateTomo01();
+                        else if (onOpenTomo) onOpenTomo('01');
+                      }}
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                    >
+                      <BookOpen className="w-4 h-4 text-black" />
+                      <span>EXPERIENCIA INTERACTIVA</span>
+                    </button>
 
-                {selectedTomeProfile.associatedLabStatus === 'ACTIVO' && selectedTomeProfile.associatedLabId ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedTomeProfile(null);
+                        if (onNavigateMagazine) onNavigateMagazine();
+                      }}
+                      className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Layers className="w-4 h-4 text-amber-400" />
+                      <span>REVISTA A4</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedTomeProfile(null);
+                        if (onNavigateHotSwapLab) onNavigateHotSwapLab('hardware');
+                      }}
+                      className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                    >
+                      <Zap className="w-4 h-4 text-black" />
+                      <span>LABORATORIO</span>
+                    </button>
+                  </>
+                ) : selectedTomeProfile.tomoNumber === '02' ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedTomeProfile(null);
+                        if (onOpenTomo) onOpenTomo('02');
+                      }}
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(0,210,255,0.3)]"
+                    >
+                      <BookOpen className="w-4 h-4 text-black" />
+                      <span>LEER TOMO 02</span>
+                    </button>
+
+                    {onNavigateWindowsMatrixLab && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedTomeProfile(null);
+                          onNavigateWindowsMatrixLab();
+                        }}
+                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                      >
+                        <Zap className="w-4 h-4 text-black" />
+                        <span>LAB: WINDOWS MATRIX</span>
+                      </button>
+                    )}
+                  </>
+                ) : selectedTomeProfile.tomoNumber === '08' ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedTomeProfile(null);
+                        if (onOpenTomo) onOpenTomo('08');
+                      }}
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                    >
+                      <BookOpen className="w-4 h-4 text-black" />
+                      <span>LEER TOMO 08</span>
+                    </button>
+
+                    {onNavigateBootLab && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedTomeProfile(null);
+                          onNavigateBootLab();
+                        }}
+                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                      >
+                        <Power className="w-4 h-4 text-black" />
+                        <span>LABORATORIO DE ARRANQUE</span>
+                      </button>
+                    )}
+                  </>
+                ) : selectedTomeProfile.tomoNumber === '03' ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedTomeProfile(null);
+                        if (onOpenTomo) onOpenTomo('03');
+                      }}
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                    >
+                      <BookOpen className="w-4 h-4 text-black" />
+                      <span>LEER TOMO 03</span>
+                    </button>
+
+                    {onNavigateLabCore && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedTomeProfile(null);
+                          onNavigateLabCore();
+                        }}
+                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-emerald-300 border border-emerald-500/50 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Wrench className="w-4 h-4 text-emerald-400" />
+                        <span>BANCO DE REPARACIÓN</span>
+                      </button>
+                    )}
+                  </>
+                ) : selectedTomeProfile.tomoNumber === '04' ? (
                   <button
                     type="button"
                     onClick={() => {
-                      const guide = EVO_LAB_GUIDES[selectedTomeProfile.associatedLabId!];
                       setSelectedTomeProfile(null);
-                      if (guide) setSelectedLabGuide(guide);
-                      else handleExecuteLabAction(selectedTomeProfile.associatedLabId!);
+                      if (onOpenTomo) onOpenTomo('04');
                     }}
-                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-purple-400 hover:bg-purple-300 text-black font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(168,85,247,0.3)]"
                   >
-                    <Power className="w-4 h-4 text-black" />
-                    <span>PRACTICAR EN LABORATORIO</span>
+                    <BookOpen className="w-4 h-4 text-black" />
+                    <span>LEER TOMO 04</span>
                   </button>
                 ) : (
                   <span className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-zinc-900 text-zinc-500 border border-zinc-800 text-center text-xs font-bold uppercase">
-                    LABORATORIO EN DESARROLLO
+                    CONTENIDO EN DESARROLLO
                   </span>
                 )}
               </div>
