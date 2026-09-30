@@ -29,8 +29,8 @@ export const Station04Storage: React.FC<Station04StorageProps> = ({
   const [activeMoment, setActiveMoment] = useState<'carga' | 'ejecucion'>('carga');
   const [showDeepArchitecture, setShowDeepArchitecture] = useState<boolean>(false);
 
-  const storageText = specs.storage?.trim() || 'tu disco o SSD';
-  const ramText = specs.ram?.trim() || 'la memoria RAM';
+  const storageText = specs?.storage?.trim?.() || 'tu disco o SSD';
+  const ramText = specs?.ram?.trim?.() || 'la memoria RAM';
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">

@@ -36,9 +36,9 @@ export const Station01Journey: React.FC<Station01JourneyProps> = ({
     setVisitedNodes((prev) => new Set([...prev, node]));
   };
 
-  const cpuText = specs.cpu?.trim() || 'tu procesador';
-  const gpuText = specs.gpu?.trim() || 'tu tarjeta gráfica';
-  const ramText = specs.ram?.trim() || 'la memoria del sistema';
+  const cpuText = specs?.cpu?.trim?.() || 'tu procesador';
+  const gpuText = specs?.gpu?.trim?.() || 'tu tarjeta gráfica';
+  const ramText = specs?.ram?.trim?.() || 'la memoria del sistema';
 
   const nodeDetails: Record<
     JourneyNodeId,

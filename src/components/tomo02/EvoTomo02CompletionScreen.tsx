@@ -132,17 +132,36 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
 
       {/* Associated Lab Handoff Box */}
       <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-cyan-950/40 via-[#0A1220] to-[#060910] border-2 border-cyan-400/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-2xl">
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center gap-2 text-xs font-mono-tech text-cyan-400 font-bold uppercase tracking-widest">
             <FlaskConical className="w-4 h-4 text-cyan-400" />
-            <span>LABORATORIO PRÁCTICO ASOCIADO</span>
+            <span>LABORATORIO VIRTUAL GUIADO DE WINDOWS</span>
           </div>
           <h3 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight">
             WINDOWS MATRIX LAB
           </h3>
           <p className="font-sans-editorial text-xs sm:text-sm text-zinc-300 max-w-xl leading-relaxed">
-            Aplicá los conceptos aprendidos en el simulador de matrices de Windows: combiná diferentes microarquitecturas de CPU (Híbrida, V-Cache, Monolítica) con versiones de kernel NT y medí latencias de syscalls y comportamiento del scheduler.
+            Aplicá los conocimientos del Tomo 02 en el simulador interactivo de arquitectura y kernel de Windows.
           </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-sans-editorial pt-1">
+            <div className="p-2 rounded bg-black/60 border border-cyan-950/70">
+              <strong className="text-cyan-400 font-mono-tech block text-[10px]">▸ QUÉ VA A PRACTICAR:</strong>
+              <span className="text-zinc-300">Simulación de microarquitecturas de CPU con versiones de kernel NT.</span>
+            </div>
+            <div className="p-2 rounded bg-black/60 border border-cyan-950/70">
+              <strong className="text-cyan-400 font-mono-tech block text-[10px]">▸ QUÉ CAPÍTULOS UTILIZA:</strong>
+              <span className="text-zinc-300">Módulos 01 (Arranque), 06 (Procesos), 07 (Memoria) y 08 (Drivers).</span>
+            </div>
+            <div className="p-2 rounded bg-black/60 border border-cyan-950/70">
+              <strong className="text-cyan-400 font-mono-tech block text-[10px]">▸ QUÉ DEBE OBSERVAR:</strong>
+              <span className="text-zinc-300">Reparto de hilos por el Thread Director y latencias de syscalls.</span>
+            </div>
+            <div className="p-2 rounded bg-black/60 border border-cyan-950/70">
+              <strong className="text-cyan-400 font-mono-tech block text-[10px]">▸ QUÉ DEBE COMPROBAR:</strong>
+              <span className="text-zinc-300">Comportamiento del scheduler en silicio híbrido frente a monolítico.</span>
+            </div>
+          </div>
         </div>
 
         {onGoToLab && (

@@ -149,20 +149,32 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
         </div>
       </nav>
 
-      {/* Main Magazine Header */}
-      <header className="mb-8 sm:mb-12 max-w-4xl">
-        <div className="flex items-center gap-2 text-xs font-mono-tech text-cyan-400 mb-2 tracking-widest uppercase font-semibold">
+      {/* Main Magazine Header & Editorial Opening */}
+      <header className="mb-8 sm:mb-10 max-w-4xl space-y-4">
+        <div className="flex items-center gap-2 text-xs font-mono-tech text-cyan-400 tracking-widest uppercase font-semibold">
           <Terminal className="w-3.5 h-3.5 text-cyan-400" />
           <span>EVO LABS // GUÍA DE PERITAJE DE KERNEL & ARQUITECTURA</span>
         </div>
 
-        <h1 className="font-display font-black text-4xl sm:text-5xl md:text-6xl text-white tracking-tight uppercase leading-[0.93] mb-3">
+        <h1 className="font-display font-black text-4xl sm:text-5xl md:text-6xl text-white tracking-tight uppercase leading-[0.93]">
           LA BIBLIA NEGRA DE WINDOWS
         </h1>
 
         <p className="font-sans-editorial text-lg sm:text-xl text-cyan-200/90 max-w-2xl leading-relaxed italic">
           “El lado oculto de Windows. Descubrilo.”
         </p>
+
+        {/* Cómo usar este Tomo */}
+        <div className="p-5 rounded-2xl bg-zinc-950/70 border border-cyan-950/80 space-y-2 text-xs font-sans-editorial text-zinc-300">
+          <span className="font-mono-tech font-bold text-cyan-400 uppercase tracking-wider block text-[11px]">
+            CÓMO USAR ESTE TOMO // CADENA DE APRENDIZAJE EVO:
+          </span>
+          <p className="leading-relaxed">
+            Este Tomo no es una lista de trucos ni un manual de recetas mágicas. Cada capítulo sigue la cadena metódica oficial:
+            <strong className="text-white font-semibold"> GANCHO → EXPLICACIÓN SIMPLE → DETALLE TÉCNICO → IMAGEN / DIAGRAMA → EJEMPLO REAL → PRÁCTICA EVO → COMPROBALO</strong>.
+            Avanzá en orden, ejecutá las auditorías en tu terminal y medí siempre tu baseline antes de cualquier intervención.
+          </p>
+        </div>
       </header>
 
       {/* Direct A4 Magazine Access Banner */}
@@ -342,16 +354,50 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
           <div className="p-5 rounded-2xl bg-gradient-to-b from-[#0A1220] to-[#060A12] border-2 border-cyan-500/40 space-y-3.5 font-mono-tech">
             <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase">
               <FlaskConical className="w-4 h-4 text-cyan-400" />
-              <span>LABORATORIO ASOCIADO</span>
+              <span>LABORATORIO VIRTUAL GUIADO DE WINDOWS</span>
             </div>
 
             <h3 className="font-display font-black text-lg text-white uppercase tracking-tight">
               WINDOWS MATRIX LAB
             </h3>
 
-            <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
-              El entorno interactivo para simular arquitecturas de silicio (Híbrido Intel vs 3D V-Cache vs Monolítico) y combinarlas con diferentes versiones de Windows NT.
-            </p>
+            <div className="space-y-2.5 text-[11px] text-zinc-300 font-sans-editorial">
+              <div className="p-2 rounded bg-black/50 border border-cyan-950/70">
+                <span className="font-mono-tech font-bold text-cyan-400 uppercase block text-[10px]">
+                  ▸ QUÉ VA A PRACTICAR:
+                </span>
+                <p className="text-zinc-300">
+                  Simulación de microarquitecturas de CPU (Híbrido vs 3D V-Cache vs Monolítico) frente a versiones de kernel NT y switches de mitigación.
+                </p>
+              </div>
+
+              <div className="p-2 rounded bg-black/50 border border-cyan-950/70">
+                <span className="font-mono-tech font-bold text-cyan-400 uppercase block text-[10px]">
+                  ▸ QUÉ CAPÍTULOS UTILIZA:
+                </span>
+                <p className="text-zinc-300">
+                  Módulo 01 (Arranque), Módulo 06 (Procesos & Ring 0), Módulo 07 (Memoria Virtual), Módulo 08 (Drivers & DPC).
+                </p>
+              </div>
+
+              <div className="p-2 rounded bg-black/50 border border-cyan-950/70">
+                <span className="font-mono-tech font-bold text-cyan-400 uppercase block text-[10px]">
+                  ▸ QUÉ DEBE OBSERVAR:
+                </span>
+                <p className="text-zinc-300">
+                  Reparto de hilos en núcleos P y E por el Thread Director, latencias de syscalls y comportamiento del working set.
+                </p>
+              </div>
+
+              <div className="p-2 rounded bg-black/50 border border-cyan-950/70">
+                <span className="font-mono-tech font-bold text-cyan-400 uppercase block text-[10px]">
+                  ▸ QUÉ DEBE COMPROBAR:
+                </span>
+                <p className="text-zinc-300">
+                  La correlación directa entre arquitectura física de silicio y planificación del planificador (scheduler) del sistema.
+                </p>
+              </div>
+            </div>
 
             {onOpenWindowsMatrixLab && (
               <button

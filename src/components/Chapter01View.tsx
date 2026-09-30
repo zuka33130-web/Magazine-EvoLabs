@@ -117,33 +117,39 @@ export const Chapter01View: React.FC<Chapter01ViewProps> = ({
     }
   });
 
+  const defaultSpecs: UserPcSpec = {
+    cpu: '',
+    ram: '',
+    gpu: '',
+    storage: '',
+    motherboard: '',
+    os: '',
+    monitor: '',
+    peripherals: '',
+  };
+
   const [specs, setSpecs] = useState<UserPcSpec>(() => {
     try {
       const saved = localStorage.getItem('evo_c01_specs');
-      return saved
-        ? JSON.parse(saved)
-        : {
-            cpu: '',
-            ram: '',
-            gpu: '',
-            storage: '',
-            motherboard: '',
-            os: '',
-            monitor: '',
-            peripherals: '',
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          return {
+            cpu: typeof parsed.cpu === 'string' ? parsed.cpu : '',
+            ram: typeof parsed.ram === 'string' ? parsed.ram : '',
+            gpu: typeof parsed.gpu === 'string' ? parsed.gpu : '',
+            storage: typeof parsed.storage === 'string' ? parsed.storage : '',
+            motherboard: typeof parsed.motherboard === 'string' ? parsed.motherboard : '',
+            os: typeof parsed.os === 'string' ? parsed.os : '',
+            monitor: typeof parsed.monitor === 'string' ? parsed.monitor : '',
+            peripherals: typeof parsed.peripherals === 'string' ? parsed.peripherals : '',
           };
+        }
+      }
     } catch {
-      return {
-        cpu: '',
-        ram: '',
-        gpu: '',
-        storage: '',
-        motherboard: '',
-        os: '',
-        monitor: '',
-        peripherals: '',
-      };
+      // fallback
     }
+    return defaultSpecs;
   });
 
   const [hypothesis, setHypothesis] = useState<HypothesisGuess>(() => {
@@ -639,10 +645,10 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
   };
 
   const isAllRequiredDone =
-    specs.cpu.trim() !== '' &&
-    specs.ram.trim() !== '' &&
-    specs.gpu.trim() !== '' &&
-    specs.storage.trim() !== '';
+    Boolean(specs?.cpu && specs.cpu.trim() !== '') &&
+    Boolean(specs?.ram && specs.ram.trim() !== '') &&
+    Boolean(specs?.gpu && specs.gpu.trim() !== '') &&
+    Boolean(specs?.storage && specs.storage.trim() !== '');
 
   const getHypothesisComparison = (hyp: string, real: string): ComparisonResult => {
     return calculateComparison(hyp, real);
@@ -1000,14 +1006,14 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                   <input
                     type="text"
                     placeholder="Ej: Intel Core i5-12400F 6-Core o AMD Ryzen 5 5600"
-                    value={specs.cpu}
+                    value={specs?.cpu || ''}
                     onChange={(e) => handleFieldChange('cpu', e.target.value, 'ADMINISTRADOR DE TAREAS')}
                     className="flex-1 bg-black/70 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white font-mono-tech focus:outline-none focus:border-yellow-400"
                   />
                   <button
                     type="button"
                     onClick={() => {
-                      if (specs.cpu.trim()) {
+                      if (specs?.cpu?.trim()) {
                         markSectionCompleted('cpu');
                         setActiveSection('ram');
                       }
@@ -1190,14 +1196,14 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                   <input
                     type="text"
                     placeholder="Ej: 16 GB DDR4 (2x8GB) 3200 MHz"
-                    value={specs.ram}
+                    value={specs?.ram || ''}
                     onChange={(e) => handleFieldChange('ram', e.target.value, 'ADMINISTRADOR DE TAREAS')}
                     className="flex-1 bg-black/70 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white font-mono-tech focus:outline-none focus:border-yellow-400"
                   />
                   <button
                     type="button"
                     onClick={() => {
-                      if (specs.ram.trim()) {
+                      if (specs?.ram?.trim()) {
                         markSectionCompleted('ram');
                         setActiveSection('gpu');
                       }
@@ -1364,14 +1370,14 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                   <input
                     type="text"
                     placeholder="Ej: NVIDIA GeForce RTX 3060 12GB o Intel UHD Graphics 770"
-                    value={specs.gpu}
+                    value={specs?.gpu || ''}
                     onChange={(e) => handleFieldChange('gpu', e.target.value, 'ADMINISTRADOR DE TAREAS')}
                     className="flex-1 bg-black/70 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white font-mono-tech focus:outline-none focus:border-yellow-400"
                   />
                   <button
                     type="button"
                     onClick={() => {
-                      if (specs.gpu.trim()) {
+                      if (specs?.gpu?.trim()) {
                         markSectionCompleted('gpu');
                         setActiveSection('storage');
                       }
@@ -1502,14 +1508,14 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                   <input
                     type="text"
                     placeholder="Ej: SSD NVMe Kingston NV2 1TB o SSD SATA 480GB"
-                    value={specs.storage}
+                    value={specs?.storage || ''}
                     onChange={(e) => handleFieldChange('storage', e.target.value, 'ADMINISTRADOR DE TAREAS')}
                     className="flex-1 bg-black/70 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white font-mono-tech focus:outline-none focus:border-yellow-400"
                   />
                   <button
                     type="button"
                     onClick={() => {
-                      if (specs.storage.trim()) {
+                      if (specs?.storage?.trim()) {
                         markSectionCompleted('storage');
                         setActiveSection('motherboard');
                       }
@@ -1627,7 +1633,7 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                   <input
                     type="text"
                     placeholder="Ej: ASUS B550M-A, MSI B650 o Lenovo IdeaPad 3"
-                    value={specs.motherboard}
+                    value={specs?.motherboard || ''}
                     onChange={(e) => handleFieldChange('motherboard', e.target.value, 'INFORMACIÓN DEL SISTEMA')}
                     className="flex-1 bg-black/70 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white font-mono-tech focus:outline-none focus:border-yellow-400"
                   />
@@ -1749,7 +1755,7 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                   <input
                     type="text"
                     placeholder="Ej: Windows 11 Pro 23H2 (Build 22631)"
-                    value={specs.os}
+                    value={specs?.os || ''}
                     onChange={(e) => handleFieldChange('os', e.target.value, 'WINVER')}
                     className="flex-1 bg-black/70 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white font-mono-tech focus:outline-none focus:border-yellow-400"
                   />
@@ -1858,7 +1864,7 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                   <input
                     type="text"
                     placeholder="Ej: 1080p 144Hz IPS o 1440p 165Hz"
-                    value={specs.monitor}
+                    value={specs?.monitor || ''}
                     onChange={(e) => handleFieldChange('monitor', e.target.value, 'CONFIGURACIÓN DE PANTALLA')}
                     className="w-full bg-black/70 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white font-mono-tech focus:outline-none focus:border-yellow-400"
                   />
@@ -1871,7 +1877,7 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                   <input
                     type="text"
                     placeholder="Ej: Cable Ethernet directo, Mouse óptico 1000Hz"
-                    value={specs.peripherals}
+                    value={specs?.peripherals || ''}
                     onChange={(e) => handleFieldChange('peripherals', e.target.value, 'OBSERVACIÓN')}
                     className="w-full bg-black/70 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white font-mono-tech focus:outline-none focus:border-yellow-400"
                   />
@@ -2210,10 +2216,10 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
 
             {/* CREACIÓN DE ARCHIVO DESDE POWERSHELL (CAPA 03 // LABORATORIO PASAPORTE DE MI PC) */}
             {(() => {
-              const cpuVal = specs.cpu.trim() ? specs.cpu.trim() : 'NO IDENTIFICADO';
-              const ramVal = specs.ram.trim() ? specs.ram.trim() : 'NO IDENTIFICADO';
-              const gpuVal = specs.gpu.trim() ? specs.gpu.trim() : 'NO IDENTIFICADO';
-              const storageVal = specs.storage.trim() ? specs.storage.trim() : 'NO IDENTIFICADO';
+              const cpuVal = specs?.cpu?.trim() ? specs.cpu.trim() : 'NO IDENTIFICADO';
+              const ramVal = specs?.ram?.trim() ? specs.ram.trim() : 'NO IDENTIFICADO';
+              const gpuVal = specs?.gpu?.trim() ? specs.gpu.trim() : 'NO IDENTIFICADO';
+              const storageVal = specs?.storage?.trim() ? specs.storage.trim() : 'NO IDENTIFICADO';
 
               const step1Code = `$Escritorio = [Environment]::GetFolderPath('Desktop')
 $Archivo = Join-Path $Escritorio 'EVO-LABS-MI-PC.txt'

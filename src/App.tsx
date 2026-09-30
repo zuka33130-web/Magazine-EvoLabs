@@ -826,6 +826,10 @@ export default function App() {
             <Tomo02MagazineView
               onBackToApp={handleNavigateHome}
               onNavigateTomo={handleNavigateTomo}
+              onOpenLab={() => {
+                setCurrentView('windows-matrix-lab');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             />
           )}
 

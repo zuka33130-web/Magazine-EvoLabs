@@ -32,11 +32,20 @@ import {
   TOMO_02_SECRETS,
   TOMO_02_GLOSSARY,
 } from '../../data/tomo02Data';
+import { Tomo02Cover } from './Tomo02Cover';
+import { Tomo02EditorialIndex, ModuleProgressStatus } from './Tomo02EditorialIndex';
+import { Tomo02ModuleReader } from './Tomo02ModuleReader';
+import { EvoTomo02FinalExam } from './EvoTomo02FinalExam';
+import { EvoTomo02CompletionScreen } from './EvoTomo02CompletionScreen';
+
+export type Tomo02SubView = 'cover' | 'index' | 'reader' | 'exam' | 'completion' | 'a4_magazine';
 
 interface Tomo02MagazineViewProps {
   onBackToApp?: () => void;
   onNavigateTomo?: (tomo: '01' | '02' | '03' | '04') => void;
+  onOpenLab?: () => void;
   initialPage?: number;
+  initialSubView?: Tomo02SubView;
 }
 
 type ViewMode = 'continuous' | 'single';
@@ -44,8 +53,98 @@ type ViewMode = 'continuous' | 'single';
 export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   onBackToApp,
   onNavigateTomo,
+  onOpenLab,
   initialPage = 1,
+  initialSubView,
 }) => {
+  // Sub-view management
+  const [subView, setSubView] = useState<Tomo02SubView>(() => {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('mode') === 'magazine' || p.get('print') === 'true') {
+        return 'a4_magazine';
+      }
+    } catch {
+      // ignore
+    }
+    return initialSubView || 'cover';
+  });
+
+  const [selectedModuleIndex, setSelectedModuleIndex] = useState<number>(0);
+
+  // Real progress state initialized from localStorage
+  const [moduleProgress, setModuleProgress] = useState<ModuleProgressStatus>(() => {
+    try {
+      const saved = localStorage.getItem('evo_tomo02_progress');
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // ignore
+    }
+    return {};
+  });
+
+  const [hasPassedFinalExam, setHasPassedFinalExam] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('evo_tomo02_completed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const [examScore, setExamScore] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('evo_tomo02_exam_score');
+      return saved ? parseInt(saved, 10) : 10;
+    } catch {
+      return 10;
+    }
+  });
+
+  const completedCount = Object.values(moduleProgress).filter((s) => s === 'completed').length;
+
+  const handleSelectModule = (index: number) => {
+    setSelectedModuleIndex(index);
+    const modId = TOMO_02_MODULES[index]?.id;
+    if (modId && (!moduleProgress[modId] || moduleProgress[modId] === 'not_started')) {
+      setModuleProgress((prev) => {
+        const updated: ModuleProgressStatus = { ...prev, [modId]: 'in_progress' };
+        try {
+          localStorage.setItem('evo_tomo02_progress', JSON.stringify(updated));
+        } catch {
+          // ignore
+        }
+        return updated;
+      });
+    }
+    setSubView('reader');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleMarkCompleted = (moduleId: string) => {
+    setModuleProgress((prev) => {
+      const updated: ModuleProgressStatus = { ...prev, [moduleId]: 'completed' };
+      try {
+        localStorage.setItem('evo_tomo02_progress', JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
+  };
+
+  const handleExamPassed = (score: number, total: number) => {
+    setExamScore(score);
+    setHasPassedFinalExam(true);
+    try {
+      localStorage.setItem('evo_tomo02_completed', 'true');
+      localStorage.setItem('evo_tomo02_exam_score', String(score));
+    } catch {
+      // ignore
+    }
+    setSubView('completion');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const [viewMode, setViewMode] = useState<ViewMode>('continuous');
   const [isPreparingPrint, setIsPreparingPrint] = useState<boolean>(false);
@@ -150,6 +249,200 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     URL.revokeObjectURL(url);
   };
 
+  // If subView is 'cover', 'index', 'reader', 'exam', or 'completion', render their respective view
+  if (subView === 'cover') {
+    return (
+      <div className="min-h-screen bg-[#060709] text-zinc-100 flex flex-col font-sans-editorial">
+        <Tomo02Cover
+          onOpenIndex={() => {
+            setSubView('index');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onOpenA4Magazine={() => {
+            setSubView('a4_magazine');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onOpenPrintModal={() => setShowExportModal(true)}
+          onBackToApp={onBackToApp}
+          completedModulesCount={completedCount}
+          totalModulesCount={TOMO_02_MODULES.length}
+        />
+        {showExportModal && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <div className="bg-[#0b0e14] border border-cyan-900/80 rounded-2xl max-w-lg w-full p-6 text-white space-y-4 shadow-2xl font-sans-editorial">
+              <div className="flex items-center justify-between border-b border-cyan-950 pb-3">
+                <div className="flex items-center gap-2">
+                  <Printer className="w-5 h-5 text-cyan-400" />
+                  <h3 className="font-display font-bold text-lg text-white">
+                    Exportar Tomo 02 a PDF A4
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowExportModal(false)}
+                  className="p-1 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3 text-xs text-zinc-300 font-mono-tech">
+                <p className="font-sans-editorial text-sm">
+                  Para obtener un PDF de calidad editorial idéntico a una revista impresa:
+                </p>
+                <div className="p-3 rounded-xl bg-black/60 border border-cyan-950 space-y-1.5 text-[11px]">
+                  <div>1. Destino: <strong>Guardar como PDF</strong></div>
+                  <div>2. Tamaño de papel: <strong>A4</strong></div>
+                  <div>3. Márgenes: <strong>Ninguno / 0 mm</strong></div>
+                  <div>4. Gráficos de fondo: <strong>Activado (Obligatorio)</strong></div>
+                </div>
+
+                {isInIframe && (
+                  <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-900 text-cyan-300 text-[11px] space-y-2">
+                    <p>
+                      💡 Estás en una vista de previsualización. Para abrir el diálogo de impresión nativo sin restricciones del navegador:
+                    </p>
+                    <a
+                      href={getStandalonePrintUrl()}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500 text-black font-bold hover:bg-cyan-400 transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>ABRIR EN PESTAÑA NUEVA PARA IMPRIMIR</span>
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-cyan-950">
+                <button
+                  type="button"
+                  onClick={handleDownloadOfflineHtml}
+                  className="px-3 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-mono-tech flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileDown className="w-3.5 h-3.5" />
+                  <span>DESCARGAR HTML OFFLINE</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowExportModal(false);
+                    handleNativePrint();
+                  }}
+                  className="px-4 py-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold text-xs font-mono-tech flex items-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(0,210,255,0.4)]"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>IMPRIMIR AHORA</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (subView === 'index') {
+    return (
+      <div className="min-h-screen bg-[#060709] text-zinc-100 flex flex-col font-sans-editorial px-4 sm:px-8">
+        <div className="max-w-7xl mx-auto w-full">
+          <Tomo02EditorialIndex
+            onBackToCover={() => {
+              setSubView('cover');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onBackToApp={onBackToApp}
+            onOpenA4Magazine={() => {
+              setSubView('a4_magazine');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onSelectModule={handleSelectModule}
+            onStartFinalExam={() => {
+              setSubView('exam');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenCompletionScreen={() => {
+              setSubView('completion');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenWindowsMatrixLab={onOpenLab}
+            moduleProgress={moduleProgress}
+            completedCount={completedCount}
+            hasPassedFinalExam={hasPassedFinalExam}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (subView === 'reader') {
+    return (
+      <div className="min-h-screen bg-[#060709] text-zinc-100 flex flex-col font-sans-editorial px-4 sm:px-6">
+        <Tomo02ModuleReader
+          moduleIndex={selectedModuleIndex}
+          onBackToIndex={() => {
+            setSubView('index');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onSelectModule={handleSelectModule}
+          onMarkCompleted={handleMarkCompleted}
+          isCompleted={moduleProgress[TOMO_02_MODULES[selectedModuleIndex]?.id] === 'completed'}
+          onFinishTomo={() => {
+            setSubView('exam');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (subView === 'exam') {
+    return (
+      <div className="min-h-screen bg-[#060709] text-zinc-100 flex flex-col font-sans-editorial px-4 sm:px-6">
+        <EvoTomo02FinalExam
+          onBackToIndex={() => {
+            setSubView('index');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onCompleteExam={handleExamPassed}
+          onGoToModule={(idx) => {
+            handleSelectModule(idx);
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (subView === 'completion') {
+    return (
+      <div className="min-h-screen bg-[#060709] text-zinc-100 flex flex-col font-sans-editorial px-4 sm:px-6">
+        <EvoTomo02CompletionScreen
+          onBackToIndex={() => {
+            setSubView('index');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onGoToLab={onOpenLab}
+          onGoToCampusFormation={onBackToApp}
+          onReviewExam={() => {
+            setSubView('exam');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onOpenA4Magazine={() => {
+            setSubView('a4_magazine');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          score={examScore}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#060709] text-zinc-100 flex flex-col font-sans-editorial selection:bg-cyan-400 selection:text-black">
       {/* Top Floating Technical Editorial Toolbar (Screen Only) */}
@@ -158,14 +451,22 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         className="sticky top-0 z-50 bg-[#080a0e]/95 backdrop-blur-md border-b border-cyan-950/80 px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono-tech select-none print:hidden"
       >
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setSubView('index')}
+            className="px-3 py-1.5 rounded-lg bg-cyan-950/80 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer font-bold"
+          >
+            <ChevronLeft className="w-4 h-4 text-cyan-400" />
+            <span>← ÍNDICE TOMO 02</span>
+          </button>
+
           {onBackToApp && (
             <button
               type="button"
               onClick={onBackToApp}
               className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-cyan-900/60 hover:border-cyan-400 text-zinc-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer"
             >
-              <ChevronLeft className="w-4 h-4 text-cyan-400" />
-              <span className="font-bold">VOLVER</span>
+              <span>CAMPUS EVO</span>
             </button>
           )}
 
@@ -175,7 +476,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               EVO LABS // TOMO 02
             </span>
             <span className="text-cyan-400 text-[11px] font-bold">
-              LA BIBLIA NEGRA DE WINDOWS
+              REVISTA A4 FACSIMILAR
             </span>
           </div>
 

@@ -28,15 +28,15 @@ export const Station03Graphics: React.FC<Station03GraphicsProps> = ({
   const [frameStep, setFrameStep] = useState<number>(0);
   const [revealedWait, setRevealedWait] = useState<boolean>(false);
 
-  const cpuText = specs.cpu?.trim() || 'tu CPU';
-  const rawGpu = specs.gpu || '';
+  const cpuText = specs?.cpu?.trim?.() || 'tu CPU';
+  const rawGpu = specs?.gpu || '';
   const hasMultipleGpus = rawGpu.includes('/') || rawGpu.includes('\n') || rawGpu.includes(';');
   const gpuList = hasMultipleGpus
     ? rawGpu
         .split(/[\/\n;]+/)
         .map((g) => g.trim())
         .filter(Boolean)
-    : [specs.gpu?.trim() || 'tu GPU'];
+    : [specs?.gpu?.trim?.() || 'tu GPU'];
 
   const frameJourneySteps = [
     {

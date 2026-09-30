@@ -29,7 +29,7 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
   onOpenPrintModal,
   onBackToApp,
   completedModulesCount = 0,
-  totalModulesCount = 26,
+  totalModulesCount = 27,
 }) => {
   const isStarted = completedModulesCount > 0;
   const isAllDone = completedModulesCount >= totalModulesCount;

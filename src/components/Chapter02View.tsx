@@ -71,36 +71,47 @@ export const Chapter02View: React.FC<Chapter02ViewProps> = ({
     }
   }, []);
 
+  const defaultSpecs: UserPcSpec = {
+    cpu: '',
+    ram: '',
+    gpu: '',
+    storage: '',
+    motherboard: '',
+    os: '',
+    monitor: '',
+    peripherals: '',
+  };
+
+  const sanitizeSpecs = (raw: unknown): UserPcSpec => {
+    if (raw && typeof raw === 'object') {
+      const p = raw as Record<string, unknown>;
+      return {
+        cpu: typeof p.cpu === 'string' ? p.cpu : '',
+        ram: typeof p.ram === 'string' ? p.ram : '',
+        gpu: typeof p.gpu === 'string' ? p.gpu : '',
+        storage: typeof p.storage === 'string' ? p.storage : '',
+        motherboard: typeof p.motherboard === 'string' ? p.motherboard : '',
+        os: typeof p.os === 'string' ? p.os : '',
+        monitor: typeof p.monitor === 'string' ? p.monitor : '',
+        peripherals: typeof p.peripherals === 'string' ? p.peripherals : '',
+      };
+    }
+    return defaultSpecs;
+  };
+
   // Load inherited specs from Chapter 01
   const [specs, setSpecs] = useState<UserPcSpec>(() => {
     try {
       const saved =
         localStorage.getItem('evo_c01_specs') ||
         localStorage.getItem('evo_user_pc_specs');
-      return saved
-        ? JSON.parse(saved)
-        : {
-            cpu: '',
-            ram: '',
-            gpu: '',
-            storage: '',
-            motherboard: '',
-            os: '',
-            monitor: '',
-            peripherals: '',
-          };
+      if (saved) {
+        return sanitizeSpecs(JSON.parse(saved));
+      }
     } catch {
-      return {
-        cpu: '',
-        ram: '',
-        gpu: '',
-        storage: '',
-        motherboard: '',
-        os: '',
-        monitor: '',
-        peripherals: '',
-      };
+      // fallback
     }
+    return defaultSpecs;
   });
 
   const [evidenceMap, setEvidenceMap] = useState<UserPcEvidenceMap | undefined>(() => {
@@ -165,7 +176,7 @@ export const Chapter02View: React.FC<Chapter02ViewProps> = ({
         const savedSpecs =
           localStorage.getItem('evo_c01_specs') ||
           localStorage.getItem('evo_user_pc_specs');
-        if (savedSpecs) setSpecs(JSON.parse(savedSpecs));
+        if (savedSpecs) setSpecs(sanitizeSpecs(JSON.parse(savedSpecs)));
 
         const savedEvidence = localStorage.getItem('evo_c01_evidence');
         if (savedEvidence) setEvidenceMap(JSON.parse(savedEvidence));

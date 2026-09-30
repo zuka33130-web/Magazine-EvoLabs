@@ -13,14 +13,14 @@ export const InheritedPassportBanner: React.FC<InheritedPassportBannerProps> = (
   evidenceMap,
   isCompact = false,
 }) => {
-  const cpuVal = specs.cpu?.trim() || 'NO DISPONIBLE';
-  const ramVal = specs.ram?.trim() || 'NO DISPONIBLE';
-  const gpuVal = specs.gpu?.trim() || 'NO DISPONIBLE';
-  const storageVal = specs.storage?.trim() || 'NO DISPONIBLE';
-  const mbVal = specs.motherboard?.trim() || 'NO DISPONIBLE';
+  const cpuVal = specs?.cpu?.trim?.() || 'NO DISPONIBLE';
+  const ramVal = specs?.ram?.trim?.() || 'NO DISPONIBLE';
+  const gpuVal = specs?.gpu?.trim?.() || 'NO DISPONIBLE';
+  const storageVal = specs?.storage?.trim?.() || 'NO DISPONIBLE';
+  const mbVal = specs?.motherboard?.trim?.() || 'NO DISPONIBLE';
 
   // Check if multiple GPUs are reported (e.g. separated by comma or newlines or " / ")
-  const rawGpu = specs.gpu || '';
+  const rawGpu = specs?.gpu || '';
   const hasMultipleGpus = rawGpu.includes('/') || rawGpu.includes('\n') || rawGpu.includes(';');
   const gpuList = hasMultipleGpus
     ? rawGpu

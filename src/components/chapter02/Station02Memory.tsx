@@ -29,9 +29,9 @@ export const Station02Memory: React.FC<Station02MemoryProps> = ({
   const [selectedHierarchy, setSelectedHierarchy] = useState<'registros' | 'cache' | 'ram' | 'disco'>('cache');
   const [analogiaTab, setAnalogiaTab] = useState<'latencia' | 'ancho_de_banda'>('latencia');
 
-  const cpuText = specs.cpu?.trim() || 'tu procesador';
-  const ramText = specs.ram?.trim() || 'tu memoria RAM';
-  const gpuText = specs.gpu?.trim() || '';
+  const cpuText = specs?.cpu?.trim?.() || 'tu procesador';
+  const ramText = specs?.ram?.trim?.() || 'tu memoria RAM';
+  const gpuText = specs?.gpu?.trim?.() || '';
 
   // Check if integrated graphics might be present
   const isIntegratedSuspected =
@@ -39,8 +39,8 @@ export const Station02Memory: React.FC<Station02MemoryProps> = ({
     /intel.*(uhd|hd|iris)|radeon.*(vega|graphics)|integrated/i.test(cpuText);
 
   // Check channel mode from evidence details if available
-  const channelModeReported = evidenceMap?.ram.details?.channelMode as string | undefined;
-  const channelModeDisplay = channelModeReported?.trim() || 'NO DETERMINADO';
+  const channelModeReported = evidenceMap?.ram?.details?.channelMode as string | undefined;
+  const channelModeDisplay = channelModeReported?.trim?.() || 'NO DETERMINADO';
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">

@@ -98,12 +98,12 @@ const computeInheritedProgress = () => {
 
   // Check specs data presence
   const hasSpecsData = Boolean(
-    (loadedSpecs.cpu && loadedSpecs.cpu.trim() !== '') ||
-    (loadedSpecs.ram && loadedSpecs.ram.trim() !== '') ||
-    (loadedSpecs.gpu && loadedSpecs.gpu.trim() !== '') ||
-    (loadedSpecs.storage && loadedSpecs.storage.trim() !== '') ||
-    (loadedSpecs.motherboard && loadedSpecs.motherboard.trim() !== '') ||
-    (loadedSpecs.os && loadedSpecs.os.trim() !== '')
+    (loadedSpecs?.cpu && typeof loadedSpecs.cpu === 'string' && loadedSpecs.cpu.trim() !== '') ||
+    (loadedSpecs?.ram && typeof loadedSpecs.ram === 'string' && loadedSpecs.ram.trim() !== '') ||
+    (loadedSpecs?.gpu && typeof loadedSpecs.gpu === 'string' && loadedSpecs.gpu.trim() !== '') ||
+    (loadedSpecs?.storage && typeof loadedSpecs.storage === 'string' && loadedSpecs.storage.trim() !== '') ||
+    (loadedSpecs?.motherboard && typeof loadedSpecs.motherboard === 'string' && loadedSpecs.motherboard.trim() !== '') ||
+    (loadedSpecs?.os && typeof loadedSpecs.os === 'string' && loadedSpecs.os.trim() !== '')
   );
 
   // Check C01 completion flags
