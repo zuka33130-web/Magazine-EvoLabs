@@ -483,6 +483,7 @@ export const TOMO_02_MODULES: TomoModuleItem[] = [
     title: 'TELEMETRÍA Y PRIVACIDAD',
     subtitle: 'Datos de diagnóstico requeridos vs opcionales, Diagnostic Data Viewer y debloaters',
     categoryTag: 'PRIVACIDAD RACIONAL',
+    safetyBadge: 'VERDE',
     readTime: '10 min',
     summary: 'La verdad sobre los datos que Windows envía a Microsoft. Análisis objetivo de datos de diagnóstico, visor oficial y advertencia formal contra scripts de "debloat" destructivos de YouTube.',
     keyTakeaways: [
@@ -498,6 +499,7 @@ export const TOMO_02_MODULES: TomoModuleItem[] = [
     title: 'WINDOWS UPDATE',
     subtitle: 'Staging, SoftwareDistribution, LCU, Delivery Optimization y orden SFC/DISM',
     categoryTag: 'MANTENIMIENTO DEL SISTEMA',
+    safetyBadge: 'AMARILLO',
     readTime: '11 min',
     summary: 'Cómo se actualiza el sistema. Las fases de detección, descarga y ensamblado en SoftwareDistribution, actualización acumulativa (LCU) y el orden correcto de reparación con DISM y SFC.',
     keyTakeaways: [
@@ -514,6 +516,7 @@ export const TOMO_02_MODULES: TomoModuleItem[] = [
     title: 'SEGURIDAD PROFUNDA',
     subtitle: 'UAC token, Secure Desktop, Defender, SmartScreen y el archivo trampa',
     categoryTag: 'CIBERSEGURIDAD DEFENSIVA',
+    safetyBadge: 'AMARILLO',
     readTime: '13 min',
     summary: 'Arquitectura de defensa de Windows. Por qué el UAC oscurece la pantalla (Secure Desktop), comprobación de firmas digitales y el caso forense del archivo que parece foto pero es un ejecutable.',
     keyTakeaways: [
@@ -530,6 +533,7 @@ export const TOMO_02_MODULES: TomoModuleItem[] = [
     title: 'REPARACIÓN ANTES DE FORMATEAR',
     subtitle: 'WinRE, BCD, puntos de restauración, CBS.log y reparación in-place',
     categoryTag: 'RECUPERACIÓN AVANZADA',
+    safetyBadge: 'AMARILLO',
     readTime: '14 min',
     summary: 'El arsenal de recuperación cuando Windows entra en bucle de reparación o falla al iniciar. Cómo reparar el BCD desde WinRE, diagnosticar con CBS.log y la instalación in-place no destructiva.',
     keyTakeaways: [
@@ -545,6 +549,7 @@ export const TOMO_02_MODULES: TomoModuleItem[] = [
     title: 'OPTIMIZACIÓN ADAPTATIVA EVO',
     subtitle: 'Medir antes de tocar: BIOS time, latencia DPC, frametime y reversibilidad',
     categoryTag: 'MÉTRICA & RENDIMIENTO',
+    safetyBadge: 'VERDE',
     readTime: '12 min',
     summary: 'La filosofía de la medición objetiva. Por qué no existen los "100 tweaks mágicos", cómo utilizar LatencyMon para cazar picos de latencia en controladores de audio y red, y medir tiempos reales.',
     keyTakeaways: [
@@ -560,6 +565,7 @@ export const TOMO_02_MODULES: TomoModuleItem[] = [
     title: 'PC DE BAJOS RECURSOS',
     subtitle: 'Diagnóstico en hardware limitado: HDD al 100%, 4GB RAM y optimización racional',
     categoryTag: 'SUPERVIVENCIA DE HARDWARE',
+    safetyBadge: 'VERDE',
     readTime: '11 min',
     summary: 'Rescate de computadoras con procesadores de 2 núcleos, 4 a 8 GB de RAM y discos duros mecánicos. Solución al síntoma de disco al 100%, ajuste de efectos visuales y control de pestañas.',
     keyTakeaways: [
@@ -575,6 +581,7 @@ export const TOMO_02_MODULES: TomoModuleItem[] = [
     title: 'EMERGENCIAS TÉCNICAS',
     subtitle: 'Protocolos de acción inmediata: pantalla negra con cursor, disco 100% y BSOD',
     categoryTag: 'PROTOCOLO DE CRISIS',
+    safetyBadge: 'ROJO',
     readTime: '10 min',
     summary: 'Las fallas más temidas y la secuencia metódica de salvataje. El protocolo "NO HACER TODAVÍA...", reinicio del subsistema de video y recuperación de archivos borrados.',
     keyTakeaways: [
@@ -590,6 +597,7 @@ export const TOMO_02_MODULES: TomoModuleItem[] = [
     title: 'CASOS GUIADOS EVO',
     subtitle: '4 expedientes completos de taller: síntoma, evidencia, hipótesis y solución',
     categoryTag: 'INVESTIGACIÓN PERICIAL',
+    safetyBadge: 'AMARILLO',
     readTime: '14 min',
     summary: 'Casos didácticos basados en situaciones reales de laboratorio: desde el juego que tartamudea por conflicto de antivirus hasta el misterio del archivo que desaparecía al reiniciar.',
     keyTakeaways: [
@@ -605,6 +613,7 @@ export const TOMO_02_MODULES: TomoModuleItem[] = [
     title: 'LOS SECRETOS EVO',
     subtitle: 'Atajos de élite, paneles directos de control y funciones ocultas del sistema',
     categoryTag: 'HERRAMIENTAS MAESTRAS',
+    safetyBadge: 'VERDE',
     readTime: '8 min',
     summary: 'La recopilación selecta de accesos directos, atajos de teclado y comandos de ejecución inmediata que diferencian a un operador principiante de un especialista de laboratorio.',
     keyTakeaways: [
@@ -620,6 +629,7 @@ export const TOMO_02_MODULES: TomoModuleItem[] = [
     title: 'GLOSARIO MAESTRO A-Z',
     subtitle: 'Más de 50 términos explicados desde la analogía cotidiana hasta el rigor técnico',
     categoryTag: 'DICCIONARIO TÉCNICO',
+    safetyBadge: 'VERDE',
     readTime: '16 min',
     summary: 'El diccionario definitivo de conceptos de Windows: desde ACL, BCD y Commit Charge hasta WinSxS, Working Set y Zero-Day. Explicado con analogías claras y contexto pericial.',
     keyTakeaways: [
@@ -635,6 +645,7 @@ export const TOMO_02_MODULES: TomoModuleItem[] = [
     title: 'PASAPORTE DEL INVESTIGADOR & CIERRE',
     subtitle: 'Auditoría final, checklist de competencias y fuentes oficiales Microsoft',
     categoryTag: 'CERTIFICACIÓN EDITORIAL',
+    safetyBadge: 'VERDE',
     readTime: '6 min',
     summary: 'Cierre del Tomo 02: verificación de competencias adquiridas, organización final del Archivo EVO personal, bibliografía oficial de Microsoft Learn y Sysinternals, y contratapa coleccionable.',
     keyTakeaways: [
