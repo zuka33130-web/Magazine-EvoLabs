@@ -18,6 +18,7 @@ interface EditorialIndexProps {
   outcomes: string[];
   onBackToCover: () => void;
   onOpenA4Magazine?: () => void;
+  onOpenLab?: () => void;
   onBackToWorldMap?: () => void;
   onStartResearch: () => void;
   onStartChapter02?: () => void;
@@ -36,6 +37,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
   outcomes,
   onBackToCover,
   onOpenA4Magazine,
+  onOpenLab,
   onBackToWorldMap,
   onStartResearch,
   onStartChapter02,
@@ -128,31 +130,42 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
       </header>
 
       {/* Direct A4 Magazine Access Banner */}
-      {onOpenA4Magazine && (
-        <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-yellow-400/15 via-[#141720] to-[#10121a] border border-yellow-400/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 shadow-xl">
-          <div className="flex items-center gap-3.5">
-            <span className="w-3 h-3 bg-yellow-400 inline-block shadow-[0_0_10px_#facc15]" />
-            <div>
-              <span className="font-mono-tech text-[10px] text-yellow-400 font-bold uppercase tracking-wider block">
-                NUEVA VERSIÓN EDITORIAL DISPONIBLE
-              </span>
-              <h3 className="font-display font-black text-base sm:text-lg text-white uppercase tracking-tight">
-                EVO LABS MAGAZINE — Formato A4 Vertical (PDF Ready)
-              </h3>
-              <p className="text-xs text-zinc-300 font-sans-editorial max-w-2xl mt-0.5">
-                Revista digital completa, estática y visual. Sin bloqueos ni interacción obligatoria: 12 páginas diagramadas con infografías de silicio, telemetría y peritajes técnicos.
-              </p>
-            </div>
+      <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-yellow-400/15 via-[#141720] to-[#10121a] border border-yellow-400/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 shadow-xl">
+        <div className="flex items-center gap-3.5">
+          <span className="w-3 h-3 bg-yellow-400 inline-block shadow-[0_0_10px_#facc15]" />
+          <div>
+            <span className="font-mono-tech text-[10px] text-yellow-400 font-bold uppercase tracking-wider block">
+              EDICIÓN FACSIMILAR // 46 PÁGINAS A4
+            </span>
+            <h3 className="font-display font-black text-base sm:text-lg text-white uppercase tracking-tight">
+              REVISTA A4 // CONOCÉ TU PC
+            </h3>
+            <p className="text-xs text-zinc-300 font-sans-editorial max-w-2xl mt-0.5">
+              Lectura continua en formato facsimilar A4 con esquemas de silicio, telemetría de frametime, buses y descarga PDF.
+            </p>
           </div>
-          <button
-            type="button"
-            onClick={onOpenA4Magazine}
-            className="px-6 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-mono-tech font-bold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer shrink-0 shadow-lg hover:shadow-yellow-400/30"
-          >
-            ABRIR REVISTA A4 →
-          </button>
         </div>
-      )}
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          {onOpenA4Magazine && (
+            <button
+              type="button"
+              onClick={onOpenA4Magazine}
+              className="px-5 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-mono-tech font-bold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer shadow-lg hover:shadow-yellow-400/30"
+            >
+              ABRIR REVISTA A4 →
+            </button>
+          )}
+          {onOpenLab && (
+            <button
+              type="button"
+              onClick={onOpenLab}
+              className="px-4 py-3 bg-zinc-900 hover:bg-zinc-800 border border-yellow-400/50 text-yellow-300 font-mono-tech font-bold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
+            >
+              IR AL LABORATORIO →
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* FINAL EXAM & COMPLETION HANDOFF BANNER */}
       {(isAllChaptersDone || hasPassedFinalExam) && (

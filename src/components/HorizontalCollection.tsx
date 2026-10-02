@@ -140,8 +140,13 @@ export const HorizontalCollection: React.FC<HorizontalCollectionProps> = ({
                 {/* Card Action or Unlock Condition */}
                 <div className="pt-3 border-t border-zinc-800/60">
                   {isCurrent ? (
-                    <div className="flex items-center justify-between text-xs font-mono-tech font-bold text-yellow-400 group-hover:text-yellow-300 transition-colors">
-                      <span>ABRIR TOMO 01</span>
+                    <div
+                      className="flex items-center justify-between text-xs font-mono-tech font-bold transition-colors"
+                      style={{ color: volume.themeColor || '#EAB308' }}
+                    >
+                      <span>
+                        ABRIR {volume.volumeLabel ? volume.volumeLabel.toUpperCase() : `TOMO ${volume.number}`}
+                      </span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                     </div>
                   ) : (

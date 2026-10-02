@@ -497,6 +497,15 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onBackToCover}
+            className="px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-zinc-400" />
+            <span>← VOLVER AL TOMO 02</span>
+          </button>
+
           {onOpenInteractive && (
             <button
               type="button"
@@ -504,7 +513,7 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
               className="px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-cyan-900/60 hover:border-cyan-400 text-cyan-200 font-bold transition-all cursor-pointer flex items-center gap-1.5"
             >
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span>IR A TOMO INTERACTIVO →</span>
+              <span>MAGAZINE DIGITAL INTERACTIVO →</span>
             </button>
           )}
 
@@ -515,7 +524,7 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
               className="px-3.5 py-1.5 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-600/60 text-cyan-300 font-bold transition-all cursor-pointer flex items-center gap-1.5"
             >
               <Layers className="w-3.5 h-3.5 text-cyan-400" />
-              <span>LABORATORIO ASOCIADO →</span>
+              <span>LABORATORIO →</span>
             </button>
           )}
         </div>

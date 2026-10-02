@@ -732,12 +732,12 @@ export default function App() {
     );
   }
 
-  const handleNavigateTomo = (tomo: '01' | '02' | '03' | '04' | '08') => {
-    if (tomo === '01') setCurrentView('magazine');
-    else if (tomo === '02') setCurrentView('tomo-02');
-    else if (tomo === '03') setCurrentView('tomo-03');
-    else if (tomo === '04') setCurrentView('tomo-04');
-    else if (tomo === '08') setCurrentView('tomo-08');
+  const handleNavigateTomo = (tomo: string) => {
+    if (tomo === '01' || tomo === 'tomo-01') setCurrentView('cover');
+    else if (tomo === '02' || tomo === 'tomo-02') setCurrentView('tomo-02');
+    else if (tomo === '03' || tomo === 'tomo-03') setCurrentView('tomo-03');
+    else if (tomo === '04' || tomo === 'tomo-04') setCurrentView('tomo-04');
+    else if (tomo === '08' || tomo === 'tomo-08') setCurrentView('tomo-08');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
@@ -819,7 +819,12 @@ export default function App() {
         {/* Main View Render Stage */}
         <main className="flex-1 w-full">
           {currentView === 'magazine' && (
-            <EvoMagazineView onBackToApp={handleNavigateHome} />
+            <EvoMagazineView
+              onBackToApp={handleNavigateTomo01}
+              onBackToTomo01={handleNavigateTomo01}
+              onOpenInteractive={handleExploreTomo01}
+              onOpenLab={handleNavigateHotSwapLab}
+            />
           )}
 
           {currentView === 'tomo-02' && (
@@ -958,8 +963,9 @@ export default function App() {
               <EditorialIndex
                 chapters={chaptersList}
                 outcomes={TOMO_01_OUTCOMES}
-                onBackToCover={() => setCurrentView('archivo')}
+                onBackToCover={handleNavigateTomo01}
                 onOpenA4Magazine={() => setCurrentView('magazine')}
+                onOpenLab={handleNavigateHotSwapLab}
                 onBackToWorldMap={handleNavigateHome}
                 onStartResearch={handleStartChapter01}
                 onStartChapter02={handleStartChapter02}

@@ -13,6 +13,7 @@ import {
   Copy,
   Sparkles,
   Layers,
+  ArrowLeft,
 } from 'lucide-react';
 import { Page01Cover } from './Page01Cover';
 import { Page02Manifesto } from './Page02Manifesto';
@@ -63,6 +64,9 @@ import { Page46BackCover } from './Page46BackCover';
 
 interface EvoMagazineViewProps {
   onBackToApp?: () => void;
+  onBackToTomo01?: () => void;
+  onOpenInteractive?: () => void;
+  onOpenLab?: () => void;
   initialPage?: number;
 }
 
@@ -70,6 +74,9 @@ type ViewMode = 'continuous' | 'single' | 'spread';
 
 export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
   onBackToApp,
+  onBackToTomo01,
+  onOpenInteractive,
+  onOpenLab,
   initialPage = 1,
 }) => {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
@@ -377,16 +384,25 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
         
         {/* Left: Magazine Badge & Volume Info */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onBackToTomo01 || onBackToApp}
+            className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700/80 hover:border-yellow-400 text-zinc-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer font-bold font-mono-tech text-xs"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>← VOLVER AL TOMO 01</span>
+          </button>
+
+          <div className="hidden md:flex items-center gap-2">
             <span className="w-2.5 h-2.5 bg-yellow-400 inline-block shadow-[0_0_8px_rgba(234,179,8,0.7)]" />
             <h1 className="font-display font-black text-sm sm:text-base tracking-wider uppercase text-white">
-              EVO LABS <span className="text-yellow-400 font-mono-tech font-bold text-xs">MAGAZINE</span>
+              CONOCÉ TU PC
             </h1>
+            <span className="text-zinc-600">/</span>
+            <span className="text-yellow-400 text-[11px] font-mono-tech uppercase">
+              REVISTA A4 ({totalPages} PÁGS)
+            </span>
           </div>
-          <span className="hidden md:inline text-zinc-600">|</span>
-          <span className="hidden md:inline text-zinc-400 text-[11px] uppercase tracking-wider">
-            TOMO 01: CONOCÉ TU PC (46 PÁGINAS A4)
-          </span>
         </div>
 
         {/* Center: Page Controls & Jump Selector */}
@@ -518,16 +534,29 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
             <span>{isPreparingPrint ? 'PREPARANDO A4...' : 'DESCARGAR PDF'}</span>
           </button>
 
-          {/* Toggle Interactive Lab Mode */}
-          {onBackToApp && (
+          {/* Quick jump to Interactive Tome */}
+          {onOpenInteractive && (
             <button
               type="button"
-              onClick={onBackToApp}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#141824] hover:bg-[#1a2030] text-zinc-300 hover:text-white border border-zinc-700/80 font-mono-tech text-[11px] uppercase rounded transition-colors cursor-pointer"
-              title="Cambiar a la plataforma de laboratorio interactivo"
+              onClick={onOpenInteractive}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#141824] hover:bg-[#1a2030] text-zinc-300 hover:text-yellow-300 border border-zinc-700/80 font-mono-tech text-[11px] uppercase rounded-lg transition-colors cursor-pointer"
+              title="Abrir edición digital interactiva"
             >
-              <Compass className="w-3.5 h-3.5 text-yellow-400" />
-              <span className="hidden lg:inline">Lab Interactivo</span>
+              <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+              <span className="hidden sm:inline">Interactivo</span>
+            </button>
+          )}
+
+          {/* Quick jump to Laboratory */}
+          {onOpenLab && (
+            <button
+              type="button"
+              onClick={onOpenLab}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#141824] hover:bg-[#1a2030] text-zinc-300 hover:text-yellow-300 border border-zinc-700/80 font-mono-tech text-[11px] uppercase rounded-lg transition-colors cursor-pointer"
+              title="Ir al Laboratorio Hot-Swap"
+            >
+              <Layers className="w-3.5 h-3.5 text-yellow-400" />
+              <span className="hidden sm:inline">Laboratorio</span>
             </button>
           )}
         </div>
@@ -856,6 +885,47 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
         )}
 
       </main>
+
+      {/* Bottom 3-Stage Navigation Deck */}
+      <footer className="no-print border-t border-zinc-800 bg-[#090b10]/95 backdrop-blur-md px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono-tech sticky bottom-0 z-40">
+        <div className="flex items-center gap-2 text-zinc-400">
+          <span className="w-2 h-2 rounded-full bg-yellow-400" />
+          <span>ETAPA 01: LEER & ENTENDER (MAGAZINE A4)</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onBackToTomo01 || onBackToApp}
+            className="px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-zinc-400" />
+            <span>← VOLVER AL TOMO 01</span>
+          </button>
+
+          {onOpenInteractive && (
+            <button
+              type="button"
+              onClick={onOpenInteractive}
+              className="px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-yellow-400 text-yellow-200 font-bold transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+              <span>MAGAZINE DIGITAL INTERACTIVO →</span>
+            </button>
+          )}
+
+          {onOpenLab && (
+            <button
+              type="button"
+              onClick={onOpenLab}
+              className="px-3.5 py-1.5 rounded-lg bg-amber-950/60 hover:bg-amber-900/80 border border-yellow-600/60 text-yellow-300 font-bold transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <Layers className="w-3.5 h-3.5 text-yellow-400" />
+              <span>LABORATORIO →</span>
+            </button>
+          )}
+        </div>
+      </footer>
     </div>
   );
 };
