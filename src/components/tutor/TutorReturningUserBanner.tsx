@@ -47,33 +47,25 @@ export const TutorReturningUserBanner: React.FC<TutorReturningUserBannerProps> =
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2.5 shrink-0 w-full md:w-auto">
+      <div className="flex items-center gap-2.5 shrink-0 w-full md:w-auto">
+        {/* ACCIÓN PRINCIPAL DOMINANTE */}
         <button
           type="button"
           onClick={onContinue}
-          className="flex-1 md:flex-initial px-5 py-2.5 rounded-xl font-extrabold text-xs text-black bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-amber-500/20"
+          className="flex-1 md:flex-initial px-6 py-3 rounded-xl font-mono-tech font-black text-xs uppercase tracking-wider text-black bg-yellow-400 hover:bg-yellow-300 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-yellow-400/20"
         >
           <span>CONTINUAR DONDE QUEDÉ</span>
           <ArrowRight className="w-4 h-4 text-black" />
         </button>
 
+        {/* ACCIÓN SECUNDARIA */}
         <button
           type="button"
           onClick={onOpenMap}
-          className="px-3.5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold text-xs border border-zinc-700 transition-all flex items-center gap-1.5 cursor-pointer"
+          className="px-4 py-3 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 font-mono-tech font-bold text-xs uppercase tracking-wider border border-zinc-700/80 transition-all flex items-center gap-1.5 cursor-pointer"
         >
           <Map className="w-3.5 h-3.5 text-cyan-400" />
           <span>VER MAPA</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => openTutorWithTab('explain')}
-          className="px-3 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-amber-300 font-bold text-xs border border-amber-500/30 transition-all flex items-center gap-1.5 cursor-pointer"
-          title="Abrir asistencia de Tutor EVO"
-        >
-          <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
-          <span>TUTOR EVO</span>
         </button>
       </div>
     </div>

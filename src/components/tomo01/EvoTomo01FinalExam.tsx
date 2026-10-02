@@ -20,6 +20,7 @@ export interface EvoTomo01FinalExamProps {
   onCompleteExam: (score: number, total: number) => void;
   onContinueToLab?: () => void;
   onBackToTomoCover?: () => void;
+  onOpenCompletionScreen?: () => void;
 }
 
 export const EvoTomo01FinalExam: React.FC<EvoTomo01FinalExamProps> = ({
@@ -28,6 +29,7 @@ export const EvoTomo01FinalExam: React.FC<EvoTomo01FinalExamProps> = ({
   onCompleteExam,
   onContinueToLab,
   onBackToTomoCover,
+  onOpenCompletionScreen,
 }) => {
   return (
     <EvoTomeExamEngine
@@ -37,6 +39,7 @@ export const EvoTomo01FinalExam: React.FC<EvoTomo01FinalExamProps> = ({
       onGoToChapter={onGoToChapter}
       onExamPassed={onCompleteExam}
       onContinueToLab={onContinueToLab}
+      onOpenCompletionScreen={onOpenCompletionScreen}
     />
   );
 };

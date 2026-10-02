@@ -215,33 +215,33 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
           “De mirar especificaciones a entender realmente cómo trabaja tu máquina.”
         </p>
 
-        {/* Tutor Quick Entry Actions */}
-        <div className="flex flex-wrap items-center gap-2.5 pt-1">
+        {/* Herramientas de apoyo (visualmente subordinadas) */}
+        <div className="flex flex-wrap items-center gap-3 pt-1 text-xs font-mono-tech text-zinc-400">
           <button
             type="button"
             onClick={() => setIsTourOpen(true)}
-            className="px-4 py-2 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+            className="hover:text-amber-400 flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>VER TOUR REAL DE LA INTERFAZ</span>
+            <span>Tour de interfaz</span>
           </button>
-
+          <span className="text-zinc-700">•</span>
           <button
             type="button"
             onClick={() => setIsMapOpen(true)}
-            className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-cyan-300 border border-zinc-700 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+            className="hover:text-cyan-300 flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Map className="w-3.5 h-3.5 text-cyan-400" />
-            <span>MAPA DE RECORRIDO</span>
+            <span>Mapa de recorrido</span>
           </button>
-
+          <span className="text-zinc-700">•</span>
           <button
             type="button"
             onClick={() => openTutorWithTab('explain')}
-            className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+            className="hover:text-zinc-200 flex items-center gap-1.5 transition-colors cursor-pointer"
           >
-            <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
-            <span>TUTOR EVO</span>
+            <HelpCircle className="w-3.5 h-3.5 text-zinc-500" />
+            <span>Glosario y conceptos</span>
           </button>
         </div>
       </header>
@@ -481,10 +481,14 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
                         id="btn-comenzar-investigacion"
                         data-evo-tour="check"
                         onClick={onStartResearch}
-                        className="inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-white text-black hover:bg-yellow-400 hover:text-black transition-all duration-200 cursor-pointer shadow-xl hover:shadow-yellow-400/25 group/btn"
+                        className={`inline-flex items-center justify-center gap-3 px-8 py-3.5 rounded-xl font-mono-tech text-xs tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-xl group/btn ${
+                          isCompleted
+                            ? 'bg-zinc-850 hover:bg-zinc-750 text-zinc-300 border border-zinc-750 font-bold'
+                            : 'bg-yellow-400 text-black hover:bg-yellow-300 font-black shadow-yellow-400/20 hover:shadow-yellow-400/30'
+                        }`}
                       >
                         <span>{isCompleted ? 'REVISAR INVESTIGACIÓN' : 'COMENZAR INVESTIGACIÓN'}</span>
-                        <ArrowRight className="w-4 h-4 text-black group-hover/btn:translate-x-1 transition-transform" />
+                        <ArrowRight className={`w-4 h-4 ${isCompleted ? 'text-zinc-400' : 'text-black'} group-hover/btn:translate-x-1 transition-transform`} />
                       </button>
                     </div>
 

@@ -142,5 +142,6 @@ export interface EvoTomeExamEngineProps {
   onGoToChapter?: (chapterNumber: string) => void;
   onGoToModule?: (moduleIndex: number) => void;
   onContinueToLab?: () => void;
+  onOpenCompletionScreen?: () => void;
   onExamPassed?: (score: number, total: number) => void;
 }

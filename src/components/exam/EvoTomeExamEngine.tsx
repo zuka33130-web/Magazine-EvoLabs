@@ -25,6 +25,7 @@ import {
   MoveUp,
   MoveDown,
   ExternalLink,
+  FlaskConical,
 } from 'lucide-react';
 import {
   EvoTomeExamEngineProps,
@@ -57,6 +58,7 @@ export const EvoTomeExamEngine: React.FC<EvoTomeExamEngineProps> = ({
   onGoToChapter,
   onGoToModule,
   onContinueToLab,
+  onOpenCompletionScreen,
   onExamPassed,
 }) => {
   const bank = useMemo(() => getExamBankForTomo(tomoId), [tomoId]);
@@ -1105,11 +1107,23 @@ export const EvoTomeExamEngine: React.FC<EvoTomeExamEngineProps> = ({
               <span>Repetir Examen (Nuevas Preguntas)</span>
             </button>
 
+            {record.passed && onOpenCompletionScreen && (
+              <button
+                onClick={onOpenCompletionScreen}
+                className="px-6 py-3 rounded-xl font-black text-xs text-black bg-yellow-400 hover:bg-yellow-300 transition-all flex items-center gap-2 shadow-lg shadow-yellow-400/20 cursor-pointer"
+              >
+                <Award className="w-4 h-4 text-black" />
+                <span>Ver Acreditación Oficial</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
+
             {record.passed && onContinueToLab && (
               <button
                 onClick={onContinueToLab}
-                className="px-6 py-3 rounded-xl font-black text-xs text-black bg-emerald-400 hover:bg-emerald-300 transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer"
+                className="px-6 py-3 rounded-xl font-bold text-xs text-emerald-300 bg-emerald-950/80 hover:bg-emerald-900/80 border border-emerald-500/50 transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/10"
               >
+                <FlaskConical className="w-4 h-4 text-emerald-400" />
                 <span>Continuar al Laboratorio Asociado</span>
                 <ArrowRight className="w-4 h-4" />
               </button>

@@ -55,7 +55,7 @@ export const TutorChapterBanner: React.FC<TutorChapterBannerProps> = ({
   className = '',
 }) => {
   const { openTutorWithTab, mode } = useTutorEvo();
-  const [isExpanded, setIsExpanded] = useState<boolean>(true);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   return (
     <div

@@ -99,35 +99,38 @@ export const MagazineCover: React.FC<MagazineCoverProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons: 1 Dominant Action + max 2 Secondary Actions */}
           <div className="pt-2 flex flex-wrap items-center gap-3">
+            {/* ACCIÓN PRINCIPAL DOMINANTE */}
             <button
               id="btn-abrir-edicion"
               type="button"
               onClick={onOpenEdition}
-              className="inline-flex items-center gap-3.5 px-7 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-white text-black hover:bg-yellow-400 hover:text-black transition-all duration-200 cursor-pointer shadow-xl hover:shadow-yellow-400/20 group"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-mono-tech font-black text-xs sm:text-sm tracking-wider uppercase bg-yellow-400 text-black hover:bg-yellow-300 transition-all duration-200 cursor-pointer shadow-xl shadow-yellow-400/20 hover:shadow-yellow-400/30 group"
             >
-              <span>ABRIR EDICIÓN INTERACTIVA</span>
+              <span>COMENZAR TOMO 01</span>
               <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" />
             </button>
 
+            {/* ACCIÓN SECUNDARIA 1: GUÍA APRENDIZ CERO */}
             <button
               type="button"
               onClick={() => setIsWelcomeOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-500/40 transition-all duration-200 cursor-pointer shadow-md"
+              className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700/80 transition-all duration-200 cursor-pointer"
             >
-              <Sparkles className="w-4 h-4 text-amber-400" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>EMPEZAR DESDE CERO</span>
             </button>
 
+            {/* ACCIÓN SECUNDARIA 2: REVISTA A4 */}
             {onOpenA4Magazine && (
               <button
                 id="btn-abrir-revista-a4"
                 type="button"
                 onClick={onOpenA4Magazine}
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-yellow-400 text-black hover:bg-yellow-300 transition-all duration-200 cursor-pointer shadow-xl hover:shadow-yellow-400/30"
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900/80 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 transition-all duration-200 cursor-pointer"
               >
-                <span>📖 REVISTA EDITORIAL A4 (PDF)</span>
+                <span>📖 REVISTA EDITORIAL A4</span>
               </button>
             )}
           </div>

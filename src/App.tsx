@@ -1279,6 +1279,7 @@ function AppContent() {
                 onBackToTomoCover={handleNavigateTomo01}
                 onGoToChapter={(ch) => handleGoToMissing(ch)}
                 onCompleteExam={handleCompleteExam}
+                onOpenCompletionScreen={handleOpenCompletionScreen}
                 onContinueToLab={() => {
                   setActiveLabPanel('hardware');
                   setCurrentView('hotswap-lab');
