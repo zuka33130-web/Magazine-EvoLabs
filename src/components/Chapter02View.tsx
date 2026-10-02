@@ -23,6 +23,7 @@ import { Station04Storage } from './chapter02/Station04Storage';
 import { Station05Lab } from './chapter02/Station05Lab';
 import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
 import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
+import { TutorChapterBanner } from './tutor/TutorChapterBanner';
 
 interface Chapter02ViewProps {
   onBackToIndex: () => void;
@@ -271,6 +272,31 @@ export const Chapter02View: React.FC<Chapter02ViewProps> = ({
             </span>
           </div>
         </nav>
+
+        {/* Tutor EVO Chapter Permanent Orientation Banner */}
+        <TutorChapterBanner
+          chapterNumber="02"
+          chapterTitle="CÓMO TRABAJAN JUNTOS"
+          currentStage={activeStation === 'lab' ? 'COMPROBAR' : 'OBSERVAR'}
+          currentAction={
+            activeStation === 'journey'
+              ? 'Observá el viaje del flujo de datos desde el clic del mouse hasta el píxel en pantalla.'
+              : activeStation === 'memory'
+              ? 'Analizá cómo interactúan la CPU y la RAM a través de las jerarquías de caché L1/L2/L3.'
+              : activeStation === 'graphics'
+              ? 'Comprendé cómo la CPU entrega órdenes de dibujado (Draw Calls) a la GPU.'
+              : activeStation === 'storage'
+              ? 'Seguí el trayecto de carga desde el SSD/HDD hacia la memoria RAM.'
+              : 'Completá la simulación de flujo de datos y validá el mapa pericial.'
+          }
+          tutorExplanation="La computadora no es una suma de piezas aisladas: es una orquesta sincronizada por nanosegundos. Si un componente se atrasa, todo el sistema espera."
+          nextStep={
+            activeStation === 'lab'
+              ? 'Validá la comprobación final para desbloquear el Capítulo 03 (La Verdad de los FPS).'
+              : 'Avanzá a la siguiente estación del flujo de datos.'
+          }
+          whatToLookFor="Los cuellos de botella temporales donde los datos esperan en la cola de bus."
+        />
 
         {/* Inherited Evidence Banner from Chapter 01 */}
         <InheritedPassportBanner specs={specs} evidenceMap={evidenceMap} />

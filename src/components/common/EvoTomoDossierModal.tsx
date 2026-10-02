@@ -19,9 +19,11 @@ import {
   Lock,
   Zap,
   Power,
+  Award,
 } from 'lucide-react';
 import { VOLUMES_COLLECTION } from '../../data/collections';
 import { EvoBootLab } from '../tomo08/EvoBootLab';
+import { EvoTomeExamEngine } from '../exam/EvoTomeExamEngine';
 
 export interface ForensicBenchTarget {
   tomoId: string;
@@ -933,16 +935,38 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
   // CRITICAL DIRECTIVE: The modal MUST ALWAYS open in 'portada' (cover) view by default
   const [modalView, setModalView] = useState<'portada' | 'indice'>('portada');
   const [isBootLabOpen, setIsBootLabOpen] = useState<boolean>(false);
+  const [isExamOpen, setIsExamOpen] = useState<boolean>(false);
 
   // Reset to 'portada' whenever the modal opens or tomoId changes
   useEffect(() => {
     if (isOpen) {
       setModalView('portada');
       setIsBootLabOpen(false);
+      setIsExamOpen(false);
     }
   }, [isOpen, tomoId]);
 
   if (!isOpen || !tomoId) return null;
+
+  if (isExamOpen) {
+    return (
+      <div className="fixed inset-0 z-[130] bg-[#07090e] text-zinc-100 overflow-y-auto animate-in fade-in duration-200">
+        <EvoTomeExamEngine
+          tomoId={tomoId}
+          onBackToTomoCover={() => setIsExamOpen(false)}
+          onBackToIndex={() => setIsExamOpen(false)}
+          onContinueToLab={() => {
+            setIsExamOpen(false);
+            if (tomoId === 'tomo-08') {
+              setIsBootLabOpen(true);
+            } else if (onOpenTomoView) {
+              onOpenTomoView(tomoId);
+            }
+          }}
+        />
+      </div>
+    );
+  }
 
   if (isBootLabOpen && tomoId === 'tomo-08') {
     return (
@@ -1214,6 +1238,15 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
 
                   <button
                     type="button"
+                    onClick={() => setIsExamOpen(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 transition-all duration-200 cursor-pointer shadow-lg"
+                  >
+                    <Award className="w-4 h-4 text-amber-400" />
+                    <span>EXAMEN FINAL</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={handlePrintOrPdf}
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 transition-all duration-200 cursor-pointer shadow-lg"
                   >
@@ -1349,6 +1382,16 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
               </div>
 
               <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsExamOpen(true)}
+                  className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-amber-500/40 text-amber-300 font-mono-tech text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+                  title="Rendir Examen Final Interactivo"
+                >
+                  <Award className="w-4 h-4 text-amber-400" />
+                  <span>EXAMEN FINAL</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={handlePrintOrPdf}

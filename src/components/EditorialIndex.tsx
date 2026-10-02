@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -10,8 +10,17 @@ import {
   FlaskConical,
   RotateCcw,
   Check,
+  Compass,
+  Map,
+  HelpCircle,
 } from 'lucide-react';
 import { ChapterItem } from '../types';
+import { TutorReturningUserBanner } from './tutor/TutorReturningUserBanner';
+import { TutorTomo01TourModal } from './tutor/TutorTomo01TourModal';
+import { TutorTomo01WelcomeModal } from './tutor/TutorTomo01WelcomeModal';
+import { TutorProgressMapModal } from './tutor/TutorProgressMapModal';
+import { TutorPreFlightModal } from './tutor/TutorPreFlightModal';
+import { useTutorEvo } from './tutor/TutorEvoContext';
 
 interface EditorialIndexProps {
   chapters: ChapterItem[];
@@ -50,10 +59,36 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
   onStartFinalExam,
   onOpenCompletionScreen,
 }) => {
+  const { openTutorWithTab, setMode } = useTutorEvo();
+  const [isTourOpen, setIsTourOpen] = useState(false);
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
+  const [preFlightType, setPreFlightType] = useState<'EXAM' | 'LAB' | null>(null);
+
   const completedCount = chapters.filter((c) => c.status === 'COMPLETADO').length;
   const isAllChaptersDone = completedCount >= 7;
   const hasPassedFinalExam =
     typeof window !== 'undefined' && localStorage.getItem('evo_tomo01_completed') === 'true';
+
+  // Identify latest active chapter for returning user
+  const latestActiveChapter = useMemo(() => {
+    const firstAvailable = chapters.find((c) => c.status === 'DISPONIBLE');
+    if (firstAvailable) return firstAvailable;
+    const completedOnes = chapters.filter((c) => c.status === 'COMPLETADO');
+    if (completedOnes.length > 0) return completedOnes[completedOnes.length - 1];
+    return chapters[0];
+  }, [chapters]);
+
+  const handleStartChapterByNumber = (chNum: string) => {
+    if (chNum === '01') onStartResearch();
+    else if (chNum === '02' && onStartChapter02) onStartChapter02();
+    else if (chNum === '03' && onStartChapter03) onStartChapter03();
+    else if (chNum === '04' && onStartChapter04) onStartChapter04();
+    else if (chNum === '05' && onStartChapter05) onStartChapter05();
+    else if (chNum === '06' && onStartChapter06) onStartChapter06();
+    else if (chNum === '07' && onStartChapter07) onStartChapter07();
+    else onStartResearch();
+  };
 
   const getChapterDisplayStatus = (cap: ChapterItem) => {
     if (cap.status === 'COMPLETADO') {
@@ -114,7 +149,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
       </nav>
 
       {/* Main Magazine Index Header: Spacious, high contrast */}
-      <header className="mb-8 sm:mb-12 max-w-4xl">
+      <header className="mb-6 sm:mb-8 max-w-4xl">
         <div className="flex items-center gap-2 text-xs font-mono-tech text-yellow-400 mb-2.5 tracking-widest uppercase font-semibold">
           <BookOpen className="w-3.5 h-3.5 text-yellow-400" />
           <span>TOMO 01 // GUÍA EDITORIAL</span>
@@ -124,10 +159,53 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
           CONOCÉ TU PC
         </h1>
 
-        <p className="font-sans-editorial text-lg sm:text-xl text-zinc-300 max-w-2xl leading-relaxed italic">
+        <p className="font-sans-editorial text-lg sm:text-xl text-zinc-300 max-w-2xl leading-relaxed italic mb-4">
           “De mirar especificaciones a entender realmente cómo trabaja tu máquina.”
         </p>
+
+        {/* Tutor Quick Entry Actions */}
+        <div className="flex flex-wrap items-center gap-2.5 pt-1">
+          <button
+            type="button"
+            onClick={() => setIsTourOpen(true)}
+            className="px-4 py-2 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>VER TOUR REAL DE LA INTERFAZ</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsMapOpen(true)}
+            className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-cyan-300 border border-zinc-700 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+          >
+            <Map className="w-3.5 h-3.5 text-cyan-400" />
+            <span>MAPA DE RECORRIDO</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => openTutorWithTab('explain')}
+            className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+            <span>TUTOR EVO</span>
+          </button>
+        </div>
       </header>
+
+      {/* Returning User Banner */}
+      {completedCount > 0 && latestActiveChapter && (
+        <div className="mb-6">
+          <TutorReturningUserBanner
+            lastChapterNumber={latestActiveChapter.number}
+            lastChapterTitle={latestActiveChapter.title}
+            completedCount={completedCount}
+            onContinue={() => handleStartChapterByNumber(latestActiveChapter.number)}
+            onOpenMap={() => setIsMapOpen(true)}
+          />
+        </div>
+      )}
 
       {/* Direct A4 Magazine Access Banner */}
       <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-yellow-400/15 via-[#141720] to-[#10121a] border border-yellow-400/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 shadow-xl">
@@ -713,6 +791,57 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
         </aside>
 
       </div>
+
+      {/* Tutor Real Interface Tour Modal */}
+      <TutorTomo01TourModal
+        isOpen={isTourOpen}
+        onClose={() => setIsTourOpen(false)}
+        onFinishTour={() => setIsTourOpen(false)}
+        onStartChapter01={onStartResearch}
+      />
+
+      {/* Tutor Welcome Zero Knowledge Modal */}
+      <TutorTomo01WelcomeModal
+        isOpen={isWelcomeOpen}
+        onClose={() => setIsWelcomeOpen(false)}
+        onStartZeroKnowledge={() => {
+          setIsWelcomeOpen(false);
+          setIsTourOpen(true);
+        }}
+        onExploreFreely={() => {
+          setIsWelcomeOpen(false);
+          setMode('libre');
+        }}
+        onStartChapter01={onStartResearch}
+      />
+
+      {/* Real Progress Map Modal */}
+      <TutorProgressMapModal
+        isOpen={isMapOpen}
+        onClose={() => setIsMapOpen(false)}
+        chapters={chapters}
+        currentChapterNumber={latestActiveChapter.number}
+        onSelectChapter={handleStartChapterByNumber}
+        onOpenExam={onStartFinalExam}
+        onOpenLab={onOpenLab}
+      />
+
+      {/* Pre-Flight Guidance Modals */}
+      {preFlightType && (
+        <TutorPreFlightModal
+          isOpen={!!preFlightType}
+          onClose={() => setPreFlightType(null)}
+          onConfirm={() => {
+            if (preFlightType === 'EXAM' && onStartFinalExam) {
+              onStartFinalExam();
+            } else if (preFlightType === 'LAB' && onOpenLab) {
+              onOpenLab();
+            }
+          }}
+          type={preFlightType}
+          tomoTitle="Tomo 01 // Conocé tu PC"
+        />
+      )}
 
     </div>
   );

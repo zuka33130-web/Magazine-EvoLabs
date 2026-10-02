@@ -42,6 +42,8 @@ import {
 } from '../types';
 import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
 import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
+import { TutorChapterBanner } from './tutor/TutorChapterBanner';
+import { TutorConceptTrigger } from './tutor/TutorConceptTrigger';
 
 interface Chapter01ViewProps {
   onBackToIndex: () => void;
@@ -678,6 +680,27 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
           <span className="text-yellow-400 font-semibold tracking-wider">INVESTIGACIÓN ACTIVA</span>
         </div>
       </nav>
+
+      {/* Tutor EVO Chapter Permanent Orientation Banner */}
+      <TutorChapterBanner
+        chapterNumber="01"
+        chapterTitle="¿QUÉ PC TENÉS REALMENTE?"
+        currentStage={activeSection === 'tu-pc' ? 'COMPROBAR' : activeSection === 'cover' ? 'ENTENDER' : 'PRACTICAR'}
+        currentAction={
+          activeSection === 'cover'
+            ? 'Leé la tesis introductoria y seleccioná un componente para auditar.'
+            : activeSection === 'tu-pc'
+            ? 'Comprobá el pasaporte de hardware que recolectaste con la evidencia real.'
+            : `Auditá la especificación de ${activeSection.toUpperCase()} usando los comandos periciales seguros.`
+        }
+        tutorExplanation="Cada componente tiene un comando de lectura directa de hardware. No necesitás memorizar nada: copiá el comando, observá el resultado y registralo."
+        nextStep={
+          activeSection === 'tu-pc'
+            ? 'Validá la comprobación para desbloquear el Capítulo 02 (CPU y Silicio).'
+            : 'Continuá completando los 8 componentes de tu pasaporte.'
+        }
+        whatToLookFor="El nombre exacto del fabricante, modelo y especificación que devuelve Windows."
+      />
 
       {/* Persistent Visual Navigation Bar: 01 CPU ... 08 TU PC */}
       <div className="mb-10 p-3 sm:p-4 rounded-2xl bg-[#101115] border border-zinc-800/80 shadow-xl overflow-x-auto scrollbar-none">

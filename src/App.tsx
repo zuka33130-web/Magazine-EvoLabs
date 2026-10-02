@@ -42,8 +42,17 @@ import { EvoCase } from './components/evoLabCore/types';
 import { EvoTomo01FinalExam } from './components/tomo01/EvoTomo01FinalExam';
 import { EvoTomo01CompletionScreen } from './components/tomo01/EvoTomo01CompletionScreen';
 import { CheckCircle2, X, History } from 'lucide-react';
+import {
+  TutorEvoProvider,
+  useTutorEvo,
+} from './components/tutor/TutorEvoContext';
+import { TutorBreadcrumbBar } from './components/tutor/TutorBreadcrumbBar';
+import { TutorEvoFloatingButton } from './components/tutor/TutorEvoFloatingButton';
+import { TutorEvoDrawer } from './components/tutor/TutorEvoDrawer';
+import { TutorOnboardingModal } from './components/tutor/TutorOnboardingModal';
 
-export default function App() {
+function AppContent() {
+  const { updateLocation } = useTutorEvo();
   const [currentView, setCurrentView] = useState<
     | 'magazine'
     | 'tomo-02'
@@ -167,6 +176,198 @@ export default function App() {
       // ignore
     }
   }, []);
+
+  // Sync Tutor Location with currentView
+  useEffect(() => {
+    switch (currentView) {
+      case 'world-map':
+        updateLocation({
+          academySection: 'MUNDO EVO',
+          tomoNumber: undefined,
+          tomoTitle: 'Academia EVO LABS',
+          chapterTitle: undefined,
+          activityTitle: 'Mapa Principal',
+          activityType: 'mundo',
+          whatIs: 'Centro principal de navegación y exploración de EVO LABS.',
+          whatFor: 'Permite visualizar todos los 10 Tomos, acceder al recorrido guiado y retomar tu progreso.',
+          currentAction: 'Seleccioná un Tomo de la colección o hacé clic en "Continuar mi recorrido".',
+          whatToLookFor: 'Observá los 10 tomos organizados correlativamente con sus badges de estado.',
+          whyItMatters: 'Comprender el mapa global de la Academia te ayuda a trazar tu plan de estudio sin perderte.',
+          nextStep: 'Ingresá al Tomo 01 (Conocé tu PC) para aprender la base del silicio y componentes.',
+        });
+        break;
+      case 'cover':
+      case 'index':
+        updateLocation({
+          academySection: 'TOMOS EVO LABS',
+          tomoNumber: '01',
+          tomoTitle: 'CONOCÉ TU PC',
+          chapterTitle: currentView === 'cover' ? 'Portada' : 'Índice de Capítulos',
+          activityTitle: 'Tomo Interactivo',
+          activityType: 'lectura',
+          whatIs: 'Tomo 01: Conocé tu PC. El punto de partida de la formación.',
+          whatFor: 'Aprender a identificar la arquitectura de tu máquina, procesador, memoria y métricas reales.',
+          currentAction: 'Seleccioná un capítulo para comenzar o abrí el Magazine para lectura completa.',
+          whatToLookFor: 'Los 7 capítulos progresivos y el Examen Final al completar el recorrido.',
+          whyItMatters: 'Es la base obligatoria antes de diagnosticar fallas o reparar hardware.',
+          nextStep: 'Comenzá por el Capítulo 01: ¿Qué PC tenés realmente?.',
+        });
+        break;
+      case 'chapter-01':
+      case 'chapter-02':
+      case 'chapter-03':
+      case 'chapter-04':
+      case 'chapter-05':
+      case 'chapter-06':
+      case 'chapter-07': {
+        const chNum = currentView.replace('chapter-', '');
+        updateLocation({
+          academySection: 'TOMOS EVO LABS',
+          tomoNumber: '01',
+          tomoTitle: 'CONOCÉ TU PC',
+          chapterTitle: `Capítulo ${chNum}`,
+          activityTitle: 'Módulo Activo',
+          activityType: 'practica',
+          whatIs: `Capítulo ${chNum} del Tomo 01: aprendizaje guiado con teoría, prácticas y comprobaciones.`,
+          whatFor: 'Dominar la materia del capítulo y generar evidencia pericial para desbloquear el siguiente.',
+          currentAction: 'Leé el contenido, interactuá con las estaciones y completá la comprobación final.',
+          whatToLookFor: 'Los bloques didácticos, las definiciones de conceptos y las métricas en tiempo real.',
+          whyItMatters: 'Cada capítulo completado afianza tu pasaporte técnico y te prepara para el Examen Final.',
+          nextStep: 'Completá la actividad para marcar el capítulo como completado.',
+        });
+        break;
+      }
+      case 'tomo01-quiz':
+        updateLocation({
+          academySection: 'EXAMEN FINAL INTERACTIVO',
+          tomoNumber: '01',
+          tomoTitle: 'CONOCÉ TU PC',
+          chapterTitle: 'Examen de Comprobación Pericial',
+          activityTitle: '15 Preguntas Técnicas',
+          activityType: 'examen',
+          whatIs: 'Examen Final interactivo y reutilizable del Tomo 01.',
+          whatFor: 'Validar tu entendimiento real de hardware, telemetría y diagnósticos con 15 preguntas aleatorias.',
+          currentAction: 'Respondé cada pregunta analizando las premisas y revisá tus respuestas antes de entregar.',
+          whatToLookFor: 'Preguntas de elección simple, múltiple, secuencias, análisis de gráficos y casos de taller.',
+          whyItMatters: 'Alcanzar el 75% o más otorga la distinción oficial "TEORÍA COMPROBADA".',
+          nextStep: 'Revisá la devolución pericial y continuá al Laboratorio de Identidad y Hardware.',
+        });
+        break;
+      case 'tomo-02':
+        updateLocation({
+          academySection: 'TOMOS EVO LABS',
+          tomoNumber: '02',
+          tomoTitle: 'LA BIBLIA NEGRA DE WINDOWS',
+          activityTitle: 'Ficha del Tomo',
+          activityType: 'lectura',
+          whatIs: 'Tomo 02: La Biblia Negra de Windows. El lado oscuro del sistema operativo.',
+          whatFor: 'Comprender el kernel, registros, telemetría, servicios ocultos y auditoría de Windows.',
+          currentAction: 'Leé el Magazine de 67 páginas, realizá las prácticas o rendí el Examen Final.',
+          whyItMatters: 'Dominar Windows a nivel pericial te permite detectar cuellos de botella y fallas invisibles.',
+          nextStep: 'Accedé al Laboratorio Virtual Guiado de Windows (Matrix Lab).',
+        });
+        break;
+      case 'tomo-03':
+        updateLocation({
+          academySection: 'TOMOS EVO LABS',
+          tomoNumber: '03',
+          tomoTitle: 'REPARACIÓN DE PC',
+          activityTitle: 'Sistema Virtual Guiado',
+          activityType: 'diagnostico',
+          whatIs: 'Tomo 03: Reparación de PC. Diagnóstico metódico y resolución de averías.',
+          whatFor: 'Aislar fallas de encendido, cuelgues, memorias defectuosas y fuentes de alimentación.',
+          currentAction: 'Explorá los casos de taller, leé los procedimientos o rendí el Examen Final.',
+          whyItMatters: 'Evita el cambio de piezas a ciegas aplicando el método de descarte pericial.',
+          nextStep: 'Comprobá tu teoría en el Examen Final del Tomo 03.',
+        });
+        break;
+      case 'tomo-04':
+        updateLocation({
+          academySection: 'TOMOS EVO LABS',
+          tomoNumber: '04',
+          tomoTitle: 'REPARACIÓN DE NOTEBOOKS',
+          activityTitle: 'Sistema Virtual Guiado',
+          activityType: 'diagnostico',
+          whatIs: 'Tomo 04: Reparación de Notebooks. Diagnóstico de arquitecturas portátiles y circuitos de potencia.',
+          whatFor: 'Comprender cargadores, chips EC/KBC, líneas de standby de 3.3V/5V y secuencias de encendido.',
+          currentAction: 'Analizá los esquemáticos y casos de fallas en placas de notebooks.',
+          whyItMatters: 'Las notebooks tienen arquitecturas compactas y fuentes conmutadas complejas.',
+          nextStep: 'Rendí el Examen Final del Tomo 04.',
+        });
+        break;
+      case 'tomo-08':
+      case 'boot-lab':
+        updateLocation({
+          academySection: 'LABORATORIOS EVO',
+          tomoNumber: '08',
+          tomoTitle: 'ARRANQUE Y DIAGNÓSTICO',
+          activityTitle: 'Laboratorio de Arranque y Fallas Guiado',
+          activityType: 'laboratorio',
+          whatIs: 'Laboratorio del Tomo 08: Del botón POWER al escritorio de Windows paso a paso.',
+          whatFor: 'Aprender la secuencia de señales de hardware, POST, inicialización UEFI y carga del kernel.',
+          currentAction: 'Provocá fallas en cada etapa de arranque y observá la telemetría y códigos de error.',
+          whyItMatters: 'Comprender el arranque te permite aislar en qué segundo exacto muere una máquina.',
+          nextStep: 'Rendí el Examen Final del Tomo 08 para validar tus conocimientos.',
+        });
+        break;
+      case 'hotswap-lab':
+        updateLocation({
+          academySection: 'LABORATORIOS EVO',
+          tomoNumber: '01',
+          tomoTitle: 'CONOCÉ TU PC',
+          activityTitle: 'Laboratorio Virtual de Identidad y Hardware',
+          activityType: 'laboratorio',
+          whatIs: 'El banco interactivo de hardware del Tomo 01.',
+          whatFor: 'Intercambiar CPUs, GPUs, RAMs y discos para observar en tiempo real cuellos de botella y telemetría.',
+          currentAction: 'Cambiá componentes, ejecutá simulaciones de carga y analizá el frametime.',
+          whyItMatters: 'Permite experimentar sin riesgo de quemar silicio real.',
+          nextStep: 'Comprobá el impacto de las configuraciones en el rendimiento general.',
+        });
+        break;
+      case 'windows-matrix-lab':
+        updateLocation({
+          academySection: 'LABORATORIOS EVO',
+          tomoNumber: '02',
+          tomoTitle: 'LA BIBLIA NEGRA DE WINDOWS',
+          activityTitle: 'Laboratorio Virtual Guiado de Windows',
+          activityType: 'laboratorio',
+          whatIs: 'Laboratorio de auditoría de Windows del Tomo 02.',
+          whatFor: 'Inspeccionar procesos, servicios, registros y telemetría en escenarios controlados.',
+          currentAction: 'Elegí un escenario de diagnóstico e investigá las anomalías de sistema.',
+          whyItMatters: 'Te capacita para resolver problemas avanzados de sistema operativo.',
+          nextStep: 'Validá los hallazgos periciales con los comandos recomendados.',
+        });
+        break;
+      case 'lab-core':
+        updateLocation({
+          academySection: 'TALLER DE CASOS Y EXPEDIENTES',
+          activityTitle: 'Banco de Diagnóstico Multitomo',
+          activityType: 'diagnostico',
+          whatIs: 'Taller pericial donde se combinan hardware, sistema y telemetría en casos reales.',
+          whatFor: 'Resolver expedientes complejos de clientes y auditorías de taller.',
+          currentAction: 'Seleccioná un caso abierto, armá la PC de pruebas o diagnosticá la máquina cliente.',
+          whyItMatters: 'Es el entorno pericial donde aplicás todo lo aprendido en los 10 Tomos.',
+          nextStep: 'Completá el expediente y emití el informe pericial.',
+        });
+        break;
+      case 'magazine':
+        updateLocation({
+          academySection: 'MAGAZINE A4',
+          tomoNumber: '01',
+          tomoTitle: 'CONOCÉ TU PC',
+          activityTitle: 'Edición Editorial Descargable',
+          activityType: 'lectura',
+          whatIs: 'Revista técnica editorial oficial del Tomo 01 en formato A4 de alta calidad.',
+          whatFor: 'Lectura pausada, comprensión profunda y descarga para tu biblioteca offline.',
+          currentAction: 'Navegá las páginas con las flechas, usá el índice o descargá el archivo.',
+          whyItMatters: 'Leer y entender es el primer paso indispensable del Método EVO.',
+          nextStep: 'Pasá al Tomo Interactivo para realizar las prácticas guiadas.',
+        });
+        break;
+      default:
+        break;
+    }
+  }, [currentView, updateLocation]);
 
   // Navigation target station for Chapter 02
   const [c02TargetStation, setC02TargetStation] = useState<Chapter02Station | undefined>(undefined);
@@ -805,6 +1006,9 @@ export default function App() {
         onCloseDossierModal={() => setDossierModalTomoId(null)}
       />
 
+      {/* Orientación Permanente: Tutor Breadcrumb Bar */}
+      <TutorBreadcrumbBar />
+
       {/* Main Body Container */}
       <div className="flex-1 min-h-screen flex flex-col relative">
         {/* Subtle Ambient Workspace Top Glow */}
@@ -1046,11 +1250,17 @@ export default function App() {
           )}
 
           {currentView === 'tomo01-quiz' && (
-            <div className="max-w-7xl w-full mx-auto px-6 sm:px-8 lg:px-12 py-6">
+            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4">
               <EvoTomo01FinalExam
                 onBackToIndex={handleBackToIndex}
+                onBackToTomoCover={handleNavigateTomo01}
                 onGoToChapter={(ch) => handleGoToMissing(ch)}
                 onCompleteExam={handleCompleteExam}
+                onContinueToLab={() => {
+                  setActiveLabPanel('hardware');
+                  setCurrentView('hotswap-lab');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
               />
             </div>
           )}
@@ -1221,6 +1431,18 @@ export default function App() {
           </button>
         </div>
       )}
+      {/* TUTOR EVO: Sistema de Acompañamiento Global */}
+      <TutorEvoFloatingButton />
+      <TutorEvoDrawer />
+      <TutorOnboardingModal />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <TutorEvoProvider>
+      <AppContent />
+    </TutorEvoProvider>
   );
 }

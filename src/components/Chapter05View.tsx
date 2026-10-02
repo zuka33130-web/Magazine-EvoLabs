@@ -43,6 +43,7 @@ import { ActivityMapArtifact } from './chapter05/ActivityMapArtifact';
 import { OptimizationLogArtifact } from './chapter05/OptimizationLogArtifact';
 import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
 import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
+import { TutorChapterBanner } from './tutor/TutorChapterBanner';
 
 interface Chapter05ViewProps {
   onBackToIndex: () => void;
@@ -512,6 +513,25 @@ export const Chapter05View: React.FC<Chapter05ViewProps> = ({
             </span>
           </div>
         </nav>
+
+        {/* Tutor EVO Chapter Permanent Orientation Banner */}
+        <TutorChapterBanner
+          chapterNumber="05"
+          chapterTitle="WINDOWS EN MOVIMIENTO (TELEMETRÍA)"
+          currentStage={isCompleted ? 'COMPROBAR' : 'PRACTICAR'}
+          currentAction={
+            isCompleted
+              ? 'Revisá el mapa pericial de actividad y registro de optimización consolidado.'
+              : `Auditá la estación ${currentStation} de 8: ${stationsMeta[currentStation - 1]?.title || 'Procesos'}.`
+          }
+          tutorExplanation="Windows ejecuta decenas de procesos y servicios invisibles. En este capítulo aprendés a distinguir cuáles son esenciales y cuáles son bloatware que roba ciclos de reloj."
+          nextStep={
+            isCompleted
+              ? 'Avanzá al Capítulo 06 (Casos Reales).'
+              : 'Completá la investigación del proceso o servicio actual.'
+          }
+          whatToLookFor="Consumo en reposo: si en reposo la CPU supera el 5% o la RAM el 60%, hay procesos en segundo plano consumiendo recursos."
+        />
 
         {/* Inherited Evidence Banner */}
         <ExpedienteAcumuladoC05Banner

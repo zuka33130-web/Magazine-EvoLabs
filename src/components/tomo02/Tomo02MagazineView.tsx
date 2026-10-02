@@ -436,10 +436,15 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             setSubView('index');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
+          onBackToTomoCover={() => {
+            setSubView('cover');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
           onCompleteExam={handleExamPassed}
           onGoToModule={(idx) => {
             handleSelectModule(idx);
           }}
+          onContinueToLab={onOpenLab}
         />
       </div>
     );

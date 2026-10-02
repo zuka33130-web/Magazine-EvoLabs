@@ -31,6 +31,7 @@ import { InterpretationStation } from './chapter03/InterpretationStation';
 import { FluidezProfileArtifact } from './chapter03/FluidezProfileArtifact';
 import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
 import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
+import { TutorChapterBanner } from './tutor/TutorChapterBanner';
 
 interface Chapter03ViewProps {
   onBackToIndex: () => void;
@@ -317,6 +318,25 @@ export const Chapter03View: React.FC<Chapter03ViewProps> = ({
             </span>
           </div>
         </nav>
+
+        {/* Tutor EVO Chapter Permanent Orientation Banner */}
+        <TutorChapterBanner
+          chapterNumber="03"
+          chapterTitle="LA VERDAD DE LOS FPS (FRAMETIME)"
+          currentStage={isCompleted ? 'COMPROBAR' : 'OBSERVAR'}
+          currentAction={
+            isCompleted
+              ? 'Revisá el perfil pericial de fluidez consolidado y la comprobación de aprendizaje.'
+              : 'Analizá el simulador de frametimes para entender por qué los FPS promedio pueden ser engañosos.'
+          }
+          tutorExplanation="El ojo humano no percibe promedios de FPS: percibe regularidad temporal. Si un solo cuadro tarda 50 ms en lugar de 16 ms, sentís un tirón (stuttering) aunque el contador marque 60 FPS."
+          nextStep={
+            isCompleted
+              ? 'Avanzá al Capítulo 04 (Cuellos de Botella).'
+              : 'Configurá tu perfil de prueba y analizá el percentil 1% Low.'
+          }
+          whatToLookFor="La regularidad de la línea de tiempo de frametime: una línea plana significa fluidez perfecta."
+        />
 
         {/* Inherited Evidence Card */}
         <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

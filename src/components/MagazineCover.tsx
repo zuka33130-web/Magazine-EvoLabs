@@ -1,6 +1,9 @@
-import React from 'react';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowRight, ArrowLeft, Sparkles, HelpCircle, Compass } from 'lucide-react';
 import { EditorialHeadline } from '../types';
+import { TutorTomo01TourModal } from './tutor/TutorTomo01TourModal';
+import { TutorTomo01WelcomeModal } from './tutor/TutorTomo01WelcomeModal';
+import { useTutorEvo } from './tutor/TutorEvoContext';
 
 interface MagazineCoverProps {
   headlines: EditorialHeadline[];
@@ -15,6 +18,9 @@ export const MagazineCover: React.FC<MagazineCoverProps> = ({
   onOpenA4Magazine,
   onBackToWorldMap,
 }) => {
+  const { openTutorWithTab, setMode } = useTutorEvo();
+  const [isTourOpen, setIsTourOpen] = useState(false);
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
   return (
     <section 
       id="contemporary-magazine-cover" 
@@ -104,6 +110,15 @@ export const MagazineCover: React.FC<MagazineCoverProps> = ({
               <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" />
             </button>
 
+            <button
+              type="button"
+              onClick={() => setIsWelcomeOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-500/40 transition-all duration-200 cursor-pointer shadow-md"
+            >
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span>EMPEZAR DESDE CERO</span>
+            </button>
+
             {onOpenA4Magazine && (
               <button
                 id="btn-abrir-revista-a4"
@@ -135,6 +150,30 @@ export const MagazineCover: React.FC<MagazineCoverProps> = ({
         </div>
 
       </div>
+
+      {/* Tutor Tour Modal */}
+      <TutorTomo01TourModal
+        isOpen={isTourOpen}
+        onClose={() => setIsTourOpen(false)}
+        onFinishTour={() => setIsTourOpen(false)}
+        onStartChapter01={onOpenEdition}
+      />
+
+      {/* Tutor Welcome Zero Knowledge Modal */}
+      <TutorTomo01WelcomeModal
+        isOpen={isWelcomeOpen}
+        onClose={() => setIsWelcomeOpen(false)}
+        onStartZeroKnowledge={() => {
+          setIsWelcomeOpen(false);
+          setIsTourOpen(true);
+        }}
+        onExploreFreely={() => {
+          setIsWelcomeOpen(false);
+          setMode('libre');
+          onOpenEdition();
+        }}
+        onStartChapter01={onOpenEdition}
+      />
     </section>
   );
 };

@@ -17,8 +17,10 @@ import {
   Activity,
   Check,
   Zap,
+  Award,
 } from 'lucide-react';
 import { Tomo03MasterPage } from './Tomo03MasterPage';
+import { EvoTomeExamEngine } from '../exam/EvoTomeExamEngine';
 import {
   TOMO_03_META,
   WORKBENCH_BASE_KIT,
@@ -45,6 +47,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
   const [isPreparingPrint, setIsPreparingPrint] = useState<boolean>(false);
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
+  const [isExamOpen, setIsExamOpen] = useState<boolean>(false);
 
   const totalPages = TOMO_03_META.totalPages;
 
@@ -261,6 +264,15 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
 
           <button
             type="button"
+            onClick={() => setIsExamOpen(true)}
+            className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-emerald-400 font-bold border border-emerald-500/40 text-xs flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)] cursor-pointer"
+          >
+            <Award className="w-3.5 h-3.5 text-emerald-400" />
+            <span>EXAMEN FINAL</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setShowExportModal(true)}
             className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-black font-extrabold hover:brightness-110 transition-all flex items-center gap-1.5 shadow-[0_0_12px_rgba(16,185,129,0.4)] cursor-pointer"
           >
@@ -270,8 +282,17 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         </div>
       </nav>
 
-      {/* Main Magazine Pages Container */}
-      <main className="flex-1 py-8 px-2 sm:px-4 flex flex-col items-center gap-8 print:p-0 print:m-0 print:gap-0">
+      {isExamOpen ? (
+        <div className="flex-1 w-full">
+          <EvoTomeExamEngine
+            tomoId="tomo-03"
+            onBackToTomoCover={() => setIsExamOpen(false)}
+            onBackToIndex={() => setIsExamOpen(false)}
+          />
+        </div>
+      ) : (
+        /* Main Magazine Pages Container */
+        <main className="flex-1 py-8 px-2 sm:px-4 flex flex-col items-center gap-8 print:p-0 print:m-0 print:gap-0">
         {/* ========================================================
             PAGE 01: COVER
         ======================================================== */}
@@ -886,6 +907,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
           </Tomo03MasterPage>
         )}
       </main>
+      )}
 
       {/* Export / PDF Modal */}
       {showExportModal && (

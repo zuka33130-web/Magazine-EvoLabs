@@ -37,6 +37,7 @@ import { Tome01DossierView } from './chapter07/Tome01DossierView';
 import { AVAILABLE_METRICS } from './chapter07/abExperimentKnowledge';
 import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
 import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
+import { TutorChapterBanner } from './tutor/TutorChapterBanner';
 
 interface Chapter07ViewProps {
   onBackToIndex: () => void;
@@ -748,6 +749,25 @@ export const Chapter07View: React.FC<Chapter07ViewProps> = ({
           <span className="text-yellow-400 font-bold tracking-wider">LABORATORIO A/B</span>
         </div>
       </nav>
+
+      {/* Tutor EVO Chapter Permanent Orientation Banner */}
+      <TutorChapterBanner
+        chapterNumber="07"
+        chapterTitle="NO ME DIGAS QUE MEJORÓ. DEMOSTRALO. (ENSAYO A/B)"
+        currentStage={finalReport ? 'COMPROBAR' : 'DIAGNOSTICAR'}
+        currentAction={
+          finalReport
+            ? 'Revisá el informe de laboratorio A/B y el expediente integral del Tomo 01.'
+            : `Ejecutando la Fase ${currentPhase} de 7: Medición pericial controlada A/B.`
+        }
+        tutorExplanation="La regla de oro del perito: una sola variable cambiada a la vez. Medición A (antes) vs Medición B (después) con condiciones idénticas de prueba."
+        nextStep={
+          finalReport
+            ? 'Avanzá al Examen Final Interactivo para certificar TEORÍA COMPROBADA.'
+            : 'Completá la fase actual del ensayo A/B para emitir el dictamen pericial.'
+        }
+        whatToLookFor="El delta porcentual real entre Medición A y Medición B: si no hay cambio numérico, la optimización fue un placebo."
+      />
 
       {/* Screen Mode Switch: Dossier vs Experiment */}
       {screenMode === 'dossier' ? (

@@ -51,6 +51,7 @@ import { WorkshopCasesLibrary } from './chapter06/WorkshopCasesLibrary';
 import { DiagnosticExpedienteModal } from './chapter06/DiagnosticExpedienteModal';
 import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
 import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
+import { TutorChapterBanner } from './tutor/TutorChapterBanner';
 
 interface Chapter06ViewProps {
   onBackToIndex: () => void;
@@ -608,6 +609,25 @@ export const Chapter06View: React.FC<Chapter06ViewProps> = ({
             </span>
           </div>
         </nav>
+
+        {/* Tutor EVO Chapter Permanent Orientation Banner */}
+        <TutorChapterBanner
+          chapterNumber="06"
+          chapterTitle="ENCONTRÁ LA FALLA (MÉTODO DE DESCARTE)"
+          currentStage={hasRecordedAtLeastOneTest ? 'DIAGNOSTICAR' : 'PRACTICAR'}
+          currentAction={
+            activeCase
+              ? `Analizando el caso "${activeCase.title}". Ejecutá las pruebas técnicas de descarte.`
+              : 'Seleccioná un caso del taller pericial o creá un expediente con tus propios síntomas.'
+          }
+          tutorExplanation="El método pericial nunca cambia piezas al azar. Plantea hipótesis comprobables, diseña una prueba para cada una y descarta causas con evidencia dura."
+          nextStep={
+            hasRecordedAtLeastOneTest
+              ? 'Consolidá el expediente pericial y avanzá al Capítulo 07 (Tu Informe Técnico).'
+              : 'Seleccioná la primera prueba recomendada para descartar causas.'
+          }
+          whatToLookFor="Síntoma → Hipótesis → Prueba técnica → Descarte o confirmación basada en evidencia."
+        />
 
         {/* Resumed Investigation Toast */}
         {resumedNotice && (

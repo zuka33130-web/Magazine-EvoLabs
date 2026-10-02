@@ -32,6 +32,7 @@ import { Station04ControlledExperiment } from './chapter04/Station04ControlledEx
 import { Station05LimitationMatrix } from './chapter04/Station05LimitationMatrix';
 import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
 import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
+import { TutorChapterBanner } from './tutor/TutorChapterBanner';
 
 interface Chapter04ViewProps {
   onBackToIndex: () => void;
@@ -203,6 +204,25 @@ export const Chapter04View: React.FC<Chapter04ViewProps> = ({
             </span>
           </div>
         </nav>
+
+        {/* Tutor EVO Chapter Permanent Orientation Banner */}
+        <TutorChapterBanner
+          chapterNumber="04"
+          chapterTitle="LÍMITES REALES DE TU MÁQUINA"
+          currentStage={isCompleted ? 'COMPROBAR' : 'DIAGNOSTICAR'}
+          currentAction={
+            isCompleted
+              ? 'Revisá la matriz de limitaciones físicas consolidada y completá la comprobación.'
+              : 'Ejecutá el experimento A/B variando resolución y carga gráfica para aislar el cuello de botella.'
+          }
+          tutorExplanation="El cuello de botella no es un error de fábrica: siempre hay un componente que llega al 100% de su capacidad primero y marca el límite de velocidad del sistema."
+          nextStep={
+            isCompleted
+              ? 'Avanzá al Capítulo 05 (Telemetría de la Verdad).'
+              : 'Analizá si el límite proviene de la CPU, la GPU, la RAM o el almacenamiento.'
+          }
+          whatToLookFor="Si al bajar la resolución los FPS suben, el límite es la GPU. Si los FPS se quedan clavados, el límite es la CPU."
+        />
 
         {/* Inherited Evidence Banner (C01 + C02 + C03) */}
         <ExpedienteAcumuladoBanner

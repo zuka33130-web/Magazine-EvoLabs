@@ -21,8 +21,10 @@ import {
   Layers,
   Wrench,
   BookOpen,
+  Award,
 } from 'lucide-react';
 import { Tomo08MasterPage } from './Tomo08MasterPage';
+import { EvoTomeExamEngine } from '../exam/EvoTomeExamEngine';
 import {
   TOMO_08_META,
   TOMO_08_MODULES,
@@ -51,8 +53,9 @@ export const Tomo08MagazineView: React.FC<Tomo08MagazineViewProps> = ({
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
 
-  // Embedded Interactive Lab state
+  // Embedded Interactive Lab & Exam state
   const [isLabOpen, setIsLabOpen] = useState<boolean>(false);
+  const [isExamOpen, setIsExamOpen] = useState<boolean>(false);
   const [labTargetStep, setLabTargetStep] = useState<number | undefined>(undefined);
 
   const totalPages = TOMO_08_META.totalPages;
@@ -165,6 +168,22 @@ export const Tomo08MagazineView: React.FC<Tomo08MagazineViewProps> = ({
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+
+  if (isExamOpen) {
+    return (
+      <div className="min-h-screen bg-[#07090e] p-4 sm:p-6 text-zinc-100 animate-in fade-in duration-200">
+        <EvoTomeExamEngine
+          tomoId="tomo-08"
+          onBackToTomoCover={() => setIsExamOpen(false)}
+          onBackToIndex={() => setIsExamOpen(false)}
+          onContinueToLab={() => {
+            setIsExamOpen(false);
+            setIsLabOpen(true);
+          }}
+        />
+      </div>
+    );
+  }
 
   // If the interactive lab modal is open inside the Tomo view
   if (isLabOpen) {
@@ -284,6 +303,17 @@ export const Tomo08MagazineView: React.FC<Tomo08MagazineViewProps> = ({
                 </option>
               ))}
             </select>
+
+            {/* Exam Button */}
+            <button
+              type="button"
+              onClick={() => setIsExamOpen(true)}
+              className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-emerald-400 font-bold border border-emerald-500/40 font-mono-tech text-xs flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)] cursor-pointer"
+              title="Rendir Examen Final de Arranque y Diagnóstico"
+            >
+              <Award className="w-3.5 h-3.5 text-emerald-400" />
+              <span>EXAMEN FINAL</span>
+            </button>
 
             {/* Print A4 PDF Button */}
             <button
