@@ -36,9 +36,10 @@ import { TomoModuleItem, TOMO_02_FOLDERS } from '../../data/tomo02Data';
 interface VisualProps {
   module: TomoModuleItem;
   richData?: any;
+  compact?: boolean;
 }
 
-export const Tomo02ModuleVisual: React.FC<VisualProps> = ({ module, richData }) => {
+export const Tomo02ModuleVisual: React.FC<VisualProps> = ({ module, richData, compact = false }) => {
   const [activeFocalPoint, setActiveFocalPoint] = useState<number>(0);
   const moduleId = module.id;
 
@@ -106,6 +107,14 @@ export const Tomo02ModuleVisual: React.FC<VisualProps> = ({ module, richData }) 
 
   // Dedicated pedagogical metadata per module
   const visualMeta = getVisualPedagogicalMeta(moduleId, module, richData);
+
+  if (compact) {
+    return (
+      <div className="w-full h-full flex flex-col justify-center items-center overflow-auto p-1.5 sm:p-2.5">
+        {renderVisualGraphic()}
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl bg-black border border-cyan-900/80 shadow-[0_0_50px_rgba(6,182,212,0.15)] overflow-hidden">
@@ -2728,7 +2737,7 @@ const GenericKernelVisual: React.FC<{ module: TomoModuleItem; richData?: any }> 
 /* =========================================================================
    PEDAGOGICAL METADATA HELPER
 ========================================================================= */
-function getVisualPedagogicalMeta(moduleId: string, module: TomoModuleItem, richData?: any) {
+export function getVisualPedagogicalMeta(moduleId: string, module: TomoModuleItem, richData?: any) {
   const defaultMeta = {
     badge: 'DIAGRAMA DE ARQUITECTURA TÉCNICA',
     title: richData?.diagramTitle || `ARQUITECTURA DE SUBSISTEMA // ${module.title}`,

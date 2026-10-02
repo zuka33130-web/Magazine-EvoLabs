@@ -33,22 +33,98 @@ import {
   TOMO_02_GLOSSARY,
 } from '../../data/tomo02Data';
 import { Tomo02Cover } from './Tomo02Cover';
+import { Tomo02CoverHeroVisual } from './Tomo02CoverHeroVisual';
 import { Tomo02EditorialIndex, ModuleProgressStatus } from './Tomo02EditorialIndex';
-import { Tomo02ModuleReader } from './Tomo02ModuleReader';
+import {
+  Tomo02ModuleReader,
+  CHAPTERS_01_TO_09_DATA,
+  MODULE_QUESTIONS,
+} from './Tomo02ModuleReader';
+import {
+  Tomo02EditorialHero,
+  Tomo02EditorialDiagram,
+  Tomo02EditorialComparison,
+  Tomo02EditorialPractice,
+  Tomo02EditorialCase,
+  Tomo02EditorialCheck,
+} from './editorial';
+import { Tomo02ComoUsarElTomo } from './Tomo02ComoUsarElTomo';
 import { EvoTomo02FinalExam } from './EvoTomo02FinalExam';
 import { EvoTomo02CompletionScreen } from './EvoTomo02CompletionScreen';
+import { Tomo02OfficialPdfMagazine } from './Tomo02OfficialPdfMagazine';
 
-export type Tomo02SubView = 'cover' | 'index' | 'reader' | 'exam' | 'completion' | 'a4_magazine';
+export type Tomo02SubView =
+  | 'cover'
+  | 'pdf_magazine'
+  | 'index'
+  | 'reader'
+  | 'exam'
+  | 'completion'
+  | 'a4_magazine';
 
 interface Tomo02MagazineViewProps {
   onBackToApp?: () => void;
-  onNavigateTomo?: (tomo: '01' | '02' | '03' | '04') => void;
+  onNavigateTomo?: (tomo: '01' | '02' | '03' | '04' | '08') => void;
   onOpenLab?: () => void;
   initialPage?: number;
   initialSubView?: Tomo02SubView;
 }
 
 type ViewMode = 'continuous' | 'single';
+
+const getModuleEditorialVariant = (
+  modId: string
+): 'hero' | 'diagram' | 'comparison' | 'practice' | 'case' | 'check' => {
+  switch (modId) {
+    // LAYOUT A: HERO OPENERS (Key Milestone Modules)
+    case 'm00':
+    case 'm07':
+    case 'm12':
+    case 'm17':
+    case 'm26':
+      return 'hero';
+
+    // LAYOUT B & C: TECHNICAL DIAGRAM & ARCHITECTURE
+    case 'm01':
+    case 'm05':
+    case 'm15':
+    case 'm25':
+      return 'diagram';
+
+    // LAYOUT F: MITO VS REALIDAD CONTRAST
+    case 'm03':
+    case 'm06':
+    case 'm11':
+    case 'm16':
+    case 'm21':
+      return 'comparison';
+
+    // LAYOUT D: PRACTICAL LAB DOSSIERS
+    case 'm02':
+    case 'm10':
+    case 'm13':
+    case 'm20':
+      return 'practice';
+
+    // LAYOUT E & G: FORENSIC WORKSHOP CASES
+    case 'm04':
+    case 'm09':
+    case 'm14':
+    case 'm19':
+    case 'm22':
+    case 'm23':
+      return 'case';
+
+    // LAYOUT H: COMPROBALO (Challenge de comprobación técnica e interpretación pericial)
+    case 'm08':
+    case 'm18':
+    case 'm24':
+      return 'check';
+
+    default:
+      return 'diagram';
+  }
+};
 
 export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   onBackToApp,
@@ -249,102 +325,52 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  // If subView is 'cover', 'index', 'reader', 'exam', or 'completion', render their respective view
+  // If subView is 'cover', 'pdf_magazine', 'index', 'reader', 'exam', or 'completion', render their respective view
   if (subView === 'cover') {
     return (
-      <div className="min-h-screen bg-[#060709] text-zinc-100 flex flex-col font-sans-editorial">
-        <Tomo02Cover
-          onOpenIndex={() => {
-            setSubView('index');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onOpenA4Magazine={() => {
-            setSubView('a4_magazine');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onOpenPrintModal={() => setShowExportModal(true)}
-          onBackToApp={onBackToApp}
-          completedModulesCount={completedCount}
-          totalModulesCount={TOMO_02_MODULES.length}
-        />
-        {showExportModal && (
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
-          >
-            <div className="bg-[#0b0e14] border border-cyan-900/80 rounded-2xl max-w-lg w-full p-6 text-white space-y-4 shadow-2xl font-sans-editorial">
-              <div className="flex items-center justify-between border-b border-cyan-950 pb-3">
-                <div className="flex items-center gap-2">
-                  <Printer className="w-5 h-5 text-cyan-400" />
-                  <h3 className="font-display font-bold text-lg text-white">
-                    Exportar Tomo 02 a PDF A4
-                  </h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowExportModal(false)}
-                  className="p-1 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="space-y-3 text-xs text-zinc-300 font-mono-tech">
-                <p className="font-sans-editorial text-sm">
-                  Para obtener un PDF de calidad editorial idéntico a una revista impresa:
-                </p>
-                <div className="p-3 rounded-xl bg-black/60 border border-cyan-950 space-y-1.5 text-[11px]">
-                  <div>1. Destino: <strong>Guardar como PDF</strong></div>
-                  <div>2. Tamaño de papel: <strong>A4</strong></div>
-                  <div>3. Márgenes: <strong>Ninguno / 0 mm</strong></div>
-                  <div>4. Gráficos de fondo: <strong>Activado (Obligatorio)</strong></div>
-                </div>
-
-                {isInIframe && (
-                  <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-900 text-cyan-300 text-[11px] space-y-2">
-                    <p>
-                      💡 Estás en una vista de previsualización. Para abrir el diálogo de impresión nativo sin restricciones del navegador:
-                    </p>
-                    <a
-                      href={getStandalonePrintUrl()}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500 text-black font-bold hover:bg-cyan-400 transition-colors"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>ABRIR EN PESTAÑA NUEVA PARA IMPRIMIR</span>
-                    </a>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between pt-3 border-t border-cyan-950">
-                <button
-                  type="button"
-                  onClick={handleDownloadOfflineHtml}
-                  className="px-3 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-mono-tech flex items-center gap-1.5 cursor-pointer"
-                >
-                  <FileDown className="w-3.5 h-3.5" />
-                  <span>DESCARGAR HTML OFFLINE</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowExportModal(false);
-                    handleNativePrint();
-                  }}
-                  className="px-4 py-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold text-xs font-mono-tech flex items-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(0,210,255,0.4)]"
-                >
-                  <Printer className="w-4 h-4" />
-                  <span>IMPRIMIR AHORA</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+      <div className="min-h-screen bg-[#07090e] text-zinc-100 flex flex-col font-sans-editorial">
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <Tomo02Cover
+            onOpenMagazine={() => {
+              setSubView('pdf_magazine');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenInteractive={() => {
+              setSubView('index');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenLab={() => {
+              if (onOpenLab) {
+                onOpenLab();
+              }
+            }}
+            onOpenA4WebVersion={() => {
+              setSubView('a4_magazine');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onBackToApp={onBackToApp}
+            onNavigateTomo={onNavigateTomo}
+            completedModulesCount={completedCount}
+            totalModulesCount={TOMO_02_MODULES.length}
+          />
+        </div>
       </div>
+    );
+  }
+
+  if (subView === 'pdf_magazine') {
+    return (
+      <Tomo02OfficialPdfMagazine
+        onBackToCover={() => {
+          setSubView('cover');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenInteractive={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenLab={onOpenLab}
+      />
     );
   }
 
@@ -584,7 +610,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
       {/* Main Magazine Pages Container */}
       <main className="flex-1 py-8 px-2 sm:px-4 flex flex-col items-center gap-8 print:p-0 print:m-0 print:gap-0">
         {/* ========================================================
-            PAGE 01: COVER
+            PAGE 01: COVER (DOMINÁ WINDOWS // EL LADO OSCURO DE WINDOWS)
         ======================================================== */}
         {(viewMode === 'continuous' || currentPage === 1) && (
           <Tomo02MasterPage
@@ -594,74 +620,154 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             hideHeaderFooter
             accentColor="#00D2FF"
           >
-            <div className="h-full w-full flex flex-col justify-between p-8 sm:p-12 relative overflow-hidden bg-gradient-to-b from-[#03070C] via-[#070C14] to-[#04060A] text-white">
-              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
-              
-              {/* Cover Masthead */}
-              <div className="relative z-10 border-b-2 border-cyan-400 pb-5">
-                <div className="flex items-center justify-between text-[11px] font-mono-tech tracking-widest text-cyan-400 mb-2">
-                  <span>EVO LABS // COLECCIÓN TÉCNICA MAESTRA</span>
-                  <span>PUBLICACIÓN OFICIAL 2026 // VOL. 02</span>
-                </div>
-                <div className="flex items-baseline justify-between gap-4">
-                  <h1 className="font-display font-black text-5xl sm:text-6xl md:text-7xl tracking-tighter text-white uppercase leading-none">
-                    LA BIBLIA NEGRA<br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                      DE WINDOWS
-                    </span>
-                  </h1>
-                  <span className="text-4xl font-mono-tech font-bold text-cyan-400 hidden sm:block">
-                    02
+            <div className="h-full w-full flex flex-col justify-between p-6 sm:p-9 lg:p-10 relative overflow-hidden bg-gradient-to-b from-[#020509] via-[#050912] to-[#020306] text-white select-none font-sans-editorial">
+              {/* Atmospheric Background Tech Grid */}
+              <div className="absolute inset-0 pointer-events-none opacity-20 bg-tech-grid" />
+              <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-cyan-500/10 rounded-full blur-[110px] pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-blue-600/10 rounded-full blur-[110px] pointer-events-none" />
+
+              {/* ----------------------------------------------------
+                  TOP BAR (COLECCIÓN PERICIAL // EDICIÓN COLECCIONABLE)
+              ---------------------------------------------------- */}
+              <div className="relative z-10 border-b border-cyan-950 pb-2 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-cyan-400">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 bg-cyan-400 inline-block shadow-[0_0_8px_#00D2FF]" />
+                  <span className="font-bold text-white uppercase tracking-widest">
+                    COLECCIÓN PERICIAL // TOMO 02
+                  </span>
+                  <span className="text-zinc-600">|</span>
+                  <span className="text-zinc-400 uppercase tracking-widest hidden sm:inline">
+                    ARQUITECTURA DE SISTEMAS & KERNEL NT
                   </span>
                 </div>
-                <p className="mt-3 text-sm sm:text-base text-zinc-300 font-mono-tech uppercase tracking-wide">
-                  EL MANUAL FORENSE DEFINITIVO DEL SISTEMA OPERATIVO
-                </p>
+                <div className="flex items-center gap-3 text-cyan-400 font-bold">
+                  <span className="text-zinc-400 hidden sm:inline">EDICIÓN COLECCIONABLE // 2026</span>
+                  <span className="px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-700 text-cyan-300 text-[9px]">
+                    A4 210×297mm
+                  </span>
+                </div>
               </div>
 
-              {/* Cover Center Art / Technical Diagram */}
-              <div className="relative z-10 my-8 flex flex-col items-center justify-center">
-                <div className="w-full max-w-xl p-6 rounded-2xl border border-cyan-900/60 bg-[#0A101D]/80 backdrop-blur-sm shadow-2xl relative">
-                  <div className="flex items-center justify-between pb-3 border-b border-cyan-950 text-xs font-mono-tech text-cyan-400">
-                    <span>KERNEL RING 0 & USER MODE RING 3</span>
-                    <span className="px-2 py-0.5 bg-cyan-500/10 rounded border border-cyan-500/30 text-[10px]">
-                      FORENSIC DEEP-DIVE
+              {/* ----------------------------------------------------
+                  MASTHEAD: EVO LABS (MASSIVE EDITORIAL LOGO)
+              ---------------------------------------------------- */}
+              <div className="relative z-10 py-1.5 flex items-baseline justify-between border-b-2 border-cyan-400">
+                <h1 className="font-display font-black text-6xl sm:text-7xl md:text-8xl tracking-tight text-white uppercase leading-none">
+                  EVO LABS
+                </h1>
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 text-[10px] font-mono-tech shadow-[0_0_12px_rgba(0,210,255,0.2)]">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                  <span className="hidden sm:inline">INTERNET DICE // EVO MIDE:</span>
+                  <span className="font-bold text-white">Windows deja de ser una caja negra.</span>
+                </div>
+              </div>
+
+              {/* ----------------------------------------------------
+                  SUB-HEADER STRIP
+              ---------------------------------------------------- */}
+              <div className="relative z-10 py-1.5 flex items-center justify-between text-xs font-mono-tech border-b border-cyan-950">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded bg-cyan-400 text-black font-extrabold text-[10px] tracking-wider">
+                    MAGAZINE // TOMO 02
+                  </span>
+                  <span className="text-white font-bold tracking-widest uppercase text-[11px]">
+                    INGENIERÍA DEL SISTEMA OPERATIVO
+                  </span>
+                </div>
+                <div className="text-[10px] text-zinc-500 font-mono-tech uppercase tracking-widest hidden md:block">
+                  DESMONTAJE DEL KERNEL NT // EDICIÓN METROLÓGICA OFICIAL
+                </div>
+              </div>
+
+              {/* ----------------------------------------------------
+                  MAIN FEATURE BOX: HERO DIAGRAM + DOMINÁ WINDOWS
+              ---------------------------------------------------- */}
+              <div className="relative z-10 my-auto p-4 sm:p-5 rounded-2xl border border-cyan-900/60 bg-[#060A14]/85 backdrop-blur-md shadow-2xl flex flex-col justify-between">
+                <div className="flex items-center justify-between text-[10px] font-mono-tech pb-2 border-b border-cyan-950">
+                  <div className="flex items-center gap-2 text-cyan-400 font-bold uppercase tracking-wider">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#00D2FF]" />
+                    <span>INVESTIGACIÓN PRINCIPAL // TOMO 02</span>
+                  </div>
+                  <span className="text-zinc-500 uppercase tracking-widest text-[9px]">
+                    DESMONTAJE DEL KERNEL NT
+                  </span>
+                </div>
+
+                {/* Central Windows Architecture Flow Diagram */}
+                <div className="my-2">
+                  <Tomo02CoverHeroVisual />
+                </div>
+
+                {/* Dominá Windows Headline & Hook */}
+                <div className="pt-2 border-t border-cyan-950/80">
+                  <h2 className="font-display font-black text-4xl sm:text-5xl md:text-6xl text-white uppercase tracking-tighter leading-none">
+                    DOMINÁ WINDOWS
+                  </h2>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <span className="text-cyan-400 font-bold tracking-widest text-xs sm:text-sm uppercase font-mono-tech">
+                      EL LADO OSCURO DE WINDOWS
+                    </span>
+                    <span className="text-zinc-500">/</span>
+                    <span className="text-zinc-300 text-xs sm:text-sm font-sans-editorial italic">
+                      Lo usás todos los días. Ahora descubrí qué hace cuando no estás mirando.
                     </span>
                   </div>
 
-                  <div className="py-6 font-mono-tech text-xs text-zinc-300 space-y-2">
-                    <div className="p-2.5 rounded bg-black/50 border border-cyan-950 flex items-center justify-between">
-                      <span className="text-cyan-300 font-bold">15 CARPETAS MAESTRAS:</span>
-                      <span className="text-zinc-400">System32, WinSxS, DriverStore, RegBack</span>
+                  {/* Highlight Callout Pill */}
+                  <div className="mt-3 p-3 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-xs font-sans-editorial">
+                    <div className="flex items-center gap-2 text-cyan-300 font-bold font-mono-tech text-[11px] mb-1">
+                      <span className="text-cyan-400">❄</span>
+                      <span>WINDOWS HACE COSAS ANTES DE QUE ABRAS TU PRIMER PROGRAMA.</span>
                     </div>
-                    <div className="p-2.5 rounded bg-black/50 border border-cyan-950 flex items-center justify-between">
-                      <span className="text-cyan-300 font-bold">REGISTRO INTERNO:</span>
-                      <span className="text-zinc-400">SAM, SYSTEM, SOFTWARE, NTUSER.DAT</span>
-                    </div>
-                    <div className="p-2.5 rounded bg-black/50 border border-cyan-950 flex items-center justify-between">
-                      <span className="text-cyan-300 font-bold">HERRAMIENTAS SYSINTERNALS:</span>
-                      <span className="text-zinc-400">Procmon, Procexp, Autoruns, LatencyMon</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-cyan-950 flex items-center justify-between text-[11px] font-mono-tech text-zinc-400">
-                    <span>“TOCALO. PERO PRIMERO ENTENDAMOS QUÉ HACE.”</span>
-                    <span className="text-cyan-400 font-bold">48 PÁGINAS A4</span>
+                    <p className="text-[11px] text-zinc-300 leading-snug">
+                      Procesos invisibles, servicios en segundo plano, la memoria virtual que nadie te explicó y la telemetría bajo escrutinio forense.
+                    </p>
                   </div>
                 </div>
               </div>
 
-              {/* Cover Footer & Barcode */}
-              <div className="relative z-10 pt-4 border-t border-cyan-950/80 flex items-end justify-between text-xs font-mono-tech text-zinc-400">
-                <div>
-                  <p className="font-bold text-white uppercase text-sm">EDITORIAL EVO LABS</p>
-                  <p className="text-[11px] text-zinc-400">Formato Revista A4 // Sin Placeholders // 100% Código Real</p>
+              {/* ----------------------------------------------------
+                  3 TECHNICAL COLUMNS (PROCESOS, MEMORIA, REGISTRO)
+              ---------------------------------------------------- */}
+              <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-mono-tech border-t border-cyan-950">
+                <div className="space-y-1">
+                  <span className="text-cyan-400 font-bold text-[10px] block tracking-wider uppercase">
+                    • PROCESOS & SERVICIOS
+                  </span>
+                  <p className="text-[10px] text-zinc-400 font-sans-editorial leading-tight">
+                    Quién ejecuta qué, svchost compartido y disparadores por eventos.
+                  </p>
                 </div>
-                <div className="text-right">
-                  <div className="tracking-widest font-mono-tech text-sm text-cyan-400 font-bold">
-                    |||||||| | |||| | |||||||
-                  </div>
-                  <span className="text-[9px] text-zinc-500">ISBN-EVO-T02-2026</span>
+
+                <div className="space-y-1 border-t sm:border-t-0 sm:border-l border-cyan-950 sm:pl-3 pt-1.5 sm:pt-0">
+                  <span className="text-cyan-400 font-bold text-[10px] block tracking-wider uppercase">
+                    • MEMORIA VIRTUAL
+                  </span>
+                  <p className="text-[10px] text-zinc-400 font-sans-editorial leading-tight">
+                    Dossier especial: Commit Charge, Working Set, Standby y Pagefile.
+                  </p>
+                </div>
+
+                <div className="space-y-1 border-t sm:border-t-0 sm:border-l border-cyan-950 sm:pl-3 pt-1.5 sm:pt-0">
+                  <span className="text-cyan-400 font-bold text-[10px] block tracking-wider uppercase">
+                    • REGISTRO & SEGURIDAD
+                  </span>
+                  <p className="text-[10px] text-zinc-400 font-sans-editorial leading-tight">
+                    MenuShowDelay, supercompresión compact, hash SHA-256 y defensa activa.
+                  </p>
+                </div>
+              </div>
+
+              {/* ----------------------------------------------------
+                  COVER FOOTER: REGLA DE ORO EVO & CITACIÓN
+              ---------------------------------------------------- */}
+              <div className="relative z-10 pt-2 border-t border-cyan-950/80 flex flex-wrap items-center justify-between text-[10px] font-mono-tech text-zinc-500">
+                <div className="flex items-center gap-1.5 text-amber-400 font-bold">
+                  <span>🛡️</span>
+                  <span>REGLA DE ORO EVO: SI NO PODÉS REVERTIRLO, NO LO TOQUES.</span>
+                </div>
+                <div className="text-zinc-400">
+                  INTERNET DICE // EVO MIDE • <span className="text-cyan-400 font-bold">PÁG. 01 // PORTADA</span>
                 </div>
               </div>
             </div>
@@ -669,95 +775,258 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 02: MANIFIESTO & PACTO CON EL LECTOR
+            PAGE 02: MANIFIESTO & APERTURA EDITORIAL
         ======================================================== */}
         {(viewMode === 'continuous' || currentPage === 2) && (
           <Tomo02MasterPage
             pageId="t02-page-02"
             pageNumber={2}
-            sectionTitle="EDITORIAL & MANIFIESTO"
-            subSlug="FILOSOFÍA DEL KERNEL"
+            sectionTitle="COLECCIÓN PERICIAL"
+            subSlug="APERTURA EDITORIAL // MANIFIESTO"
+            pageFooterRight="EL LADO OSCURO DE WINDOWS"
             accentColor="#00D2FF"
           >
-            <div className="h-full flex flex-col justify-between space-y-5">
+            <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
               <div>
                 <div className="flex items-center gap-2 text-xs font-mono-tech text-cyan-400 mb-1">
-                  <span className="w-1.5 h-1.5 bg-cyan-400" />
-                  <span>MANIFIESTO DEL SISTEMA OPERATIVO</span>
+                  <span>❄</span>
+                  <span className="uppercase tracking-widest text-[10px] font-bold">LA PREGUNTA QUE NUNCA TE HICISTE</span>
                 </div>
-                <h2 className="text-3xl font-display font-black text-white tracking-tight">
-                  WINDOWS NO ES UNA CAJA NEGRA MÁGICA
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-black text-white tracking-tight uppercase leading-tight">
+                  ENCENDÉS LA PC. NO ABRISTE CHROME. NO ABRISTE STEAM.
+                  <span className="block text-cyan-400 mt-1">¿QUÉ ESTÁ HACIENDO WINDOWS?</span>
                 </h2>
-                <p className="text-sm font-mono-tech text-cyan-300 mt-1">
-                  Es un sistema determinístico de archivos, servicios, hilos, memoria virtual y registros.
-                </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans-editorial text-zinc-300 leading-relaxed">
-                <div className="p-4 rounded-xl bg-zinc-950/70 border border-cyan-950 space-y-2">
-                  <h3 className="font-bold text-white font-mono-tech text-xs uppercase flex items-center gap-2 text-cyan-400">
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                    EL PACTO CON EL LECTOR
-                  </h3>
-                  <p>
-                    <strong>1. Cero scripts misteriosos:</strong> Jamás te diremos “descargá este archivo .bat mágico”. Cada cambio se enseña con su comando nativo de PowerShell o clave de Registro visible.
-                  </p>
-                  <p>
-                    <strong>2. Regla de Reversibilidad Absoluta:</strong> Todo lo que se toca tiene un comando exacto para volver al estado de fábrica en caso de incompatibilidad.
-                  </p>
-                  <p>
-                    <strong>3. Verificación empírica:</strong> Si un tweak promete mejorar la latencia, te enseñamos a medirla en microsegundos con LatencyMon antes y después.
-                  </p>
+              {/* Technical Blueprint Visual Box */}
+              <div className="p-3 rounded-xl bg-black/80 border border-cyan-950 text-xs font-mono-tech">
+                <div className="flex items-center justify-between pb-2 border-b border-cyan-950 text-[10px]">
+                  <span className="text-cyan-400 font-bold">
+                    LABORATORIO FORENSE EVO // ESTADO EN REPOSO (IDLE)
+                  </span>
+                  <span className="text-zinc-500">
+                    Registro de hilos y descriptores en los primeros 120 segundos
+                  </span>
                 </div>
-
-                <div className="p-4 rounded-xl bg-zinc-950/70 border border-cyan-950 space-y-2">
-                  <h3 className="font-bold text-white font-mono-tech text-xs uppercase flex items-center gap-2 text-cyan-400">
-                    <ShieldAlert className="w-4 h-4 text-cyan-400" />
-                    EL MÉTODO FORENSE EVO
-                  </h3>
-                  <p>
-                    La mayoría de los usuarios intenta "arreglar" Windows a los golpes: reinstalando, pasando limpiadores de registro basura o siguiendo tutoriales de YouTube de 2017.
-                  </p>
-                  <p>
-                    El método EVO propone un camino pericial:
-                  </p>
-                  <div className="p-2 rounded bg-black/60 border border-cyan-950 font-mono-tech text-[11px] text-cyan-300">
-                    OBSERVÁ → MEDÍ → AISLÁ EL PROCESO → MODIFICÁ CON REGISTRO → VALIDÁ TELEMETRÍA.
+                <div className="py-4 flex items-center justify-center">
+                  <div className="w-full max-w-xl p-3 rounded-lg bg-[#050811] border border-cyan-900/60 font-mono-tech text-[10px] text-cyan-300 space-y-1">
+                    <div className="flex justify-between border-b border-cyan-950 pb-1">
+                      <span>THREAD DISPATCHER // IDLE QUEUE:</span>
+                      <span className="text-emerald-400">142 HILOS ACTIVOS</span>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[9px] pt-1 text-zinc-400">
+                      <div>svchost (SecSvcs): 12 hilos</div>
+                      <div>lsass.exe: 8 descriptores</div>
+                      <div>csrss.exe: LPC activo</div>
+                      <div>Registry Flusher: Standby</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Anatomy diagram */}
-              <div className="p-4 rounded-xl bg-black/80 border border-cyan-900/50">
-                <span className="text-[10px] font-mono-tech text-cyan-400 uppercase tracking-wider block mb-2">
-                  ANATOMÍA ESTRUCTURAL // KERNEL RING 0 VS USER MODE RING 3
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono-tech">
-                  <div className="p-3 rounded bg-zinc-950 border border-cyan-950">
-                    <span className="text-cyan-400 font-bold block mb-1">USER MODE (RING 3)</span>
-                    <p className="text-[11px] text-zinc-400">
-                      Explorer.exe, navegadores, juegos, servicios estándar. Si un proceso crashea, no arrastra al sistema completo.
-                    </p>
-                  </div>
-                  <div className="p-3 rounded bg-zinc-950 border border-cyan-950">
-                    <span className="text-blue-400 font-bold block mb-1">KERNEL MODE (RING 0)</span>
-                    <p className="text-[11px] text-zinc-400">
-                      ntoskrnl.exe, HAL.dll, controladores gráficos y de red. Acceso directo a hardware y memoria física.
+              {/* Two Editorial Columns with Drop Cap */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-zinc-300 leading-relaxed">
+                <div>
+                  <p>
+                    <span className="float-left text-3xl font-display font-black text-cyan-400 mr-2 leading-none">E</span>
+                    l usuario promedio convive con su sistema operativo bajo una ilusión de quietud. Cuando el escritorio aparece y el cursor se detiene, asumimos que la computadora está descansando, esperando pasivamente nuestra próxima orden. Nada está más lejos de la verdad técnica.
+                  </p>
+                  <p className="mt-2 text-zinc-400">
+                    Bajo la superficie de esa pantalla inmóvil, decenas de procesos han sido convocados por el planificador del kernel. Servicios de red intercambian paquetes de comprobación. Tareas programadas analizan si el equipo entró en reposo para comenzar tareas de indexación o comprobación de firmas criptográficas.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <p>
+                    Durante años, internet promovió una respuesta desesperada ante este fenómeno: el <em>debloat ciego</em>. Scripts descargados de foros oscuros que prometen apagar cien servicios con un doble clic, o trucos milagrosos que limpian el Registro para "duplicar los cuadros por segundo".
+                  </p>
+
+                  <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/40 text-[11px]">
+                    <span className="text-cyan-400 font-bold block mb-1 font-mono-tech text-[10px] uppercase">
+                      • EL PRINCIPIO EDITORIAL DE ESTE TOMO:
+                    </span>
+                    <p className="text-zinc-200 leading-snug">
+                      No queremos menos procesos por obsesión; queremos menos cosas desconocidas. El objetivo de este volumen no es un Administrador de Tareas vacío: es la certeza absoluta de qué hace tu sistema operativo.
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* Bottom Investigation Bar */}
+              <div className="p-2.5 rounded-lg bg-zinc-950/80 border border-cyan-950 flex flex-wrap items-center justify-between text-[10px] font-mono-tech">
+                <span className="text-cyan-400 font-bold">INVESTIGACIÓN RECURRENTE</span>
+                <span className="text-white">WINDOWS HACE COSAS QUE NUNCA TE CONTARON</span>
+                <span className="text-cyan-300">EXPEDIENTE DISTRIBUIDO // CAPÍTULOS 01 A 14 →</span>
               </div>
             </div>
           </Tomo02MasterPage>
         )}
 
         {/* ========================================================
-            PAGE 03: LAS 15 CARPETAS MAESTRAS DE WINDOWS
+            PAGE 03: LAS 6 REGLAS INMUTABLES & SEMÁFORO PERICIAL
         ======================================================== */}
         {(viewMode === 'continuous' || currentPage === 3) && (
           <Tomo02MasterPage
             pageId="t02-page-03"
             pageNumber={3}
+            sectionTitle="REGLAS DEL INVESTIGADOR"
+            subSlug="FILOSOFÍA DE TRABAJO & SEMÁFORO PERICIAL"
+            pageFooterRight="HACEMOS MILAGROS, PERO LOS MEDIMOS"
+            accentColor="#00D2FF"
+          >
+            <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
+              <div>
+                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest block font-bold">
+                  MANIFIESTO TÉCNICO
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-display font-black text-white uppercase tracking-tight">
+                  LAS 6 REGLAS INMUTABLES DEL INVESTIGADOR
+                </h2>
+                <p className="text-xs font-mono-tech text-zinc-400 mt-0.5">
+                  Todo lo que aprenderás en este volumen se rige por un método científico riguroso y determinista.
+                </p>
+              </div>
+
+              {/* 6 Inmutable Rules Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs font-mono-tech">
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
+                  <span className="text-cyan-400 font-bold block text-[11px]">01 // OBSERVAR</span>
+                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+                    Identificar el fenómeno antes de actuar. Registrar el estado en reposo sin precipitarse.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
+                  <span className="text-cyan-400 font-bold block text-[11px]">02 // ENTENDER</span>
+                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+                    Comprender qué componente es dueño de la función. No asumir que todo lo desconocido es basura.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
+                  <span className="text-cyan-400 font-bold block text-[11px]">03 // INVESTIGAR</span>
+                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+                    Consultar la documentación oficial (Microsoft Learn) y no foros anónimos sin sustento.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
+                  <span className="text-cyan-400 font-bold block text-[11px]">04 // MEDIR</span>
+                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+                    Establecer una métrica objetiva con unidades de medida: milisegundos, bytes o ciclos de reloj.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
+                  <span className="text-cyan-400 font-bold block text-[11px]">05 // INTERVENIR</span>
+                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+                    Cambiar un único parámetro por vez de manera deliberada y documentada.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
+                  <span className="text-cyan-400 font-bold block text-[11px]">06 // REVERTIR</span>
+                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+                    La regla de oro: si no podés revertir el cambio en cinco segundos, no tenés permiso de tocar.
+                  </p>
+                </div>
+              </div>
+
+              {/* Semáforo de Intervención EVO */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs font-mono-tech border-b border-cyan-950 pb-1">
+                  <span className="text-cyan-400 font-bold uppercase tracking-wider">
+                    EL SEMÁFORO DE INTERVENCIÓN // CÓDIGO DE RIESGO
+                  </span>
+                  <span className="text-zinc-500 text-[10px]">
+                    CLASIFICACIÓN OFICIAL EVO
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-xs font-mono-tech">
+                  <div className="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/30 flex items-start gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 mt-1 shrink-0 shadow-[0_0_8px_#34d399]" />
+                    <div>
+                      <span className="text-emerald-300 font-bold block text-[11px]">
+                        NIVEL VERDE // OBSERVACIÓN & CONSULTA SEGURA
+                      </span>
+                      <p className="text-[10.5px] text-zinc-400 font-sans-editorial">
+                        Comandos de sólo lectura, consultas en PowerShell, inspección de procesos, atajos del sistema y telemetría pasiva. No altera el estado de Windows.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-amber-950/20 border border-amber-500/30 flex items-start gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 mt-1 shrink-0 shadow-[0_0_8px_#fbbf24]" />
+                    <div>
+                      <span className="text-amber-300 font-bold block text-[11px]">
+                        NIVEL AMARILLO // MODIFICACIÓN CONTROLADA CON PRE-CONDICIÓN
+                      </span>
+                      <p className="text-[10.5px] text-zinc-400 font-sans-editorial">
+                        Desactivación de aplicaciones de inicio, cambios en tareas programadas de terceros o ajuste de preferencias. Requiere documentar el estado original antes de accionar.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-rose-950/20 border border-rose-500/30 flex items-start gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-400 mt-1 shrink-0 shadow-[0_0_8px_#f43f5e]" />
+                    <div>
+                      <span className="text-rose-300 font-bold block text-[11px]">
+                        NIVEL ROJO // ZONA CRÍTICA (REGISTRO & SUBSISTEMAS)
+                      </span>
+                      <p className="text-[10.5px] text-zinc-400 font-sans-editorial">
+                        Edición directa de colmenas del Registro, modificación de servicios dependientes del kernel o borrado de carpetas protegidas. Prohibido ejecutar sin backup .reg y Punto de Restauración previo.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Axioma Editorial Supremo */}
+              <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/50 flex items-center justify-between font-mono-tech text-xs">
+                <div>
+                  <span className="text-[9px] text-cyan-400 uppercase tracking-widest block font-bold">
+                    ADVERTENCIA // AXIOMA EDITORIAL SUPREMO
+                  </span>
+                  <span className="text-white font-bold text-sm tracking-wide">
+                    “SI NO PODÉS REVERTIRLO, NO LO TOQUES.”
+                  </span>
+                </div>
+                <span className="px-3 py-1 rounded bg-cyan-500 text-black font-extrabold text-[10px] tracking-wider">
+                  CUSTODIA EVO
+                </span>
+              </div>
+            </div>
+          </Tomo02MasterPage>
+        )}
+
+        {/* ========================================================
+            PAGE 03: CÓMO USAR EL TOMO // GUÍA METODOLÓGICA
+        ======================================================== */}
+        {(viewMode === 'continuous' || currentPage === 3) && (
+          <Tomo02MasterPage
+            pageId="t02-page-03"
+            pageNumber={3}
+            totalPages={totalPages}
+            sectionTitle="GUÍA METODOLÓGICA"
+            subSlug="CÓMO USAR EL TOMO & ARCHIVO EVO"
+            accentColor="#00D2FF"
+          >
+            <Tomo02ComoUsarElTomo
+              onCopySnippet={handleCopySnippet}
+              copiedSnippet={copiedSnippet}
+            />
+          </Tomo02MasterPage>
+        )}
+
+        {/* ========================================================
+            PAGE 04: LAS 15 CARPETAS MAESTRAS DE WINDOWS
+        ======================================================== */}
+        {(viewMode === 'continuous' || currentPage === 4) && (
+          <Tomo02MasterPage
+            pageId="t02-page-04"
+            pageNumber={4}
+            totalPages={totalPages}
             sectionTitle="MAPA DE ALMACENAMIENTO"
             subSlug="LAS 15 CARPETAS MAESTRAS"
             accentColor="#00D2FF"
@@ -818,12 +1087,13 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 04: ÍNDICE MAESTRO DE LOS 26 MÓDULOS
+            PAGE 05: ÍNDICE MAESTRO DE LOS 26 MÓDULOS
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 4) && (
+        {(viewMode === 'continuous' || currentPage === 5) && (
           <Tomo02MasterPage
-            pageId="t02-page-04"
-            pageNumber={4}
+            pageId="t02-page-05"
+            pageNumber={5}
+            totalPages={totalPages}
             sectionTitle="SUMARIO EJECUTIVO"
             subSlug="ÍNDICE DE 26 MÓDULOS"
             accentColor="#00D2FF"
@@ -842,12 +1112,12 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-mono-tech overflow-y-auto max-h-[720px] pr-1">
-                {TOMO_02_MODULES.map((m) => (
+                {TOMO_02_MODULES.map((m, mIdx) => (
                   <div
                     key={m.id}
                     onClick={() => {
                       if (viewMode === 'single') {
-                        setCurrentPage(5);
+                        setCurrentPage(6 + mIdx);
                       }
                       const el = document.getElementById(`t02-mod-${m.moduleNumber}`);
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -880,183 +1150,79 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            MODULE PAGES: 26 TECHNICAL MODULES (A4 SPREADS)
+            MODULE PAGES: 26 TECHNICAL MODULES (A4 EDITORIAL SPREADS)
         ======================================================== */}
         {TOMO_02_MODULES.map((mod, idx) => {
-          const modPageNumber = 5 + idx;
+          const modPageNumber = 6 + idx;
           if (viewMode === 'single' && currentPage !== modPageNumber) {
             return null;
           }
+
+          const richData = CHAPTERS_01_TO_09_DATA[mod.id];
+          const variant = getModuleEditorialVariant(mod.id);
 
           return (
             <Tomo02MasterPage
               key={mod.id}
               pageId={`t02-mod-${mod.moduleNumber}`}
               pageNumber={modPageNumber}
+              totalPages={totalPages}
               sectionTitle={`MÓDULO ${mod.moduleNumber}`}
               subSlug={mod.categoryTag}
               accentColor="#00D2FF"
             >
-              <div className="h-full flex flex-col justify-between space-y-3.5">
-                {/* Module Header */}
-                <div className="border-b border-cyan-950 pb-3">
-                  <div className="flex items-center justify-between text-xs font-mono-tech text-cyan-400 mb-1">
-                    <span className="px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-800 text-[10px] font-bold">
-                      {mod.categoryTag}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-zinc-500">Lectura: {mod.readTime}</span>
-                      <span
-                        className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                          (mod.safetyBadge || 'VERDE') === 'VERDE'
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                            : mod.safetyBadge === 'AMARILLO'
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                            : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                        }`}
-                      >
-                        NIVEL {mod.safetyBadge || 'VERDE'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <h2 className="text-2xl font-display font-black text-white tracking-tight">
-                    {mod.moduleNumber}. {mod.title}
-                  </h2>
-                  <p className="text-xs font-mono-tech text-cyan-300 mt-0.5">
-                    {mod.subtitle}
-                  </p>
-                </div>
-
-                {/* Main Content Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                  {/* Left Column: Forensic Goal & Decision Tree */}
-                  <div className="space-y-3">
-                    <div className="p-3 rounded-xl bg-zinc-950/70 border border-cyan-950">
-                      <span className="text-[10px] font-mono-tech text-cyan-400 uppercase tracking-wider block mb-1">
-                        OBJETIVO FORENSE
-                      </span>
-                      <p className="text-zinc-300 font-sans-editorial leading-relaxed">
-                        {mod.forensicGoal || mod.summary}
-                      </p>
-                    </div>
-
-                    {mod.decisionTree ? (
-                      <div className="p-3 rounded-xl bg-black/60 border border-cyan-900/60 font-mono-tech text-xs">
-                        <span className="text-[10px] text-cyan-400 uppercase tracking-wider block mb-2">
-                          ÁRBOL DEDUCTIVO // CRITERIO TÉCNICO
-                        </span>
-                        <div className="space-y-1.5 text-[11px]">
-                          <div className="text-white font-semibold">
-                            ❓ {mod.decisionTree.question}
-                          </div>
-                          <div className="text-emerald-400 pl-3 border-l-2 border-emerald-500">
-                            ✔ SÍ: {mod.decisionTree.yesAction}
-                          </div>
-                          <div className="text-amber-400 pl-3 border-l-2 border-amber-500">
-                            ✖ NO: {mod.decisionTree.noAction}
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="p-3 rounded-xl bg-black/60 border border-cyan-900/60 font-mono-tech text-xs">
-                        <span className="text-[10px] text-cyan-400 uppercase tracking-wider block mb-2">
-                          EVIDENCIA CIENTÍFICA / HALLAZGO KERNEL
-                        </span>
-                        <p className="text-cyan-200 text-[11px]">
-                          {mod.scientificFact || mod.summary}
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="p-2.5 rounded-lg bg-zinc-950 border border-zinc-900 font-mono-tech text-[11px] text-zinc-400">
-                      <span className="text-zinc-300 font-bold block mb-1">HERRAMIENTA SYSINTERNALS / NATIVA:</span>
-                      <span className="text-cyan-400">{mod.sysinternalsTool || 'Sysinternals Suite / PowerShell'}</span>
-                    </div>
-                  </div>
-
-                  {/* Right Column: Commands, False Positives & Reversibility */}
-                  <div className="space-y-3">
-                    {/* Command Box */}
-                    <div className="p-3 rounded-xl bg-[#090D14] border border-cyan-900">
-                      <div className="flex items-center justify-between text-[10px] font-mono-tech text-cyan-400 mb-1.5">
-                        <span className="flex items-center gap-1">
-                          <Terminal className="w-3.5 h-3.5" />
-                          <span>COMANDO AUDITORÍA POWERSHELL</span>
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleCopySnippet(mod.powershellCommand || mod.forensicCommand || mod.practicalCommand || '')}
-                          className="px-2 py-0.5 rounded bg-cyan-950 hover:bg-cyan-900 text-cyan-300 transition-colors flex items-center gap-1 cursor-pointer"
-                        >
-                          {copiedSnippet === (mod.powershellCommand || mod.forensicCommand || mod.practicalCommand || '') ? (
-                            <>
-                              <Check className="w-3 h-3 text-emerald-400" />
-                              <span className="text-emerald-400">COPIADO</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              <span>COPIAR</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                      <pre className="p-2.5 rounded bg-black/80 font-mono-tech text-[11px] text-cyan-300 overflow-x-auto border border-cyan-950 select-all">
-                        <code>{mod.powershellCommand || mod.forensicCommand || mod.practicalCommand || '# Auditoría nativa de Windows'}</code>
-                      </pre>
-                    </div>
-
-                    {/* Reversibility & False Positives */}
-                    <div className="p-3 rounded-xl bg-zinc-950/70 border border-cyan-950 space-y-2 text-xs">
-                      <div>
-                        <span className="text-[10px] font-mono-tech text-emerald-400 uppercase tracking-wider block">
-                          REGLA DE REVERSIBILIDAD (EVO GUARANTEE)
-                        </span>
-                        <p className="text-zinc-300 text-[11px] font-sans-editorial">
-                          {mod.reversibility || mod.scientificFact || 'Totalmente documentado y reversible con comando nativo o exportación de registro.'}
-                        </p>
-                      </div>
-
-                      <div className="border-t border-zinc-900 pt-2">
-                        <span className="text-[10px] font-mono-tech text-amber-400 uppercase tracking-wider block">
-                          FALSO POSITIVO TÍPICO DE INTERNET
-                        </span>
-                        <p className="text-zinc-400 text-[11px] font-sans-editorial">
-                          {mod.falsePositive || mod.warningNotice || 'Evitar tocar claves sin respaldo previo .reg.'}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Key Takeaways */}
-                    <div className="p-2.5 rounded-lg bg-black/50 border border-cyan-950 text-[11px] font-mono-tech text-zinc-300 space-y-1">
-                      {mod.keyTakeaways.map((kt, kIdx) => (
-                        <div key={kIdx} className="flex items-start gap-1.5">
-                          <span className="text-cyan-400">▸</span>
-                          <span>{kt}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer Callout */}
-                <div className="p-2 rounded bg-cyan-950/20 border border-cyan-900/40 text-[10px] font-mono-tech text-cyan-300 flex items-center justify-between">
-                  <span>EVO LABS // VERIFICACIÓN FORENSE REPRODUCIBLE</span>
-                  <span className="text-zinc-500">MÓDULO {mod.moduleNumber} / 26</span>
-                </div>
-              </div>
+              {variant === 'hero' && (
+                <Tomo02EditorialHero
+                  module={mod}
+                  richData={richData}
+                  onCopySnippet={handleCopySnippet}
+                  copiedSnippet={copiedSnippet}
+                />
+              )}
+              {variant === 'diagram' && (
+                <Tomo02EditorialDiagram
+                  module={mod}
+                  richData={richData}
+                />
+              )}
+              {variant === 'comparison' && (
+                <Tomo02EditorialComparison
+                  module={mod}
+                  richData={richData}
+                />
+              )}
+              {variant === 'practice' && (
+                <Tomo02EditorialPractice
+                  module={mod}
+                  richData={richData}
+                  onCopySnippet={handleCopySnippet}
+                  copiedSnippet={copiedSnippet}
+                />
+              )}
+              {variant === 'case' && (
+                <Tomo02EditorialCase
+                  module={mod}
+                  richData={richData}
+                />
+              )}
+              {variant === 'check' && (
+                <Tomo02EditorialCheck
+                  module={mod}
+                  questionData={MODULE_QUESTIONS[mod.id]}
+                />
+              )}
             </Tomo02MasterPage>
           );
         })}
 
         {/* ========================================================
-            PAGE 32: CASOS FORENSES DE WINDOWS GUIADOS
+            PAGE 33: CASOS FORENSES DE WINDOWS GUIADOS
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 32) && (
+        {(viewMode === 'continuous' || currentPage === 33) && (
           <Tomo02MasterPage
-            pageId="t02-page-32"
-            pageNumber={32}
+            pageId="t02-page-33"
+            pageNumber={33}
+            totalPages={totalPages}
             sectionTitle="EXPEDIENTES FORENSES"
             subSlug="CASOS REALES DE TALLER"
             accentColor="#00D2FF"
@@ -1109,12 +1275,13 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 33: LOS 5 SECRETOS DEL KERNEL
+            PAGE 34: LOS 5 SECRETOS DEL KERNEL
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 33) && (
+        {(viewMode === 'continuous' || currentPage === 34) && (
           <Tomo02MasterPage
-            pageId="t02-page-33"
-            pageNumber={33}
+            pageId="t02-page-34"
+            pageNumber={34}
+            totalPages={totalPages}
             sectionTitle="MICRO-ARQUITECTURA"
             subSlug="SECRETOS DEL KERNEL"
             accentColor="#00D2FF"
@@ -1161,12 +1328,13 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 34: GLOSARIO FORENSE A-Z
+            PAGE 35: GLOSARIO FORENSE A-Z
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 34) && (
+        {(viewMode === 'continuous' || currentPage === 35) && (
           <Tomo02MasterPage
-            pageId="t02-page-34"
-            pageNumber={34}
+            pageId="t02-page-35"
+            pageNumber={35}
+            totalPages={totalPages}
             sectionTitle="DICCIONARIO TÉCNICO"
             subSlug="GLOSARIO FORENSE A-Z"
             accentColor="#00D2FF"
@@ -1208,12 +1376,13 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 35: PASAPORTE / FICHA DE AUDITORÍA FORENSE IMPRIMIBLE
+            PAGE 36: PASAPORTE / FICHA DE AUDITORÍA FORENSE IMPRIMIBLE
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 35) && (
+        {(viewMode === 'continuous' || currentPage === 36) && (
           <Tomo02MasterPage
-            pageId="t02-page-35"
-            pageNumber={35}
+            pageId="t02-page-36"
+            pageNumber={36}
+            totalPages={totalPages}
             sectionTitle="INSTRUMENTO DE TALLER"
             subSlug="FICHA DE AUDITORÍA DE WINDOWS"
             accentColor="#00D2FF"
@@ -1297,12 +1466,13 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 36: BACK COVER / CONTRATAPA
+            PAGE 37: BACK COVER / CONTRATAPA
         ======================================================== */}
         {(viewMode === 'continuous' || currentPage === totalPages) && (
           <Tomo02MasterPage
-            pageId="t02-page-36"
+            pageId="t02-page-37"
             pageNumber={totalPages}
+            totalPages={totalPages}
             isBackCover
             hideHeaderFooter
             accentColor="#00D2FF"

@@ -215,6 +215,7 @@
   }
 
   /* Exclude all interactive web chrome, bars, buttons, scrollbars, modals and navigation */
+  header,
   .no-print,
   header.no-print,
   nav,

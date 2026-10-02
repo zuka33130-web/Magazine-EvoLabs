@@ -1,23 +1,25 @@
 import React from 'react';
 
-interface Tomo02MasterPageProps {
+export interface Tomo02MasterPageProps {
   pageNumber: number;
   totalPages?: number;
   sectionTitle?: string;
   subSlug?: string;
+  pageFooterRight?: string;
   accentColor?: string;
   hideHeaderFooter?: boolean;
   isCover?: boolean;
   isBackCover?: boolean;
   children: React.ReactNode;
-  pageId: string;
+  pageId?: string;
 }
 
 export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
   pageNumber,
-  totalPages = 48,
-  sectionTitle = 'BIBLIA NEGRA DE WINDOWS',
-  subSlug = 'KERNEL & ARQUITECTURA DEL SISTEMA',
+  totalPages = 67,
+  sectionTitle = 'INGENIERÍA DEL SISTEMA OPERATIVO',
+  subSlug = 'DOMINÁ WINDOWS',
+  pageFooterRight,
   accentColor = '#00D2FF',
   hideHeaderFooter = false,
   isCover = false,
@@ -41,42 +43,30 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
 
       {/* Alignment Marks */}
       <div className="absolute top-2 left-2 text-[8px] font-mono-tech text-cyan-900 select-none pointer-events-none hidden sm:block print:hidden">
-        + 210×297mm // A4 TOMO 02 // LA BIBLIA NEGRA
+        + 210×297mm // A4 TOMO 02 // DOMINÁ WINDOWS
       </div>
       <div className="absolute top-2 right-2 text-[8px] font-mono-tech text-cyan-900 select-none pointer-events-none hidden sm:block print:hidden">
-        EVO LABS FORENSIC EDITION // KERNEL RING 0 +
+        EVO LABS FORENSIC EDITION // DESMONTAJE DEL KERNEL NT +
       </div>
 
       {!hideHeaderFooter && (
-        <header className="relative z-20 px-8 pt-5 pb-3 border-b border-cyan-950/70 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-zinc-400 select-none">
-          <div className="flex items-center gap-2.5">
+        <header className="relative z-20 px-8 pt-4 pb-2.5 border-b border-cyan-950/70 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-zinc-400 select-none">
+          <div className="flex items-center gap-2">
             <span
               className="w-2 h-2 inline-block shadow-[0_0_8px_#00D2FF]"
               style={{ backgroundColor: accentColor }}
             />
-            <span className="font-bold text-white tracking-widest uppercase">
-              EVO LABS
-            </span>
-            <span className="text-zinc-700">|</span>
-            <span className="text-cyan-400 font-semibold uppercase tracking-widest">
-              TOMO 02 // LA BIBLIA NEGRA DE WINDOWS
+            <span className="font-bold text-cyan-400 tracking-widest uppercase">
+              EVO LABS MAGAZINE // TOMO 02
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="text-zinc-500 uppercase tracking-widest text-[9px] hidden md:inline">
-              {subSlug}
-            </span>
-            <span
-              className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest"
-              style={{
-                backgroundColor: 'rgba(0, 210, 255, 0.12)',
-                color: accentColor,
-                border: '1px solid rgba(0, 210, 255, 0.3)',
-              }}
-            >
-              {sectionTitle}
-            </span>
+          <div className="text-zinc-400 uppercase tracking-widest text-[9px] font-medium hidden sm:block">
+            {subSlug || sectionTitle}
+          </div>
+
+          <div className="font-bold text-zinc-300 tracking-wider">
+            PÁG. {String(pageNumber).padStart(2, '0')}
           </div>
         </header>
       )}
@@ -84,31 +74,22 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
       {/* Page Content Body */}
       <div
         className={`relative z-10 w-full flex flex-col justify-between ${
-          hideHeaderFooter ? 'h-full p-0' : 'h-[calc(100%-74px)] px-7 sm:px-9 py-5'
+          hideHeaderFooter ? 'h-full p-0' : 'h-[calc(100%-62px)] px-6 sm:px-8 py-3.5'
         }`}
       >
-        <div className="flex-1 w-full flex flex-col">{children}</div>
+        <div className="flex-1 w-full flex flex-col justify-between min-h-0 overflow-hidden">{children}</div>
 
         {!hideHeaderFooter && (
-          <footer className="mt-auto pt-3 border-t border-cyan-950/70 flex items-center justify-between text-[10px] font-mono-tech text-zinc-500 select-none">
-            <div className="flex items-center gap-3">
-              <span className="font-bold text-cyan-300">
-                PÁG. {String(pageNumber).padStart(2, '0')}
-              </span>
-              <span className="text-zinc-700">/</span>
-              <span className="text-zinc-600">{String(totalPages).padStart(2, '0')}</span>
-              <span className="text-zinc-800">|</span>
-              <span className="text-zinc-500 tracking-wide">
-                “TOCALO. PERO PRIMERO ENTENDAMOS QUÉ HACE.”
+          <footer className="mt-auto pt-2.5 border-t border-cyan-950/70 flex items-center justify-between text-[9.5px] font-mono-tech text-zinc-500 select-none">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-zinc-400 uppercase tracking-wider">
+                EVO LABS // {sectionTitle || 'COLECCIÓN PERICIAL'}
               </span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <span className="text-zinc-600 uppercase tracking-widest text-[9px]">
-                REVERSIBILIDAD & FORENSE
-              </span>
-              <span className="text-cyan-400 font-mono-tech text-[9px]">
-                [EVO-T02-P{String(pageNumber).padStart(2, '0')}]
+            <div className="flex items-center gap-2 text-right">
+              <span className="text-cyan-400/90 font-medium tracking-wide">
+                {pageFooterRight || 'EL LADO OSCURO DE WINDOWS'}
               </span>
             </div>
           </footer>

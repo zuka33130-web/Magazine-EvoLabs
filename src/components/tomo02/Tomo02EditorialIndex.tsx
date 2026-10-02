@@ -183,22 +183,22 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
           <span className="w-3 h-3 bg-cyan-400 inline-block shadow-[0_0_10px_#00D2FF]" />
           <div>
             <span className="font-mono-tech text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">
-              EDICIÓN FACSIMILAR // A4 VERTICAL COMPLETA
+              EDICIÓN OFICIAL FACSIMILAR // 67 PÁGINAS A4
             </span>
             <h3 className="font-display font-black text-base sm:text-lg text-white uppercase tracking-tight">
-              REVISTA A4 LA BIBLIA NEGRA — 36 Páginas Diagramadas
+              REVISTA OFICIAL DOMINÁ WINDOWS — 67 Páginas
             </h3>
             <p className="text-xs text-zinc-300 font-sans-editorial max-w-2xl mt-0.5">
-              Lectura continua con infografías de Kernel, tablas de carpetas, esquemas de procesos y hoja de auditoría imprimible.
+              Lectura oficial en pliego A4 con desmontaje del Kernel NT, auditoría de memoria virtual, colmenas del Registro y descarga PDF.
             </p>
           </div>
         </div>
         <button
           type="button"
           onClick={onOpenA4Magazine}
-          className="px-5 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-mono-tech font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shrink-0 shadow-lg hover:shadow-cyan-400/30"
+          className="px-5 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 hover:brightness-110 text-black font-mono-tech font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shrink-0 shadow-lg hover:shadow-cyan-400/30"
         >
-          ABRIR REVISTA A4 →
+          LEER MAGAZINE (67 PÁGS) →
         </button>
       </div>
 

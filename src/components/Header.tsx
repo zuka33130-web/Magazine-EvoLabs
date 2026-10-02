@@ -141,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-white/[0.08] bg-[#07090e]/95 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.85)] transition-all">
+      <header className="sticky top-0 z-40 w-full border-b border-white/[0.08] bg-[#07090e]/95 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.85)] transition-all print:hidden">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-15 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* ========================================================================= */}

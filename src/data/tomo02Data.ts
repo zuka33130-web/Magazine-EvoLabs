@@ -213,15 +213,16 @@ export const TOMO_02_CASES: GuidedCase[] = [
 export const TOMO_02_META = {
   number: '02',
   volumeLabel: 'Tomo 02',
-  title: 'LA BIBLIA NEGRA DE WINDOWS',
-  subtitle: 'El Windows que usás todos los días esconde mucho más de lo que imaginás',
+  title: 'DOMINÁ WINDOWS',
+  subtitle: 'EL LADO OSCURO DE WINDOWS // DESMONTAJE DEL KERNEL NT',
+  secondaryTitle: 'LA BIBLIA NEGRA DE WINDOWS',
   themeColor: '#00D2FF',
   secondaryColor: '#38BDF8',
-  badge: 'SISTEMA INTERNO & KERNEL',
-  edition: 'Edición Maestra Coleccionable 2026',
-  totalPages: 36,
-  manifestoPhrase: 'TOCALO. PERO PRIMERO ENTENDAMOS QUÉ HACE.',
-  description: 'Guía pericial de arquitectura, kernel, memoria, servicios, Registro, terminal y recuperación de Windows. Sin recetas mágicas ni debloaters ciegos.',
+  badge: 'INGENIERÍA DEL SISTEMA OPERATIVO',
+  edition: 'Edición Coleccionable 2026 // A4 210×297mm',
+  totalPages: 67,
+  manifestoPhrase: 'SI NO PODÉS REVERTIRLO, NO LO TOQUES.',
+  description: 'Ingeniería del sistema operativo, desmontaje del Kernel NT, metrología de memoria, procesos, servicios y telemetría bajo escrutinio forense.',
 };
 
 export const TOMO_02_MODULES: TomoModuleItem[] = [

@@ -42,7 +42,7 @@ interface Tomo02ModuleReaderProps {
 }
 
 // Module-specific interactive check questions for all modules
-interface CheckQuestion {
+export interface CheckQuestion {
   question: string;
   options: {
     label: string;
@@ -51,7 +51,7 @@ interface CheckQuestion {
   }[];
 }
 
-interface ChapterRichContent {
+export interface ChapterRichContent {
   hookQuestion: string;
   simpleAnalogy: string;
   evoExplains: string;
@@ -84,7 +84,7 @@ interface ChapterRichContent {
   };
 }
 
-const MODULE_QUESTIONS: Record<string, CheckQuestion> = {
+export const MODULE_QUESTIONS: Record<string, CheckQuestion> = {
   m00: {
     question: '¿Por qué la metodología EVO exige registrar un baseline métrico antes de aplicar cualquier ajuste a Windows?',
     options: [
@@ -627,7 +627,7 @@ const MODULE_QUESTIONS: Record<string, CheckQuestion> = {
   },
 };
 
-const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
+export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
   m00: {
     hookQuestion:
       '¿Por qué el 90% de los usuarios que intentan "optimizar" Windows terminan rompiendo el sistema con herramientas automáticas o tienen pánico de tocar cualquier carpeta por miedo a "arruinar la computadora"?',
