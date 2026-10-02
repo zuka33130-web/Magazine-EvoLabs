@@ -52,7 +52,7 @@ import { TutorEvoDrawer } from './components/tutor/TutorEvoDrawer';
 import { TutorOnboardingModal } from './components/tutor/TutorOnboardingModal';
 
 function AppContent() {
-  const { updateLocation } = useTutorEvo();
+  const { updateLocation, saveCurrentLocationHistory } = useTutorEvo();
   const [currentView, setCurrentView] = useState<
     | 'magazine'
     | 'tomo-02'
@@ -195,14 +195,14 @@ function AppContent() {
           whyItMatters: 'Comprender el mapa global de la Academia te ayuda a trazar tu plan de estudio sin perderte.',
           nextStep: 'Ingresá al Tomo 01 (Conocé tu PC) para aprender la base del silicio y componentes.',
         });
+        saveCurrentLocationHistory('world-map', undefined, 'Mundo EVO');
         break;
       case 'cover':
-      case 'index':
         updateLocation({
           academySection: 'TOMOS EVO LABS',
           tomoNumber: '01',
           tomoTitle: 'CONOCÉ TU PC',
-          chapterTitle: currentView === 'cover' ? 'Portada' : 'Índice de Capítulos',
+          chapterTitle: 'Portada',
           activityTitle: 'Tomo Interactivo',
           activityType: 'lectura',
           whatIs: 'Tomo 01: Conocé tu PC. El punto de partida de la formación.',
@@ -212,6 +212,24 @@ function AppContent() {
           whyItMatters: 'Es la base obligatoria antes de diagnosticar fallas o reparar hardware.',
           nextStep: 'Comenzá por el Capítulo 01: ¿Qué PC tenés realmente?.',
         });
+        saveCurrentLocationHistory('cover', '01', 'Portada');
+        break;
+      case 'index':
+        updateLocation({
+          academySection: 'TOMOS EVO LABS',
+          tomoNumber: '01',
+          tomoTitle: 'CONOCÉ TU PC',
+          chapterTitle: 'Índice de Capítulos',
+          activityTitle: 'Tomo Interactivo',
+          activityType: 'lectura',
+          whatIs: 'Tomo 01: Conocé tu PC. El punto de partida de la formación.',
+          whatFor: 'Aprender a identificar la arquitectura de tu máquina, procesador, memoria y métricas reales.',
+          currentAction: 'Seleccioná un capítulo para comenzar o abrí el Magazine para lectura completa.',
+          whatToLookFor: 'Los 7 capítulos progresivos y el Examen Final al completar el recorrido.',
+          whyItMatters: 'Es la base obligatoria antes de diagnosticar fallas o reparar hardware.',
+          nextStep: 'Comenzá por el Capítulo 01: ¿Qué PC tenés realmente?.',
+        });
+        saveCurrentLocationHistory('index', '01', 'Índice de Capítulos');
         break;
       case 'chapter-01':
       case 'chapter-02':
@@ -235,6 +253,7 @@ function AppContent() {
           whyItMatters: 'Cada capítulo completado afianza tu pasaporte técnico y te prepara para el Examen Final.',
           nextStep: 'Completá la actividad para marcar el capítulo como completado.',
         });
+        saveCurrentLocationHistory(currentView, '01', `Capítulo ${chNum}`);
         break;
       }
       case 'tomo01-quiz':
@@ -252,6 +271,7 @@ function AppContent() {
           whyItMatters: 'Alcanzar el 75% o más otorga la distinción oficial "TEORÍA COMPROBADA".',
           nextStep: 'Revisá la devolución pericial y continuá al Laboratorio de Identidad y Hardware.',
         });
+        saveCurrentLocationHistory('tomo01-quiz', '01', 'Examen Final Tomo 01');
         break;
       case 'tomo-02':
         updateLocation({
@@ -266,6 +286,7 @@ function AppContent() {
           whyItMatters: 'Dominar Windows a nivel pericial te permite detectar cuellos de botella y fallas invisibles.',
           nextStep: 'Accedé al Laboratorio Virtual Guiado de Windows (Matrix Lab).',
         });
+        saveCurrentLocationHistory('tomo-02', '02', 'La Biblia Negra de Windows');
         break;
       case 'tomo-03':
         updateLocation({
@@ -280,6 +301,7 @@ function AppContent() {
           whyItMatters: 'Evita el cambio de piezas a ciegas aplicando el método de descarte pericial.',
           nextStep: 'Comprobá tu teoría en el Examen Final del Tomo 03.',
         });
+        saveCurrentLocationHistory('tomo-03', '03', 'Reparación de PC');
         break;
       case 'tomo-04':
         updateLocation({
@@ -294,6 +316,7 @@ function AppContent() {
           whyItMatters: 'Las notebooks tienen arquitecturas compactas y fuentes conmutadas complejas.',
           nextStep: 'Rendí el Examen Final del Tomo 04.',
         });
+        saveCurrentLocationHistory('tomo-04', '04', 'Reparación de Notebooks');
         break;
       case 'tomo-08':
       case 'boot-lab':
@@ -309,6 +332,7 @@ function AppContent() {
           whyItMatters: 'Comprender el arranque te permite aislar en qué segundo exacto muere una máquina.',
           nextStep: 'Rendí el Examen Final del Tomo 08 para validar tus conocimientos.',
         });
+        saveCurrentLocationHistory(currentView, '08', 'Laboratorio de Arranque');
         break;
       case 'hotswap-lab':
         updateLocation({
@@ -323,6 +347,7 @@ function AppContent() {
           whyItMatters: 'Permite experimentar sin riesgo de quemar silicio real.',
           nextStep: 'Comprobá el impacto de las configuraciones en el rendimiento general.',
         });
+        saveCurrentLocationHistory('hotswap-lab', '01', 'Laboratorio de Identidad y Hardware');
         break;
       case 'windows-matrix-lab':
         updateLocation({
@@ -337,6 +362,7 @@ function AppContent() {
           whyItMatters: 'Te capacita para resolver problemas avanzados de sistema operativo.',
           nextStep: 'Validá los hallazgos periciales con los comandos recomendados.',
         });
+        saveCurrentLocationHistory('windows-matrix-lab', '02', 'Matrix Lab Windows');
         break;
       case 'lab-core':
         updateLocation({
@@ -349,6 +375,7 @@ function AppContent() {
           whyItMatters: 'Es el entorno pericial donde aplicás todo lo aprendido en los 10 Tomos.',
           nextStep: 'Completá el expediente y emití el informe pericial.',
         });
+        saveCurrentLocationHistory('lab-core', undefined, 'Taller Multitomo');
         break;
       case 'magazine':
         updateLocation({
@@ -363,11 +390,12 @@ function AppContent() {
           whyItMatters: 'Leer y entender es el primer paso indispensable del Método EVO.',
           nextStep: 'Pasá al Tomo Interactivo para realizar las prácticas guiadas.',
         });
+        saveCurrentLocationHistory('magazine', '01', 'Magazine Editorial A4');
         break;
       default:
         break;
     }
-  }, [currentView, updateLocation]);
+  }, [currentView, updateLocation, saveCurrentLocationHistory]);
 
   // Navigation target station for Chapter 02
   const [c02TargetStation, setC02TargetStation] = useState<Chapter02Station | undefined>(undefined);

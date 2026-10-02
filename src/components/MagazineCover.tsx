@@ -24,6 +24,7 @@ export const MagazineCover: React.FC<MagazineCoverProps> = ({
   return (
     <section 
       id="contemporary-magazine-cover" 
+      data-evo-tour="cover"
       className="w-full pt-6 sm:pt-10 lg:pt-14 pb-16 sm:pb-24 border-b border-zinc-800/40"
     >
       {/* Pure Editorial Meta Bar */}

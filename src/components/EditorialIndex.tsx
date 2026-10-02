@@ -59,7 +59,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
   onStartFinalExam,
   onOpenCompletionScreen,
 }) => {
-  const { openTutorWithTab, setMode } = useTutorEvo();
+  const { openTutorWithTab, setMode, lastSavedLocation } = useTutorEvo();
   const [isTourOpen, setIsTourOpen] = useState(false);
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
@@ -70,7 +70,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
   const hasPassedFinalExam =
     typeof window !== 'undefined' && localStorage.getItem('evo_tomo01_completed') === 'true';
 
-  // Identify latest active chapter for returning user
+  // Identify latest active chapter for returning user fallback
   const latestActiveChapter = useMemo(() => {
     const firstAvailable = chapters.find((c) => c.status === 'DISPONIBLE');
     if (firstAvailable) return firstAvailable;
@@ -78,6 +78,40 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
     if (completedOnes.length > 0) return completedOnes[completedOnes.length - 1];
     return chapters[0];
   }, [chapters]);
+
+  // Compute exact resume destination using stored Tutor EVO real location
+  const resumeTarget = useMemo(() => {
+    if (lastSavedLocation && lastSavedLocation.tomoNumber === '01') {
+      if (lastSavedLocation.viewId && lastSavedLocation.viewId.startsWith('chapter-')) {
+        const num = lastSavedLocation.viewId.replace('chapter-', '');
+        const matching = chapters.find((c) => c.number === num);
+        if (matching) {
+          return {
+            type: 'chapter' as const,
+            chapterNumber: matching.number,
+            chapterTitle: matching.title,
+          };
+        }
+      } else if (lastSavedLocation.viewId === 'tomo01-quiz') {
+        return {
+          type: 'exam' as const,
+          chapterNumber: '07',
+          chapterTitle: 'Examen Final Pericial',
+        };
+      } else if (lastSavedLocation.viewId === 'hotswap-lab') {
+        return {
+          type: 'lab' as const,
+          chapterNumber: '01',
+          chapterTitle: 'Laboratorio de Hardware',
+        };
+      }
+    }
+    return {
+      type: 'chapter' as const,
+      chapterNumber: latestActiveChapter.number,
+      chapterTitle: latestActiveChapter.title,
+    };
+  }, [lastSavedLocation, chapters, latestActiveChapter]);
 
   const handleStartChapterByNumber = (chNum: string) => {
     if (chNum === '01') onStartResearch();
@@ -88,6 +122,18 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
     else if (chNum === '06' && onStartChapter06) onStartChapter06();
     else if (chNum === '07' && onStartChapter07) onStartChapter07();
     else onStartResearch();
+  };
+
+  const handleResumeWhereILeft = () => {
+    if (resumeTarget.type === 'chapter') {
+      handleStartChapterByNumber(resumeTarget.chapterNumber);
+    } else if (resumeTarget.type === 'exam' && onStartFinalExam) {
+      onStartFinalExam();
+    } else if (resumeTarget.type === 'lab' && onOpenLab) {
+      onOpenLab();
+    } else {
+      handleStartChapterByNumber(latestActiveChapter.number);
+    }
   };
 
   const getChapterDisplayStatus = (cap: ChapterItem) => {
@@ -109,7 +155,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
     return { label: 'BLOQUEADO', style: 'bg-black/60 border border-zinc-800 text-zinc-500' };
   };
   return (
-    <div id="pantalla-indice-editorial" className="w-full min-h-screen py-6 sm:py-10 lg:py-14">
+    <div id="pantalla-indice-editorial" data-evo-tour="index" className="w-full min-h-screen py-6 sm:py-10 lg:py-14">
       
       {/* Editorial Navigation Top Bar */}
       <nav className="flex items-center justify-between pb-5 mb-10 sm:mb-14 border-b border-zinc-800/50">
@@ -117,6 +163,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
           <button
             type="button"
             onClick={onBackToCover}
+            data-evo-tour="cover"
             className="inline-flex items-center gap-2 text-xs font-mono-tech tracking-widest uppercase text-zinc-400 hover:text-yellow-400 transition-colors cursor-pointer group"
             id="btn-volver-portada"
           >
@@ -195,13 +242,13 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
       </header>
 
       {/* Returning User Banner */}
-      {completedCount > 0 && latestActiveChapter && (
+      {(completedCount > 0 || (lastSavedLocation && lastSavedLocation.tomoNumber === '01')) && (
         <div className="mb-6">
           <TutorReturningUserBanner
-            lastChapterNumber={latestActiveChapter.number}
-            lastChapterTitle={latestActiveChapter.title}
+            lastChapterNumber={resumeTarget.chapterNumber}
+            lastChapterTitle={resumeTarget.chapterTitle}
             completedCount={completedCount}
-            onContinue={() => handleStartChapterByNumber(latestActiveChapter.number)}
+            onContinue={handleResumeWhereILeft}
             onOpenMap={() => setIsMapOpen(true)}
           />
         </div>
@@ -236,6 +283,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
           {onOpenLab && (
             <button
               type="button"
+              data-evo-tour="laboratory"
               onClick={onOpenLab}
               className="px-4 py-3 bg-zinc-900 hover:bg-zinc-800 border border-yellow-400/50 text-yellow-300 font-mono-tech font-bold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
             >
@@ -247,7 +295,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
 
       {/* FINAL EXAM & COMPLETION HANDOFF BANNER */}
       {(isAllChaptersDone || hasPassedFinalExam) && (
-        <div className="p-6 rounded-2xl bg-gradient-to-r from-yellow-400/20 via-[#181a24] to-[#10121a] border-2 border-yellow-400 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-10 shadow-2xl">
+        <div data-evo-tour="exam" className="p-6 rounded-2xl bg-gradient-to-r from-yellow-400/20 via-[#181a24] to-[#10121a] border-2 border-yellow-400 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-10 shadow-2xl">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs font-mono-tech uppercase font-bold text-yellow-400 tracking-widest">
               <Award className="w-4 h-4 text-yellow-400" />
@@ -282,6 +330,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
             {onStartFinalExam && (
               <button
                 type="button"
+                data-evo-tour="exam"
                 onClick={onStartFinalExam}
                 className={`px-6 py-3.5 rounded-xl font-mono-tech font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   hasPassedFinalExam
@@ -329,6 +378,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
                   <article
                     key={cap.number}
                     id={`capitulo-${cap.number}`}
+                    data-evo-tour="chapter"
                     className={`relative rounded-2xl border-2 p-6 sm:p-8 shadow-2xl transition-all duration-300 group ${
                       isCompleted
                         ? 'border-yellow-400/60 bg-gradient-to-br from-[#121318] via-[#101115] to-[#0c0d10]'
@@ -361,7 +411,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
                           {cap.number}
                         </span>
 
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-zinc-900 border-2 border-yellow-400/60 shadow-xl shrink-0">
+                        <div data-evo-tour="visual" className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-zinc-900 border-2 border-yellow-400/60 shadow-xl shrink-0">
                           <img
                             src={cap.visualImage}
                             alt="Visual de microprocesador y zócalo de silicio"
@@ -384,7 +434,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
                     </div>
 
                     {/* Quick Scan Microcopy: APRENDÉS / HACÉS / DESBLOQUEA */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-black/50 border border-zinc-800 mb-6 text-xs font-mono-tech">
+                    <div data-evo-tour="practice" className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-black/50 border border-zinc-800 mb-6 text-xs font-mono-tech">
                       <div className="space-y-1">
                         <span className="text-yellow-400 font-bold block tracking-wider uppercase text-[10px]">
                           1. APRENDÉS:
@@ -424,6 +474,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
                       <button
                         type="button"
                         id="btn-comenzar-investigacion"
+                        data-evo-tour="check"
                         onClick={onStartResearch}
                         className="inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-white text-black hover:bg-yellow-400 hover:text-black transition-all duration-200 cursor-pointer shadow-xl hover:shadow-yellow-400/25 group/btn"
                       >
@@ -733,7 +784,7 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
         </section>
 
         {/* Right Lateral Sticky Column: Clean, punchy takeaways (4 cols) */}
-        <aside className="lg:col-span-4 space-y-6">
+        <aside data-evo-tour="progress" className="lg:col-span-4 space-y-6">
           <div className="rounded-2xl border border-zinc-800 bg-[#121318] p-6 sm:p-7 space-y-6 sticky top-6 shadow-xl">
             
             {/* Header */}
