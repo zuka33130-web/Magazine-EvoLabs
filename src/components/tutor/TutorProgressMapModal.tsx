@@ -13,6 +13,7 @@ import {
   Check,
 } from 'lucide-react';
 import { ChapterItem } from '../../types';
+import { isTomo01ExamPassed, isTomo01Complete, areAllTomo01ChaptersComplete } from '../../utils/tomo01Progress';
 
 interface TutorProgressMapModalProps {
   isOpen: boolean;
@@ -36,9 +37,9 @@ export const TutorProgressMapModal: React.FC<TutorProgressMapModalProps> = ({
   if (!isOpen) return null;
 
   const completedCount = chapters.filter((c) => c.status === 'COMPLETADO').length;
-  const isExamPassed =
-    typeof window !== 'undefined' &&
-    localStorage.getItem('evo_tomo01_completed') === 'true';
+  const isExamPassed = isTomo01ExamPassed();
+  const isAllChaptersDone = areAllTomo01ChaptersComplete();
+  const isTomoCompleted = isTomo01Complete();
 
   return (
     <div

@@ -50,6 +50,18 @@ import { TutorBreadcrumbBar } from './components/tutor/TutorBreadcrumbBar';
 import { TutorEvoFloatingButton } from './components/tutor/TutorEvoFloatingButton';
 import { TutorEvoDrawer } from './components/tutor/TutorEvoDrawer';
 import { TutorOnboardingModal } from './components/tutor/TutorOnboardingModal';
+import {
+  isChapter01Complete,
+  isChapter02Complete,
+  isChapter03Complete,
+  isChapter04Complete,
+  isChapter05Complete,
+  isChapter06Complete,
+  isChapter07Complete,
+  areAllTomo01ChaptersComplete,
+  isTomo01ExamPassed,
+  isTomo01Complete,
+} from './utils/tomo01Progress';
 
 function AppContent() {
   const { updateLocation, saveCurrentLocationHistory } = useTutorEvo();
@@ -415,32 +427,18 @@ function AppContent() {
   // Refresh chapters function
   const computeChaptersList = (): ChapterItem[] => {
     try {
-      const isC01Done =
-        Boolean(localStorage.getItem('evo_c01_completed')?.length) ||
-        Boolean(localStorage.getItem('evo_c01_specs'));
+      const isC01Done = isChapter01Complete();
       const isC02Unlocked = localStorage.getItem('evo_c02_unlocked') === 'true' || isC01Done;
-      const isC02Completed = localStorage.getItem('evo_c02_status') === 'completed';
-      const isC03Completed = localStorage.getItem('evo_c03_status') === 'completed';
+      const isC02Completed = isChapter02Complete();
+      const isC03Completed = isChapter03Complete();
       const isC03Unlocked = isC02Completed;
-      const isC04Completed = localStorage.getItem('evo_c04_status') === 'completed';
+      const isC04Completed = isChapter04Complete();
       const isC04Unlocked = isC03Completed || localStorage.getItem('evo_c04_unlocked') === 'true';
-      const isC05Completed = localStorage.getItem('evo_c05_status') === 'completed';
+      const isC05Completed = isChapter05Complete();
       const isC05Unlocked = isC04Completed || localStorage.getItem('evo_c05_unlocked') === 'true';
-
-      let isC06Completed = localStorage.getItem('evo_c06_status') === 'completed';
-      try {
-        const rawCases = localStorage.getItem('evo_c06_cases');
-        if (rawCases) {
-          const parsed = JSON.parse(rawCases);
-          if (Array.isArray(parsed) && parsed.some((c: any) => c && c.completed === true && c.status !== 'INVESTIGANDO')) {
-            isC06Completed = true;
-          }
-        }
-      } catch {
-        // ignore
-      }
-
+      const isC06Completed = isChapter06Complete();
       const isC06Unlocked = isC05Completed || localStorage.getItem('evo_c06_unlocked') === 'true';
+      const isC07Completed = isChapter07Complete();
       const isC07Unlocked = isC06Completed;
 
       return TOMO_01_CHAPTERS.map((c) => {
@@ -473,9 +471,6 @@ function AppContent() {
           return { ...c, status: 'BLOQUEADO' as const };
         }
         if (c.number === '07') {
-          const isC07Completed =
-            localStorage.getItem('evo_c07_status') === 'completed' ||
-            Boolean(localStorage.getItem('evo_c07_report'));
           if (isC07Completed) return { ...c, status: 'COMPLETADO' as const };
           if (isC07Unlocked) return { ...c, status: 'DISPONIBLE' as const };
           return { ...c, status: 'BLOQUEADO' as const };

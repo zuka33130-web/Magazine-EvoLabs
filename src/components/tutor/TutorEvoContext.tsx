@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import {
   TutorMode,
   TutorLocation,
@@ -75,34 +75,42 @@ export const TutorEvoProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     lastSavedLocation && localStorage.getItem(STORAGE_KEY_ONBOARDING_DISMISSED) === 'true'
   );
 
-  const setMode = (newMode: TutorMode) => {
+  const setMode = useCallback((newMode: TutorMode) => {
     setModeState(newMode);
     try {
       localStorage.setItem(STORAGE_KEY_TUTOR_MODE, newMode);
     } catch (err) {
       console.error(err);
     }
-  };
-
-  const updateLocation = useCallback((partial: Partial<TutorLocation>) => {
-    setCurrentLocation((prev) => ({
-      ...prev,
-      ...partial,
-    }));
   }, []);
 
-  const openTutorWithTerm = (termKey: string) => {
+  const updateLocation = useCallback((partial: Partial<TutorLocation>) => {
+    setCurrentLocation((prev) => {
+      let changed = false;
+      for (const key in partial) {
+        const k = key as keyof TutorLocation;
+        if (prev[k] !== partial[k]) {
+          changed = true;
+          break;
+        }
+      }
+      if (!changed) return prev;
+      return { ...prev, ...partial };
+    });
+  }, []);
+
+  const openTutorWithTerm = useCallback((termKey: string) => {
     setSelectedGlossaryKey(termKey);
     setActiveTutorTab('glossary');
     setIsTutorOpen(true);
-  };
+  }, []);
 
-  const openTutorWithTab = (tab: 'explain' | 'glossary' | 'map' | 'tour') => {
+  const openTutorWithTab = useCallback((tab: 'explain' | 'glossary' | 'map' | 'tour') => {
     setActiveTutorTab(tab);
     setIsTutorOpen(true);
-  };
+  }, []);
 
-  const startZeroKnowledgeTour = () => {
+  const startZeroKnowledgeTour = useCallback(() => {
     setMode('guiado');
     setIsOnboardingOpen(false);
     try {
@@ -111,57 +119,93 @@ export const TutorEvoProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error(err);
     }
     openTutorWithTab('tour');
-  };
+  }, [setMode, openTutorWithTab]);
 
-  const dismissOnboarding = () => {
+  const dismissOnboarding = useCallback(() => {
     setIsOnboardingOpen(false);
     try {
       localStorage.setItem(STORAGE_KEY_ONBOARDING_DISMISSED, 'true');
     } catch (err) {
       console.error(err);
     }
-  };
+  }, []);
 
-  const saveCurrentLocationHistory = (viewId: string, tomoNumber?: string, chapterTitle?: string) => {
-    const record = {
-      tomoNumber: tomoNumber || '01',
-      tomoTitle: tomoNumber === '02' ? 'La Biblia Negra de Windows' : 'Conocé tu PC',
-      chapterTitle: chapterTitle || 'Inicio de Recorrido',
-      viewId,
-      timestamp: new Date().toISOString(),
-    };
-    setLastSavedLocation(record);
-    try {
-      localStorage.setItem(STORAGE_KEY_LAST_LOCATION, JSON.stringify(record));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const saveCurrentLocationHistory = useCallback(
+    (viewId: string, tomoNumber?: string, chapterTitle?: string) => {
+      const tomoTitle = tomoNumber === '02' ? 'La Biblia Negra de Windows' : 'Conocé tu PC';
+      const title = chapterTitle || 'Inicio de Recorrido';
+      const num = tomoNumber || '01';
+
+      setLastSavedLocation((prev) => {
+        if (
+          prev &&
+          prev.viewId === viewId &&
+          prev.tomoNumber === num &&
+          prev.chapterTitle === title
+        ) {
+          return prev;
+        }
+        const record = {
+          tomoNumber: num,
+          tomoTitle,
+          chapterTitle: title,
+          viewId,
+          timestamp: new Date().toISOString(),
+        };
+        try {
+          localStorage.setItem(STORAGE_KEY_LAST_LOCATION, JSON.stringify(record));
+        } catch (err) {
+          console.error(err);
+        }
+        return record;
+      });
+    },
+    []
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      mode,
+      setMode,
+      isTutorOpen,
+      setIsTutorOpen,
+      activeTutorTab,
+      setActiveTutorTab,
+      selectedGlossaryKey,
+      setSelectedGlossaryKey,
+      currentLocation,
+      updateLocation,
+      openTutorWithTerm,
+      openTutorWithTab,
+      isOnboardingOpen,
+      setIsOnboardingOpen,
+      startZeroKnowledgeTour,
+      dismissOnboarding,
+      isReturningUser,
+      lastSavedLocation,
+      saveCurrentLocationHistory,
+    }),
+    [
+      mode,
+      setMode,
+      isTutorOpen,
+      activeTutorTab,
+      selectedGlossaryKey,
+      currentLocation,
+      updateLocation,
+      openTutorWithTerm,
+      openTutorWithTab,
+      isOnboardingOpen,
+      startZeroKnowledgeTour,
+      dismissOnboarding,
+      isReturningUser,
+      lastSavedLocation,
+      saveCurrentLocationHistory,
+    ]
+  );
 
   return (
-    <TutorEvoContext.Provider
-      value={{
-        mode,
-        setMode,
-        isTutorOpen,
-        setIsTutorOpen,
-        activeTutorTab,
-        setActiveTutorTab,
-        selectedGlossaryKey,
-        setSelectedGlossaryKey,
-        currentLocation,
-        updateLocation,
-        openTutorWithTerm,
-        openTutorWithTab,
-        isOnboardingOpen,
-        setIsOnboardingOpen,
-        startZeroKnowledgeTour,
-        dismissOnboarding,
-        isReturningUser,
-        lastSavedLocation,
-        saveCurrentLocationHistory,
-      }}
-    >
+    <TutorEvoContext.Provider value={contextValue}>
       {children}
     </TutorEvoContext.Provider>
   );

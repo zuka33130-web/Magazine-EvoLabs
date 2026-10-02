@@ -105,13 +105,22 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
 
             {/* Main Title & Subtitle */}
             <div className="space-y-3">
-              <h1 className="font-display font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white tracking-tight leading-[0.93] uppercase">
+              <h1 className="font-display font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white tracking-tight leading-[0.92] uppercase">
                 DOMINÁ WINDOWS
               </h1>
 
-              <p className="text-xl sm:text-2xl text-cyan-300 font-sans-editorial italic font-medium leading-snug pt-1">
-                “El lado oscuro de Windows.”
+              <p className="text-xl sm:text-2xl text-cyan-300 font-sans-editorial italic font-semibold leading-snug pt-0.5">
+                “La Biblia Negra de Windows — El lado oscuro del sistema.”
               </p>
+
+              {/* Official Motto Banner */}
+              <div className="p-3 rounded-xl bg-[#09111F] border border-cyan-500/40 text-xs font-mono-tech text-cyan-200 flex items-center gap-2.5 shadow-lg my-1">
+                <Shield className="w-4 h-4 text-cyan-400 shrink-0" />
+                <span>
+                  <strong className="text-white font-bold uppercase tracking-wider block text-[10px]">LEMA DE REVERSIBILIDAD OBLIGATORIA:</strong>
+                  <span className="text-cyan-300 font-extrabold tracking-tight">“SI NO PODÉS REVERTIRLO, NO LO TOQUES.”</span>
+                </span>
+              </div>
 
               <p className="text-sm sm:text-base text-zinc-300 font-sans-editorial leading-relaxed max-w-xl pt-1">
                 Lo usás todos los días. Ahora descubrí qué hace cuando no estás mirando. Del arranque UEFI y el Kernel NT a la memoria virtual, los procesos svchost compartidos y el diagnóstico pericial sin mitos.

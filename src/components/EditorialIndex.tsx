@@ -21,6 +21,11 @@ import { TutorTomo01WelcomeModal } from './tutor/TutorTomo01WelcomeModal';
 import { TutorProgressMapModal } from './tutor/TutorProgressMapModal';
 import { TutorPreFlightModal } from './tutor/TutorPreFlightModal';
 import { useTutorEvo } from './tutor/TutorEvoContext';
+import {
+  isTomo01ExamPassed,
+  areAllTomo01ChaptersComplete,
+  isTomo01Complete,
+} from '../utils/tomo01Progress';
 
 interface EditorialIndexProps {
   chapters: ChapterItem[];
@@ -66,9 +71,9 @@ export const EditorialIndex: React.FC<EditorialIndexProps> = ({
   const [preFlightType, setPreFlightType] = useState<'EXAM' | 'LAB' | null>(null);
 
   const completedCount = chapters.filter((c) => c.status === 'COMPLETADO').length;
-  const isAllChaptersDone = completedCount >= 7;
-  const hasPassedFinalExam =
-    typeof window !== 'undefined' && localStorage.getItem('evo_tomo01_completed') === 'true';
+  const isAllChaptersDone = areAllTomo01ChaptersComplete();
+  const hasPassedFinalExam = isTomo01ExamPassed();
+  const isTomo01FullyDone = isTomo01Complete();
 
   // Identify latest active chapter for returning user fallback
   const latestActiveChapter = useMemo(() => {

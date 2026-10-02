@@ -43,16 +43,22 @@ export const Tomo02ComoUsarElTomo: React.FC<Tomo02ComoUsarElTomoProps> = ({
       {/* Top Banner / Section Header */}
       <div className="border-b border-cyan-950 pb-2.5 flex items-baseline justify-between">
         <div>
-          <span className="text-[10px] font-mono-tech tracking-widest text-cyan-400 uppercase font-bold">
-            CONVENCIONES EDITORIALES // GUÍA DE NAVEGACIÓN PERICIAL
+          <span className="text-[10px] font-mono-tech tracking-widest text-cyan-400 uppercase font-bold flex items-center gap-1.5">
+            <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
+            MANIFIESTO EDITORIAL // CONVENCIONES Y REVERSIBILIDAD
           </span>
           <h2 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight mt-0.5">
             Cómo leer este tomo y tu Archivo EVO
           </h2>
         </div>
-        <span className="font-mono-tech text-[10px] text-zinc-500 uppercase tracking-wider hidden sm:inline">
-          REF: EVO-T02-SYS-001
-        </span>
+        <div className="text-right">
+          <span className="font-mono-tech text-[10px] text-cyan-400 font-extrabold uppercase tracking-wider block">
+            LEMA: SI NO PODÉS REVERTIRLO, NO LO TOQUES
+          </span>
+          <span className="font-mono-tech text-[9px] text-zinc-500 uppercase tracking-wider">
+            REF: EVO-T02-SYS-001
+          </span>
+        </div>
       </div>
 
       {/* Main Grid: 2 Columns (Sistema de Lectura + Archivo Forense EVO) */}

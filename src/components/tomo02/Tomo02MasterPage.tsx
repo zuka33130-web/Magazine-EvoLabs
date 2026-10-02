@@ -88,8 +88,8 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
             </div>
 
             <div className="flex items-center gap-2 text-right">
-              <span className="text-cyan-400/90 font-medium tracking-wide">
-                {pageFooterRight || 'EL LADO OSCURO DE WINDOWS'}
+              <span className="text-cyan-400/90 font-medium tracking-wide uppercase">
+                {pageFooterRight || 'LEMA: SI NO PODÉS REVERTIRLO, NO LO TOQUES'}
               </span>
             </div>
           </footer>

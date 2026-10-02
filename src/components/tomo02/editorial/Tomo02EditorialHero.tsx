@@ -179,7 +179,7 @@ export const Tomo02EditorialHero: React.FC<Tomo02EditorialHeroProps> = ({
       <div className="pt-2 border-t border-cyan-950/60 flex items-center justify-between text-[10px] font-mono-tech text-zinc-500">
         <span className="text-zinc-400 flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 bg-cyan-400 rounded-none inline-block shadow-[0_0_6px_#00D2FF]" />
-          ESTÁNDAR EDITORIAL EVO LABS // KERNEL ARCHITECTURE & TELEMETRY
+          ESTÁNDAR EDITORIAL EVO LABS // LEMA: “SI NO PODÉS REVERTIRLO, NO LO TOQUES.”
         </span>
         <span className="text-cyan-400 font-bold">
           EXPEDIENTE TÉCNICO #{module.moduleNumber} DE 26

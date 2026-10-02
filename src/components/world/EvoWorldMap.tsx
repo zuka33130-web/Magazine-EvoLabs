@@ -28,6 +28,18 @@ import { EvoLabConsole } from './labs/EvoLabConsole';
 import { EvoOperatingModeSelector } from '../common/EvoOperatingModeSelector';
 import { EvoLearningGuideModal } from '../common/EvoLearningGuideModal';
 import {
+  isChapter01Complete,
+  isChapter02Complete,
+  isChapter03Complete,
+  isChapter04Complete,
+  isChapter05Complete,
+  isChapter06Complete,
+  isChapter07Complete,
+  areAllTomo01ChaptersComplete,
+  isTomo01ExamPassed,
+  isTomo01Complete,
+} from '../../utils/tomo01Progress';
+import {
   Power,
   Cpu,
   Wrench,
@@ -154,14 +166,15 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
   // -------------------------------------------------------------
   const realProgress = useMemo(() => {
     try {
-      const hasPassport = Boolean(localStorage.getItem('evo_c01_specs')) || Boolean(passport);
-      const isC01Done = localStorage.getItem('evo_c01_completed') === 'true' || hasPassport;
-      const isC02Done = localStorage.getItem('evo_c02_status') === 'completed';
-      const isC03Done = localStorage.getItem('evo_c03_status') === 'completed';
-      const isC04Done = localStorage.getItem('evo_c04_status') === 'completed';
-      const isC05Done = localStorage.getItem('evo_c05_status') === 'completed';
-      const isC06Done = localStorage.getItem('evo_c06_status') === 'completed';
-      const isC07Done = localStorage.getItem('evo_c07_status') === 'completed';
+      const isC01Done = isChapter01Complete();
+      const isC02Done = isChapter02Complete();
+      const isC03Done = isChapter03Complete();
+      const isC04Done = isChapter04Complete();
+      const isC05Done = isChapter05Complete();
+      const isC06Done = isChapter06Complete();
+      const isC07Done = isChapter07Complete();
+      const isExamPassed = isTomo01ExamPassed();
+      const isTomo01FullyDone = isTomo01Complete();
 
       // Boot lab real progress
       const isBootLabDone = localStorage.getItem('evo_boot_lab_completed') === 'true';
@@ -181,14 +194,27 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
         onContinue: () => void;
       } | null = null;
 
-      if (isC07Done) {
+      if (isTomo01FullyDone) {
+        lastActivity = {
+          levelNumber: 1,
+          levelTitle: 'NIVEL 1: CONOCER LA PC',
+          tomoNumber: '01',
+          title: 'Tomo 01 // Certificación y Examen Aprobado',
+          detail: 'Certificación empírica de rendimiento y teoría comprobada (≥70%).',
+          tag: 'TOMO 01 FINALIZADO',
+          onContinue: () => {
+            if (onOpenTomo) onOpenTomo('01');
+            else if (onNavigateMagazine) onNavigateMagazine();
+          },
+        };
+      } else if (isC07Done) {
         lastActivity = {
           levelNumber: 1,
           levelTitle: 'NIVEL 1: CONOCER LA PC',
           tomoNumber: '01',
           title: 'Tomo 01 // Laboratorio Final Completado',
-          detail: 'Certificación empírica de rendimiento y método A/B finalizado.',
-          tag: 'TOMO 01 FINALIZADO',
+          detail: 'Capítulos 01–07 completados. Listo para rendir la Prueba Final EVO.',
+          tag: 'EXAMEN DISPONIBLE',
           onContinue: () => {
             if (onOpenTomo) onOpenTomo('01');
             else if (onNavigateMagazine) onNavigateMagazine();
@@ -310,6 +336,8 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
         isC05Done,
         isC06Done,
         isC07Done,
+        isExamPassed,
+        isTomo01FullyDone,
         isBootLabDone,
         resolvedCasesCount,
         totalCasesCount: savedCases.length,
@@ -326,6 +354,8 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
         isC05Done: false,
         isC06Done: false,
         isC07Done: false,
+        isExamPassed: false,
+        isTomo01FullyDone: false,
         isBootLabDone: false,
         resolvedCasesCount: 0,
         totalCasesCount: 0,
@@ -1817,7 +1847,7 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
               {EVO_SCHOOL_LEVELS.map((lvl) => {
                 let statusLabel: 'INICIADO' | 'EN CURSO' | 'COMPLETADO' | 'EN DESARROLLO' = 'EN CURSO';
                 if (lvl.levelNumber === 0) statusLabel = 'INICIADO';
-                else if (lvl.levelNumber === 1) statusLabel = realProgress.isC07Done ? 'COMPLETADO' : realProgress.isC01Done ? 'EN CURSO' : 'INICIADO';
+                else if (lvl.levelNumber === 1) statusLabel = realProgress.isTomo01FullyDone ? 'COMPLETADO' : realProgress.isC01Done ? 'EN CURSO' : 'INICIADO';
                 else if (lvl.levelNumber === 2) statusLabel = realProgress.isBootLabDone ? 'COMPLETADO' : 'EN CURSO';
                 else statusLabel = 'EN DESARROLLO';
 

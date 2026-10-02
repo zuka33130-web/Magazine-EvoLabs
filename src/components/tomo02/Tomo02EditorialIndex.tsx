@@ -161,7 +161,7 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
         </h1>
 
         <p className="font-sans-editorial text-lg sm:text-xl text-cyan-200/90 max-w-2xl leading-relaxed italic">
-          “El lado oculto de Windows. Descubrilo.”
+          “El lado oscuro de Windows. Lema: Si no podés revertirlo, no lo toques.”
         </p>
 
         {/* Cómo usar este Tomo */}
