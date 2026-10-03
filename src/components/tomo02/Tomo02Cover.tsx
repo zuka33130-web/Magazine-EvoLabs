@@ -59,7 +59,7 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
 
           <div className="flex items-center gap-4">
             <span className="tracking-widest uppercase text-zinc-400 hidden sm:inline text-[11px]">
-              ARQUITECTURA DE SISTEMAS & KERNEL NT // INVESTIGACIÓN TÉCNICA
+              ARQUITECTURA DE WINDOWS // INVESTIGACIÓN TÉCNICA
             </span>
 
             {onBackToApp && (
@@ -113,11 +113,11 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
                       01.
                     </span>
                     <h2 className="font-display font-bold text-base sm:text-lg text-white group-hover:text-cyan-300 transition-colors">
-                      Procesos, Kernel & Memoria Virtual
+                      Qué ocurre cuando Windows arranca
                     </h2>
                   </div>
                   <p className="mt-0.5 pl-6 text-xs sm:text-sm text-zinc-400 font-sans-editorial leading-relaxed">
-                    Quién ejecuta qué, svchost compartido, Commit Charge, pools de memoria y la falacia de vaciar RAM a ciegas.
+                    Secuencia de arranque UEFI, partición ESP, almacén BCD y carga determinista de Winload.efi.
                   </p>
                 </article>
 
@@ -127,11 +127,11 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
                       02.
                     </span>
                     <h2 className="font-display font-bold text-base sm:text-lg text-white group-hover:text-cyan-300 transition-colors">
-                      Red, Servicios & Automatización
+                      Procesos, memoria y servicios
                     </h2>
                   </div>
                   <p className="mt-0.5 pl-6 text-xs sm:text-sm text-zinc-400 font-sans-editorial leading-relaxed">
-                    Sockets en escucha, telemetría bajo escrutinio forense, tareas programadas y auditoría de controladores DPC/ISR.
+                    Arquitectura de svchost.exe, Commit Charge, Working Set y la falacia de vaciar RAM a ciegas.
                   </p>
                 </article>
 
@@ -141,11 +141,11 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
                       03.
                     </span>
                     <h2 className="font-display font-bold text-base sm:text-lg text-white group-hover:text-cyan-300 transition-colors">
-                      Registro Profundo & Triage de Taller
+                      Diagnóstico sin mitos ni cambios a ciegas
                     </h2>
                   </div>
                   <p className="mt-0.5 pl-6 text-xs sm:text-sm text-zinc-400 font-sans-editorial leading-relaxed">
-                    Colmenas binarias, privilegios UAC, recuperación del BCD y reparación in-place no destructiva.
+                    Estructura del Registro, telemetría forense, metrología DPC/ISR y reparación de taller in-place.
                   </p>
                 </article>
               </div>

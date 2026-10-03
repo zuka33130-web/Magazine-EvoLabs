@@ -1,18 +1,34 @@
 import React from 'react';
 import { TOMO_02_MODULES, TomoModuleItem } from '../../../data/tomo02Data';
-import sec1Img from '../../../assets/images/cap_01_silicon_1789531835511.jpg';
-import sec2Img from '../../../assets/images/cap_02_interconnect_1789531847526.jpg';
-import sec3Img from '../../../assets/images/cap_05_kernel_1789531884339.jpg';
-import sec4Img from '../../../assets/images/cap_03_frametime_1789531858625.jpg';
-import sec5Img from '../../../assets/images/pcb_traces_detail_1789530447414.jpg';
-import sec6Img from '../../../assets/images/cap_06_workshop_1789531894578.jpg';
+import {
+  Cpu,
+  Database,
+  Layers,
+  Network,
+  Shield,
+  Wrench,
+  Lock,
+  Terminal,
+  Activity,
+  Zap,
+  HardDrive,
+  FileCode,
+  FolderTree,
+  Binary,
+  Radio,
+  Clock,
+  KeyRound,
+  AlertOctagon,
+  RefreshCw,
+  Search,
+} from 'lucide-react';
 
 export interface SectionOpenerMeta {
   romanNumber: string;
   sectionTitle: string;
+  subtitle: string;
   impactPhrase: string;
-  image: string;
-  imageAlt: string;
+  architectureBadge: string;
   whatYouWillUnderstand: string;
   whatYouWillVerify: string;
   moduleIds: string[];
@@ -22,10 +38,10 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
   m00: {
     romanNumber: 'I',
     sectionTitle: 'ARQUITECTURA DE ARRANQUE & DESPLIEGUE',
+    subtitle: 'Cadena de confianza determinista y transición de firmware a kernel',
     impactPhrase:
       'El encendido del silicio no es magia: es una cadena determinista de instrucciones desde el primer microvoltio en la placa madre.',
-    image: sec1Img,
-    imageAlt: 'Microfotografía editorial de arquitectura de silicio, pistas de cobre y socket de CPU',
+    architectureBadge: 'UEFI ➔ ESP ➔ BCD ➔ WINLOAD.EFI ➔ NTOSKRNL',
     whatYouWillUnderstand:
       'Secuencia UEFI, tabla GPT, partición ESP, el almacén BCD y la transferencia al bootloader Winload.efi.',
     whatYouWillVerify:
@@ -35,10 +51,10 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
   m03: {
     romanNumber: 'II',
     sectionTitle: 'SISTEMA DE ARCHIVOS & ALMACENAMIENTO',
+    subtitle: 'Árbol transaccional NTFS, almacén inmutable y jerarquía física NVMe',
     impactPhrase:
       'El disco no almacena archivos: gestiona un árbol binario transaccional donde cada byte tiene un propietario y un registro de auditoría.',
-    image: sec2Img,
-    imageAlt: 'Fotografía macro de líneas de bus de datos y pistas de interconexión PCIe de alta velocidad',
+    architectureBadge: 'NTFS // $MFT RECORD 0 // WINSXS HARDLINKS // NVMe 4K',
     whatYouWillUnderstand:
       'La tabla maestra MFT de NTFS, el almacén inmutable WinSxS, la separación System32 vs SysWOW64 y la compresión Compact.',
     whatYouWillVerify:
@@ -48,10 +64,10 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
   m06: {
     romanNumber: 'III',
     sectionTitle: 'NÚCLEO, PROCESOS & MEMORIA VIRTUAL',
+    subtitle: 'Arquitectura híbrida NT, aislamiento Ring 0/Ring 3 y gestión de páginas',
     impactPhrase:
       'La RAM libre es memoria desperdiciada. El Kernel NT no vacía: organiza, pagina y proyecta páginas de memoria bajo demanda física.',
-    image: sec3Img,
-    imageAlt: 'Fotografía editorial del encapsulado de silicio y substrato de alta densidad de compuertas lógicas',
+    architectureBadge: 'RING 0 KERNEL // SYSCALL DISPATCH // CR3 PAGE TABLES // COMMIT CHARGE',
     whatYouWillUnderstand:
       'Commit Charge vs Working Set, Standby List, Paged vs Non-Paged Pool, despachador de interrupciones y latencias DPC.',
     whatYouWillVerify:
@@ -61,10 +77,10 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
   m10: {
     romanNumber: 'IV',
     sectionTitle: 'CONECTIVIDAD, SERVICIOS & AUTOMATIZACIÓN',
+    subtitle: 'Matriz de aislamiento svchost, sockets en escucha y eventos de servicio',
     impactPhrase:
       'Un proceso no es un programa: es un contenedor de hilos. Svchost agrupa servicios compartidos para ahorrar recursos, no para ocultar actividad.',
-    image: sec4Img,
-    imageAlt: 'Fotografía de osciloscopio y análisis de señales temporales y paquetes de red en tiempo real',
+    architectureBadge: 'SVCHOST MATRIX // TCP-UDP Sockets // SCM SERVICES // SCHEDULER',
     whatYouWillUnderstand:
       'La arquitectura svchost.exe compartida, sockets TCP/UDP en escucha, SysMain, indexación inteligente y disparadores por eventos.',
     whatYouWillVerify:
@@ -74,10 +90,10 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
   m14: {
     romanNumber: 'V',
     sectionTitle: 'TERMINAL, REGISTRO & CIBERSEGURIDAD',
+    subtitle: 'Colmenas binarias atómicas, tokens de elevación y barreras UIPI',
     impactPhrase:
       'El Registro es una base de datos atómica en memoria. Desactivar el UAC no te hace técnico: le entrega la llave de Ring 0 a cualquier script.',
-    image: sec5Img,
-    imageAlt: 'Fotografía macro de trazas de circuito impreso PCB y capas conductoras de alta precisión',
+    architectureBadge: 'REGISTRY HIVES // UAC TOKEN // INTEGRITY LEVELS // POWERSHELL CLI',
     whatYouWillUnderstand:
       'Colmenas físicas del Registro (SAM, SYSTEM, SOFTWARE), permisos ACL, tokens de elevación UAC, directiva UIPI y telemetría.',
     whatYouWillVerify:
@@ -87,10 +103,10 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
   m19: {
     romanNumber: 'VI',
     sectionTitle: 'METROLOGÍA, RECUPERACIÓN & CASOS DE TALLER',
+    subtitle: 'Triangulación de fallos, volcados BSOD, WinRE y reparación in-place',
     impactPhrase:
       'El mejor técnico no es el que formatea más rápido, sino el que rescata el sistema sin destruir un solo dato ni tocar la partición del usuario.',
-    image: sec6Img,
-    imageAlt: 'Fotografía editorial de instrumental forense de taller técnico, puntas de prueba y banco de trabajo',
+    architectureBadge: 'WINRE OFFLINE // BSOD 0x3B DUMP // SFC & DISM // RELIABILITY GRAPH',
     whatYouWillUnderstand:
       'El entorno de recuperación WinRE, reconstrucción de BCD, diagnóstico de volcados BSOD (Minidumps), triage en vivo y reparación in-place.',
     whatYouWillVerify:
@@ -98,6 +114,267 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     moduleIds: ['m19', 'm20', 'm21', 'm22', 'm23', 'm24', 'm25', 'm26'],
   },
 };
+
+// ============================================================================
+// BESPOKE VECTOR TECHNICAL ARCHITECTURE SCHEMATICS (100% TOMO 02 IDENTITY)
+// Zero raster dependencies on Tomo 01 images. Pure Windows NT Systems Art.
+// ============================================================================
+
+interface SectionSchematicProps {
+  sectionId: string;
+  isCompact?: boolean;
+}
+
+const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, isCompact = false }) => {
+  switch (sectionId) {
+    case 'm00':
+      // SECCIÓN I: ARRANQUE & DESPLIEGUE (UEFI -> ESP -> BCD -> WINLOAD -> KERNEL NT)
+      return (
+        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
+          {/* Subtle grid backdrop */}
+          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
+
+          {/* Top telemetry status */}
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
+            <span className="flex items-center gap-1">
+              <Zap className="w-2.5 h-2.5 text-cyan-400 animate-pulse" />
+              BOOT SEQUENCE // DETERMINISTIC PIPELINE
+            </span>
+            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
+              SECURE BOOT: ACTIVE
+            </span>
+          </div>
+
+          {/* Vector Flow Nodes */}
+          <div className="grid grid-cols-5 gap-1.5 items-center z-10 my-auto py-1">
+            {[
+              { name: 'UEFI NVRAM', tag: 'POST/SEC', color: 'border-cyan-700 bg-cyan-950/70 text-cyan-300' },
+              { name: 'ESP (FAT32)', tag: 'EFI/BOOT', color: 'border-cyan-600 bg-cyan-900/50 text-cyan-200' },
+              { name: 'BCD STORE', tag: '{CURRENT}', color: 'border-blue-600 bg-blue-950/70 text-blue-200' },
+              { name: 'WINLOAD.EFI', tag: 'PE/64', color: 'border-emerald-600 bg-emerald-950/70 text-emerald-200' },
+              { name: 'NTOSKRNL', tag: 'RING 0', color: 'border-cyan-400 bg-cyan-950 text-white font-bold' },
+            ].map((node, i) => (
+              <div key={i} className="flex flex-col items-center text-center">
+                <div className={`w-full py-1 px-0.5 rounded border ${node.color} shadow-sm transition-transform`}>
+                  <div className="text-[8px] font-bold truncate leading-none">{node.name}</div>
+                  <div className="text-[7px] opacity-70 tracking-tighter mt-0.5 leading-none">{node.tag}</div>
+                </div>
+                {i < 4 && (
+                  <span className="hidden lg:block text-[8px] text-cyan-500 font-black mt-0.5">➔</span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom architecture verification string */}
+          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
+            <span className="truncate">0x7C00 ➔ KiSystemStartup ➔ Phase0Init</span>
+            <span className="text-cyan-400 font-bold">GPT / GUID: 0xEF</span>
+          </div>
+        </div>
+      );
+
+    case 'm03':
+      // SECCIÓN II: SISTEMA DE ARCHIVOS & ALMACENAMIENTO (NTFS / MFT / WinSxS / NVMe)
+      return (
+        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
+          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
+
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
+            <span className="flex items-center gap-1">
+              <HardDrive className="w-2.5 h-2.5 text-cyan-400" />
+              NTFS VOLUME STRUCTURE // 4K CLUSTER MAP
+            </span>
+            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
+              $LogFile: ATOMIC
+            </span>
+          </div>
+
+          <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
+            {[
+              { title: '$MFT REC 0', desc: 'Master Table', badge: '1024-byte', color: 'border-cyan-600 bg-cyan-950/80' },
+              { title: '$LogFile', desc: 'Journaling', badge: 'TxCommit', color: 'border-blue-600 bg-blue-950/80' },
+              { title: 'WinSxS Tree', desc: 'Side-by-Side', badge: 'Hardlinks', color: 'border-emerald-600 bg-emerald-950/80' },
+              { title: 'NVMe LBA', desc: 'Direct 4KB', badge: 'PCIe 4.0', color: 'border-cyan-400 bg-cyan-900/70 text-cyan-100' },
+            ].map((node, i) => (
+              <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
+                <div className="text-[8px] font-bold text-white truncate leading-none">{node.title}</div>
+                <div className="text-[7px] text-zinc-300 truncate mt-0.5 leading-none">{node.desc}</div>
+                <div className="text-[6.5px] text-cyan-300 font-semibold mt-0.5">{node.badge}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
+            <span className="truncate">DISM /AnalyzeComponentStore // Hardlink Invariance</span>
+            <span className="text-cyan-400 font-bold">NTFS v3.1</span>
+          </div>
+        </div>
+      );
+
+    case 'm06':
+      // SECCIÓN III: KERNEL, PROCESOS & MEMORIA VIRTUAL (Ring 0 / Ring 3 / CR3 Page Tables / Commit Charge)
+      return (
+        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
+          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
+
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
+            <span className="flex items-center gap-1">
+              <Cpu className="w-2.5 h-2.5 text-cyan-400" />
+              NT KERNEL DUALITY // MEMORY ISOLATION
+            </span>
+            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
+              VIRTUAL MEM: 128 TB
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 items-center z-10 my-auto py-1">
+            <div className="p-1.5 rounded border border-blue-600/70 bg-blue-950/60 text-center">
+              <div className="text-[7.5px] text-blue-300 font-bold leading-none">RING 3 (USER)</div>
+              <div className="text-[8px] text-white font-bold mt-1">Apps / Subsystem</div>
+              <div className="text-[6.5px] text-blue-200/80 mt-0.5">Isolated 48-bit VA</div>
+            </div>
+
+            <div className="p-1.5 rounded border border-cyan-500 bg-cyan-950/90 text-center shadow-[0_0_8px_rgba(0,210,255,0.15)]">
+              <div className="text-[7.5px] text-cyan-400 font-bold leading-none">SYSCALL / SSDT</div>
+              <div className="text-[8px] text-white font-bold mt-1">KiSystemCall64</div>
+              <div className="text-[6.5px] text-cyan-300 mt-0.5">Ring Transition &lt;15ns</div>
+            </div>
+
+            <div className="p-1.5 rounded border border-purple-600/70 bg-purple-950/60 text-center">
+              <div className="text-[7.5px] text-purple-300 font-bold leading-none">RING 0 (KERNEL)</div>
+              <div className="text-[8px] text-white font-bold mt-1">HAL / Drivers / Pools</div>
+              <div className="text-[6.5px] text-purple-200/80 mt-0.5">Non-Paged Pool</div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
+            <span className="truncate">Commit Charge Limit vs Working Set Pool</span>
+            <span className="text-cyan-400 font-bold">PML4 / CR3</span>
+          </div>
+        </div>
+      );
+
+    case 'm10':
+      // SECCIÓN IV: RED, SERVICIOS & AUTOMATIZACIÓN (svchost / services / sockets / scheduler)
+      return (
+        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
+          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
+
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
+            <span className="flex items-center gap-1">
+              <Network className="w-2.5 h-2.5 text-cyan-400" />
+              SVCHOST & SERVICE CONTROL MATRIX
+            </span>
+            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
+              SCM: ACTIVE
+            </span>
+          </div>
+
+          <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
+            {[
+              { group: '-k netsvcs', item: 'Dhcp, Dnscache', port: ':53, :68', color: 'border-cyan-600 bg-cyan-950/80' },
+              { group: '-k LocalService', item: 'EventLog, W32Time', port: ':123 NTP', color: 'border-blue-600 bg-blue-950/80' },
+              { group: '-k DcomLaunch', item: 'RPC Endpoint', port: ':135 RPC', color: 'border-emerald-600 bg-emerald-950/80' },
+              { group: 'TaskScheduler', item: 'Event Triggers', port: 'Cron/Event', color: 'border-cyan-500 bg-cyan-900/80' },
+            ].map((node, i) => (
+              <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
+                <div className="text-[7.5px] font-bold text-cyan-300 truncate leading-none">{node.group}</div>
+                <div className="text-[7px] text-white font-medium truncate mt-0.5 leading-none">{node.item}</div>
+                <div className="text-[6.5px] text-zinc-300 mt-0.5">{node.port}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
+            <span className="truncate">tasklist /svc ➔ PID-to-DLL Disambiguation</span>
+            <span className="text-cyan-400 font-bold">TCP/UDP 0.0.0.0:*</span>
+          </div>
+        </div>
+      );
+
+    case 'm14':
+      // SECCIÓN V: TERMINAL, REGISTRO & CIBERSEGURIDAD (PowerShell / Registry Hives / UAC / UIPI)
+      return (
+        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
+          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
+
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
+            <span className="flex items-center gap-1">
+              <Shield className="w-2.5 h-2.5 text-cyan-400" />
+              REGISTRY HIVES & UAC INTEGRITY BOUNDARY
+            </span>
+            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
+              UIPI: ENFORCED
+            </span>
+          </div>
+
+          <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
+            {[
+              { hive: 'HKLM\\SYSTEM', target: 'ControlSet001', acl: 'SYSTEM:F', color: 'border-cyan-600 bg-cyan-950/80' },
+              { hive: 'HKLM\\SAM', target: 'Security Accounts', acl: 'SystemOnly', color: 'border-red-600/70 bg-red-950/50' },
+              { hive: 'UAC TOKEN', target: 'Split Token SID', acl: 'High vs Med', color: 'border-amber-600/80 bg-amber-950/50' },
+              { hive: 'POWERSHELL', target: 'AST & Transcripts', acl: 'ExecutionPolicy', color: 'border-blue-600 bg-blue-950/80' },
+            ].map((node, i) => (
+              <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
+                <div className="text-[7.5px] font-bold text-white truncate leading-none">{node.hive}</div>
+                <div className="text-[7px] text-zinc-300 truncate mt-0.5 leading-none">{node.target}</div>
+                <div className="text-[6.5px] text-cyan-300 mt-0.5">{node.acl}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
+            <span className="truncate">whoami /groups ➔ S-1-16-12288 (High Mandatory Level)</span>
+            <span className="text-cyan-400 font-bold">REGBIN HIVE</span>
+          </div>
+        </div>
+      );
+
+    case 'm19':
+    default:
+      // SECCIÓN VI: RECUPERACIÓN & TALLER (WinRE / BSOD BugCheck / SFC / DISM / perfmon)
+      return (
+        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
+          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
+
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
+            <span className="flex items-center gap-1">
+              <Wrench className="w-2.5 h-2.5 text-cyan-400" />
+              FORENSIC TRIAGE & IN-PLACE RECOVERY
+            </span>
+            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
+              WinRE: ATTACHED
+            </span>
+          </div>
+
+          <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
+            {[
+              { action: 'BUGCHECK', metric: '0x0000003B', note: 'SYSTEM_SERVICE', color: 'border-red-600/70 bg-red-950/60' },
+              { action: 'MINIDUMP', metric: 'MEMORY.DMP', note: '!analyze -v', color: 'border-blue-600 bg-blue-950/80' },
+              { action: 'SFC /VERIFY', metric: 'CBS.log audit', note: 'Hash Check', color: 'border-amber-600/80 bg-amber-950/60' },
+              { action: 'DISM RESTORE', metric: 'ComponentStore', note: 'Non-Destructive', color: 'border-emerald-600 bg-emerald-950/80' },
+            ].map((node, i) => (
+              <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
+                <div className="text-[7.5px] font-bold text-white truncate leading-none">{node.action}</div>
+                <div className="text-[7px] text-cyan-300 font-mono mt-0.5 leading-none">{node.metric}</div>
+                <div className="text-[6.5px] text-zinc-400 mt-0.5">{node.note}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
+            <span className="truncate">reagentc /info ➔ In-Place Recovery Pipeline</span>
+            <span className="text-emerald-400 font-bold">100% REVERSIBLE</span>
+          </div>
+        </div>
+      );
+  }
+};
+
+// ============================================================================
+// MAIN COMPONENT: TOMO 02 EDITORIAL SECTION OPENER
+// ============================================================================
 
 interface Tomo02EditorialSectionOpenerProps {
   moduleId: string;
@@ -117,18 +394,11 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
 
   if (compact) {
     return (
-      <header className="mb-4 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#030814] via-[#050B1B] to-black border border-cyan-500/40 shadow-xl font-sans-editorial">
+      <header className="mb-4 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#020611] via-[#040C20] to-[#010309] border border-cyan-500/40 shadow-xl font-sans-editorial">
         <div className="flex flex-col md:flex-row items-center gap-4">
-          {/* Section Image thumbnail */}
-          <div className="w-full md:w-36 h-24 rounded-xl overflow-hidden bg-black border border-cyan-900/80 shrink-0 relative shadow-md">
-            <img
-              src={data.image}
-              alt={data.imageAlt}
-              className="w-full h-full object-cover object-center filter contrast-[1.04] brightness-[0.96]"
-            />
-            <span className="absolute bottom-1 left-1.5 px-1.5 py-0.5 rounded bg-black/85 text-cyan-300 font-mono-tech text-[9px] font-black border border-cyan-800">
-              SECCIÓN {data.romanNumber}
-            </span>
+          {/* Section Architectural Vector Schematic */}
+          <div className="w-full md:w-56 h-28 rounded-xl overflow-hidden shrink-0 shadow-lg border border-cyan-800/80">
+            <Tomo02SectionSchematic sectionId={moduleId} isCompact={true} />
           </div>
 
           {/* Section Title, Impact Quote & Metadata */}
@@ -182,7 +452,7 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
     );
   }
 
-  // Full-Page View (if ever used non-compact)
+  // Full-Page View
   return (
     <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
       <div className="border-b border-cyan-950/80 pb-2.5 flex items-baseline justify-between">
@@ -213,15 +483,11 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 flex-1 items-stretch min-h-0">
         <div className="lg:col-span-6 flex flex-col justify-between">
-          <div className="h-full rounded-2xl overflow-hidden bg-black border border-cyan-950/80 shadow-2xl relative">
-            <img
-              src={data.image}
-              alt={data.imageAlt}
-              className="w-full h-full object-cover object-center filter contrast-[1.04] brightness-[0.96]"
-            />
+          <div className="h-full rounded-2xl overflow-hidden bg-black border border-cyan-950/80 shadow-2xl relative min-h-[220px]">
+            <Tomo02SectionSchematic sectionId={moduleId} isCompact={false} />
           </div>
-          <span className="text-[9.5px] font-mono-tech text-zinc-500 uppercase tracking-wider mt-1.5 block">
-            {data.imageAlt}
+          <span className="text-[9.5px] font-mono-tech text-cyan-400/80 uppercase tracking-wider mt-1.5 block">
+            {data.architectureBadge}
           </span>
         </div>
 
