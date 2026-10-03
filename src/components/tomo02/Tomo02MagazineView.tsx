@@ -33,7 +33,7 @@ import {
   TOMO_02_GLOSSARY,
 } from '../../data/tomo02Data';
 import { Tomo02Cover } from './Tomo02Cover';
-import { Tomo02CoverHeroVisual } from './Tomo02CoverHeroVisual';
+import coverTomo2HeroImg from '../../assets/images/cover_tomo2_win_1789531499967.jpg';
 import { Tomo02EditorialIndex, ModuleProgressStatus } from './Tomo02EditorialIndex';
 import {
   Tomo02ModuleReader,
@@ -651,7 +651,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
       {/* Main Magazine Pages Container */}
       <main className="flex-1 py-8 px-2 sm:px-4 flex flex-col items-center gap-8 print:p-0 print:m-0 print:gap-0">
         {/* ========================================================
-            PAGE 01: COVER (DOMINÁ WINDOWS // EL LADO OSCURO DE WINDOWS)
+            PAGE 01: COVER (REVISTA EDITORIAL A4 // TOMO 02)
         ======================================================== */}
         {(viewMode === 'continuous' || currentPage === 1) && (
           <Tomo02MasterPage
@@ -661,154 +661,195 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             hideHeaderFooter
             accentColor="#00D2FF"
           >
-            <div className="h-full w-full flex flex-col justify-between p-6 sm:p-9 lg:p-10 relative overflow-hidden bg-gradient-to-b from-[#020509] via-[#050912] to-[#020306] text-white select-none font-sans-editorial">
-              {/* Atmospheric Background Tech Grid */}
-              <div className="absolute inset-0 pointer-events-none opacity-20 bg-tech-grid" />
-              <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-cyan-500/10 rounded-full blur-[110px] pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-blue-600/10 rounded-full blur-[110px] pointer-events-none" />
+            <div className="relative w-full h-full flex flex-col justify-between p-7 sm:p-9 md:p-10 bg-gradient-to-b from-[#0a0c10] via-[#07080b] to-[#040507] text-white select-none overflow-hidden font-sans-editorial">
+              {/* Background Subtle Technical Grid */}
+              <div className="absolute inset-0 pointer-events-none opacity-[0.035] bg-tech-grid z-0" />
 
-              {/* ----------------------------------------------------
-                  TOP BAR (COLECCIÓN PERICIAL // EDICIÓN COLECCIONABLE)
-              ---------------------------------------------------- */}
-              <div className="relative z-10 border-b border-cyan-950 pb-2 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-cyan-400">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 bg-cyan-400 inline-block shadow-[0_0_8px_#00D2FF]" />
-                  <span className="font-bold text-white uppercase tracking-widest">
-                    COLECCIÓN TÉCNICA // TOMO 02
-                  </span>
-                  <span className="text-zinc-600">|</span>
-                  <span className="text-zinc-400 uppercase tracking-widest hidden sm:inline">
-                    ARQUITECTURA DE SISTEMAS & KERNEL NT
+              {/* ========================================================================= */}
+              {/* 1. TOP HEADER STRIP: COLLECTIBLE SYSTEM BRANDING                          */}
+              {/* ========================================================================= */}
+              <div className="relative z-10 flex items-center justify-between border-b-2 border-cyan-400 pb-3 text-[10px] font-mono-tech tracking-wider text-zinc-300">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 bg-cyan-400 inline-block shadow-[0_0_10px_rgba(0,210,255,0.75)]" />
+                  <span className="font-black text-white tracking-widest uppercase">
+                    COLECCIÓN EDITORIAL // TOMO 02
                   </span>
                 </div>
-                <div className="flex items-center gap-3 text-cyan-400 font-bold">
-                  <span className="text-zinc-400 hidden sm:inline">EDICIÓN COLECCIONABLE // 2026</span>
-                  <span className="px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-700 text-cyan-300 text-[9px]">
-                    A4 210×297mm
-                  </span>
+
+                <div className="hidden sm:flex items-center gap-3 text-zinc-400 text-[10px]">
+                  <span className="uppercase tracking-widest">ARQUITECTURA DE WINDOWS & SISTEMA OPERATIVO</span>
+                  <span className="text-zinc-600">•</span>
+                  <span className="text-cyan-400 font-bold uppercase tracking-wider">EDICIÓN COLECCIONABLE // 2026</span>
+                </div>
+
+                <div className="font-mono-tech font-bold text-cyan-400 text-[10px] tracking-widest">
+                  A4 210×297 MM
                 </div>
               </div>
 
-              {/* ----------------------------------------------------
-                  MASTHEAD: EVO LABS (MASSIVE EDITORIAL LOGO)
-              ---------------------------------------------------- */}
-              <div className="relative z-10 py-1.5 flex items-baseline justify-between border-b-2 border-cyan-400">
-                <h1 className="font-display font-black text-6xl sm:text-7xl md:text-8xl tracking-tight text-white uppercase leading-none">
-                  EVO LABS
-                </h1>
-                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 text-[10px] font-mono-tech shadow-[0_0_12px_rgba(0,210,255,0.2)]">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                  <span className="hidden sm:inline">INTERNET DICE // EVO MIDE:</span>
-                  <span className="font-bold text-white">Windows deja de ser una caja negra.</span>
-                </div>
-              </div>
-
-              {/* ----------------------------------------------------
-                  SUB-HEADER STRIP
-              ---------------------------------------------------- */}
-              <div className="relative z-10 py-1.5 flex items-center justify-between text-xs font-mono-tech border-b border-cyan-950">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded bg-cyan-400 text-black font-extrabold text-[10px] tracking-wider">
-                    MAGAZINE // TOMO 02
-                  </span>
-                  <span className="text-white font-bold tracking-widest uppercase text-[11px]">
-                    INGENIERÍA DEL SISTEMA OPERATIVO
-                  </span>
-                </div>
-                <div className="text-[10px] text-zinc-500 font-mono-tech uppercase tracking-widest hidden md:block">
-                  DESMONTAJE DEL KERNEL NT // EDICIÓN 2026
-                </div>
-              </div>
-
-              {/* ----------------------------------------------------
-                  MAIN FEATURE BOX: HERO DIAGRAM + DOMINÁ WINDOWS
-              ---------------------------------------------------- */}
-              <div className="relative z-10 my-auto p-4 sm:p-5 rounded-2xl border border-cyan-900/60 bg-[#060A14]/85 backdrop-blur-md shadow-2xl flex flex-col justify-between">
-                <div className="flex items-center justify-between text-[10px] font-mono-tech pb-2 border-b border-cyan-950">
-                  <div className="flex items-center gap-2 text-cyan-400 font-bold uppercase tracking-wider">
-                    <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#00D2FF]" />
-                    <span>INVESTIGACIÓN PRINCIPAL // TOMO 02</span>
-                  </div>
-                  <span className="text-zinc-500 uppercase tracking-widest text-[9px]">
-                    DESMONTAJE DEL KERNEL NT
-                  </span>
-                </div>
-
-                {/* Central Windows Architecture Flow Diagram */}
-                <div className="my-2">
-                  <Tomo02CoverHeroVisual />
-                </div>
-
-                {/* Dominá Windows Headline & Hook */}
-                <div className="pt-2 border-t border-cyan-950/80">
-                  <h2 className="font-display font-black text-4xl sm:text-5xl md:text-6xl text-white uppercase tracking-tighter leading-none">
-                    DOMINÁ WINDOWS
-                  </h2>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-cyan-400 font-bold tracking-widest text-xs sm:text-sm uppercase font-mono-tech">
-                      EL LADO OSCURO DE WINDOWS
-                    </span>
-                    <span className="text-zinc-500">/</span>
-                    <span className="text-zinc-300 text-xs sm:text-sm font-sans-editorial italic">
-                      Lo usás todos los días. Ahora descubrí qué hace cuando no estás mirando.
-                    </span>
+              {/* ========================================================================= */}
+              {/* 2. BIG MAGAZINE MASTHEAD (EVO LABS)                                       */}
+              {/* ========================================================================= */}
+              <div className="relative z-10 mt-4 mb-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-zinc-800/80 pb-3.5">
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <h1 className="font-display font-black text-5xl sm:text-7xl md:text-8xl tracking-tight uppercase leading-[0.82] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
+                      EVO LABS
+                    </h1>
                   </div>
 
-                  {/* Highlight Callout Pill */}
-                  <div className="mt-3 p-3 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-xs font-sans-editorial">
-                    <div className="flex items-center gap-2 text-cyan-300 font-bold font-mono-tech text-[11px] mb-1">
-                      <span className="text-cyan-400">❄</span>
-                      <span>WINDOWS HACE COSAS ANTES DE QUE ABRAS TU PRIMER PROGRAMA.</span>
-                    </div>
-                    <p className="text-[11px] text-zinc-300 leading-snug">
+                  <div className="flex items-center gap-2.5 mt-2.5">
+                    <span className="bg-cyan-400 text-black text-[11px] font-mono-tech font-black tracking-widest uppercase px-2 py-0.5 rounded-xs shadow-[0_0_10px_rgba(0,210,255,0.4)]">
+                      MAGAZINE // TOMO 02
+                    </span>
+                    <span className="font-mono-tech text-[10px] sm:text-[11px] tracking-wider text-zinc-400 uppercase font-semibold">
+                      LA BIBLIA NEGRA DE WINDOWS
+                    </span>
+                  </div>
+                </div>
+
+                {/* Sello Editorial: DE USUARIO A INVESTIGADOR */}
+                <div className="flex items-center gap-2.5 bg-[#12151e] border border-cyan-400/40 rounded-md px-3.5 py-2 shadow-lg shrink-0">
+                  <div className="w-8 h-8 rounded-full border-2 border-cyan-400 flex items-center justify-center bg-cyan-400/10 text-cyan-400 shrink-0">
+                    <Layers className="w-4 h-4 text-cyan-400" />
+                  </div>
+                  <div className="font-mono-tech leading-tight">
+                    <span className="block text-[9.5px] font-black text-cyan-400 tracking-wider uppercase">
+                      DE USUARIO A INVESTIGADOR
+                    </span>
+                    <span className="block text-[8.5px] text-zinc-400">
+                      Windows deja de ser una caja negra.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ========================================================================= */}
+              {/* 3. HERO SECTION: REALISTIC WINDOWS ARCHITECTURE + HEADLINES                */}
+              {/* ========================================================================= */}
+              <div className="relative z-10 my-2 rounded-xl overflow-hidden border border-zinc-800 bg-[#0d1017] shadow-2xl flex-1 flex flex-col justify-between min-h-[310px]">
+                {/* Background Photography */}
+                <img
+                  src={coverTomo2HeroImg}
+                  alt="Fotografía editorial // Dominá Windows — La Biblia Negra de Windows"
+                  className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.70] contrast-[1.18]"
+                />
+
+                {/* Cinematic Vignette Overlays for High Contrast & Text Legibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#07090d] via-[#07090d]/65 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#07090d]/95 via-[#07090d]/60 to-[#07090d]/80" />
+
+                {/* Top Stamp Tag in Image */}
+                <div className="relative z-10 p-4 sm:p-5 flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-black/80 backdrop-blur-md border border-cyan-400/60 rounded text-cyan-400 text-[10px] font-mono-tech font-bold uppercase tracking-widest">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                    INVESTIGACIÓN PRINCIPAL // TOMO 02
+                  </span>
+
+                  <span className="hidden sm:inline-block font-mono-tech text-[9.5px] text-zinc-300 bg-black/70 px-2.5 py-1 rounded border border-zinc-800">
+                    DESMONTAJE DEL KERNEL NT // EDICIÓN 2026
+                  </span>
+                </div>
+
+                {/* Central Commercial Core: DOMINÁ WINDOWS + PROMESA CENTRAL */}
+                <div className="relative z-10 px-5 sm:px-7 md:px-8 pb-5 sm:pb-6 space-y-2.5">
+                  {/* Título Principal */}
+                  <div>
+                    <h2 className="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white tracking-tight leading-[0.88] uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+                      DOMINÁ WINDOWS
+                    </h2>
+                    <p className="font-display font-bold text-sm sm:text-base md:text-lg text-cyan-300 mt-1.5 tracking-wide drop-shadow">
+                      “DESCUBRÍ QUÉ HACE WINDOWS CUANDO VOS NO ESTÁS MIRANDO.”
+                    </p>
+                  </div>
+
+                  {/* Gancho Editorial de Alto Impacto */}
+                  <div className="p-3 sm:p-3.5 bg-gradient-to-r from-cyan-400/20 via-black/85 to-black/90 border-l-4 border-cyan-400 rounded-r-lg backdrop-blur-md max-w-2xl">
+                    <h3 className="font-display font-black text-sm sm:text-base md:text-lg text-white uppercase tracking-tight leading-tight">
+                      ¿QUÉ ESTÁ HACIENDO TU SISTEMA ANTES DE QUE ABRAS TU PRIMER PROGRAMA?
+                    </h3>
+                    <p className="font-sans-editorial text-[11px] sm:text-xs text-zinc-300 mt-1 leading-relaxed">
                       Procesos invisibles, servicios en segundo plano, la memoria virtual que nadie te explicó y la telemetría bajo escrutinio forense.
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* ----------------------------------------------------
-                  3 TECHNICAL COLUMNS (PROCESOS, MEMORIA, REGISTRO)
-              ---------------------------------------------------- */}
-              <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-mono-tech border-t border-cyan-950">
-                <div className="space-y-1">
-                  <span className="text-cyan-400 font-bold text-[10px] block tracking-wider uppercase">
-                    • PROCESOS & SERVICIOS
-                  </span>
-                  <p className="text-[10px] text-zinc-400 font-sans-editorial leading-tight">
-                    Quién ejecuta qué, svchost compartido y disparadores por eventos.
+              {/* ========================================================================= */}
+              {/* 4. DOSSIER CENTRAL BANNER (EL LADO OSCURO DE WINDOWS)                      */}
+              {/* ========================================================================= */}
+              <div className="relative z-10 my-1 p-2.5 sm:p-3 bg-[#0d1017] border-2 border-cyan-500/60 rounded-lg shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-cyan-400 text-black text-[9.5px] font-mono-tech font-black tracking-wider uppercase rounded-xs">
+                      DOSSIER CENTRAL
+                    </span>
+                    <h4 className="font-display font-black text-sm sm:text-base text-white uppercase tracking-tight">
+                      EL LADO OSCURO DE WINDOWS
+                    </h4>
+                  </div>
+                  <p className="text-[10.5px] sm:text-[11.5px] text-zinc-300 font-sans-editorial leading-snug">
+                    Arranque, procesos, memoria, servicios, Registro y recuperación explicados desde cero y comprobados con metodología EVO.
                   </p>
                 </div>
 
-                <div className="space-y-1 border-t sm:border-t-0 sm:border-l border-cyan-950 sm:pl-3 pt-1.5 sm:pt-0">
-                  <span className="text-cyan-400 font-bold text-[10px] block tracking-wider uppercase">
-                    • MEMORIA VIRTUAL
+                <div className="hidden sm:flex items-center gap-1.5 text-[9.5px] font-mono-tech text-cyan-400 font-bold bg-cyan-400/10 px-2.5 py-1 rounded border border-cyan-400/30 shrink-0">
+                  <span>38 PÁGINAS A4</span>
+                </div>
+              </div>
+
+              {/* ========================================================================= */}
+              {/* 5. EDITORIAL HIGHLIGHTS (4 PILARES)                                       */}
+              {/* ========================================================================= */}
+              <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-2 pt-1 font-mono-tech">
+                <div className="p-2.5 bg-[#0d1017]/90 border border-zinc-800 rounded-md flex flex-col justify-between">
+                  <span className="text-[9.5px] text-cyan-400 font-black uppercase tracking-wider block">
+                    ARRANQUE
                   </span>
-                  <p className="text-[10px] text-zinc-400 font-sans-editorial leading-tight">
-                    Dossier especial: Commit Charge, Working Set, Standby y Pagefile.
+                  <p className="text-[10px] text-zinc-300 font-sans-editorial mt-1 leading-snug">
+                    UEFI, ESP, BCD y Winload.
                   </p>
                 </div>
 
-                <div className="space-y-1 border-t sm:border-t-0 sm:border-l border-cyan-950 sm:pl-3 pt-1.5 sm:pt-0">
-                  <span className="text-cyan-400 font-bold text-[10px] block tracking-wider uppercase">
-                    • REGISTRO & SEGURIDAD
+                <div className="p-2.5 bg-[#0d1017]/90 border border-zinc-800 rounded-md flex flex-col justify-between">
+                  <span className="text-[9.5px] text-cyan-400 font-black uppercase tracking-wider block">
+                    PROCESOS
                   </span>
-                  <p className="text-[10px] text-zinc-400 font-sans-editorial leading-tight">
-                    MenuShowDelay, supercompresión compact, hash SHA-256 y defensa activa.
+                  <p className="text-[10px] text-zinc-300 font-sans-editorial mt-1 leading-snug">
+                    svchost, servicios y tareas.
+                  </p>
+                </div>
+
+                <div className="p-2.5 bg-[#0d1017]/90 border border-zinc-800 rounded-md flex flex-col justify-between">
+                  <span className="text-[9.5px] text-cyan-400 font-black uppercase tracking-wider block">
+                    MEMORIA
+                  </span>
+                  <p className="text-[10px] text-zinc-300 font-sans-editorial mt-1 leading-snug">
+                    Working Set, Commit y Pagefile.
+                  </p>
+                </div>
+
+                <div className="p-2.5 bg-[#0d1017]/90 border border-zinc-800 rounded-md flex flex-col justify-between">
+                  <span className="text-[9.5px] text-cyan-400 font-black uppercase tracking-wider block">
+                    RECUPERACIÓN
+                  </span>
+                  <p className="text-[10px] text-zinc-300 font-sans-editorial mt-1 leading-snug">
+                    WinRE, SFC, DISM y diagnóstico.
                   </p>
                 </div>
               </div>
 
-              {/* ----------------------------------------------------
-                  COVER FOOTER: REGLA DE ORO EVO & CITACIÓN
-              ---------------------------------------------------- */}
-              <div className="relative z-10 pt-2 border-t border-cyan-950/80 flex flex-wrap items-center justify-between text-[10px] font-mono-tech text-zinc-500">
-                <div className="flex items-center gap-1.5 text-amber-400 font-bold">
-                  <span>🛡️</span>
-                  <span>REGLA DE ORO EVO: SI NO PODÉS REVERTIRLO, NO LO TOQUES.</span>
+              {/* ========================================================================= */}
+              {/* 6. PIE / FOOTER: ACREDITACIÓN EDITORIAL LIMPIA                            */}
+              {/* ========================================================================= */}
+              <div className="relative z-10 mt-2.5 pt-2.5 border-t border-zinc-800/80 flex items-center justify-between text-[9.5px] font-mono-tech text-zinc-400">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-white uppercase">EVO LABS MAGAZINE // TOMO 02</span>
+                  <span className="text-zinc-600">•</span>
+                  <span className="text-zinc-400 hidden sm:inline">INGENIERÍA DEL SISTEMA OPERATIVO & KERNEL NT</span>
                 </div>
-                <div className="text-zinc-400">
-                  INTERNET DICE // EVO MIDE • <span className="text-cyan-400 font-bold">PÁG. 01 // PORTADA</span>
+                <div className="text-cyan-400 font-bold uppercase tracking-wider">
+                  38 PÁGINAS A4
                 </div>
               </div>
             </div>
