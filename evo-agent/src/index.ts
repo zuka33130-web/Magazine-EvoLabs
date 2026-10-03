@@ -16,6 +16,7 @@ import { AgentSecurityManager } from './security.js';
 import { WindowsInventoryCollector } from './inventory.js';
 import { AgentTelemetryManager } from './telemetry.js';
 import { AgentCapabilitiesProvider } from './capabilities.js';
+import { WindowsServicesExperimentManager } from './windowsServices.js';
 import { AgentHealthResponse } from './types.js';
 
 const HOST: string = '127.0.0.1';
@@ -30,6 +31,39 @@ if (HOST.startsWith('0.0.0.0')) {
 const security = new AgentSecurityManager();
 const inventoryCollector = new WindowsInventoryCollector();
 const telemetryManager = new AgentTelemetryManager();
+const windowsServicesManager = new WindowsServicesExperimentManager();
+
+async function readJsonBody(req: http.IncomingMessage): Promise<any> {
+  return await new Promise((resolve, reject) => {
+    let body = '';
+    let bytes = 0;
+    const MAX_BODY = 64 * 1024;
+
+    req.on('data', (chunk) => {
+      bytes += Buffer.byteLength(chunk);
+      if (bytes > MAX_BODY) {
+        reject(new Error('REQUEST_TOO_LARGE'));
+        req.destroy();
+        return;
+      }
+      body += chunk.toString('utf8');
+    });
+
+    req.on('end', () => {
+      if (!body.trim()) {
+        resolve({});
+        return;
+      }
+      try {
+        resolve(JSON.parse(body));
+      } catch {
+        reject(new Error('INVALID_JSON_BODY'));
+      }
+    });
+
+    req.on('error', reject);
+  });
+}
 
 const server = http.createServer(async (req, res) => {
   const method = (req.method || 'GET').toUpperCase();
@@ -79,6 +113,24 @@ const server = http.createServer(async (req, res) => {
         JSON.stringify({
           error: 'UNAUTHORIZED_TOKEN',
           message: 'Token de sesión local no válido o ausente. Consultá GET /health para sincronizar.',
+        })
+      );
+      return;
+    }
+  }
+
+  // 3b. Windows service experiment endpoints are protected even though they are
+  // intentionally not generic command endpoints. They accept only fixed, allowlisted actions.
+  if (
+    (method === 'GET' && cleanPath === '/v1/services') ||
+    (method === 'POST' && cleanPath === '/v1/services/experiment')
+  ) {
+    if (!security.validateToken(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(
+        JSON.stringify({
+          error: 'UNAUTHORIZED_TOKEN',
+          message: 'Token de sesión local no válido o ausente.',
         })
       );
       return;
@@ -177,6 +229,82 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (method === 'GET' && cleanPath === '/v1/services') {
+      if (process.platform !== 'win32') {
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            error: 'PLATFORM_NOT_SUPPORTED',
+            message: 'La auditoría de servicios EVO requiere Windows nativo.',
+          })
+        );
+        return;
+      }
+
+      const services = await windowsServicesManager.listServices();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(
+        JSON.stringify(
+          {
+            provenance: 'SYSTEM_REPORTED',
+            services,
+            experimentAllowlist: WindowsServicesExperimentManager.getAllowedExperimentServices(),
+            timestamp: new Date().toISOString(),
+          },
+          null,
+          2
+        )
+      );
+      return;
+    }
+
+    if (method === 'POST' && cleanPath === '/v1/services/experiment') {
+      const body = await readJsonBody(req);
+      const serviceName = String(body?.serviceName || '');
+      const action = String(body?.action || '').toUpperCase();
+
+      if (action !== 'STOP' && action !== 'START') {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            error: 'INVALID_ACTION',
+            message: 'Acción inválida. Sólo se admite STOP o START.',
+          })
+        );
+        return;
+      }
+
+      try {
+        const result = await windowsServicesManager.applyExperiment(
+          serviceName,
+          action as 'STOP' | 'START'
+        );
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify(
+            {
+              ...result,
+              provenance: 'SYSTEM_REPORTED',
+              safety:
+                'EXPERIMENTO REVERSIBLE: EVO sólo detiene/inicia servicios allowlisted. No modifica StartupType.',
+            },
+            null,
+            2
+          )
+        );
+      } catch (err: any) {
+        const status = String(err?.message || '').includes('SERVICE_NOT_ALLOWLISTED') ? 403 : 500;
+        res.writeHead(status, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            error: 'SERVICE_EXPERIMENT_FAILED',
+            message: err?.message || 'No se pudo ejecutar el experimento de servicio.',
+          })
+        );
+      }
+      return;
+    }
+
     // Prohibited commands / Arbitrary execution prevention
     if (
       cleanPath.includes('/exec') ||
@@ -211,6 +339,8 @@ const server = http.createServer(async (req, res) => {
           'GET /v1/telemetry',
           'POST /v1/telemetry/start',
           'POST /v1/telemetry/stop',
+          'GET /v1/services',
+          'POST /v1/services/experiment',
         ],
       })
     );
@@ -240,6 +370,8 @@ server.listen(PORT, HOST, () => {
   console.log('      - GET  /v1/telemetry');
   console.log('      - POST /v1/telemetry/start');
   console.log('      - POST /v1/telemetry/stop');
+  console.log('      - GET  /v1/services');
+  console.log('      - POST /v1/services/experiment (allowlist reversible)');
   console.log(' [OK] Seguridad: Prohibido 0.0.0.0 | Prohibido Shell / Eval');
   console.log('================================================================');
 });
