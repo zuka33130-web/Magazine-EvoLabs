@@ -93,17 +93,15 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
                 Descubrí qué hace Windows cuando vos no estás mirando.
               </p>
 
-              {/* Lema */}
-              <div className="flex items-center gap-2 pt-2 text-xs font-mono-tech text-cyan-300 font-bold tracking-wider">
-                <span className="w-1.5 h-1.5 bg-cyan-400 inline-block" />
-                <span>LEMA: “SI NO PODÉS REVERTIRLO, NO LO TOQUES.”</span>
-              </div>
+              <p className="text-xs font-mono-tech text-cyan-400/90 tracking-wider uppercase font-semibold pt-1">
+                “SI NO PODÉS REVERTIRLO, NO LO TOQUES.”
+              </p>
             </div>
 
             {/* Secondary Headlines: 3 clean editorial items */}
             <div className="pt-6 border-t border-zinc-800/40 space-y-4">
-              <span className="text-[11px] font-mono-tech tracking-widest text-zinc-400 uppercase font-semibold block mb-2">
-                EN ESTA EDICIÓN // 3 EJES MAESTROS
+              <span className="text-[11px] font-mono-tech tracking-widest text-zinc-300 uppercase font-semibold block mb-2">
+                EN ESTA EDICIÓN
               </span>
 
               <div className="space-y-4">
@@ -116,8 +114,8 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
                       Qué ocurre cuando Windows arranca
                     </h2>
                   </div>
-                  <p className="mt-0.5 pl-6 text-xs sm:text-sm text-zinc-400 font-sans-editorial leading-relaxed">
-                    Secuencia de arranque UEFI, partición ESP, almacén BCD y carga determinista de Winload.efi.
+                  <p className="mt-0.5 pl-6 text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
+                    Secuencia UEFI, partición ESP, BCD y transferencia a Winload.
                   </p>
                 </article>
 
@@ -130,8 +128,8 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
                       Procesos, memoria y servicios
                     </h2>
                   </div>
-                  <p className="mt-0.5 pl-6 text-xs sm:text-sm text-zinc-400 font-sans-editorial leading-relaxed">
-                    Arquitectura de svchost.exe, Commit Charge, Working Set y la falacia de vaciar RAM a ciegas.
+                  <p className="mt-0.5 pl-6 text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
+                    svchost compartido, Commit Charge y pools del Kernel NT.
                   </p>
                 </article>
 
@@ -144,8 +142,8 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
                       Diagnóstico sin mitos ni cambios a ciegas
                     </h2>
                   </div>
-                  <p className="mt-0.5 pl-6 text-xs sm:text-sm text-zinc-400 font-sans-editorial leading-relaxed">
-                    Estructura del Registro, telemetría forense, metrología DPC/ISR y reparación de taller in-place.
+                  <p className="mt-0.5 pl-6 text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
+                    Registro binario, telemetría forense y reparación no destructiva.
                   </p>
                 </article>
               </div>
@@ -189,14 +187,14 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
 
           {/* Right Column: Clean Editorial Photography (Vite ESM local asset) */}
           <div className="lg:col-span-6">
-            <div className="rounded-2xl overflow-hidden bg-[#101115] border border-cyan-950/80 shadow-2xl transition-all duration-300 hover:border-cyan-800">
+            <div className="rounded-2xl overflow-hidden bg-[#101115] border border-zinc-800/80 shadow-2xl transition-all duration-300 hover:border-zinc-700">
               <img
                 src={coverHeroImg}
                 alt="Fotografía editorial // Dominá Windows — La Biblia Negra de Windows"
                 className="w-full aspect-[4/3] object-cover object-center filter contrast-[1.04] brightness-[0.97] transition-transform duration-500 hover:scale-[1.015]"
               />
             </div>
-            <p className="mt-3 text-[11px] font-mono-tech text-zinc-400 text-right tracking-wider uppercase">
+            <p className="mt-3 text-[11px] font-mono-tech text-zinc-300 text-right tracking-wider uppercase">
               Fotografía editorial // Arquitectura de sistemas & Kernel NT
             </p>
           </div>

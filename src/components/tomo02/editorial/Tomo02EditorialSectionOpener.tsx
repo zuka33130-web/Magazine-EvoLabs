@@ -21,6 +21,7 @@ import {
   AlertOctagon,
   RefreshCw,
   Search,
+  Info,
 } from 'lucide-react';
 
 export interface SectionOpenerMeta {
@@ -41,7 +42,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Cadena de confianza determinista y transición de firmware a kernel',
     impactPhrase:
       'El encendido del silicio no es magia: es una cadena determinista de instrucciones desde el primer microvoltio en la placa madre.',
-    architectureBadge: 'UEFI ➔ ESP ➔ BCD ➔ WINLOAD.EFI ➔ NTOSKRNL',
+    architectureBadge: 'ESQUEMA CONCEPTUAL // CADENA DE ARRANQUE UEFI ➔ ESP ➔ BCD ➔ WINLOAD ➔ NTOSKRNL',
     whatYouWillUnderstand:
       'Secuencia UEFI, tabla GPT, partición ESP, el almacén BCD y la transferencia al bootloader Winload.efi.',
     whatYouWillVerify:
@@ -54,7 +55,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Árbol transaccional NTFS, almacén inmutable y jerarquía física NVMe',
     impactPhrase:
       'El disco no almacena archivos: gestiona un árbol binario transaccional donde cada byte tiene un propietario y un registro de auditoría.',
-    architectureBadge: 'NTFS // $MFT RECORD 0 // WINSXS HARDLINKS // NVMe 4K',
+    architectureBadge: 'ESQUEMA CONCEPTUAL // ESTRUCTURA NTFS $MFT RECORD 0 ➔ WINSXS HARDLINKS ➔ NVMe',
     whatYouWillUnderstand:
       'La tabla maestra MFT de NTFS, el almacén inmutable WinSxS, la separación System32 vs SysWOW64 y la compresión Compact.',
     whatYouWillVerify:
@@ -67,7 +68,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Arquitectura híbrida NT, aislamiento Ring 0/Ring 3 y gestión de páginas',
     impactPhrase:
       'La RAM libre es memoria desperdiciada. El Kernel NT no vacía: organiza, pagina y proyecta páginas de memoria bajo demanda física.',
-    architectureBadge: 'RING 0 KERNEL // SYSCALL DISPATCH // CR3 PAGE TABLES // COMMIT CHARGE',
+    architectureBadge: 'ESQUEMA CONCEPTUAL // MODELO RING 0 / RING 3 ➔ TABLAS CR3 ➔ COMMIT CHARGE',
     whatYouWillUnderstand:
       'Commit Charge vs Working Set, Standby List, Paged vs Non-Paged Pool, despachador de interrupciones y latencias DPC.',
     whatYouWillVerify:
@@ -80,7 +81,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Matriz de aislamiento svchost, sockets en escucha y eventos de servicio',
     impactPhrase:
       'Un proceso no es un programa: es un contenedor de hilos. Svchost agrupa servicios compartidos para ahorrar recursos, no para ocultar actividad.',
-    architectureBadge: 'SVCHOST MATRIX // TCP-UDP Sockets // SCM SERVICES // SCHEDULER',
+    architectureBadge: 'ESQUEMA CONCEPTUAL // MATRIZ SVCHOST ➔ SCM ➔ SOCKETS TCP/UDP ➔ SCHEDULER',
     whatYouWillUnderstand:
       'La arquitectura svchost.exe compartida, sockets TCP/UDP en escucha, SysMain, indexación inteligente y disparadores por eventos.',
     whatYouWillVerify:
@@ -93,7 +94,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Colmenas binarias atómicas, tokens de elevación y barreras UIPI',
     impactPhrase:
       'El Registro es una base de datos atómica en memoria. Desactivar el UAC no te hace técnico: le entrega la llave de Ring 0 a cualquier script.',
-    architectureBadge: 'REGISTRY HIVES // UAC TOKEN // INTEGRITY LEVELS // POWERSHELL CLI',
+    architectureBadge: 'ESQUEMA CONCEPTUAL // COLMENAS REGISTRO ➔ TOKENS UAC ➔ NIVELES DE INTEGRIDAD',
     whatYouWillUnderstand:
       'Colmenas físicas del Registro (SAM, SYSTEM, SOFTWARE), permisos ACL, tokens de elevación UAC, directiva UIPI y telemetría.',
     whatYouWillVerify:
@@ -106,7 +107,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Triangulación de fallos, volcados BSOD, WinRE y reparación in-place',
     impactPhrase:
       'El mejor técnico no es el que formatea más rápido, sino el que rescata el sistema sin destruir un solo dato ni tocar la partición del usuario.',
-    architectureBadge: 'WINRE OFFLINE // BSOD 0x3B DUMP // SFC & DISM // RELIABILITY GRAPH',
+    architectureBadge: 'ESQUEMA CONCEPTUAL // TRIANGULACIÓN BSOD ➔ VOLCADOS DMP ➔ REPARACIÓN IN-PLACE',
     whatYouWillUnderstand:
       'El entorno de recuperación WinRE, reconstrucción de BCD, diagnóstico de volcados BSOD (Minidumps), triage en vivo y reparación in-place.',
     whatYouWillVerify:
@@ -117,7 +118,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
 
 // ============================================================================
 // BESPOKE VECTOR TECHNICAL ARCHITECTURE SCHEMATICS (100% TOMO 02 IDENTITY)
-// Zero raster dependencies on Tomo 01 images. Pure Windows NT Systems Art.
+// Strict Data Discipline: Explicitly labeled as ESQUEMA CONCEPTUAL // NO MEDIDO EN TU PC
 // ============================================================================
 
 interface SectionSchematicProps {
@@ -131,33 +132,37 @@ const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, is
       // SECCIÓN I: ARRANQUE & DESPLIEGUE (UEFI -> ESP -> BCD -> WINLOAD -> KERNEL NT)
       return (
         <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
-          {/* Subtle grid backdrop */}
           <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
 
-          {/* Top telemetry status */}
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
-            <span className="flex items-center gap-1">
-              <Zap className="w-2.5 h-2.5 text-cyan-400 animate-pulse" />
-              BOOT SEQUENCE // DETERMINISTIC PIPELINE
+          {/* Top header with strict non-measurement disclaimer */}
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
+            <span className="flex items-center gap-1 truncate font-bold">
+              <Zap className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
+              CADENA DE ARRANQUE // SECUENCIA DETERMINISTA
             </span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
-              SECURE BOOT: ACTIVE
-            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
+                ESQUEMA CONCEPTUAL
+              </span>
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
+                NO MEDIDO EN TU PC
+              </span>
+            </div>
           </div>
 
           {/* Vector Flow Nodes */}
           <div className="grid grid-cols-5 gap-1.5 items-center z-10 my-auto py-1">
             {[
-              { name: 'UEFI NVRAM', tag: 'POST/SEC', color: 'border-cyan-700 bg-cyan-950/70 text-cyan-300' },
-              { name: 'ESP (FAT32)', tag: 'EFI/BOOT', color: 'border-cyan-600 bg-cyan-900/50 text-cyan-200' },
-              { name: 'BCD STORE', tag: '{CURRENT}', color: 'border-blue-600 bg-blue-950/70 text-blue-200' },
-              { name: 'WINLOAD.EFI', tag: 'PE/64', color: 'border-emerald-600 bg-emerald-950/70 text-emerald-200' },
-              { name: 'NTOSKRNL', tag: 'RING 0', color: 'border-cyan-400 bg-cyan-950 text-white font-bold' },
+              { name: 'UEFI NVRAM', tag: 'Firmware POST', color: 'border-cyan-700 bg-cyan-950/70 text-cyan-300' },
+              { name: 'ESP (FAT32)', tag: 'Partición EFI', color: 'border-cyan-600 bg-cyan-900/50 text-cyan-200' },
+              { name: 'BCD STORE', tag: 'Almacén Boot', color: 'border-blue-600 bg-blue-950/70 text-blue-200' },
+              { name: 'WINLOAD.EFI', tag: 'Cargador PE/64', color: 'border-emerald-600 bg-emerald-950/70 text-emerald-200' },
+              { name: 'NTOSKRNL', tag: 'Núcleo Ring 0', color: 'border-cyan-400 bg-cyan-950 text-white font-bold' },
             ].map((node, i) => (
               <div key={i} className="flex flex-col items-center text-center">
-                <div className={`w-full py-1 px-0.5 rounded border ${node.color} shadow-sm transition-transform`}>
+                <div className={`w-full py-1 px-0.5 rounded border ${node.color} shadow-sm`}>
                   <div className="text-[8px] font-bold truncate leading-none">{node.name}</div>
-                  <div className="text-[7px] opacity-70 tracking-tighter mt-0.5 leading-none">{node.tag}</div>
+                  <div className="text-[7px] opacity-80 tracking-tighter mt-0.5 leading-none">{node.tag}</div>
                 </div>
                 {i < 4 && (
                   <span className="hidden lg:block text-[8px] text-cyan-500 font-black mt-0.5">➔</span>
@@ -168,8 +173,8 @@ const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, is
 
           {/* Bottom architecture verification string */}
           <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">0x7C00 ➔ KiSystemStartup ➔ Phase0Init</span>
-            <span className="text-cyan-400 font-bold">GPT / GUID: 0xEF</span>
+            <span className="truncate">Transición: 0x7C00 ➔ KiSystemStartup ➔ Phase0Init</span>
+            <span className="text-cyan-400 font-bold">ESTÁNDAR UEFI / SECURE BOOT</span>
           </div>
         </div>
       );
@@ -180,22 +185,27 @@ const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, is
         <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
           <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
 
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
-            <span className="flex items-center gap-1">
-              <HardDrive className="w-2.5 h-2.5 text-cyan-400" />
-              NTFS VOLUME STRUCTURE // 4K CLUSTER MAP
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
+            <span className="flex items-center gap-1 truncate font-bold">
+              <HardDrive className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
+              ESTRUCTURA DE VOLUMEN NTFS & ALMACÉN
             </span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
-              $LogFile: ATOMIC
-            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
+                ESQUEMA CONCEPTUAL
+              </span>
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
+                NO MEDIDO EN TU PC
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
             {[
-              { title: '$MFT REC 0', desc: 'Master Table', badge: '1024-byte', color: 'border-cyan-600 bg-cyan-950/80' },
-              { title: '$LogFile', desc: 'Journaling', badge: 'TxCommit', color: 'border-blue-600 bg-blue-950/80' },
-              { title: 'WinSxS Tree', desc: 'Side-by-Side', badge: 'Hardlinks', color: 'border-emerald-600 bg-emerald-950/80' },
-              { title: 'NVMe LBA', desc: 'Direct 4KB', badge: 'PCIe 4.0', color: 'border-cyan-400 bg-cyan-900/70 text-cyan-100' },
+              { title: '$MFT REC 0', desc: 'Tabla Maestra', badge: 'Registro 1024B', color: 'border-cyan-600 bg-cyan-950/80' },
+              { title: '$LogFile', desc: 'Transacciones', badge: 'Journaling', color: 'border-blue-600 bg-blue-950/80' },
+              { title: 'WinSxS Tree', desc: 'Side-by-Side', badge: 'Hardlinks Inm.', color: 'border-emerald-600 bg-emerald-950/80' },
+              { title: 'NVMe LBA', desc: 'Bloques 4KB', badge: 'Acceso Físico', color: 'border-cyan-400 bg-cyan-900/70 text-cyan-100' },
             ].map((node, i) => (
               <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
                 <div className="text-[8px] font-bold text-white truncate leading-none">{node.title}</div>
@@ -206,8 +216,8 @@ const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, is
           </div>
 
           <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">DISM /AnalyzeComponentStore // Hardlink Invariance</span>
-            <span className="text-cyan-400 font-bold">NTFS v3.1</span>
+            <span className="truncate">Modelo: DISM /AnalyzeComponentStore // Auditoría de Hardlinks</span>
+            <span className="text-cyan-400 font-bold">ESTRUCTURA NTFS v3.1</span>
           </div>
         </div>
       );
@@ -218,39 +228,44 @@ const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, is
         <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
           <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
 
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
-            <span className="flex items-center gap-1">
-              <Cpu className="w-2.5 h-2.5 text-cyan-400" />
-              NT KERNEL DUALITY // MEMORY ISOLATION
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
+            <span className="flex items-center gap-1 truncate font-bold">
+              <Cpu className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
+              ARQUITECTURA DE NÚCLEO NT // AISLAMIENTO
             </span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
-              VIRTUAL MEM: 128 TB
-            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
+                ESQUEMA CONCEPTUAL
+              </span>
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
+                NO MEDIDO EN TU PC
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-2 items-center z-10 my-auto py-1">
             <div className="p-1.5 rounded border border-blue-600/70 bg-blue-950/60 text-center">
-              <div className="text-[7.5px] text-blue-300 font-bold leading-none">RING 3 (USER)</div>
+              <div className="text-[7.5px] text-blue-300 font-bold leading-none">RING 3 (USER MODE)</div>
               <div className="text-[8px] text-white font-bold mt-1">Apps / Subsystem</div>
-              <div className="text-[6.5px] text-blue-200/80 mt-0.5">Isolated 48-bit VA</div>
+              <div className="text-[6.5px] text-blue-200/80 mt-0.5">Espacio VA Aislado</div>
             </div>
 
             <div className="p-1.5 rounded border border-cyan-500 bg-cyan-950/90 text-center shadow-[0_0_8px_rgba(0,210,255,0.15)]">
               <div className="text-[7.5px] text-cyan-400 font-bold leading-none">SYSCALL / SSDT</div>
               <div className="text-[8px] text-white font-bold mt-1">KiSystemCall64</div>
-              <div className="text-[6.5px] text-cyan-300 mt-0.5">Ring Transition &lt;15ns</div>
+              <div className="text-[6.5px] text-cyan-300 mt-0.5">Transición de Privilegio</div>
             </div>
 
             <div className="p-1.5 rounded border border-purple-600/70 bg-purple-950/60 text-center">
-              <div className="text-[7.5px] text-purple-300 font-bold leading-none">RING 0 (KERNEL)</div>
+              <div className="text-[7.5px] text-purple-300 font-bold leading-none">RING 0 (KERNEL MODE)</div>
               <div className="text-[8px] text-white font-bold mt-1">HAL / Drivers / Pools</div>
-              <div className="text-[6.5px] text-purple-200/80 mt-0.5">Non-Paged Pool</div>
+              <div className="text-[6.5px] text-purple-200/80 mt-0.5">Paged & Non-Paged</div>
             </div>
           </div>
 
           <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">Commit Charge Limit vs Working Set Pool</span>
-            <span className="text-cyan-400 font-bold">PML4 / CR3</span>
+            <span className="truncate">Concepto: Commit Charge Limit vs Working Set Pool</span>
+            <span className="text-cyan-400 font-bold">MODELO DE MEMORIA VIRTUAL</span>
           </div>
         </div>
       );
@@ -261,22 +276,27 @@ const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, is
         <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
           <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
 
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
-            <span className="flex items-center gap-1">
-              <Network className="w-2.5 h-2.5 text-cyan-400" />
-              SVCHOST & SERVICE CONTROL MATRIX
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
+            <span className="flex items-center gap-1 truncate font-bold">
+              <Network className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
+              MATRIZ SVCHOST & SERVICE CONTROL MANAGER
             </span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
-              SCM: ACTIVE
-            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
+                ESQUEMA CONCEPTUAL
+              </span>
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
+                NO MEDIDO EN TU PC
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
             {[
-              { group: '-k netsvcs', item: 'Dhcp, Dnscache', port: ':53, :68', color: 'border-cyan-600 bg-cyan-950/80' },
-              { group: '-k LocalService', item: 'EventLog, W32Time', port: ':123 NTP', color: 'border-blue-600 bg-blue-950/80' },
-              { group: '-k DcomLaunch', item: 'RPC Endpoint', port: ':135 RPC', color: 'border-emerald-600 bg-emerald-950/80' },
-              { group: 'TaskScheduler', item: 'Event Triggers', port: 'Cron/Event', color: 'border-cyan-500 bg-cyan-900/80' },
+              { group: '-k netsvcs', item: 'Dhcp, Dnscache', port: 'Ej: :53, :68', color: 'border-cyan-600 bg-cyan-950/80' },
+              { group: '-k LocalService', item: 'EventLog, W32Time', port: 'Ej: :123 NTP', color: 'border-blue-600 bg-blue-950/80' },
+              { group: '-k DcomLaunch', item: 'RPC Endpoint', port: 'Ej: :135 RPC', color: 'border-emerald-600 bg-emerald-950/80' },
+              { group: 'TaskScheduler', item: 'Disparadores', port: 'Triggers de Evento', color: 'border-cyan-500 bg-cyan-900/80' },
             ].map((node, i) => (
               <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
                 <div className="text-[7.5px] font-bold text-cyan-300 truncate leading-none">{node.group}</div>
@@ -287,8 +307,8 @@ const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, is
           </div>
 
           <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">tasklist /svc ➔ PID-to-DLL Disambiguation</span>
-            <span className="text-cyan-400 font-bold">TCP/UDP 0.0.0.0:*</span>
+            <span className="truncate">Desambiguación: tasklist /svc (Asociación PID ➔ DLL)</span>
+            <span className="text-cyan-400 font-bold">SERVICE CONTROL MANAGER</span>
           </div>
         </div>
       );
@@ -299,22 +319,27 @@ const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, is
         <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
           <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
 
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
-            <span className="flex items-center gap-1">
-              <Shield className="w-2.5 h-2.5 text-cyan-400" />
-              REGISTRY HIVES & UAC INTEGRITY BOUNDARY
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
+            <span className="flex items-center gap-1 truncate font-bold">
+              <Shield className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
+              COLMENAS DE REGISTRO & BARRERAS UAC
             </span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
-              UIPI: ENFORCED
-            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
+                ESQUEMA CONCEPTUAL
+              </span>
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
+                NO MEDIDO EN TU PC
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
             {[
-              { hive: 'HKLM\\SYSTEM', target: 'ControlSet001', acl: 'SYSTEM:F', color: 'border-cyan-600 bg-cyan-950/80' },
-              { hive: 'HKLM\\SAM', target: 'Security Accounts', acl: 'SystemOnly', color: 'border-red-600/70 bg-red-950/50' },
-              { hive: 'UAC TOKEN', target: 'Split Token SID', acl: 'High vs Med', color: 'border-amber-600/80 bg-amber-950/50' },
-              { hive: 'POWERSHELL', target: 'AST & Transcripts', acl: 'ExecutionPolicy', color: 'border-blue-600 bg-blue-950/80' },
+              { hive: 'HKLM\\SYSTEM', target: 'ControlSet / HW', acl: 'Control Total Kernel', color: 'border-cyan-600 bg-cyan-950/80' },
+              { hive: 'HKLM\\SAM', target: 'Cuentas Locales', acl: 'Acceso Restringido', color: 'border-red-600/70 bg-red-950/50' },
+              { hive: 'TOKEN UAC', target: 'Split Token SID', acl: 'High vs Medium Level', color: 'border-amber-600/80 bg-amber-950/50' },
+              { hive: 'POWERSHELL', target: 'Motor de Scripts', acl: 'ExecutionPolicy & AST', color: 'border-blue-600 bg-blue-950/80' },
             ].map((node, i) => (
               <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
                 <div className="text-[7.5px] font-bold text-white truncate leading-none">{node.hive}</div>
@@ -325,8 +350,8 @@ const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, is
           </div>
 
           <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">whoami /groups ➔ S-1-16-12288 (High Mandatory Level)</span>
-            <span className="text-cyan-400 font-bold">REGBIN HIVE</span>
+            <span className="truncate">Auditoría: whoami /groups (Aislamiento de Privilegios UIPI)</span>
+            <span className="text-cyan-400 font-bold">ESTRUCTURA DE COLMENAS</span>
           </div>
         </div>
       );
@@ -338,22 +363,27 @@ const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, is
         <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
           <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
 
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10">
-            <span className="flex items-center gap-1">
-              <Wrench className="w-2.5 h-2.5 text-cyan-400" />
-              FORENSIC TRIAGE & IN-PLACE RECOVERY
+          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
+            <span className="flex items-center gap-1 truncate font-bold">
+              <Wrench className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
+              TRIANGULACIÓN FORENSE & REPARACIÓN IN-PLACE
             </span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950/80 border border-cyan-800 text-[8.5px] text-cyan-300">
-              WinRE: ATTACHED
-            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
+                ESQUEMA CONCEPTUAL
+              </span>
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
+                NO MEDIDO EN TU PC
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
             {[
-              { action: 'BUGCHECK', metric: '0x0000003B', note: 'SYSTEM_SERVICE', color: 'border-red-600/70 bg-red-950/60' },
-              { action: 'MINIDUMP', metric: 'MEMORY.DMP', note: '!analyze -v', color: 'border-blue-600 bg-blue-950/80' },
-              { action: 'SFC /VERIFY', metric: 'CBS.log audit', note: 'Hash Check', color: 'border-amber-600/80 bg-amber-950/60' },
-              { action: 'DISM RESTORE', metric: 'ComponentStore', note: 'Non-Destructive', color: 'border-emerald-600 bg-emerald-950/80' },
+              { action: 'BUGCHECK BSOD', metric: 'Ej: 0x0000003B', note: 'Código de Fallo', color: 'border-red-600/70 bg-red-950/60' },
+              { action: 'VOLCADO DMP', metric: 'MEMORY.DMP', note: 'Pila de Ejecución', color: 'border-blue-600 bg-blue-950/80' },
+              { action: 'AUDITORÍA SFC', metric: 'CBS.log / Hash', note: 'Verificación Archivo', color: 'border-amber-600/80 bg-amber-950/60' },
+              { action: 'DISM RESTORE', metric: 'ComponentStore', note: 'No Destructivo', color: 'border-emerald-600 bg-emerald-950/80' },
             ].map((node, i) => (
               <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
                 <div className="text-[7.5px] font-bold text-white truncate leading-none">{node.action}</div>
@@ -364,8 +394,8 @@ const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, is
           </div>
 
           <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">reagentc /info ➔ In-Place Recovery Pipeline</span>
-            <span className="text-emerald-400 font-bold">100% REVERSIBLE</span>
+            <span className="truncate">Procedimiento: reagentc /info ➔ Pipeline Reversible de Taller</span>
+            <span className="text-emerald-400 font-bold">FLUJO DE RECUPERACIÓN</span>
           </div>
         </div>
       );
