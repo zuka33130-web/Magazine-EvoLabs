@@ -47,6 +47,7 @@ import {
   Tomo02EditorialPractice,
   Tomo02EditorialCase,
   Tomo02EditorialCheck,
+  Tomo02EditorialSectionOpener,
 } from './editorial';
 import { Tomo02ComoUsarElTomo } from './Tomo02ComoUsarElTomo';
 import { EvoTomo02FinalExam } from './EvoTomo02FinalExam';
@@ -74,52 +75,46 @@ type ViewMode = 'continuous' | 'single';
 
 const getModuleEditorialVariant = (
   modId: string
-): 'hero' | 'diagram' | 'comparison' | 'practice' | 'case' | 'check' => {
+): 'section_opener' | 'hero' | 'diagram' | 'comparison' | 'practice' | 'case' | 'check' => {
   switch (modId) {
-    // LAYOUT A: HERO OPENERS (Key Milestone Modules)
-    case 'm00':
-    case 'm07':
-    case 'm12':
-    case 'm17':
-    case 'm26':
-      return 'hero';
+    // 6 GRAND SECTION OPENERS (TYPE A)
+    case 'm00': // Sección I: Arquitectura de Arranque & Despliegue
+    case 'm03': // Sección II: Sistema de Archivos & Almacenamiento
+    case 'm06': // Sección III: Núcleo, Procesos & Memoria Virtual
+    case 'm10': // Sección IV: Conectividad, Servicios & Automatización
+    case 'm14': // Sección V: Terminal, Registro & Ciberseguridad
+    case 'm19': // Sección VI: Metrología, Recuperación & Casos Forenses
+      return 'section_opener';
 
-    // LAYOUT B & C: TECHNICAL DIAGRAM & ARCHITECTURE
-    case 'm01':
-    case 'm05':
-    case 'm15':
-    case 'm25':
+    // TYPE B: CONTENIDO & DIAGRAMA ARQUITECTÓNICO (Texto + Visual Engine)
+    case 'm01': // Ring 0 vs Ring 3 & Compuertas Syscall
+    case 'm07': // Cadena de Booteo UEFI & Winload.efi
+    case 'm11': // Service Control Manager & Svchost
+    case 'm15': // Estructura Hexadecimal & Colmenas del Registro
+    case 'm16': // Telemetría de Diagnóstico & ETW
+    case 'm21': // Optimización E/S en Bajos Recursos
+    case 'm25': // Glosario Arquitectónico & Reparación In-Place
       return 'diagram';
 
-    // LAYOUT F: MITO VS REALIDAD CONTRAST
-    case 'm03':
-    case 'm06':
-    case 'm11':
-    case 'm16':
-    case 'm21':
-      return 'comparison';
-
-    // LAYOUT D: PRACTICAL LAB DOSSIERS
-    case 'm02':
-    case 'm10':
-    case 'm13':
-    case 'm20':
+    // TYPE C: LABORATORIO / PRÁCTICA (Objetivo, Pasos, Qué Observar, Rollback)
+    case 'm02': // Jerarquía de Memoria & Boot Pipeline
+    case 'm05': // NTFS Master File Table ($MFT)
+    case 'm13': // Programador de Tareas & Desencadenadores
+    case 'm18': // UAC, Tokens & Secure Desktop
+    case 'm20': // Metrología DPC con LatencyMon
+    case 'm24': // Matriz de Herramientas de Élite
+    case 'm26': // Pasaporte del Investigador & Ficha Técnica Final
       return 'practice';
 
-    // LAYOUT E & G: FORENSIC WORKSHOP CASES
-    case 'm04':
-    case 'm09':
-    case 'm14':
-    case 'm19':
-    case 'm22':
-    case 'm23':
+    // TYPE D: CASO / EXPEDIENTE DE TALLER (Síntoma, Evidencia, Hipótesis, Causa, Resolución)
+    case 'm04': // Latencias DPC/ISR & Controladores
+    case 'm08': // Fuga en Non-Paged Pool por driver de red
+    case 'm09': // Event Log & Saturación de Disco 100%
+    case 'm12': // Pipeline Gráfico WDDM & BSOD de Video
+    case 'm17': // Servicing Stack CBS & Almacén WinSxS
+    case 'm22': // Protocolos de Emergencia & BD PROCHOT 800MHz
+    case 'm23': // Expedientes Forenses de Taller & Winsock
       return 'case';
-
-    // LAYOUT H: COMPROBALO (Challenge de comprobación técnica e interpretación pericial)
-    case 'm08':
-    case 'm18':
-    case 'm24':
-      return 'check';
 
     default:
       return 'diagram';
@@ -664,7 +659,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 bg-cyan-400 inline-block shadow-[0_0_8px_#00D2FF]" />
                   <span className="font-bold text-white uppercase tracking-widest">
-                    COLECCIÓN PERICIAL // TOMO 02
+                    COLECCIÓN TÉCNICA // TOMO 02
                   </span>
                   <span className="text-zinc-600">|</span>
                   <span className="text-zinc-400 uppercase tracking-widest hidden sm:inline">
@@ -706,7 +701,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                   </span>
                 </div>
                 <div className="text-[10px] text-zinc-500 font-mono-tech uppercase tracking-widest hidden md:block">
-                  DESMONTAJE DEL KERNEL NT // EDICIÓN METROLÓGICA OFICIAL
+                  DESMONTAJE DEL KERNEL NT // EDICIÓN 2026
                 </div>
               </div>
 
@@ -1198,10 +1193,17 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               pageId={`t02-mod-${mod.moduleNumber}`}
               pageNumber={modPageNumber}
               totalPages={totalPages}
-              sectionTitle={`MÓDULO ${mod.moduleNumber}`}
+              sectionTitle={variant === 'section_opener' ? `SECCIÓN // ${mod.categoryTag}` : `MÓDULO ${mod.moduleNumber}`}
               subSlug={mod.categoryTag}
               accentColor="#00D2FF"
             >
+              {variant === 'section_opener' && (
+                <Tomo02EditorialSectionOpener
+                  module={mod}
+                  moduleIndex={idx}
+                  onSelectModule={handleSelectModule}
+                />
+              )}
               {variant === 'hero' && (
                 <Tomo02EditorialHero
                   module={mod}
