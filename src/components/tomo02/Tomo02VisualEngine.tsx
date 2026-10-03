@@ -2084,7 +2084,7 @@ const GLOSSARY_FORENSIC_ITEMS: GlossaryCardData[] = [
     term: 'Integrity Level (Nivel de Integridad)',
     category: 'SEGURIDAD',
     categoryLabel: 'Seguridad & Privilegios',
-    analogy: 'Niveles de acreditación de seguridad en una base militar: quien tiene nivel Medio no puede mandar órdenes ni entrar a zonas de nivel Alto.',
+    analogy: 'Niveles de autorización de seguridad en una base militar: quien tiene nivel Medio no puede mandar órdenes ni entrar a zonas de nivel Alto.',
     technicalDefinition: 'Etiqueta de seguridad de Windows Vista/7/10/11 (Untrusted, Low, Medium, High, System) que implementa el control de acceso mandatorio (MIC) y la directiva UIPI para restringir la inyección de código y mensajes de ventana.',
     practicalImpact: 'Un proceso con Low IL (como las pestañas aisladas de un navegador web) no puede escribir en archivos de Medium IL ni modificar el Registro del usuario.',
     auditCommand: 'whoami /all | findstr "Integridad"',
@@ -2387,7 +2387,7 @@ const InvestigatorPassportVisual: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-cyan-950 pb-4">
           <div className="space-y-1">
             <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold block">
-              ACADEMIA FORENSE EVO LABS // MATRÍCULA PERICIAL
+              ACADEMIA FORENSE EVO LABS // COMPROBACIÓN EVO
             </span>
             <h3 className="text-white text-lg sm:text-xl font-bold uppercase tracking-tight">
               PASAPORTE DE INVESTIGADOR DE KERNEL NT
@@ -2450,7 +2450,7 @@ const InvestigatorPassportVisual: React.FC = () => {
                 : 'bg-zinc-950 text-zinc-400 hover:text-white border border-cyan-950'
             }`}
           >
-            PUENTE AL TOMO 03 // LINUX
+            PUENTE AL TOMO 03 // REPARACIÓN DE PC
           </button>
         </div>
 
@@ -2627,45 +2627,46 @@ const InvestigatorPassportVisual: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 4: Puente al Tomo 03 // Linux */}
+        {/* Tab 4: Puente al Tomo 03 // Reparación de PC */}
         {activeTab === 'TOMO_03' && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-950/40 via-black to-cyan-950/40 border border-cyan-400/60 space-y-3">
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-950/40 via-black to-cyan-950/40 border border-blue-500/60 space-y-3">
             <div className="flex items-center justify-between border-b border-cyan-950 pb-2">
               <span className="text-xs text-cyan-300 font-bold uppercase tracking-wider">
                 PRÓXIMO DESTINO EDITORIAL // TOMO 03
               </span>
               <span className="px-2 py-0.5 rounded bg-blue-950 border border-blue-500/50 text-blue-300 text-[10px] font-bold">
-                LINUX & OPEN SOURCE
+                REPARACIÓN DE PC // SISTEMA EVO LABS
               </span>
             </div>
 
             <h4 className="text-white text-base font-bold uppercase">
-              DEL NÚCLEO PROPIETARIO NT AL KERNEL MONOLÍTICO DE CÓDIGO ABIERTO
+              DEL NÚCLEO DE SOFTWARE AL DIAGNÓSTICO INTEGRAL DE HARDWARE Y TALLER
             </h4>
 
             <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
-              Comprender el Kernel NT de Windows te dio la base conceptual exacta para conquistar Linux:
-              ambos sistemas resuelven los mismos problemas físicos del silicio (paginación, interrupciones,
-              planificación de CPU y permisos), pero con filosofías arquitectónicas radicalmente distintas.
+              Comprender el Kernel NT de Windows te dio la base analítica perfecta para el Tomo 03:
+              el dominio de llamadas al sistema, controladores, interrupciones y arquitectura interna
+              ahora se une a la metodología pericial de diagnóstico físico, reparación de componentes,
+              electrónica y rescate forense en banco de trabajo.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1 font-mono-tech">
               <div className="p-2.5 rounded bg-black border border-cyan-950">
                 <span className="text-cyan-400 font-bold block mb-1">WINDOWS NT (TOMO 02):</span>
                 <ul className="text-[10px] text-zinc-400 font-sans-editorial space-y-0.5">
-                  <li>• Microkernel híbrido (ntoskrnl.exe).</li>
-                  <li>• Todo es un Objeto gestionado por Handles.</li>
-                  <li>• Configuración centralizada en el Registro.</li>
-                  <li>• Modelo de seguridad ACLs y Tokens UAC.</li>
+                  <li>• Microkernel híbrido y abstracción HAL.</li>
+                  <li>• Gestión de memoria virtual y pools de kernel.</li>
+                  <li>• Pila de I/O, controladores y latencias DPC.</li>
+                  <li>• Diagnóstico de caídas BSOD y triage lógico.</li>
                 </ul>
               </div>
               <div className="p-2.5 rounded bg-black border border-blue-950">
-                <span className="text-blue-400 font-bold block mb-1">LINUX (TOMO 03):</span>
+                <span className="text-blue-400 font-bold block mb-1">REPARACIÓN DE PC (TOMO 03):</span>
                 <ul className="text-[10px] text-zinc-400 font-sans-editorial space-y-0.5">
-                  <li>• Kernel monolítico modular (vmlinux).</li>
-                  <li>• "En Unix, todo es un archivo" (/proc, /sys).</li>
-                  <li>• Configuración en texto plano (/etc).</li>
-                  <li>• Permisos POSIX, cgroups, namespaces y eBPF.</li>
+                  <li>• Diagnóstico metodológico de hardware en taller.</li>
+                  <li>• Líneas de tensión, VRM, fuentes y mediciones.</li>
+                  <li>• Aislamiento sistemático: falla de silicio vs software.</li>
+                  <li>• Banco de trabajo EVO, instrumental y recuperación.</li>
                 </ul>
               </div>
             </div>
@@ -2677,7 +2678,7 @@ const InvestigatorPassportVisual: React.FC = () => {
           <div className="flex items-center gap-2 text-zinc-400">
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
             <span className="text-[11px] font-sans-editorial">
-              Certificación emitida por la Academia Forense EVO LABS. Validez pericial permanente.
+              Certificado EVO emitido por la Academia Forense EVO LABS. Competencias verificadas en laboratorio.
             </span>
           </div>
           <span className="text-cyan-400 font-bold text-[10px] uppercase tracking-wider">
@@ -3551,13 +3552,13 @@ export function getVisualPedagogicalMeta(moduleId: string, module: TomoModuleIte
 
     case 'm26':
       return {
-        badge: 'CERTIFICACIÓN EDITORIAL // AUDITORÍA FINAL',
+        badge: 'COMPROBACIÓN EVO // AUDITORÍA FINAL',
         title: 'PASAPORTE DEL INVESTIGADOR & MAPA DE COMPETENCIAS FORENSES',
         whatYouAreSeeing:
-          'El panel de acreditación pericial que consolida los 26 subsistemas de Windows dominados a lo largo del Tomo 02, el inventario del Archivo EVO personal y las fuentes de ingeniería oficiales de Microsoft.',
+          'El panel de competencias verificadas que consolida los 27 módulos de Windows dominados a lo largo del Tomo 02, el inventario del Archivo EVO personal y las fuentes de ingeniería oficiales de Microsoft.',
         focalPoints: [
           {
-            label: '10 Competencias Periciales Acreditadas',
+            label: '10 Competencias Maestras Verificadas',
             instruction: 'Explorá la lista de competencias desde el arranque UEFI hasta el Triage de Crisis.',
             detail:
               'Verifica que el alumno sabe auditar cada capa con herramientas nativas (DISM, BCDedit, perfmon, LatencyMon) sin recurrir a recetas mágicas.',
@@ -3569,14 +3570,14 @@ export function getVisualPedagogicalMeta(moduleId: string, module: TomoModuleIte
               'Consolida tus scripts de telemetría de PowerShell, tus líneas base de latencia y tus perfiles de servicio para respaldo técnico profesional.',
           },
           {
-            label: 'Puente al Tomo 03: Linux & Open Source',
-            instruction: 'Observá la transición editorial hacia el kernel de código abierto.',
+            label: 'Puente al Tomo 03: Reparación de PC // Sistema EVO Labs',
+            instruction: 'Observá la transición editorial hacia el diagnóstico integral en taller.',
             detail:
-              'Conecta la arquitectura híbrida de Windows NT con la arquitectura monolítica de Linux, preparando al especialista para el Tomo 03.',
+              'Conecta la arquitectura interna de Windows NT con el diagnóstico y reparación de hardware, preparando al especialista para el Tomo 03.',
           },
         ],
         whyItMatters:
-          'Certifica el salto de usuario pasivo a especialista de laboratorio: el mejor optimizador no es un programa, sino un profesional que comprende el kernel y mide con rigor científico.',
+          'Valida el salto de usuario pasivo a especialista de laboratorio: el mejor optimizador no es un programa, sino un profesional que comprende el kernel y mide con rigor científico.',
       };
 
     default:

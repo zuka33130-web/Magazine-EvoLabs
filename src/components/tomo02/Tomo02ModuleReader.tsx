@@ -552,12 +552,12 @@ export const MODULE_QUESTIONS: Record<string, CheckQuestion> = {
       {
         label: 'Síntoma documentado → Telemetría objetiva → Hipótesis inicial → Prueba aislada → Causa raíz demostrada → Resolución reversible.',
         isCorrect: true,
-        explanation: 'Excelente: este es el estándar pericial de la Academia EVO LABS.',
+        explanation: 'Excelente: este es el estándar metodológico de la Academia EVO LABS.',
       },
       {
         label: 'Reiniciar la máquina y si sigue fallando, decir que no tiene arreglo.',
         isCorrect: false,
-        explanation: 'Falso: el peritaje técnico exige rigor y determinación de causa raíz.',
+        explanation: 'Falso: la auditoría técnica exige rigor y determinación de causa raíz.',
       },
       {
         label: 'Instalar programas aleatorios hasta que alguno funcione.',
@@ -607,12 +607,12 @@ export const MODULE_QUESTIONS: Record<string, CheckQuestion> = {
     ],
   },
   m26: {
-    question: 'Al examinar el PASAPORTE DEL INVESTIGADOR (Módulo 26) y su checklist de 10 competencias acreditadas, ¿cuál es la directiva pericial definitiva sobre la optimización de Windows?',
+    question: 'Al examinar el PASAPORTE DEL INVESTIGADOR (Módulo 26) y su checklist de 10 competencias verificadas, ¿cuál es la directiva metodológica definitiva sobre la optimización de Windows?',
     options: [
       {
         label: 'El mejor optimizador de Windows es un investigador con criterio que comprende la arquitectura del kernel NT, usa telemetría nativa para medir antes de tocar y evita scripts destructivos a ciegas.',
         isCorrect: true,
-        explanation: '¡Correcto y certificado! Has asimilado la filosofía pericial de la Academia EVO LABS: evidencia métrica antes que recetas ciegas.',
+        explanation: '¡Correcto! Has asimilado la metodología técnica de la Academia EVO LABS: evidencia métrica antes que recetas ciegas.',
       },
       {
         label: 'Descargar paquetes de "debloaters" aleatorios de foros para borrar todos los servicios y dejar la RAM vacía.',
@@ -1753,7 +1753,7 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
     simpleAnalogy:
       'Un conductor aficionado que solo aprendió a manejar por una única calle de su barrio se pierde en cuanto cortan una esquina o cambian el sentido de circulación. Un navegante profesional con brújula y carta náutica entiende la topografía del terreno: no importa si hay tormenta, desvíos o niebla, siempre sabe dónde está la costa, cuál es la profundidad del agua y cómo llevar el barco seguro a puerto. El Tomo 02 fue tu carta náutica de Windows.',
     evoExplains:
-      'Has llegado a la meta del Tomo 02 — La Biblia Negra de Windows. A lo largo de estos 27 módulos (del 00 al 26) recorriste el sistema operativo capa por capa: desde el encendido del silicio en la placa madre con UEFI y la partición ESP, pasando por la barrera infranqueable entre Ring 3 y Ring 0, la gestión científica de la memoria virtual sin mitos de vaciado, el control de latencias DPC en controladores, la estructura atómica de NTFS y el Registro, hasta las técnicas no destructivas de reparación in-place y el triage de emergencias en vivo. Este último módulo no agrega más teoría: audita tu "Pasaporte del Investigador", consolida tu "Archivo EVO" personal (el repositorio de bitácoras, scripts y mediciones con el que vas a respaldar tus intervenciones profesionales) y establece el puente editorial hacia el TOMO 03, donde llevaremos esta misma mentalidad analítica al universo de Linux y el software de código abierto.',
+      'Has llegado a la meta del Tomo 02 — La Biblia Negra de Windows. A lo largo de estos 27 módulos (del 00 al 26) recorriste el sistema operativo capa por capa: desde el encendido del silicio en la placa madre con UEFI y la partición ESP, pasando por la barrera infranqueable entre Ring 3 y Ring 0, la gestión científica de la memoria virtual sin mitos de vaciado, el control de latencias DPC en controladores, la estructura atómica de NTFS y el Registro, hasta las técnicas no destructivas de reparación in-place y el triage de emergencias en vivo. Este último módulo no agrega más teoría: audita tu "Pasaporte del Investigador", consolida tu "Archivo EVO" personal (el repositorio de bitácoras, scripts y mediciones con el que vas a respaldar tus intervenciones profesionales) y establece el puente editorial hacia el TOMO 03: REPARACIÓN DE PC // SISTEMA EVO LABS, donde llevaremos esta misma mentalidad analítica y metodológica al diagnóstico, rescate y reparación integral de hardware y software en taller.',
     mythVsReality: {
       myth: 'Para ser un experto en Windows hay que memorizar de memoria los cientos de miles de claves del Registro y comandos de consola.',
       reality:
@@ -1769,15 +1769,15 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
         '5. Respetar la Cadena de Servicio (Servicing Pipeline): DISM repara el almacén de componentes (WinSxS); SFC repara los archivos del sistema usando WinSxS como fuente. Ejecutar SFC sin reparar WinSxS es estéril ante una corrupción de componentes.',
         '6. El Archivo EVO Personal: Carpeta de trabajo profesional (C:\\EVO_LABS) con subcarpetas para Bitacoras_Peritaje, Scripts_PowerShell, Exportaciones_BCD, Dumps_Crash y Líneas_Base_Rendimiento.',
         '7. Fuentes Oficiales de Ingeniería: Windows Internals Part 1 & Part 2 (Mark Russinovich & David Solomon), Documentación de Microsoft Learn, Sysinternals Suite oficial y Repositorio de PowerShell SDK.',
-        '8. Puente Hacia el Tomo 03 (Linux & Open Source): El dominio de llamadas al sistema (syscalls), niveles de privilegio y gestión de procesos en Windows NT te da la base conceptual perfecta para explorar el kernel monolítico de Linux, los permisos POSIX, systemd y los contenedores.',
+        '8. Puente Hacia el Tomo 03 (Reparación de PC // Sistema EVO Labs): El dominio de llamadas al sistema, controladores y arquitectura del Kernel NT te da la base analítica perfecta para diagnosticar y reparar fallas críticas de hardware, arranque y estabilidad en taller profesional.',
       ],
     },
-    diagramTitle: 'PASAPORTE DEL INVESTIGADOR // ACREDITACIÓN DE 26 SUBSISTEMAS',
+    diagramTitle: 'PASAPORTE DEL INVESTIGADOR // VERIFICACIÓN DE 27 MÓDULOS',
     diagramDescription:
-      'Panel digital de acreditación pericial que verifica las 10 competencias maestras adquiridas, la estructura del Archivo EVO personal y las fuentes de validación de ingeniería de Microsoft.',
+      'Panel digital de verificación técnica que comprueba las 10 competencias maestras adquiridas, la estructura del Archivo EVO personal y las fuentes de validación de ingeniería de Microsoft.',
     diagramPendingNote: '',
     evoCase: {
-      title: 'Expediente Maestro #026 — Auditoría Pericial Completa en Estación de Control Industrial',
+      title: 'Expediente Maestro #026 — Auditoría Técnica Integral en Estación de Control Industrial',
       victim: 'Workstation Industrial de Planta — Windows 10 LTSC / Windows 11 Enterprise, Control de Línea Automatizada',
       symptom:
         'El equipo sufría pausas intermitentes de 2 segundos que detenían la sincronización del brazo robótico, costando miles de dólares por hora de paro de producción. Tres técnicos habían sugerido formatear y reinstalar desde cero.',
@@ -1789,18 +1789,18 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
     },
     practiceDetails: {
       objective:
-        'Generar la Ficha Pericial Final de tu estación de trabajo en PowerShell, exportando un informe completo de hardware, kernel, tiempo de actividad y estado de almacenamiento a tu Archivo EVO.',
+        'Generar la Ficha Técnica Final de tu estación de trabajo en PowerShell, exportando un informe completo de hardware, kernel, tiempo de actividad y estado de almacenamiento a tu Archivo EVO.',
       dataType: 'MEASURED',
       whatToObserve:
         'Salida limpia y formateada con información del sistema operativo, versión de build de Windows, procesador, memoria física total y estado de arranque UEFI.',
       steps: [
         '1. Abrí PowerShell como Administrador.',
         '2. Creá la carpeta de tu laboratorio profesional si aún no existe: New-Item -ItemType Directory -Path "C:\\EVO_LABS\\Auditoria" -Force.',
-        '3. Ejecutá la orden pericial que extrae la radiografía del sistema: Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsHardwareAbstractionLayer, BiosFirmwareType, CsProcessors, CsTotalPhysicalMemory | Format-List | Out-File -FilePath "C:\\EVO_LABS\\Auditoria\\Pasaporte_EVO_Host.txt".',
-        '4. Confirmá la generación del archivo pericial leyendo el informe: Get-Content "C:\\EVO_LABS\\Auditoria\\Pasaporte_EVO_Host.txt".',
+        '3. Ejecutá la orden técnica que extrae la radiografía del sistema: Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsHardwareAbstractionLayer, BiosFirmwareType, CsProcessors, CsTotalPhysicalMemory | Format-List | Out-File -FilePath "C:\\EVO_LABS\\Auditoria\\Pasaporte_EVO_Host.txt".',
+        '4. Confirmá la generación del archivo de informe leyendo el contenido: Get-Content "C:\\EVO_LABS\\Auditoria\\Pasaporte_EVO_Host.txt".',
       ],
       interpretation:
-        'Este archivo representa la primera acta pericial de tu Archivo EVO personal, acreditando que dispones de las herramientas y el criterio técnico para auditar cualquier entorno Windows según el estándar de la Academia EVO Labs.',
+        'Este archivo representa la primera acta de auditoría de tu Archivo EVO personal, verificando que dispones de las herramientas y el criterio técnico para diagnosticar cualquier entorno Windows según el estándar de la Academia EVO Labs.',
       howToRollback:
         'El archivo generado es un informe de texto de auditoría. Si deseás eliminarlo, ejecutá: Remove-Item "C:\\EVO_LABS\\Auditoria\\Pasaporte_EVO_Host.txt".',
     },
@@ -1979,7 +1979,7 @@ export const Tomo02ModuleReader: React.FC<Tomo02ModuleReaderProps> = ({
                 ▸ QUÉ VIENE DESPUÉS:
               </span>
               <p className="text-zinc-300 leading-snug">
-                {nextMod ? `Módulo ${nextMod.moduleNumber}: ${nextMod.title}` : 'Evaluación Pericial Final del Tomo 02 y Certificación.'}
+                {nextMod ? `Módulo ${nextMod.moduleNumber}: ${nextMod.title}` : 'Evaluación Final del Tomo 02 y Certificado EVO.'}
               </p>
             </div>
           </div>
@@ -2368,7 +2368,7 @@ export const Tomo02ModuleReader: React.FC<Tomo02ModuleReaderProps> = ({
                 </div>
                 <div>
                   <span className="font-mono-tech text-[10px] text-cyan-400 uppercase tracking-widest font-bold block">
-                    ACADEMIA FORENSE EVO LABS // CIERRE OFICIAL
+                    ACADEMIA EVO LABS // CIERRE DE TOMO
                   </span>
                   <h2 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight">
                     TOMO 02 FINALIZADO: LA BIBLIA NEGRA DE WINDOWS
@@ -2376,7 +2376,7 @@ export const Tomo02ModuleReader: React.FC<Tomo02ModuleReaderProps> = ({
                 </div>
               </div>
               <span className="px-3.5 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-500 text-emerald-300 font-mono-tech font-bold text-xs uppercase tracking-wider">
-                PASAPORTE ACREDITADO 100%
+                PASAPORTE COMPLETADO 100% // VERIFICACIÓN EVO
               </span>
             </div>
 
@@ -2390,7 +2390,7 @@ export const Tomo02ModuleReader: React.FC<Tomo02ModuleReaderProps> = ({
                 Has dejado de ser un operador que prueba "recetas ciegas" de internet o apaga la máquina
                 desesperadamente ante una pantalla negra. Ahora sabés que detrás de cada clic existe una compuerta
                 de Syscalls, un planificador de hilos administrando IRQLs y un subsistema de memoria virtual
-                respaldando el Commit Limit. Sos un investigador forense: medís antes de tocar, aislás variables
+                respaldando el Commit Limit. Sos un investigador técnico: medís antes de tocar, aislás variables
                 y demostrás la causa raíz con telemetría objetiva.
               </p>
             </div>
@@ -2403,7 +2403,7 @@ export const Tomo02ModuleReader: React.FC<Tomo02ModuleReaderProps> = ({
               </div>
               <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed bg-black/60 p-4 rounded-xl border border-cyan-950">
                 Tu laboratorio técnico personal ha quedado formalmente constituido en <code className="text-cyan-300 font-mono-tech">C:\EVO_LABS</code>:
-                con carpetas organizadas para tus bitácoras periciales, scripts automatizados de PowerShell,
+                con carpetas organizadas para tus bitácoras técnicas, scripts automatizados de PowerShell,
                 respaldos de BCD y Registro, y mediciones basales de LatencyMon. Este archivo es tu respaldo
                 profesional ante cualquier cliente o empresa.
               </p>
@@ -2416,17 +2416,17 @@ export const Tomo02ModuleReader: React.FC<Tomo02ModuleReaderProps> = ({
                   3. PUENTE EDITORIAL // PRÓXIMO TOMO:
                 </span>
                 <span className="px-2 py-0.5 rounded bg-blue-950 border border-blue-500/50 text-blue-300 text-[10px] font-mono-tech font-bold">
-                  TOMO 03 EN CAMINO
+                  TOMO 03
                 </span>
               </div>
               <h3 className="text-white text-base sm:text-lg font-bold uppercase font-display">
-                TOMO 03 // LINUX & OPEN SOURCE: DEL NÚCLEO PROPIETARIO AL KERNEL LIBRE
+                TOMO 03 // REPARACIÓN DE PC: SISTEMA EVO LABS
               </h3>
               <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
-                El dominio que adquiriste de la arquitectura del Kernel NT te posiciona en el 1% superior:
-                los mismos principios de interrupciones, memoria virtual y procesos se aplicarán en Linux,
-                pero a través del modelo monolítico modular, el árbol de pseudoficheros <code className="text-cyan-300 font-mono-tech">/proc</code> y <code className="text-cyan-300 font-mono-tech">/sys</code>,
-                el sistema de inicio systemd y la seguridad con namespaces y cgroups.
+                El dominio que adquiriste de la arquitectura del Kernel NT te posiciona en el estándar profesional:
+                los mismos principios de metrología, telemetría y aislamiento de variables se aplicarán
+                en el diagnóstico y resolución de fallas de encendido, cuelgues intermitentes, pantallas azules (BSOD),
+                corrupción de almacenamiento y validación de hardware bajo estrés de laboratorio.
               </p>
             </div>
 

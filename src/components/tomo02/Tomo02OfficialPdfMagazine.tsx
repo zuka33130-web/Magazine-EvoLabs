@@ -161,7 +161,7 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
             </span>
             <span className="text-zinc-600">/</span>
             <span className="text-cyan-400 text-[11px]">
-              REVISTA OFICIAL A4 ({totalPages} PÁGS)
+              PDF HISTÓRICO / ARCHIVO DE REFERENCIA ({totalPages} PÁGS)
             </span>
           </div>
         </div>
@@ -314,7 +314,7 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
             <div className="w-[210mm] max-w-full h-[297mm] min-h-[900px] bg-black rounded-2xl shadow-2xl border border-cyan-900/60 overflow-hidden">
               <iframe
                 src={`${activePdfUrl}#page=${currentPage}&view=FitH`}
-                title={`Revista Oficial Tomo 02 - Página ${currentPage}`}
+                title={`Tomo 02 - Página ${currentPage}`}
                 className="w-full h-full border-none"
               />
             </div>
@@ -333,7 +333,7 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 bg-cyan-400 inline-block shadow-[0_0_8px_#00D2FF]" />
                       <span className="font-bold text-white uppercase tracking-widest">
-                        COLECCIÓN PERICIAL // TOMO 02
+                        COLECCIÓN TÉCNICA // TOMO 02
                       </span>
                       <span className="text-zinc-600">|</span>
                       <span className="text-zinc-400 uppercase tracking-widest hidden sm:inline">
