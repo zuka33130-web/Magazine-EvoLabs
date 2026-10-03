@@ -63,6 +63,36 @@ import {
   isTomo01Complete,
 } from './utils/tomo01Progress';
 
+// Safe LocalStorage Helper for sandboxed iframe compatibility
+const safeStorage = {
+  getItem(key: string): string | null {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return null;
+      return window.localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem(key: string, value: string): void {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, value);
+      }
+    } catch {
+      // ignore
+    }
+  },
+  removeItem(key: string): void {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.removeItem(key);
+      }
+    } catch {
+      // ignore
+    }
+  },
+};
+
 function AppContent() {
   const { updateLocation, saveCurrentLocationHistory } = useTutorEvo();
   const [currentView, setCurrentView] = useState<

@@ -548,7 +548,7 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
         </div>
 
         {/* Machine Prepared Card summary */}
-        <EvoMachinePreparedCard machine={machine} onChangeRequested={onChangeMachineRequested} />
+        <EvoMachinePreparedCard machine={machine} onChangeMachineRequested={onChangeMachineRequested} />
 
         {/* Main Grid: Workload Configurator */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

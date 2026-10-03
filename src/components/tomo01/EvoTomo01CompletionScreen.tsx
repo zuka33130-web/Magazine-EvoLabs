@@ -250,7 +250,7 @@ export const EvoTomo01CompletionScreen: React.FC<EvoTomo01CompletionScreenProps>
           isOpen={isGuideOpen}
           onClose={() => setIsGuideOpen(false)}
           guide={labGuide}
-          onExecuteLab={() => {
+          onEnterLab={() => {
             setIsGuideOpen(false);
             onGoToLab();
           }}

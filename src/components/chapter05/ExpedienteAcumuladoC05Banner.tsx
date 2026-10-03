@@ -24,14 +24,13 @@ import {
 } from '../../types';
 
 interface ExpedienteAcumuladoC05BannerProps {
-  specs: Partial<UserPcSpec>;
+  specs: Partial<UserPcSpec> & Record<string, any>;
   hasPassport: boolean;
-  flowData: Lab02ExperimentData | null;
+  flowData: (Lab02ExperimentData & Record<string, any>) | null;
   hasFlowMap: boolean;
-  fluidezData: FluidezProfileData | null;
-  hasFluidez: boolean;
-  matrixData: LimitationMatrixData | null;
+  fluidezData: (FluidezProfileData & Record<string, any>) | null;
   hasMatrix: boolean;
+  matrixData: LimitationMatrixData | null;
   abExperiment?: AbExperimentData | null;
   onOpenChapter01?: () => void;
   onOpenChapter02?: () => void;

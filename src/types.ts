@@ -23,6 +23,7 @@ export interface ChapterItem {
   number: string;
   title: string;
   subtitle: string;
+  tagline?: string;
   aprende: string;
   hace: string;
   desbloquea: string;

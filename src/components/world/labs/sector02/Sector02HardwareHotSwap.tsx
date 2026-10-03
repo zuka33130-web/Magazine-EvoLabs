@@ -251,6 +251,9 @@ export interface GpuPreset {
   vramGb: number;
   vramType: string;
   busWidthBit: number;
+  memoryBusBit?: number;
+  memoryBandwidthGBs?: number;
+  tgpWatt?: number;
   defaultPcieId: string;
   tier: 'enthusiast' | 'high' | 'mid' | 'entry';
 }

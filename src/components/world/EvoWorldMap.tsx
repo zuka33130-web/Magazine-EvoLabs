@@ -1694,8 +1694,8 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
 
               <div className="p-4 rounded-2xl bg-[#080b11] border border-zinc-800 shadow-2xl overflow-hidden">
                 <EvoMotherboardCanvas
-                  overlayMode={activeOverlay}
-                  onSelectComponent={(c) => setInspectedComponent(c)}
+                  activeOverlay={activeOverlay}
+                  onSelectComponent={(id, name, detail) => setInspectedComponent({ id, name, detail })}
                 />
               </div>
             </div>
@@ -1769,8 +1769,14 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
           {diagnoseTab === 'consola' && (
             <div className="space-y-4">
               <EvoLabConsole
-                activeZoneId={activeConsoleZoneId}
-                onSelectZone={(zoneId) => setActiveConsoleZoneId(zoneId)}
+                initialZoneId={activeConsoleZoneId}
+                passport={passport}
+                onBackToMap={() => {}}
+                onEnterTomo01={onNavigateTomo01 || (() => {})}
+                onEnterMagazine={onNavigateMagazine || (() => {})}
+                onEnterTomo02={() => onOpenTomo?.('tomo-02')}
+                onEnterTomo03={() => onOpenTomo?.('tomo-03')}
+                onEnterTomo04={() => onOpenTomo?.('tomo-04')}
               />
             </div>
           )}

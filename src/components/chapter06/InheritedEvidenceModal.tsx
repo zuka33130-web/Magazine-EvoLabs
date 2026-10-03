@@ -5,7 +5,7 @@ import { UserPcSpec, FluidezProfileData, AbExperimentData, ActivityMapData, Opti
 interface InheritedEvidenceModalProps {
   onClose: () => void;
   specs: Partial<UserPcSpec>;
-  fluidezData: FluidezProfileData | null;
+  fluidezData: (FluidezProfileData & Record<string, any>) | null;
   limitationData: AbExperimentData | null;
   activityMap: ActivityMapData | null;
   optimizationLog: OptimizationLogData | null;

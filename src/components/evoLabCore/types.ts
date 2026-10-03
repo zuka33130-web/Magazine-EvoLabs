@@ -112,6 +112,7 @@ export interface MachinePSU {
 }
 
 export interface MachineCooling {
+  model?: string;
   type: 'Stock Fan' | 'Air Tower' | 'AIO Liquid 240mm' | 'AIO Liquid 360mm' | 'Laptop Vapor Chamber' | 'UNKNOWN';
   tdpCapacityW: number;
   provenance: EpistemicProvenance;
@@ -276,6 +277,7 @@ export interface ComponentImpactAssessment {
 export interface Machine {
   id: string;
   alias: string;
+  name?: string;
   machineType?: MachineArchetype;
   manufacturer?: string;
   model?: string;
@@ -560,6 +562,7 @@ export interface RepairSessionData {
   hypotheses: DiagnosticHypothesis[];
   diagnosticSteps: DiagnosticStep[];
   currentStepIndex: number;
+  evidenceLog?: any[];
   probableDiagnosis?: string;
   recommendedSolution?: {
     action: string;
@@ -722,6 +725,7 @@ export interface EvoCase {
   updatedAt: string;
   caseType: EvoCaseType;
   title: string;
+  summary?: string;
   machine: Machine;
   repairSession?: RepairSessionData;
   testSession?: TestSessionData;

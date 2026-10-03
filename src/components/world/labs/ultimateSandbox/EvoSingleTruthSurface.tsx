@@ -756,7 +756,7 @@ export const EvoSingleTruthSurface: React.FC<EvoSingleTruthSurfaceProps> = ({
           configuredSpeedMts: configuredSpeed,
           effectiveBandwidthGbps: {
             value: computedBandwidthGbps,
-            provenance: computedBandwidthGbps > 0 ? 'DERIVED' : 'UNKNOWN',
+            provenance: (computedBandwidthGbps > 0 ? 'DERIVED' : 'UNKNOWN') as any,
             source: 'Hardware Memory Bus Calculation',
             unit: 'GB/s'
           },
@@ -1415,7 +1415,7 @@ Dictamen Técnico Pericial: ${simulationResult.bottleneck}
               <div className="p-6 rounded-3xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between shadow-xl">
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-slate-400 font-mono tracking-wider">{currentGame.name.toUpperCase()} (FPS)</span>
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${simulationResult.provenance === 'MEASURED' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border-purple-500/40'}`}>
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${(simulationResult.provenance as string) === 'MEASURED' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border-purple-500/40'}`}>
                     [{simulationResult.provenance}]
                   </span>
                 </div>
@@ -1425,7 +1425,7 @@ Dictamen Técnico Pericial: ${simulationResult.bottleneck}
               <div className="p-6 rounded-3xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between shadow-xl">
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-slate-400 font-mono tracking-wider">1% LOW (FLUIDEZ REAL)</span>
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${simulationResult.provenance === 'MEASURED' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border-purple-500/40'}`}>
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${(simulationResult.provenance as string) === 'MEASURED' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border-purple-500/40'}`}>
                     [{simulationResult.provenance}]
                   </span>
                 </div>
@@ -1434,8 +1434,8 @@ Dictamen Técnico Pericial: ${simulationResult.bottleneck}
               </div>
               <div className="p-6 rounded-3xl bg-slate-950/70 border border-slate-800 flex flex-col justify-between shadow-xl">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400 font-mono tracking-wider">TEMPERATURA {simulationResult.provenance === 'MEASURED' ? 'MEDIDA' : 'ESTIMADA'}</span>
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${simulationResult.provenance === 'MEASURED' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border-purple-500/40'}`}>
+                  <span className="text-xs text-slate-400 font-mono tracking-wider">TEMPERATURA {(simulationResult.provenance as string) === 'MEASURED' ? 'MEDIDA' : 'ESTIMADA'}</span>
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${(simulationResult.provenance as string) === 'MEASURED' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border-purple-500/40'}`}>
                     [{simulationResult.provenance}]
                   </span>
                 </div>
