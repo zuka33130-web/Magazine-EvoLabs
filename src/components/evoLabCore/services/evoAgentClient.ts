@@ -45,6 +45,36 @@ export interface AgentLiveTelemetry {
   isSamplingActive: boolean;
 }
 
+export interface AgentWindowsService {
+  name: string;
+  displayName: string;
+  state: string;
+  startMode: string;
+  processId: number;
+  startName: string;
+  workingSetMb: number;
+  experimentAllowed: boolean;
+}
+
+export interface AgentServicesResponse {
+  provenance: 'SYSTEM_REPORTED';
+  services: AgentWindowsService[];
+  experimentAllowlist: string[];
+  timestamp: string;
+}
+
+export interface AgentServiceExperimentResponse {
+  success: boolean;
+  action: 'STOP' | 'START';
+  serviceName: string;
+  before: AgentWindowsService | null;
+  after: AgentWindowsService | null;
+  timestamp: string;
+  message: string;
+  provenance: 'SYSTEM_REPORTED';
+  safety: string;
+}
+
 export interface AgentMachineImportResult {
   success: boolean;
   machine?: Machine;
@@ -306,6 +336,53 @@ export class EvoAgentClient {
       return response.ok;
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * Reads the current Windows service inventory from the local agent.
+   * This endpoint is read-only and SYSTEM_REPORTED.
+   */
+  public static async fetchWindowsServices(): Promise<AgentServicesResponse | null> {
+    try {
+      const token = await this.ensureHandshake(1800);
+      const response = await fetch(`${this.AGENT_BASE_URL}/v1/services`, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'X-Evo-Agent-Token': token,
+        },
+      });
+      if (!response.ok) return null;
+      return await response.json();
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Applies a reversible, allowlisted service experiment.
+   * The agent only supports STOP/START and never changes StartupType here.
+   */
+  public static async applyServiceExperiment(
+    serviceName: string,
+    action: 'STOP' | 'START'
+  ): Promise<AgentServiceExperimentResponse | null> {
+    try {
+      const token = await this.ensureHandshake(1800);
+      const response = await fetch(`${this.AGENT_BASE_URL}/v1/services/experiment`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-Evo-Agent-Token': token,
+        },
+        body: JSON.stringify({ serviceName, action }),
+      });
+      if (!response.ok) return null;
+      return await response.json();
+    } catch {
+      return null;
     }
   }
 }
