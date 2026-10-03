@@ -1597,80 +1597,147 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             subSlug="FICHA DE AUDITORÍA DE WINDOWS"
             accentColor="#00D2FF"
           >
-            <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
+            <div className="h-full flex flex-col justify-between gap-3 font-sans-editorial">
               <div>
-                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest block font-bold mb-0.5">
-                  HERRAMIENTA DE CAMPO
-                </span>
-                <h2 className="text-2xl font-display font-black text-white tracking-tight uppercase">
+                <div className="flex items-center justify-between pb-1.5 border-b border-cyan-950">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest font-bold">
+                      HERRAMIENTA DE CAMPO // PROTOCOLO FÍSICO
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 font-mono-tech text-[10px] font-bold">
+                      FORMATO A4
+                    </span>
+                  </div>
+                  <span className="text-[10.5px] font-mono-tech text-zinc-500 uppercase">
+                    EXPEDIENTE N°: EVO-WS-____-____
+                  </span>
+                </div>
+                <h2 className="text-2xl font-display font-black text-white tracking-tight uppercase mt-1">
                   HOJA DE AUDITORÍA FORENSE DE WINDOWS
                 </h2>
                 <p className="text-xs font-mono-tech text-zinc-400 mt-0.5">
-                  Completá esta ficha técnica antes y después de intervenir cualquier sistema.
+                  Completá esta ficha técnica antes y después de intervenir cualquier sistema. Apta para escritura manual en taller.
                 </p>
               </div>
 
-              {/* Spacious Printable Worksheet */}
-              <div className="p-4 rounded-xl bg-black/80 border-2 border-dashed border-cyan-900/90 space-y-4 font-mono-tech text-xs">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-b border-zinc-800 pb-3.5">
+              {/* Spacious Printable Worksheet - Full A4 Utilization */}
+              <div className="flex-1 p-4 rounded-xl bg-black/90 border-2 border-dashed border-cyan-900/90 flex flex-col justify-between gap-3.5 font-mono-tech text-xs">
+                {/* 1. Identification Header Fields */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-b border-zinc-800 pb-3">
                   <div>
-                    <span className="text-xs text-zinc-400 block font-bold">FECHA DE PERITAJE:</span>
-                    <div className="h-7 border-b border-zinc-600 mt-1"></div>
+                    <span className="text-xs text-zinc-300 block font-bold">FECHA DE PERITAJE:</span>
+                    <div className="h-8 border-b-2 border-zinc-600 mt-1 flex items-end text-zinc-500 text-[11px] px-1">
+                      ___ / ___ / 202_
+                    </div>
                   </div>
                   <div>
-                    <span className="text-xs text-zinc-400 block font-bold">VERSIÓN DE WINDOWS:</span>
-                    <div className="h-7 border-b border-zinc-600 mt-1"></div>
+                    <span className="text-xs text-zinc-300 block font-bold">VERSIÓN DE WINDOWS:</span>
+                    <div className="h-8 border-b-2 border-zinc-600 mt-1 flex items-end text-zinc-500 text-[11px] px-1">
+                      Win 10 / Win 11 Ed: _______
+                    </div>
                   </div>
                   <div>
-                    <span className="text-xs text-zinc-400 block font-bold">BUILD NUMBER:</span>
-                    <div className="h-7 border-b border-zinc-600 mt-1"></div>
+                    <span className="text-xs text-zinc-300 block font-bold">BUILD / KERNEL NT:</span>
+                    <div className="h-8 border-b-2 border-zinc-600 mt-1 flex items-end text-zinc-500 text-[11px] px-1">
+                      10.0.____________________
+                    </div>
                   </div>
                   <div>
-                    <span className="text-xs text-zinc-400 block font-bold">TÉCNICO A CARGO:</span>
-                    <div className="h-7 border-b border-zinc-600 mt-1"></div>
+                    <span className="text-xs text-zinc-300 block font-bold">TÉCNICO A CARGO:</span>
+                    <div className="h-8 border-b-2 border-zinc-600 mt-1"></div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="space-y-2.5">
-                    <span className="text-cyan-400 font-bold text-xs uppercase tracking-wide block">
+                {/* 2. Baseline Comparison Tables (Pre vs Post) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-3 rounded-lg bg-zinc-950/90 border border-cyan-950 space-y-2.5">
+                    <span className="text-cyan-400 font-bold text-xs uppercase tracking-wide block pb-1 border-b border-cyan-950">
                       LÍNEA BASE INICIAL (PRE-INTERVENCIÓN):
                     </span>
-                    <div className="space-y-2 text-xs text-zinc-300">
-                      <div>Latencia DPC máxima (µs): ________________________</div>
-                      <div>Cantidad de procesos en reposo: __________________</div>
-                      <div>Consumo de RAM en reposo (GB): ___________________</div>
-                      <div>Tiempo de arranque LastBIOS (seg): _______________</div>
-                      <div>Servicios no Microsoft activos: __________________</div>
+                    <div className="space-y-2.5 text-xs text-zinc-300">
+                      <div className="flex justify-between items-end border-b border-zinc-800 pb-1">
+                        <span>Latencia DPC máxima (µs):</span>
+                        <span className="w-24 border-b border-zinc-600 text-right"></span>
+                      </div>
+                      <div className="flex justify-between items-end border-b border-zinc-800 pb-1">
+                        <span>Procesos activos en reposo:</span>
+                        <span className="w-24 border-b border-zinc-600 text-right"></span>
+                      </div>
+                      <div className="flex justify-between items-end border-b border-zinc-800 pb-1">
+                        <span>Consumo de RAM en reposo (GB):</span>
+                        <span className="w-24 border-b border-zinc-600 text-right"></span>
+                      </div>
+                      <div className="flex justify-between items-end border-b border-zinc-800 pb-1">
+                        <span>Tiempo LastBIOS (seg):</span>
+                        <span className="w-24 border-b border-zinc-600 text-right"></span>
+                      </div>
+                      <div className="flex justify-between items-end border-b border-zinc-800 pb-1">
+                        <span>Servicios de terceros activos:</span>
+                        <span className="w-24 border-b border-zinc-600 text-right"></span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="space-y-2.5">
-                    <span className="text-emerald-400 font-bold text-xs uppercase tracking-wide block">
+                  <div className="p-3 rounded-lg bg-zinc-950/90 border border-emerald-950/80 space-y-2.5">
+                    <span className="text-emerald-400 font-bold text-xs uppercase tracking-wide block pb-1 border-b border-emerald-950">
                       LÍNEA BASE FINAL (POST-INTERVENCIÓN):
                     </span>
-                    <div className="space-y-2 text-xs text-zinc-300">
-                      <div>Latencia DPC máxima (µs): ________________________</div>
-                      <div>Cantidad de procesos en reposo: __________________</div>
-                      <div>Consumo de RAM en reposo (GB): ___________________</div>
-                      <div>Tiempo de arranque LastBIOS (seg): _______________</div>
-                      <div>Delta de mejora verificado (%): __________________</div>
+                    <div className="space-y-2.5 text-xs text-zinc-300">
+                      <div className="flex justify-between items-end border-b border-zinc-800 pb-1">
+                        <span>Latencia DPC máxima (µs):</span>
+                        <span className="w-24 border-b border-zinc-600 text-right"></span>
+                      </div>
+                      <div className="flex justify-between items-end border-b border-zinc-800 pb-1">
+                        <span>Procesos activos en reposo:</span>
+                        <span className="w-24 border-b border-zinc-600 text-right"></span>
+                      </div>
+                      <div className="flex justify-between items-end border-b border-zinc-800 pb-1">
+                        <span>Consumo de RAM en reposo (GB):</span>
+                        <span className="w-24 border-b border-zinc-600 text-right"></span>
+                      </div>
+                      <div className="flex justify-between items-end border-b border-zinc-800 pb-1">
+                        <span>Tiempo LastBIOS (seg):</span>
+                        <span className="w-24 border-b border-zinc-600 text-right"></span>
+                      </div>
+                      <div className="flex justify-between items-end border-b border-zinc-800 pb-1">
+                        <span>Delta de mejora medido (%):</span>
+                        <span className="w-24 border-b border-zinc-600 text-right"></span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-800">
-                  <span className="text-xs text-zinc-400 block mb-1 font-bold">
-                    FIRMA DE CONFORMIDAD Y PUNTO DE RESTAURACIÓN CREADO:
+                {/* 3. Lined Observations Section for Manual Workshop Notes */}
+                <div className="space-y-1.5">
+                  <span className="text-xs text-zinc-300 block font-bold uppercase tracking-wider">
+                    OBSERVACIONES PERICIALES & HALLAZGOS EN KERNEL (ESCRITURA MANUAL):
                   </span>
-                  <div className="h-12 border border-zinc-800 rounded-lg bg-zinc-950/70 p-2.5 text-xs text-zinc-400 flex items-center justify-between">
-                    <span>Nombre del Restore Point: EVO_AUDIT_BASELINE_[FECHA]</span>
-                    <span className="text-zinc-600 font-bold">FIRMA: ___________________</span>
+                  <div className="space-y-2.5 pt-1">
+                    <div className="h-6 border-b border-dotted border-zinc-600"></div>
+                    <div className="h-6 border-b border-dotted border-zinc-600"></div>
+                    <div className="h-6 border-b border-dotted border-zinc-600"></div>
+                  </div>
+                </div>
+
+                {/* 4. Restore Point & Signature Block */}
+                <div className="pt-2 border-t border-zinc-800">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                    <div className="p-3 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-400 space-y-1">
+                      <strong className="text-cyan-400 block uppercase text-[11px]">PUNTO DE RESTAURACIÓN DE SEGURIDAD:</strong>
+                      <div className="text-white font-mono text-[11px]">EVO_AUDIT_BASELINE_[____________________]</div>
+                      <span className="text-emerald-400 text-[10px] block">✔ VERIFICADO CON SYSTEMRESTORE CLI</span>
+                    </div>
+                    <div className="p-3 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-400 flex flex-col justify-between h-full min-h-[64px]">
+                      <span className="text-zinc-400 font-bold uppercase text-[11px]">FIRMA DEL TÉCNICO Y SELLO:</span>
+                      <div className="border-b-2 border-zinc-500 mt-4 text-right text-[10px] text-zinc-600">
+                        FIRMA Y CONFORMIDAD FORENSE
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="text-xs font-mono-tech text-cyan-300 text-center py-1">
+              <div className="text-xs font-mono-tech text-cyan-300 text-center py-0.5">
                 ESTA FICHA PUEDE IMPRIMIRSE DIRECTAMENTE EN HOJA A4 PARA INCORPORAR AL EXPEDIENTE DE TALLER.
               </div>
             </div>

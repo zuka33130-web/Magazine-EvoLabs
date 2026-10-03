@@ -1339,7 +1339,7 @@ function AppContent() {
         </main>
 
         {/* Minimal Footer */}
-        <footer className="border-t border-zinc-800/60 py-6 bg-[#06070a] text-zinc-500 text-xs font-mono-tech mt-auto">
+        <footer className="app-global-footer border-t border-zinc-800/60 py-6 bg-[#06070a] text-zinc-500 text-xs font-mono-tech mt-auto print:hidden no-print">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-yellow-400 inline-block" />

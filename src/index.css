@@ -222,6 +222,9 @@
   .tutor-drawer,
   .tutor-floating-btn,
   .modal-overlay,
+  footer.no-print,
+  footer.print\:hidden,
+  .app-global-footer,
   ::-webkit-scrollbar {
     display: none !important;
   }

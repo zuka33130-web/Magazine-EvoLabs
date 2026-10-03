@@ -14,7 +14,7 @@ export const Tomo02EditorialCheck: React.FC<Tomo02EditorialCheckProps> = ({
   questionData,
 }) => {
   return (
-    <div className="flex flex-col gap-3 h-auto font-sans-editorial">
+    <div className="h-full flex flex-col gap-3 font-sans-editorial">
       {/* Top Header */}
       <div className="border-b border-cyan-950/80 pb-2.5 flex items-baseline justify-between">
         <div>
@@ -117,8 +117,8 @@ export const Tomo02EditorialCheck: React.FC<Tomo02EditorialCheckProps> = ({
         </div>
       </div>
 
-      {/* 3. Subsystem Visual Stage (Fills lower area naturally without artificial box expansion) */}
-      <div className="h-[160px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative">
+      {/* 3. Subsystem Visual Stage (Absorbs remaining vertical space) */}
+      <div className="flex-1 min-h-[220px] max-h-[300px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative">
         <Tomo02ModuleVisual module={module} compact={true} />
       </div>
 

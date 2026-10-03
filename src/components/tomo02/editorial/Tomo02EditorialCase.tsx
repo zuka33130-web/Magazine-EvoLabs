@@ -2,6 +2,7 @@ import React from 'react';
 import { Search, CheckCircle2, AlertOctagon, Wrench, Shield, AlertTriangle } from 'lucide-react';
 import { TomoModuleItem } from '../../../data/tomo02Data';
 import { ChapterRichContent } from '../Tomo02ModuleReader';
+import { Tomo02ModuleVisual } from '../Tomo02VisualEngine';
 
 interface Tomo02EditorialCaseProps {
   module: TomoModuleItem;
@@ -29,7 +30,7 @@ export const Tomo02EditorialCase: React.FC<Tomo02EditorialCaseProps> = ({
   const toolText = module.sysinternalsTool || 'Process Explorer & LatencyMon';
 
   return (
-    <div className="flex flex-col space-y-3 font-sans-editorial">
+    <div className="h-full flex flex-col gap-3 font-sans-editorial">
       {/* Top Header Bar */}
       <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
         <div>
@@ -125,6 +126,11 @@ export const Tomo02EditorialCase: React.FC<Tomo02EditorialCaseProps> = ({
             <span className="text-emerald-100 font-sans-editorial leading-snug block">Verificación de estabilidad y reversibilidad del procedimiento.</span>
           </div>
         </div>
+      </div>
+
+      {/* Subsystem Visual Stage - Absorbs Remaining Space */}
+      <div className="flex-1 min-h-[160px] max-h-[250px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative">
+        <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
       </div>
 
       {/* Standardized Bottom Bar - Content Driven */}

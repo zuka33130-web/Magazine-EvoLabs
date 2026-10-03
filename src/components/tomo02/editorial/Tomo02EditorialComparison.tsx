@@ -17,7 +17,7 @@ export const Tomo02EditorialComparison: React.FC<Tomo02EditorialComparisonProps>
   const reality = richData?.mythVsReality?.reality || module.scientificFact || module.summary;
 
   return (
-    <div className="flex flex-col space-y-3 font-sans-editorial">
+    <div className="h-full flex flex-col gap-3 font-sans-editorial">
       {/* Top Section Header */}
       <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
         <div>
@@ -82,8 +82,8 @@ export const Tomo02EditorialComparison: React.FC<Tomo02EditorialComparisonProps>
         </div>
       </div>
 
-      {/* Decision Tree or Visual Stage - Content Driven */}
-      {module.decisionTree ? (
+      {/* Decision Tree if present (h-auto) */}
+      {module.decisionTree && (
         <div className="p-3 rounded-xl bg-black/80 border border-cyan-900/60 font-mono-tech text-xs space-y-2 h-auto">
           <div className="flex items-center gap-2 text-cyan-400 text-[10px] uppercase font-bold tracking-wider">
             <GitFork className="w-3.5 h-3.5" />
@@ -104,11 +104,12 @@ export const Tomo02EditorialComparison: React.FC<Tomo02EditorialComparisonProps>
             </div>
           </div>
         </div>
-      ) : (
-        <div className="h-[170px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative">
-          <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
-        </div>
       )}
+
+      {/* Subsystem Visual Stage - Absorbs Remaining Space */}
+      <div className="flex-1 min-h-[200px] max-h-[300px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative">
+        <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
+      </div>
 
       {/* Bottom Metrological Rule - Content Driven */}
       <div className="p-2.5 rounded-lg bg-zinc-950/90 border border-cyan-950 text-xs font-mono-tech flex items-center justify-between text-zinc-300 h-auto">

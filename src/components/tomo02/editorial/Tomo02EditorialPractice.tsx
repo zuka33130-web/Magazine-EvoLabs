@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Terminal, Copy, Check, RotateCcw, CheckCircle2, Activity } from 'lucide-react';
 import { TomoModuleItem } from '../../../data/tomo02Data';
 import { ChapterRichContent } from '../Tomo02ModuleReader';
+import { Tomo02ModuleVisual } from '../Tomo02VisualEngine';
 
 interface Tomo02EditorialPracticeProps {
   module: TomoModuleItem;
@@ -34,7 +35,7 @@ export const Tomo02EditorialPractice: React.FC<Tomo02EditorialPracticeProps> = (
   const practice = richData?.practiceDetails;
 
   return (
-    <div className="flex flex-col space-y-3 font-sans-editorial">
+    <div className="h-full flex flex-col gap-3 font-sans-editorial">
       {/* Top Header */}
       <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
         <div>
@@ -162,6 +163,11 @@ export const Tomo02EditorialPractice: React.FC<Tomo02EditorialPracticeProps> = (
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Subsystem Visual Stage - Absorbs Remaining Space */}
+      <div className="flex-1 min-h-[200px] max-h-[300px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative">
+        <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
       </div>
 
       {/* Standardized Bottom Bar - Content Driven */}
