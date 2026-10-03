@@ -556,14 +556,16 @@ export interface DiagnosticStep {
 
 export interface RepairSessionData {
   symptomRaw: string;
-  symptomCategory: string;
+  symptomCategory?: string;
   questions: DiagnosticQuestion[];
-  currentQuestionIndex: number;
+  currentQuestionIndex?: number;
   hypotheses: DiagnosticHypothesis[];
   diagnosticSteps: DiagnosticStep[];
-  currentStepIndex: number;
+  currentStepIndex?: number;
   evidenceLog?: any[];
   probableDiagnosis?: string;
+  finalDiagnosis?: string;
+  solutionRecommended?: any;
   recommendedSolution?: {
     action: string;
     riskLevel: 'MINIMAL' | 'LOW' | 'MEDIUM' | 'HIGH';

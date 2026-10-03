@@ -633,7 +633,7 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
                 : 'text-zinc-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <span>🛠️ REPAIR LAB (36+ CASOS)</span>
+            <span>🛠️ REPAIR LAB (24 CASOS)</span>
           </button>
 
           <button
@@ -728,7 +728,7 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
       )}
 
       {/* ========================================================================= */}
-      {/* 4. REPAIR LAB (DIAGNÓSTICO PERICIAL DE 36+ CASOS REALES)                 */}
+      {/* 4. REPAIR LAB (DIAGNÓSTICO PERICIAL DE 24 CASOS REALES)                 */}
       {/* ========================================================================= */}
       {activeMode === 'repair' && (
         <WindowsFailureRepairLab

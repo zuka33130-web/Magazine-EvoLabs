@@ -198,7 +198,7 @@ export const WindowsInstallExperienceLab: React.FC = () => {
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
-            DESAFÍO DE ERRORES (8 CASOS)
+            DESAFÍO DE ERRORES (4 CASOS)
           </button>
 
           <button

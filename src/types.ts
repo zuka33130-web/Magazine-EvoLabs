@@ -62,6 +62,7 @@ export interface UserPcSpec {
   os: string;
   monitor: string;
   peripherals: string;
+  [key: string]: any;
 }
 
 export interface UserPcEvidenceMap {
@@ -564,6 +565,7 @@ export type DiagnosticOutcomeStatus = 'INVESTIGANDO' | DiagnosticFinalOutcomeSta
 
 export interface DiagnosticCase {
   id: string; // ej. "006-001"
+  title?: string;
   createdAt: string;
   updatedAt: string;
   closedAt?: string;

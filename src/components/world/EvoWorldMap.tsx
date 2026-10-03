@@ -1774,9 +1774,9 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
                 onBackToMap={() => {}}
                 onEnterTomo01={onNavigateTomo01 || (() => {})}
                 onEnterMagazine={onNavigateMagazine || (() => {})}
-                onEnterTomo02={() => onOpenTomo?.('tomo-02')}
-                onEnterTomo03={() => onOpenTomo?.('tomo-03')}
-                onEnterTomo04={() => onOpenTomo?.('tomo-04')}
+                onEnterTomo02={() => onOpenTomo?.('02')}
+                onEnterTomo03={() => onOpenTomo?.('03')}
+                onEnterTomo04={() => onOpenTomo?.('04')}
               />
             </div>
           )}
