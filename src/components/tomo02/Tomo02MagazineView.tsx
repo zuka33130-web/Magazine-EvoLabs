@@ -332,7 +332,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Tomo02Cover
             onOpenMagazine={() => {
-              setSubView('pdf_magazine');
+              setSubView('a4_magazine');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onOpenInteractive={() => {
@@ -367,6 +367,10 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         }}
         onOpenInteractive={() => {
           setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenA4Magazine={() => {
+          setSubView('a4_magazine');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onOpenLab={onOpenLab}
@@ -481,21 +485,38 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         aria-label="Barra de herramientas de la revista"
         className="sticky top-0 z-50 bg-[#080a0e]/95 backdrop-blur-md border-b border-cyan-950/80 px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono-tech select-none print:hidden"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             type="button"
-            onClick={() => setSubView('index')}
-            className="px-3 py-1.5 rounded-lg bg-cyan-950/80 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer font-bold"
+            onClick={() => {
+              setSubView('cover');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700/80 hover:border-cyan-400 text-zinc-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer font-bold"
+            title="Volver a la Portada del Tomo 02"
           >
             <ChevronLeft className="w-4 h-4 text-cyan-400" />
-            <span>← ÍNDICE TOMO 02</span>
+            <span>← PORTADA TOMO 02</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setSubView('index');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="px-3 py-1.5 rounded-lg bg-cyan-950/80 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer font-bold"
+            title="Ir al Índice Interactivo de 27 módulos"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <span>TOMO INTERACTIVO →</span>
           </button>
 
           {onBackToApp && (
             <button
               type="button"
               onClick={onBackToApp}
-              className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-cyan-900/60 hover:border-cyan-400 text-zinc-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-cyan-900/60 hover:border-cyan-400 text-zinc-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer hidden lg:inline-flex"
             >
               <span>CAMPUS EVO</span>
             </button>
@@ -503,11 +524,11 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
 
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 bg-cyan-400 rounded-none inline-block shadow-[0_0_8px_#00D2FF]" />
-            <span className="font-black text-white tracking-widest hidden sm:inline">
+            <span className="font-black text-white tracking-widest hidden md:inline">
               EVO LABS // TOMO 02
             </span>
             <span className="text-cyan-400 text-[11px] font-bold">
-              REVISTA A4 FACSIMILAR
+              MAGAZINE A4 // LA BIBLIA NEGRA DE WINDOWS
             </span>
           </div>
 
@@ -1525,6 +1546,41 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             </div>
           </Tomo02MasterPage>
         )}
+
+        {/* End of Magazine Navigation Handoff Deck */}
+        <div className="w-full max-w-[210mm] mx-auto p-6 rounded-2xl bg-[#080d18] border border-cyan-900/60 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 font-mono-tech my-8 print:hidden">
+          <div>
+            <span className="text-cyan-400 font-bold text-xs uppercase tracking-wider block">
+              FINALIZASTE LA LECTURA DEL MAGAZINE A4
+            </span>
+            <p className="text-xs text-zinc-400 font-sans-editorial mt-0.5">
+              Continuá con las prácticas de terminal, comprobaciones y examen del Tomo Interactivo.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setSubView('index');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="px-5 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-cyan-400/20"
+            >
+              <Sparkles className="w-4 h-4 text-black" />
+              <span>IR AL TOMO INTERACTIVO →</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSubView('cover');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="px-4 py-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+            >
+              ← PORTADA TOMO 02
+            </button>
+          </div>
+        </div>
       </main>
 
       {/* Export / PDF Modal */}

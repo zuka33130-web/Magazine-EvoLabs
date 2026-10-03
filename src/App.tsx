@@ -88,7 +88,38 @@ function AppContent() {
     | 'lab-core'
     | 'tomo01-quiz'
     | 'tomo01-completion'
-  >('world-map');
+  >(() => {
+    try {
+      const url = new URL(window.location.href);
+      const vol = url.searchParams.get('volume');
+      const viewParam = url.searchParams.get('view');
+      if (viewParam === 'hotswap') return 'hotswap-lab';
+      if (viewParam === 'matrix') return 'windows-matrix-lab';
+      if (viewParam === 'core' || viewParam === 'lab-core') return 'lab-core';
+      if (vol === '02') return 'tomo-02';
+      if (vol === '03') return 'tomo-03';
+      if (vol === '04') return 'tomo-04';
+      if (vol === '08') return 'tomo-08';
+      if (viewParam === 'boot' || viewParam === 'boot-lab') return 'boot-lab';
+      if (viewParam === 'index') return 'index';
+      if (viewParam === 'world' || viewParam === 'map') return 'world-map';
+      if (viewParam === 'chapter-01') return 'chapter-01';
+      if (
+        url.searchParams.get('print') === 'true' ||
+        url.searchParams.get('mode') === 'magazine' ||
+        url.searchParams.get('pdf') === 'true'
+      ) {
+        if (vol === '02') return 'tomo-02';
+        if (vol === '03') return 'tomo-03';
+        if (vol === '04') return 'tomo-04';
+        if (vol === '08') return 'tomo-08';
+        return 'magazine';
+      }
+    } catch {
+      // ignore
+    }
+    return 'cover';
+  });
 
   // Sub-panel & Lab states
   const [activeLabPanel, setActiveLabPanel] = useState<'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>('sandbox');
@@ -113,16 +144,7 @@ function AppContent() {
   const [isIntroActive, setIsIntroActive] = useState<boolean>(() => {
     try {
       const url = new URL(window.location.href);
-      if (
-        url.searchParams.get('volume') ||
-        url.searchParams.get('view') ||
-        url.searchParams.get('mode') ||
-        url.searchParams.get('pdf') ||
-        url.searchParams.get('print') === 'true'
-      ) {
-        return false;
-      }
-      return localStorage.getItem('evo_academia_intro_dismissed') !== 'true';
+      return url.searchParams.get('intro') === 'true';
     } catch {
       return false;
     }
@@ -172,7 +194,17 @@ function AppContent() {
         url.searchParams.get('mode') === 'magazine' ||
         url.searchParams.get('pdf') === 'true'
       ) {
-        setCurrentView('magazine');
+        if (vol === '02') {
+          setCurrentView('tomo-02');
+        } else if (vol === '03') {
+          setCurrentView('tomo-03');
+        } else if (vol === '04') {
+          setCurrentView('tomo-04');
+        } else if (vol === '08') {
+          setCurrentView('tomo-08');
+        } else {
+          setCurrentView('magazine');
+        }
         setIsIntroActive(false);
       }
     } catch {

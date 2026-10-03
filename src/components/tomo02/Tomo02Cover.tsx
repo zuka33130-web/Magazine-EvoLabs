@@ -141,38 +141,47 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
                 {/* Stage 1 */}
-                <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20 hover:border-cyan-400/50 transition-colors">
-                  <span className="text-cyan-400 font-bold block text-[10px] tracking-wider uppercase">
-                    1. MAGAZINE
+                <div 
+                  onClick={onOpenMagazine}
+                  className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20 hover:border-cyan-400/50 transition-colors cursor-pointer group"
+                >
+                  <span className="text-cyan-400 font-bold block text-[10px] tracking-wider uppercase group-hover:text-cyan-300">
+                    1. MAGAZINE A4
                   </span>
                   <p className="text-white font-sans-editorial font-bold text-sm mt-0.5">
                     “Leer y entender.”
                   </p>
                   <span className="text-[10px] text-zinc-400 block mt-1">
-                    67 Págs A4 Oficial
+                    Revista Editorial & PDF
                   </span>
                 </div>
 
                 {/* Stage 2 */}
-                <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20 hover:border-cyan-400/50 transition-colors">
-                  <span className="text-cyan-400 font-bold block text-[10px] tracking-wider uppercase">
-                    2. INTERACTIVO
+                <div 
+                  onClick={onOpenInteractive}
+                  className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20 hover:border-cyan-400/50 transition-colors cursor-pointer group"
+                >
+                  <span className="text-cyan-400 font-bold block text-[10px] tracking-wider uppercase group-hover:text-cyan-300">
+                    2. TOMO INTERACTIVO
                   </span>
                   <p className="text-white font-sans-editorial font-bold text-sm mt-0.5">
-                    “Practicar y comprobar.”
+                    “Practicar y diagnosticar.”
                   </p>
                   <span className="text-[10px] text-zinc-400 block mt-1">
-                    27 Módulos & Test
+                    27 Módulos & Examen
                   </span>
                 </div>
 
                 {/* Stage 3 */}
-                <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20 hover:border-cyan-400/50 transition-colors">
-                  <span className="text-cyan-400 font-bold block text-[10px] tracking-wider uppercase">
+                <div 
+                  onClick={onOpenLab}
+                  className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20 hover:border-cyan-400/50 transition-colors cursor-pointer group"
+                >
+                  <span className="text-cyan-400 font-bold block text-[10px] tracking-wider uppercase group-hover:text-cyan-300">
                     3. LABORATORIO
                   </span>
                   <p className="text-white font-sans-editorial font-bold text-sm mt-0.5">
-                    “Experimentar y diagnosticar.”
+                    “Experimentar en vivo.”
                   </p>
                   <span className="text-[10px] text-zinc-400 block mt-1">
                     Windows Matrix Lab
@@ -262,20 +271,6 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
                 <span>LABORATORIO ASOCIADO</span>
               </button>
             </div>
-
-            {/* Optional Web A4 link if user wants continuous web reading */}
-            {onOpenA4WebVersion && (
-              <div className="pt-1">
-                <button
-                  type="button"
-                  onClick={onOpenA4WebVersion}
-                  className="text-xs font-mono-tech text-zinc-500 hover:text-cyan-300 transition-colors cursor-pointer inline-flex items-center gap-1.5"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Ver maquetación continua A4 en navegador (37 páginas web)</span>
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Right Column: PORTADA REAL DEL TOMO 02 */}
@@ -292,7 +287,7 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
               {/* Overlaid Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-1.5">
                 <span className="px-3 py-1 rounded-lg bg-black/80 backdrop-blur-md border border-cyan-500/60 text-cyan-300 font-mono-tech text-[10px] font-bold tracking-wider uppercase shadow-lg">
-                  67 PÁGINAS A4 OFICIAL
+                  REVISTA A4 EDITORIAL
                 </span>
                 <span className="px-3 py-1 rounded-lg bg-cyan-500 text-black font-mono-tech text-[10px] font-black tracking-wider uppercase shadow-lg">
                   EDICIÓN COLECCIÓN 2026
@@ -312,9 +307,9 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
                 <button
                   type="button"
                   onClick={onOpenMagazine}
-                  className="px-3 py-1.5 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black font-mono-tech font-bold text-[11px] uppercase cursor-pointer transition-colors"
+                  className="px-3.5 py-1.5 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black font-mono-tech font-bold text-[11px] uppercase cursor-pointer transition-colors shadow-md"
                 >
-                  LEER PDF →
+                  LEER MAGAZINE A4 →
                 </button>
               </div>
             </div>

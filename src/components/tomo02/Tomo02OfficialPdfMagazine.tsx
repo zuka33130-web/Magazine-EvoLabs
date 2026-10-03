@@ -23,6 +23,7 @@ import { Tomo02CoverHeroVisual } from './Tomo02CoverHeroVisual';
 interface Tomo02OfficialPdfMagazineProps {
   onBackToCover: () => void;
   onOpenInteractive?: () => void;
+  onOpenA4Magazine?: () => void;
   onOpenLab?: () => void;
   initialPage?: number;
 }
@@ -30,6 +31,7 @@ interface Tomo02OfficialPdfMagazineProps {
 export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps> = ({
   onBackToCover,
   onOpenInteractive,
+  onOpenA4Magazine,
   onOpenLab,
   initialPage = 1,
 }) => {
@@ -245,16 +247,34 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
             {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>
 
-          {/* Download PDF button */}
-          <a
-            href={activePdfUrl}
-            download="EVO-LABS-TOMO-02-DOMINA-WINDOWS.pdf"
-            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-extrabold hover:brightness-110 transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,210,255,0.4)] cursor-pointer"
-            title={`Descargar archivo oficial: ${officialFilename}`}
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>DESCARGAR PDF (67 PÁGS)</span>
-          </a>
+          {/* Download / Print button */}
+          {pdfExists ? (
+            <a
+              href={activePdfUrl}
+              download="EVO-LABS-TOMO-02-DOMINA-WINDOWS.pdf"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-extrabold hover:brightness-110 transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,210,255,0.4)] cursor-pointer"
+              title={`Descargar archivo oficial: ${officialFilename}`}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>DESCARGAR PDF (67 PÁGS)</span>
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                if (onOpenA4Magazine) {
+                  onOpenA4Magazine();
+                } else {
+                  window.print();
+                }
+              }}
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-extrabold hover:brightness-110 transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,210,255,0.4)] cursor-pointer"
+              title="Abrir Revista A4 para exportar o imprimir PDF"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>IMPRIMIR / EXPORTAR A4</span>
+            </button>
+          )}
         </div>
       </header>
 
@@ -506,6 +526,17 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
             <span>← VOLVER AL TOMO 02</span>
           </button>
 
+          {onOpenA4Magazine && (
+            <button
+              type="button"
+              onClick={onOpenA4Magazine}
+              className="px-3.5 py-1.5 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 font-bold transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
+              <span>LEER REVISTA A4 WEB →</span>
+            </button>
+          )}
+
           {onOpenInteractive && (
             <button
               type="button"
@@ -513,7 +544,7 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
               className="px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-cyan-900/60 hover:border-cyan-400 text-cyan-200 font-bold transition-all cursor-pointer flex items-center gap-1.5"
             >
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span>MAGAZINE DIGITAL INTERACTIVO →</span>
+              <span>TOMO INTERACTIVO (27 MÓDULOS) →</span>
             </button>
           )}
 

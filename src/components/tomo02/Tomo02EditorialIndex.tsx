@@ -196,9 +196,10 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
         <button
           type="button"
           onClick={onOpenA4Magazine}
-          className="px-5 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 hover:brightness-110 text-black font-mono-tech font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shrink-0 shadow-lg hover:shadow-cyan-400/30"
+          className="px-5 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 hover:brightness-110 text-black font-mono-tech font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shrink-0 shadow-lg hover:shadow-cyan-400/30 flex items-center gap-2"
         >
-          LEER MAGAZINE (67 PÁGS) →
+          <BookOpen className="w-4 h-4 text-black" />
+          <span>LEER MAGAZINE A4 DEL TOMO 02 →</span>
         </button>
       </div>
 
