@@ -118,7 +118,7 @@ export const TOMO_02_FOLDERS: SystemFolder[] = [
     path: 'C:\\Windows\\Temp',
     safetyBadge: 'VERDE',
     purpose: 'Archivos temporales del sistema creados por servicios de Windows e instaladores a nivel administrador.',
-    canDeleteOrClean: '100% seguro de vaciar periódicamente.',
+    canDeleteOrClean: 'Generalmente seguro cuando no está en uso, pero cerrar aplicaciones y servicios correspondientes y conservar precauciones.',
     howToClean: 'Comando nativo: Remove-Item -Path "C:\\Windows\\Temp\\*" -Recurse -Force -ErrorAction SilentlyContinue.',
   },
   {
@@ -126,7 +126,7 @@ export const TOMO_02_FOLDERS: SystemFolder[] = [
     path: '%localappdata%\\Temp',
     safetyBadge: 'VERDE',
     purpose: 'Archivos de caché y temporales de programas en el espacio de usuario (navegadores, instaladores, editores).',
-    canDeleteOrClean: '100% seguro de vaciar.',
+    canDeleteOrClean: 'Generalmente seguro de vaciar cuando los programas están cerrados.',
     howToClean: 'Ejecutar temp o vaciar desde el Sensor de Almacenamiento de Windows.',
   },
   {

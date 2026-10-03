@@ -751,11 +751,11 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
       symptom: 'Micro-congelamientos de 50 milisegundos en juegos competitivos a pesar de promediar 240 FPS.',
       initialHypothesis: 'Temperatura excesiva en la GPU o memoria RAM fallada.',
       rootCause: 'El usuario instaló directamente los drivers de NVIDIA sobre el driver de chipset genérico de Windows de 2006, dejando el planificador de núcleos 3D V-Cache sin aprovisionar.',
-      resolution: 'Instalación del paquete oficial AMD Chipset Drivers con el controlador 3D V-Cache Performance Optimizer y reinicio. Stuttering reducido a cero microsegundos.',
+      resolution: 'Instalación del paquete oficial AMD Chipset Drivers con el controlador 3D V-Cache Performance Optimizer y reinicio. Stuttering eliminado y frametimes estables.',
     },
     practiceDetails: {
       objective: 'Verificar la integridad matemática bit a bit de cualquier archivo o instalador mediante hash SHA-256.',
-      dataType: 'MEASURED',
+      dataType: 'SYSTEM_REPORTED',
       whatToObserve: 'La cadena alfanumérica en mayúsculas de 64 caracteres generada por el algoritmo criptográfico.',
       steps: [
         '1. Abrí PowerShell.',
@@ -833,8 +833,8 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
       victim: 'Servidor de renderizado en un taller de animación durante una tormenta eléctrica.',
       symptom: 'Corte abrupto de energía a mitad del guardado de un proyecto de 120GB.',
       initialHypothesis: 'Corrupción total del sistema de archivos y pérdida del volumen NTFS.',
-      rootCause: 'El archivo en escritura quedó trunco, pero la estructura del volumen se mantuvo 100% íntegra.',
-      resolution: 'Al reiniciar, el driver de NTFS leyó el archivo $LogFile en 300 milisegundos, descartó la transacción atómica incompleta y montó el disco sin necesidad de chkdsk.',
+      rootCause: 'El archivo en escritura quedó trunco, pero la estructura del volumen se mantuvo íntegra gracias al diario transaccional.',
+      resolution: 'Al reiniciar, el driver de NTFS leyó el archivo $LogFile de forma inmediata (fracción de segundo), descartó la transacción atómica incompleta y montó el disco sin necesidad de chkdsk.',
     },
     practiceDetails: {
       objective: 'Verificar el estado activo del comando TRIM en las unidades de estado sólido del equipo.',
@@ -968,7 +968,7 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
     },
     practiceDetails: {
       objective: 'Medir la relación real entre memoria física total, memoria física libre, memoria virtual total (Commit Limit) y virtual libre.',
-      dataType: 'MEASURED',
+      dataType: 'SYSTEM_REPORTED',
       whatToObserve: 'Comparación en Gigabytes de RAM física vs Commit Limit respaldado por Pagefile.',
       steps: [
         '1. Abrí PowerShell.',
@@ -1466,8 +1466,8 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
       victim: 'Estación de diseño CAD — Intel Core i7 13700K, 64GB DDR5, SSD NVMe Samsung 990 Pro 2TB',
       symptom: 'La máquina no supera la pantalla de carga de Windows: muestra "Preparando reparación automática" seguido de "Diagnóstico de su PC" y pantalla azul con error 0xc000000e: A required device isn\'t connected or can\'t be accessed.',
       initialHypothesis: 'SSD dañado por sobretensión; formateo completo e instalación de Windows desde cero con pérdida de entornos CAD.',
-      rootCause: 'El corte de energía ocurrió mientras Windows escribía metadatos en la partición ESP (EFI System Partition). La colmena BCD (\\EFI\\Microsoft\\Boot\\BCD) quedó con tamaño 0 bytes (corrupción lógica). El SSD y los datos de C: estaban 100% íntegros y sanos.',
-      resolution: 'Desde la consola de WinRE se ejecutó diskpart, se localizó la partición ESP de 100 MB, se le asignó la letra S: y se corrió: bcdboot C:\\Windows /s S: /f UEFI /l es-es. El comando regeneró los archivos de arranque limpios en 2.3 segundos. La PC arrancó al escritorio de inmediato con todos los proyectos intactos. Tiempo total: 6 minutos.',
+      rootCause: 'El corte de energía ocurrió mientras Windows escribía metadatos en la partición ESP (EFI System Partition). La colmena BCD (\\EFI\\Microsoft\\Boot\\BCD) quedó con tamaño 0 bytes (corrupción lógica). El SSD y los datos de C: estaban íntegros y sanos.',
+      resolution: 'Desde la consola de WinRE se ejecutó diskpart, se localizó la partición ESP de 100 MB, se le asignó la letra S: y se corrió: bcdboot C:\\Windows /s S: /f UEFI /l es-es. El comando regeneró los archivos de arranque limpios en breves segundos (ejemplo pericial de referencia). La PC arrancó al escritorio de inmediato con todos los proyectos intactos.',
     },
     practiceDetails: {
       objective: 'Revisar la configuración del almacén BCD y verificar la integridad de la partición de recuperación WinRE.',
@@ -1513,7 +1513,7 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
     },
     practiceDetails: {
       objective: 'Auditar los planes de energía disponibles y comprobar si algún controlador o proceso tiene un bloqueo de energía activo en el sistema.',
-      dataType: 'MEASURED',
+      dataType: 'SYSTEM_REPORTED',
       whatToObserve: 'Esquema de energía activo (marcado con asterisco *) y bloqueos de suspensión bajo [DRIVER] o [PROCESS].',
       steps: [
         '1. Abrí PowerShell como Administrador.',
@@ -1536,7 +1536,7 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
     technicalDeepDive: {
       title: 'FORENSIA DE HARDWARE LIMITADO: IOPS MECÁNICOS, VIRTUAL MEMORY Y EFECTOS DWM',
       items: [
-        'La Barrera Física de los IOPS: Un disco mecánico de 5400 RPM tiene una latencia de búsqueda mecánica (Seek Time) de 12 ms. 1000 ms / 12 ms = máximo ~83 IOPS. Un SSD SATA básico entrega 80.000 IOPS (1.000 veces más rápido). El 100% de disco en el Administrador de Tareas no significa saturación de megabytes por segundo, sino saturación del tiempo de respuesta del cabezal.',
+        'La Barrera Física de los IOPS: Un disco mecánico de 5400 RPM tiene una latencia de búsqueda mecánica (Seek Time) de ~12 ms, imponiendo un límite teórico de aproximadamente ~83 IOPS en acceso aleatorio. Un SSD SATA estándar entrega decenas de miles de IOPS (múltiples órdenes de magnitud de mejora). El 100% de disco en el Administrador de Tareas no significa saturación de megabytes por segundo, sino saturación del tiempo de respuesta del cabezal.',
         'Optimizaciones de Carga Gráfica en sysdm.cpl: El Compositor DWM consume memoria de video (VRAM) compartida en placas integradas Intel HD Graphics. Desactivar "Animaciones en la barra de tareas", "Sombras bajo las ventanas" y "Desplazamiento suave" libera páginas de memoria física y reduce el trabajo de renderizado de la GPU.',
         'Gestión del Archivo de Paginación en 4GB RAM: En equipos de 4GB, el archivo pagefile.sys es el salvavidas contra el cierre abrupto de aplicaciones por Out of Memory (OOM). Si está en un HDD mecánico, el "paging" genera un trillado insoportable de disco; si se coloca en un SSD SATA, el sistema vuelve a ser perfectamente usable.',
         'Ahorro de Memoria en Navegadores (Tab Discarding): Chrome y Edge consumen ~300 MB por pestaña abierta. Habilitar la política nativa de descarte de pestañas inactivas libera hasta el 70% de la memoria física cuando el usuario trabaja con múltiples sitios.',
@@ -1635,11 +1635,11 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
       symptom: 'El cliente jugaba a 60 FPS fijos limitados con V-Sync, pero cada 40 segundos el juego sufría una congelación brutal de 1 segundo que hacía imposible apuntar.',
       initialHypothesis: 'Tarjeta gráfica RTX 3060 defectuosa o cuello de botella de memoria RAM.',
       rootCause: 'Se ejecutó HWInfo64 con registro de sensores en segundo plano durante la sesión de juego. La temperatura de la CPU marcaba 54°C gracias a un buen cooler, pero el sensor "VRM / Motherboard Temp" trepaba a 116°C. En ese instante, la placa activaba BD PROCHOT y la CPU bajaba de 4.4 GHz a 0.54 GHz durante 2 segundos hasta que los MOSFETs enfriaban a 105°C.',
-      resolution: 'Se colocaron pequeños disipadores de aluminio adhesivos sobre los MOSFETs del VRM y se reorientó un ventilador del gabinete para forzar flujo de aire directo sobre la placa madre. La temperatura del VRM no superó los 78°C, la señal BD PROCHOT no volvió a dispararse y el frametime quedó completamente plano a 16.6 ms. Costo del arreglo: $3.',
+      resolution: 'Se colocaron pequeños disipadores de aluminio adhesivos sobre los MOSFETs del VRM y se reorientó un ventilador del gabinete para forzar flujo de aire directo sobre la placa madre. La temperatura del VRM no superó los 78°C, la señal BD PROCHOT no volvió a dispararse y el frametime se estabilizó de forma consistente en el intervalo de referencia de 16.6 ms (60 FPS estables) sin caídas abruptas.',
     },
     practiceDetails: {
       objective: 'Auditar la pila de red Winsock y restablecer la configuración de transporte TCP/IP limpia de Windows.',
-      dataType: 'MEASURED',
+      dataType: 'SYSTEM_REPORTED',
       whatToObserve: 'Restablecimiento de los catálogos de Winsock e interfaces de red IP con salida de confirmación en consola.',
       steps: [
         '1. Abrí PowerShell o CMD como Administrador.',
@@ -1732,7 +1732,7 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
     practiceDetails: {
       objective:
         'Consultar y auditar la taxonomía de comandos nativos de PowerShell utilizando el sistema de ayuda y reflexión interna Get-Help.',
-      dataType: 'MEASURED',
+      dataType: 'SYSTEM_REPORTED',
       whatToObserve:
         'Descubrimiento de cmdlets organizados por categorías funcionales (Process, Service, Net, Item) y verificación de sintaxis oficial.',
       steps: [
@@ -1790,7 +1790,7 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
     practiceDetails: {
       objective:
         'Generar la Ficha Técnica Final de tu estación de trabajo en PowerShell, exportando un informe completo de hardware, kernel, tiempo de actividad y estado de almacenamiento a tu Archivo EVO.',
-      dataType: 'MEASURED',
+      dataType: 'SYSTEM_REPORTED',
       whatToObserve:
         'Salida limpia y formateada con información del sistema operativo, versión de build de Windows, procesador, memoria física total y estado de arranque UEFI.',
       steps: [

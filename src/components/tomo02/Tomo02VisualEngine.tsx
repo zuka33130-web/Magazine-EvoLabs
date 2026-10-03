@@ -1427,7 +1427,7 @@ const TelemetryPipelineVisual: React.FC = () => {
         </div>
 
         <div className="p-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-400 font-sans-editorial">
-          <strong className="text-cyan-400 font-mono-tech">VERDAD TÉCNICA:</strong> Poner telemetría en "Requerida" consume 0.0% de CPU en reposo y permite recibir parches de seguridad correctos. Destruir el servicio con scripts rompe Windows Update y el Store.
+          <strong className="text-cyan-400 font-mono-tech">VERDAD TÉCNICA:</strong> Poner telemetría en "Requerida" tiene impacto basal imperceptible en reposo (&lt;0.1% CPU) y permite recibir parches de seguridad correctos. Destruir el servicio con scripts rompe Windows Update y el Store.
         </div>
       </div>
     </div>
@@ -1713,7 +1713,7 @@ const LowResourceHddIoVisual: React.FC = () => {
               </div>
             </div>
             <p className="text-[10px] text-zinc-400 font-sans-editorial">
-              Sin partes móviles. 1.000 veces más operaciones por segundo resuelven el cuello de botella instantáneamente.
+              Sin partes móviles. Múltiples órdenes de magnitud en IOPS frente a discos mecánicos resuelven el cuello de botella por tiempo de respuesta.
             </p>
           </div>
         </div>

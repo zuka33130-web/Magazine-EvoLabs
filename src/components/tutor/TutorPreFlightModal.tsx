@@ -102,7 +102,7 @@ export const TutorPreFlightModal: React.FC<TutorPreFlightModalProps> = ({
               <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 flex items-start gap-2.5">
                 <Shield className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-white">Aprobación:</strong> Con 75% o más alcanzás la distinción oficial <strong className="text-emerald-400">“TEORÍA COMPROBADA”</strong>.
+                  <strong className="text-white">Aprobación:</strong> Con 75% o más alcanzás la distinción EVO <strong className="text-emerald-400">“TEORÍA COMPROBADA”</strong>.
                 </div>
               </div>
 

@@ -53,7 +53,7 @@ export const Tomo02EditorialPractice: React.FC<Tomo02EditorialPracticeProps> = (
             TIPO DE DATO:
           </span>
           <span className="px-2.5 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 font-mono-tech text-[10px] font-bold">
-            {practice?.dataType || 'MEASURED'}
+            {practice?.dataType || 'SYSTEM_REPORTED'}
           </span>
         </div>
       </div>

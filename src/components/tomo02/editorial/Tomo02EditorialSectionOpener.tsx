@@ -1,27 +1,17 @@
 import React from 'react';
 import { TOMO_02_MODULES, TomoModuleItem } from '../../../data/tomo02Data';
 import {
-  Cpu,
-  Database,
-  Layers,
-  Network,
-  Shield,
-  Wrench,
-  Lock,
-  Terminal,
-  Activity,
+  Sparkles,
   Zap,
-  HardDrive,
-  FileCode,
-  FolderTree,
-  Binary,
-  Radio,
-  Clock,
-  KeyRound,
-  AlertOctagon,
-  RefreshCw,
-  Search,
-  Info,
+  Layers,
+  Database,
+  Cpu,
+  Network,
+  Lock,
+  Wrench,
+  ShieldCheck,
+  Activity,
+  Compass,
 } from 'lucide-react';
 
 export interface SectionOpenerMeta {
@@ -42,7 +32,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Cadena de confianza determinista y transición de firmware a kernel',
     impactPhrase:
       'El encendido del silicio no es magia: es una cadena determinista de instrucciones desde el primer microvoltio en la placa madre.',
-    architectureBadge: 'ESQUEMA CONCEPTUAL // CADENA DE ARRANQUE UEFI ➔ ESP ➔ BCD ➔ WINLOAD ➔ NTOSKRNL',
+    architectureBadge: 'CADENA DE ARRANQUE // DE UEFI Y PARTICIÓN ESP AL KERNEL NT',
     whatYouWillUnderstand:
       'Secuencia UEFI, tabla GPT, partición ESP, el almacén BCD y la transferencia al bootloader Winload.efi.',
     whatYouWillVerify:
@@ -55,7 +45,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Árbol transaccional NTFS, almacén inmutable y jerarquía física NVMe',
     impactPhrase:
       'El disco no almacena archivos: gestiona un árbol binario transaccional donde cada byte tiene un propietario y un registro de auditoría.',
-    architectureBadge: 'ESQUEMA CONCEPTUAL // ESTRUCTURA NTFS $MFT RECORD 0 ➔ WINSXS HARDLINKS ➔ NVMe',
+    architectureBadge: 'ESTRUCTURA DE ALMACENAMIENTO // MFT TRANSACCIONAL Y WINSXS',
     whatYouWillUnderstand:
       'La tabla maestra MFT de NTFS, el almacén inmutable WinSxS, la separación System32 vs SysWOW64 y la compresión Compact.',
     whatYouWillVerify:
@@ -68,7 +58,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Arquitectura híbrida NT, aislamiento Ring 0/Ring 3 y gestión de páginas',
     impactPhrase:
       'La RAM libre es memoria desperdiciada. El Kernel NT no vacía: organiza, pagina y proyecta páginas de memoria bajo demanda física.',
-    architectureBadge: 'ESQUEMA CONCEPTUAL // MODELO RING 0 / RING 3 ➔ TABLAS CR3 ➔ COMMIT CHARGE',
+    architectureBadge: 'ARQUITECTURA NT // FRONTERA RING 3/RING 0 Y COMMIT CHARGE',
     whatYouWillUnderstand:
       'Commit Charge vs Working Set, Standby List, Paged vs Non-Paged Pool, despachador de interrupciones y latencias DPC.',
     whatYouWillVerify:
@@ -81,7 +71,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Matriz de aislamiento svchost, sockets en escucha y eventos de servicio',
     impactPhrase:
       'Un proceso no es un programa: es un contenedor de hilos. Svchost agrupa servicios compartidos para ahorrar recursos, no para ocultar actividad.',
-    architectureBadge: 'ESQUEMA CONCEPTUAL // MATRIZ SVCHOST ➔ SCM ➔ SOCKETS TCP/UDP ➔ SCHEDULER',
+    architectureBadge: 'MATRIZ DE SERVICIOS // SCM, SVCHOST Y SOCKETS DE RED',
     whatYouWillUnderstand:
       'La arquitectura svchost.exe compartida, sockets TCP/UDP en escucha, SysMain, indexación inteligente y disparadores por eventos.',
     whatYouWillVerify:
@@ -94,7 +84,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Colmenas binarias atómicas, tokens de elevación y barreras UIPI',
     impactPhrase:
       'El Registro es una base de datos atómica en memoria. Desactivar el UAC no te hace técnico: le entrega la llave de Ring 0 a cualquier script.',
-    architectureBadge: 'ESQUEMA CONCEPTUAL // COLMENAS REGISTRO ➔ TOKENS UAC ➔ NIVELES DE INTEGRIDAD',
+    architectureBadge: 'COLMENAS DEL REGISTRO // TOKENS UAC Y BARRERAS UIPI',
     whatYouWillUnderstand:
       'Colmenas físicas del Registro (SAM, SYSTEM, SOFTWARE), permisos ACL, tokens de elevación UAC, directiva UIPI y telemetría.',
     whatYouWillVerify:
@@ -107,7 +97,7 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
     subtitle: 'Triangulación de fallos, volcados BSOD, WinRE y reparación in-place',
     impactPhrase:
       'El mejor técnico no es el que formatea más rápido, sino el que rescata el sistema sin destruir un solo dato ni tocar la partición del usuario.',
-    architectureBadge: 'ESQUEMA CONCEPTUAL // TRIANGULACIÓN BSOD ➔ VOLCADOS DMP ➔ REPARACIÓN IN-PLACE',
+    architectureBadge: 'TRIANGULACIÓN FORENSE // WINRE, DUMPS BSOD Y PERFMON',
     whatYouWillUnderstand:
       'El entorno de recuperación WinRE, reconstrucción de BCD, diagnóstico de volcados BSOD (Minidumps), triage en vivo y reparación in-place.',
     whatYouWillVerify:
@@ -117,293 +107,8 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
 };
 
 // ============================================================================
-// BESPOKE VECTOR TECHNICAL ARCHITECTURE SCHEMATICS (100% TOMO 02 IDENTITY)
-// Strict Data Discipline: Explicitly labeled as ESQUEMA CONCEPTUAL // NO MEDIDO EN TU PC
-// ============================================================================
-
-interface SectionSchematicProps {
-  sectionId: string;
-  isCompact?: boolean;
-}
-
-const Tomo02SectionSchematic: React.FC<SectionSchematicProps> = ({ sectionId, isCompact = false }) => {
-  switch (sectionId) {
-    case 'm00':
-      // SECCIÓN I: ARRANQUE & DESPLIEGUE (UEFI -> ESP -> BCD -> WINLOAD -> KERNEL NT)
-      return (
-        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
-          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
-
-          {/* Top header with strict non-measurement disclaimer */}
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
-            <span className="flex items-center gap-1 truncate font-bold">
-              <Zap className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
-              CADENA DE ARRANQUE // SECUENCIA DETERMINISTA
-            </span>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
-                ESQUEMA CONCEPTUAL
-              </span>
-              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
-                NO MEDIDO EN TU PC
-              </span>
-            </div>
-          </div>
-
-          {/* Vector Flow Nodes */}
-          <div className="grid grid-cols-5 gap-1.5 items-center z-10 my-auto py-1">
-            {[
-              { name: 'UEFI NVRAM', tag: 'Firmware POST', color: 'border-cyan-700 bg-cyan-950/70 text-cyan-300' },
-              { name: 'ESP (FAT32)', tag: 'Partición EFI', color: 'border-cyan-600 bg-cyan-900/50 text-cyan-200' },
-              { name: 'BCD STORE', tag: 'Almacén Boot', color: 'border-blue-600 bg-blue-950/70 text-blue-200' },
-              { name: 'WINLOAD.EFI', tag: 'Cargador PE/64', color: 'border-emerald-600 bg-emerald-950/70 text-emerald-200' },
-              { name: 'NTOSKRNL', tag: 'Núcleo Ring 0', color: 'border-cyan-400 bg-cyan-950 text-white font-bold' },
-            ].map((node, i) => (
-              <div key={i} className="flex flex-col items-center text-center">
-                <div className={`w-full py-1 px-0.5 rounded border ${node.color} shadow-sm`}>
-                  <div className="text-[8px] font-bold truncate leading-none">{node.name}</div>
-                  <div className="text-[7px] opacity-80 tracking-tighter mt-0.5 leading-none">{node.tag}</div>
-                </div>
-                {i < 4 && (
-                  <span className="hidden lg:block text-[8px] text-cyan-500 font-black mt-0.5">➔</span>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Bottom architecture verification string */}
-          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">Transición: 0x7C00 ➔ KiSystemStartup ➔ Phase0Init</span>
-            <span className="text-cyan-400 font-bold">ESTÁNDAR UEFI / SECURE BOOT</span>
-          </div>
-        </div>
-      );
-
-    case 'm03':
-      // SECCIÓN II: SISTEMA DE ARCHIVOS & ALMACENAMIENTO (NTFS / MFT / WinSxS / NVMe)
-      return (
-        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
-          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
-
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
-            <span className="flex items-center gap-1 truncate font-bold">
-              <HardDrive className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
-              ESTRUCTURA DE VOLUMEN NTFS & ALMACÉN
-            </span>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
-                ESQUEMA CONCEPTUAL
-              </span>
-              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
-                NO MEDIDO EN TU PC
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
-            {[
-              { title: '$MFT REC 0', desc: 'Tabla Maestra', badge: 'Registro 1024B', color: 'border-cyan-600 bg-cyan-950/80' },
-              { title: '$LogFile', desc: 'Transacciones', badge: 'Journaling', color: 'border-blue-600 bg-blue-950/80' },
-              { title: 'WinSxS Tree', desc: 'Side-by-Side', badge: 'Hardlinks Inm.', color: 'border-emerald-600 bg-emerald-950/80' },
-              { title: 'NVMe LBA', desc: 'Bloques 4KB', badge: 'Acceso Físico', color: 'border-cyan-400 bg-cyan-900/70 text-cyan-100' },
-            ].map((node, i) => (
-              <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
-                <div className="text-[8px] font-bold text-white truncate leading-none">{node.title}</div>
-                <div className="text-[7px] text-zinc-300 truncate mt-0.5 leading-none">{node.desc}</div>
-                <div className="text-[6.5px] text-cyan-300 font-semibold mt-0.5">{node.badge}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">Modelo: DISM /AnalyzeComponentStore // Auditoría de Hardlinks</span>
-            <span className="text-cyan-400 font-bold">ESTRUCTURA NTFS v3.1</span>
-          </div>
-        </div>
-      );
-
-    case 'm06':
-      // SECCIÓN III: KERNEL, PROCESOS & MEMORIA VIRTUAL (Ring 0 / Ring 3 / CR3 Page Tables / Commit Charge)
-      return (
-        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
-          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
-
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
-            <span className="flex items-center gap-1 truncate font-bold">
-              <Cpu className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
-              ARQUITECTURA DE NÚCLEO NT // AISLAMIENTO
-            </span>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
-                ESQUEMA CONCEPTUAL
-              </span>
-              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
-                NO MEDIDO EN TU PC
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 items-center z-10 my-auto py-1">
-            <div className="p-1.5 rounded border border-blue-600/70 bg-blue-950/60 text-center">
-              <div className="text-[7.5px] text-blue-300 font-bold leading-none">RING 3 (USER MODE)</div>
-              <div className="text-[8px] text-white font-bold mt-1">Apps / Subsystem</div>
-              <div className="text-[6.5px] text-blue-200/80 mt-0.5">Espacio VA Aislado</div>
-            </div>
-
-            <div className="p-1.5 rounded border border-cyan-500 bg-cyan-950/90 text-center shadow-[0_0_8px_rgba(0,210,255,0.15)]">
-              <div className="text-[7.5px] text-cyan-400 font-bold leading-none">SYSCALL / SSDT</div>
-              <div className="text-[8px] text-white font-bold mt-1">KiSystemCall64</div>
-              <div className="text-[6.5px] text-cyan-300 mt-0.5">Transición de Privilegio</div>
-            </div>
-
-            <div className="p-1.5 rounded border border-purple-600/70 bg-purple-950/60 text-center">
-              <div className="text-[7.5px] text-purple-300 font-bold leading-none">RING 0 (KERNEL MODE)</div>
-              <div className="text-[8px] text-white font-bold mt-1">HAL / Drivers / Pools</div>
-              <div className="text-[6.5px] text-purple-200/80 mt-0.5">Paged & Non-Paged</div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">Concepto: Commit Charge Limit vs Working Set Pool</span>
-            <span className="text-cyan-400 font-bold">MODELO DE MEMORIA VIRTUAL</span>
-          </div>
-        </div>
-      );
-
-    case 'm10':
-      // SECCIÓN IV: RED, SERVICIOS & AUTOMATIZACIÓN (svchost / services / sockets / scheduler)
-      return (
-        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
-          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
-
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
-            <span className="flex items-center gap-1 truncate font-bold">
-              <Network className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
-              MATRIZ SVCHOST & SERVICE CONTROL MANAGER
-            </span>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
-                ESQUEMA CONCEPTUAL
-              </span>
-              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
-                NO MEDIDO EN TU PC
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
-            {[
-              { group: '-k netsvcs', item: 'Dhcp, Dnscache', port: 'Ej: :53, :68', color: 'border-cyan-600 bg-cyan-950/80' },
-              { group: '-k LocalService', item: 'EventLog, W32Time', port: 'Ej: :123 NTP', color: 'border-blue-600 bg-blue-950/80' },
-              { group: '-k DcomLaunch', item: 'RPC Endpoint', port: 'Ej: :135 RPC', color: 'border-emerald-600 bg-emerald-950/80' },
-              { group: 'TaskScheduler', item: 'Disparadores', port: 'Triggers de Evento', color: 'border-cyan-500 bg-cyan-900/80' },
-            ].map((node, i) => (
-              <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
-                <div className="text-[7.5px] font-bold text-cyan-300 truncate leading-none">{node.group}</div>
-                <div className="text-[7px] text-white font-medium truncate mt-0.5 leading-none">{node.item}</div>
-                <div className="text-[6.5px] text-zinc-300 mt-0.5">{node.port}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">Desambiguación: tasklist /svc (Asociación PID ➔ DLL)</span>
-            <span className="text-cyan-400 font-bold">SERVICE CONTROL MANAGER</span>
-          </div>
-        </div>
-      );
-
-    case 'm14':
-      // SECCIÓN V: TERMINAL, REGISTRO & CIBERSEGURIDAD (PowerShell / Registry Hives / UAC / UIPI)
-      return (
-        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
-          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
-
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
-            <span className="flex items-center gap-1 truncate font-bold">
-              <Shield className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
-              COLMENAS DE REGISTRO & BARRERAS UAC
-            </span>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
-                ESQUEMA CONCEPTUAL
-              </span>
-              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
-                NO MEDIDO EN TU PC
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
-            {[
-              { hive: 'HKLM\\SYSTEM', target: 'ControlSet / HW', acl: 'Control Total Kernel', color: 'border-cyan-600 bg-cyan-950/80' },
-              { hive: 'HKLM\\SAM', target: 'Cuentas Locales', acl: 'Acceso Restringido', color: 'border-red-600/70 bg-red-950/50' },
-              { hive: 'TOKEN UAC', target: 'Split Token SID', acl: 'High vs Medium Level', color: 'border-amber-600/80 bg-amber-950/50' },
-              { hive: 'POWERSHELL', target: 'Motor de Scripts', acl: 'ExecutionPolicy & AST', color: 'border-blue-600 bg-blue-950/80' },
-            ].map((node, i) => (
-              <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
-                <div className="text-[7.5px] font-bold text-white truncate leading-none">{node.hive}</div>
-                <div className="text-[7px] text-zinc-300 truncate mt-0.5 leading-none">{node.target}</div>
-                <div className="text-[6.5px] text-cyan-300 mt-0.5">{node.acl}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">Auditoría: whoami /groups (Aislamiento de Privilegios UIPI)</span>
-            <span className="text-cyan-400 font-bold">ESTRUCTURA DE COLMENAS</span>
-          </div>
-        </div>
-      );
-
-    case 'm19':
-    default:
-      // SECCIÓN VI: RECUPERACIÓN & TALLER (WinRE / BSOD BugCheck / SFC / DISM / perfmon)
-      return (
-        <div className="w-full h-full min-h-[96px] bg-[#030914] relative overflow-hidden rounded-xl border border-cyan-900/60 p-3 flex flex-col justify-between font-mono-tech select-none">
-          <div className="absolute inset-0 bg-[radial-gradient(#00D2FF_1px,transparent_1px)] [background-size:12px_12px] opacity-15 pointer-events-none" />
-
-          <div className="flex items-center justify-between text-[9px] text-cyan-400/90 z-10 gap-2">
-            <span className="flex items-center gap-1 truncate font-bold">
-              <Wrench className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
-              TRIANGULACIÓN FORENSE & REPARACIÓN IN-PLACE
-            </span>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="px-1.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-700/80 text-[7.5px] text-cyan-300 font-bold uppercase tracking-wider">
-                ESQUEMA CONCEPTUAL
-              </span>
-              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-zinc-900/90 border border-zinc-800 text-[7.5px] text-zinc-400">
-                NO MEDIDO EN TU PC
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 gap-1.5 items-center z-10 my-auto py-1">
-            {[
-              { action: 'BUGCHECK BSOD', metric: 'Ej: 0x0000003B', note: 'Código de Fallo', color: 'border-red-600/70 bg-red-950/60' },
-              { action: 'VOLCADO DMP', metric: 'MEMORY.DMP', note: 'Pila de Ejecución', color: 'border-blue-600 bg-blue-950/80' },
-              { action: 'AUDITORÍA SFC', metric: 'CBS.log / Hash', note: 'Verificación Archivo', color: 'border-amber-600/80 bg-amber-950/60' },
-              { action: 'DISM RESTORE', metric: 'ComponentStore', note: 'No Destructivo', color: 'border-emerald-600 bg-emerald-950/80' },
-            ].map((node, i) => (
-              <div key={i} className={`p-1 rounded border ${node.color} text-center`}>
-                <div className="text-[7.5px] font-bold text-white truncate leading-none">{node.action}</div>
-                <div className="text-[7px] text-cyan-300 font-mono mt-0.5 leading-none">{node.metric}</div>
-                <div className="text-[6.5px] text-zinc-400 mt-0.5">{node.note}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-between text-[8px] text-zinc-400 z-10 border-t border-cyan-950/70 pt-1">
-            <span className="truncate">Procedimiento: reagentc /info ➔ Pipeline Reversible de Taller</span>
-            <span className="text-emerald-400 font-bold">FLUJO DE RECUPERACIÓN</span>
-          </div>
-        </div>
-      );
-  }
-};
-
-// ============================================================================
 // MAIN COMPONENT: TOMO 02 EDITORIAL SECTION OPENER
+// High-Fidelity Editorial Section Header (Parity with Tomo 01 ChapterHeroOpener)
 // ============================================================================
 
 interface Tomo02EditorialSectionOpenerProps {
@@ -413,7 +118,6 @@ interface Tomo02EditorialSectionOpenerProps {
 
 export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpenerProps> = ({
   moduleId,
-  compact = true,
 }) => {
   const data = SECTION_OPENERS_DATA[moduleId] || SECTION_OPENERS_DATA.m00;
 
@@ -422,143 +126,89 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
     .map((id) => TOMO_02_MODULES.find((m) => m.id === id))
     .filter(Boolean) as TomoModuleItem[];
 
-  if (compact) {
-    return (
-      <header className="mb-3.5 p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-[#020611] via-[#040C20] to-[#010309] border border-cyan-500/40 shadow-xl font-sans-editorial h-auto">
-        <div className="flex flex-col md:flex-row items-center gap-3.5">
-          {/* Section Architectural Vector Schematic */}
-          <div className="w-full md:w-52 h-24 rounded-lg overflow-hidden shrink-0 shadow-lg border border-cyan-800/80">
-            <Tomo02SectionSchematic sectionId={moduleId} isCompact={true} />
-          </div>
-
-          {/* Section Title, Impact Quote & Metadata */}
-          <div className="flex-1 space-y-1 min-w-0 h-auto">
-            <div className="flex items-center gap-2 text-[10px] font-mono-tech text-cyan-400 uppercase tracking-widest font-bold">
-              <span>SECCIÓN {data.romanNumber} // BLOQUE EDITORIAL MAESTRO</span>
-              <span className="text-zinc-600">·</span>
-              <span className="text-zinc-400">{sectionModules.length} MÓDULOS</span>
-            </div>
-
-            <h2 className="text-base sm:text-lg font-display font-black text-white uppercase tracking-tight leading-tight truncate">
-              {data.sectionTitle}
-            </h2>
-
-            <p className="text-[11px] sm:text-xs text-cyan-200/90 italic font-sans-editorial line-clamp-1">
-              “{data.impactPhrase}”
-            </p>
-
-            {/* Quick 2-Column Insight: Qué vas a entender / Qué vas a comprobar */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[10px] font-mono-tech border-t border-cyan-950/70 items-start">
-              <div className="truncate">
-                <span className="text-cyan-400 font-bold">▸ ENTENDER: </span>
-                <span className="text-zinc-300 font-sans-editorial">{data.whatYouWillUnderstand}</span>
-              </div>
-              <div className="truncate">
-                <span className="text-emerald-400 font-bold">▸ COMPROBAR: </span>
-                <span className="text-zinc-300 font-sans-editorial">{data.whatYouWillVerify}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Dynamic Modules list resolved strictly from TOMO_02_MODULES */}
-        <div className="mt-2 pt-1.5 border-t border-cyan-950/80 flex items-center gap-2 overflow-x-auto text-[10px] font-mono-tech scrollbar-none h-auto">
-          <span className="text-zinc-500 uppercase tracking-wider shrink-0 font-bold">
-            MÓDULOS SECCIÓN {data.romanNumber}:
-          </span>
-          <div className="flex items-center gap-1.5 shrink-0">
-            {sectionModules.map((item) => (
-              <span
-                key={item.id}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-900/60 text-[9.5px]"
-              >
-                <span className="text-cyan-400 font-bold">{item.moduleNumber} —</span>
-                <span className="text-zinc-200 font-medium truncate max-w-[200px]">{item.title}</span>
-              </span>
-            ))}
-          </div>
-        </div>
-      </header>
-    );
-  }
-
-  // Full-Page View
   return (
-    <div className="flex flex-col space-y-3 font-sans-editorial h-auto">
-      <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
-        <div className="flex items-center gap-3">
-          <span className="font-display font-black text-2xl sm:text-3xl text-cyan-400">
+    <header className="mb-3.5 p-3.5 rounded-xl bg-gradient-to-r from-[#030814] via-[#051026] to-[#02050D] border border-cyan-500/40 shadow-2xl font-sans-editorial h-auto space-y-2.5">
+      {/* 1. Top Metadata Bar */}
+      <div className="flex items-center justify-between pb-1.5 border-b border-cyan-950/80">
+        <div className="flex items-center gap-2.5">
+          <span className="text-xs font-mono-tech tracking-widest uppercase font-black px-2.5 py-0.5 rounded bg-cyan-950/90 border border-cyan-500/50 text-cyan-300">
             SECCIÓN {data.romanNumber}
           </span>
-          <span className="text-zinc-600 font-mono-tech">/</span>
-          <span className="text-xs font-mono-tech uppercase tracking-widest text-zinc-400 font-semibold">
+          <span className="text-[11px] font-mono-tech uppercase tracking-widest text-zinc-300 font-bold">
             BLOQUE EDITORIAL MAESTRO
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 font-mono-tech text-[10px] font-bold uppercase tracking-wider">
+          <span className="text-[10px] font-mono-tech text-cyan-400 font-bold uppercase tracking-wider">
             {sectionModules.length} MÓDULOS DE INVESTIGACIÓN
           </span>
         </div>
       </div>
 
-      <div className="space-y-1 pt-0.5">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-black text-white uppercase tracking-tight leading-[1.08]">
+      {/* 2. Main Title & Subtitle */}
+      <div className="space-y-0.5">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-display font-black text-white uppercase tracking-tight leading-[1.05]">
           {data.sectionTitle}
         </h2>
-        <p className="text-xs sm:text-sm text-cyan-300 font-sans-editorial italic font-medium leading-snug">
-          “{data.impactPhrase}”
+        <p className="font-mono-tech text-xs sm:text-[12.5px] uppercase tracking-wider text-cyan-400 font-bold">
+          {data.subtitle}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
-        <div className="lg:col-span-6 flex flex-col space-y-2 h-auto">
-          <div className="h-[230px] rounded-2xl overflow-hidden bg-black border border-cyan-950/80 shadow-2xl relative">
-            <Tomo02SectionSchematic sectionId={moduleId} isCompact={false} />
-          </div>
-          <span className="text-[9.5px] font-mono-tech text-cyan-400/80 uppercase tracking-wider block">
-            {data.architectureBadge}
+      {/* 3. Editorial Lead & Key Insights (No microboxes, pure editorial typography) */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 pt-1 border-t border-cyan-950/70 items-start">
+        {/* Provocative Quote / Impact Statement */}
+        <div className="md:col-span-6 p-3 rounded-lg bg-black/60 border-l-3 border-cyan-400 border-t border-r border-b border-cyan-950/60">
+          <span className="text-[10px] font-mono-tech text-cyan-400 uppercase tracking-wider font-bold block mb-1 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            PRINCIPIO DETERMINISTA:
           </span>
+          <p className="text-xs sm:text-[12.5px] text-zinc-100 font-sans-editorial leading-snug italic font-medium">
+            “{data.impactPhrase}”
+          </p>
         </div>
 
-        <div className="lg:col-span-6 flex flex-col space-y-2.5 h-auto">
-          <div className="p-3 rounded-xl bg-zinc-950/90 border border-cyan-950 space-y-1 text-xs h-auto">
-            <span className="text-[10px] font-mono-tech text-cyan-400 uppercase tracking-wider font-bold block">
-              ▸ QUÉ VAS A ENTENDER EN ESTA SECCIÓN:
+        {/* Understand & Verify Editorial Columns */}
+        <div className="md:col-span-6 space-y-1.5 font-sans-editorial text-xs">
+          <div className="p-2 rounded-lg bg-[#070D1C] border border-cyan-950">
+            <span className="text-[10px] font-mono-tech text-cyan-300 font-bold uppercase tracking-wide block mb-0.5">
+              ▸ ARQUITECTURA CLAVE:
             </span>
-            <p className="text-zinc-200 font-sans-editorial text-[11px] leading-snug">
+            <p className="text-zinc-200 text-[11px] leading-tight">
               {data.whatYouWillUnderstand}
             </p>
           </div>
-
-          <div className="p-3 rounded-xl bg-zinc-950/90 border border-cyan-950 space-y-1 text-xs h-auto">
-            <span className="text-[10px] font-mono-tech text-emerald-400 uppercase tracking-wider font-bold block">
-              ▸ QUÉ VAS A COMPROBAR EN LABORATORIO:
+          <div className="p-2 rounded-lg bg-[#070D1C] border border-emerald-950">
+            <span className="text-[10px] font-mono-tech text-emerald-400 font-bold uppercase tracking-wide block mb-0.5">
+              ▸ COMPROBACIÓN EN LABORATORIO:
             </span>
-            <p className="text-zinc-200 font-sans-editorial text-[11px] leading-snug">
+            <p className="text-zinc-200 text-[11px] leading-tight">
               {data.whatYouWillVerify}
             </p>
           </div>
-
-          <div className="p-3 rounded-xl bg-black/60 border border-cyan-950/80 space-y-2 text-xs h-auto">
-            <span className="text-[10px] font-mono-tech text-zinc-400 uppercase tracking-wider font-bold block border-b border-zinc-900 pb-1">
-              MÓDULOS DE INVESTIGACIÓN INCLUIDOS:
-            </span>
-            <div className="space-y-1.5 font-mono-tech text-[10.5px]">
-              {sectionModules.map((item) => (
-                <div key={item.id} className="flex items-center gap-2 text-zinc-300">
-                  <span className="w-4 h-4 rounded bg-cyan-950 text-cyan-400 flex items-center justify-center font-bold text-[9px] border border-cyan-800">
-                    {item.moduleNumber}
-                  </span>
-                  <span className="font-semibold text-white">
-                    {item.moduleNumber} — {item.title}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
-    </div>
+
+      {/* 4. Clean Module Sequence Navigation Strip */}
+      <div className="pt-1.5 border-t border-cyan-950/80 flex items-center gap-2 overflow-x-auto text-xs font-mono-tech scrollbar-none h-auto">
+        <span className="text-zinc-400 uppercase tracking-wider shrink-0 font-bold text-[10.5px]">
+          SECUENCIA SECCIÓN {data.romanNumber}:
+        </span>
+        <div className="flex items-center gap-2 shrink-0">
+          {sectionModules.map((item, idx) => (
+            <div
+              key={item.id}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-cyan-950/80 border border-cyan-800/80 text-xs font-mono-tech"
+            >
+              <span className="text-cyan-400 font-black">#{item.moduleNumber}</span>
+              <span className="text-white font-semibold truncate max-w-[220px]">{item.title}</span>
+              {idx < sectionModules.length - 1 && (
+                <span className="text-cyan-600 font-bold ml-0.5">➔</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </header>
   );
 };

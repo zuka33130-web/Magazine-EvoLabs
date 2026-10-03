@@ -312,7 +312,7 @@ function AppContent() {
           whatFor: 'Validar tu entendimiento real de hardware, telemetría y diagnósticos con 15 preguntas aleatorias.',
           currentAction: 'Respondé cada pregunta analizando las premisas y revisá tus respuestas antes de entregar.',
           whatToLookFor: 'Preguntas de elección simple, múltiple, secuencias, análisis de gráficos y casos de taller.',
-          whyItMatters: 'Alcanzar el 75% o más otorga la distinción oficial "TEORÍA COMPROBADA".',
+          whyItMatters: 'Alcanzar el 75% o más otorga la distinción EVO "TEORÍA COMPROBADA".',
           nextStep: 'Revisá la devolución pericial y continuá al Laboratorio de Identidad y Hardware.',
         });
         saveCurrentLocationHistory('tomo01-quiz', '01', 'Examen Final Tomo 01');
@@ -326,7 +326,7 @@ function AppContent() {
           activityType: 'lectura',
           whatIs: 'Tomo 02: La Biblia Negra de Windows. El lado oscuro del sistema operativo.',
           whatFor: 'Comprender el kernel, registros, telemetría, servicios ocultos y auditoría de Windows.',
-          currentAction: 'Leé el Magazine de 67 páginas, realizá las prácticas o rendí el Examen Final.',
+          currentAction: 'Leé el Magazine editorial de 38 páginas A4, realizá las prácticas o rendí el Examen Final.',
           whyItMatters: 'Dominar Windows a nivel pericial te permite detectar cuellos de botella y fallas invisibles.',
           nextStep: 'Accedé al Laboratorio Virtual Guiado de Windows (Matrix Lab).',
         });
