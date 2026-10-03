@@ -31,7 +31,8 @@ import {
   EvoAgentClient,
 } from '../../../evoLabCore/services/evoAgentClient';
 
-type LabMode = 'BOOT' | 'FAILURES' | 'INSTALL' | 'SERVICES';
+export type WindowsXRayMode = 'BOOT' | 'FAILURES' | 'INSTALL' | 'SERVICES';
+type LabMode = WindowsXRayMode;
 type DepthMode = 'ENTENDER' | 'PROFUNDIZAR' | 'HACER';
 type ServiceMode = 'SIMULATED' | 'REAL';
 
@@ -651,19 +652,39 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export interface EvoWindowsXRayLabProps {
   initialScenario?: string;
+  forcedMode?: WindowsXRayMode;
+  hideModeTabs?: boolean;
 }
 
-export const EvoWindowsXRayLab: React.FC<EvoWindowsXRayLabProps> = ({ initialScenario }) => {
-  const initialMode: LabMode =
-    initialScenario === 'windows-install'
-      ? 'INSTALL'
-      : initialScenario === 'services-baseline'
-      ? 'SERVICES'
-      : initialScenario === 'repair'
-      ? 'FAILURES'
-      : 'BOOT';
+const resolveXRayMode = (
+  initialScenario?: string,
+  forcedMode?: WindowsXRayMode
+): LabMode => {
+  if (forcedMode) return forcedMode;
+  if (!initialScenario) return 'BOOT';
 
-  const [mode, setMode] = useState<LabMode>(initialMode);
+  const scenario = initialScenario.toLowerCase();
+  if (scenario.includes('install') || scenario.includes('format')) return 'INSTALL';
+  if (scenario.includes('service')) return 'SERVICES';
+  if (
+    scenario.includes('repair') ||
+    scenario.includes('failure') ||
+    scenario.includes('falla') ||
+    scenario.includes('diagnostic')
+  ) {
+    return 'FAILURES';
+  }
+  return 'BOOT';
+};
+
+export const EvoWindowsXRayLab: React.FC<EvoWindowsXRayLabProps> = ({
+  initialScenario,
+  forcedMode,
+  hideModeTabs = false,
+}) => {
+  const [mode, setMode] = useState<LabMode>(() =>
+    resolveXRayMode(initialScenario, forcedMode)
+  );
   const [depth, setDepth] = useState<DepthMode>('ENTENDER');
   const [xrayEnabled, setXrayEnabled] = useState(true);
   const [bootIndex, setBootIndex] = useState(0);
@@ -727,6 +748,10 @@ export const EvoWindowsXRayLab: React.FC<EvoWindowsXRayLabProps> = ({ initialSce
   useEffect(() => {
     void refreshAgent();
   }, []);
+
+  useEffect(() => {
+    setMode(resolveXRayMode(initialScenario, forcedMode));
+  }, [initialScenario, forcedMode]);
 
   useEffect(() => {
     if (!agentConnected) return;
@@ -869,23 +894,25 @@ export const EvoWindowsXRayLab: React.FC<EvoWindowsXRayLabProps> = ({ initialSce
           </button>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setMode(tab.id)}
-              className={`px-3 py-1.5 rounded-lg border text-[10px] font-black flex items-center gap-1.5 transition-all ${
-                mode === tab.id
-                  ? 'bg-cyan-400 text-black border-cyan-300'
-                  : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white'
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        {!hideModeTabs && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setMode(tab.id)}
+                className={`px-3 py-1.5 rounded-lg border text-[10px] font-black flex items-center gap-1.5 transition-all ${
+                  mode === tab.id
+                    ? 'bg-cyan-400 text-black border-cyan-300'
+                    : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:text-white'
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="p-4 sm:p-5 grid grid-cols-1 xl:grid-cols-12 gap-4">
