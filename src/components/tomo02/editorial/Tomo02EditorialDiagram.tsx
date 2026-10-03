@@ -16,9 +16,9 @@ export const Tomo02EditorialDiagram: React.FC<Tomo02EditorialDiagramProps> = ({
   const meta = getVisualPedagogicalMeta(module.id, module, richData);
 
   return (
-    <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
+    <div className="flex flex-col space-y-3 font-sans-editorial h-auto">
       {/* Header Bar */}
-      <div className="border-b border-cyan-950/80 pb-2.5 flex items-baseline justify-between">
+      <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
         <div>
           <div className="flex items-center gap-2 text-[10px] font-mono-tech text-cyan-400 uppercase tracking-widest mb-0.5">
             <span>EXPEDIENTE VISUAL [{module.moduleNumber}]</span>
@@ -40,30 +40,30 @@ export const Tomo02EditorialDiagram: React.FC<Tomo02EditorialDiagramProps> = ({
       </div>
 
       {/* Center Dominant Visual Stage */}
-      <div className="flex-1 min-h-[290px] max-h-[440px] rounded-xl overflow-hidden border border-cyan-900/80 bg-[#040812] shadow-2xl relative">
+      <div className="h-[280px] rounded-xl overflow-hidden border border-cyan-900/80 bg-[#040812] shadow-2xl relative">
         <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
       </div>
 
-      {/* 4-Column Technical Pedagogical Breakdown */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs font-mono-tech">
+      {/* 4-Point Technical Pedagogical Breakdown - 2x2 Clean Spacious Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono-tech items-start">
         {/* 1. Qué estás viendo */}
-        <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950/80 space-y-1">
-          <div className="flex items-center gap-1.5 text-cyan-400 text-[10px] font-bold uppercase tracking-wider">
-            <Eye className="w-3.5 h-3.5" />
+        <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5 h-auto">
+          <div className="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider">
+            <Eye className="w-4 h-4" />
             <span>QUÉ ESTÁS VIENDO</span>
           </div>
-          <p className="text-[10.5px] text-zinc-300 font-sans-editorial leading-snug">
+          <p className="text-xs text-zinc-200 font-sans-editorial leading-relaxed">
             {meta.whatYouAreSeeing}
           </p>
         </div>
 
         {/* 2. Puntos clave a observar */}
-        <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950/80 space-y-1">
-          <div className="flex items-center gap-1.5 text-cyan-400 text-[10px] font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
+        <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5 h-auto">
+          <div className="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider">
+            <Sparkles className="w-4 h-4" />
             <span>PUNTOS DE LECTURA</span>
           </div>
-          <div className="space-y-1 text-[10px] text-zinc-300 font-sans-editorial leading-tight">
+          <div className="space-y-1 text-xs text-zinc-200 font-sans-editorial leading-relaxed">
             {meta.focalPoints?.slice(0, 2).map((fp, i) => (
               <div key={i}>
                 <strong className="text-cyan-300 font-mono-tech">{fp.label}:</strong> {fp.detail}
@@ -75,32 +75,32 @@ export const Tomo02EditorialDiagram: React.FC<Tomo02EditorialDiagramProps> = ({
         </div>
 
         {/* 3. Qué significa en el Kernel */}
-        <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950/80 space-y-1">
-          <div className="flex items-center gap-1.5 text-blue-400 text-[10px] font-bold uppercase tracking-wider">
-            <Info className="w-3.5 h-3.5" />
+        <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5 h-auto">
+          <div className="flex items-center gap-2 text-blue-400 text-xs font-bold uppercase tracking-wider">
+            <Info className="w-4 h-4" />
             <span>FÍSICA DEL SISTEMA</span>
           </div>
-          <p className="text-[10.5px] text-zinc-300 font-sans-editorial leading-snug">
+          <p className="text-xs text-zinc-200 font-sans-editorial leading-relaxed">
             {richData?.evoExplains
-              ? richData.evoExplains.slice(0, 180) + '...'
+              ? richData.evoExplains.slice(0, 220) + '...'
               : module.summary}
           </p>
         </div>
 
         {/* 4. Por qué importa al perito */}
-        <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/40 space-y-1">
-          <div className="flex items-center gap-1.5 text-cyan-300 text-[10px] font-bold uppercase tracking-wider">
-            <CheckCircle2 className="w-3.5 h-3.5" />
+        <div className="p-3.5 rounded-xl bg-cyan-950/30 border border-cyan-500/40 space-y-1.5 h-auto">
+          <div className="flex items-center gap-2 text-cyan-300 text-xs font-bold uppercase tracking-wider">
+            <CheckCircle2 className="w-4 h-4" />
             <span>POR QUÉ IMPORTA</span>
           </div>
-          <p className="text-[10.5px] text-zinc-200 font-sans-editorial leading-snug">
+          <p className="text-xs text-zinc-100 font-sans-editorial leading-relaxed">
             {meta.whyItMatters}
           </p>
         </div>
       </div>
 
       {/* Bottom Technical Callout Bar */}
-      <div className="p-2.5 rounded-lg bg-black/60 border border-cyan-950/80 text-[10px] font-mono-tech text-zinc-400 flex flex-wrap items-center justify-between gap-2">
+      <div className="p-3 rounded-xl bg-black/70 border border-cyan-950/90 text-xs font-mono-tech text-zinc-300 flex flex-wrap items-center justify-between gap-2 h-auto">
         <div className="flex items-center gap-2">
           <span className="text-cyan-400 font-bold">REGLA FORENSE:</span>
           <span>{module.reversibility || module.scientificFact || 'Verificar siempre con telemetría antes de modificar el estado del sistema.'}</span>

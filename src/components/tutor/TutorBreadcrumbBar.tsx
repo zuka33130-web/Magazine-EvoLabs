@@ -15,7 +15,7 @@ export const TutorBreadcrumbBar: React.FC = () => {
   } = useTutorEvo();
 
   return (
-    <aside aria-label="Orientación Permanente Tutor EVO" className="w-full bg-[#080c14] border-b border-zinc-800/80 px-4 py-2 text-xs font-sans-editorial select-none transition-all">
+    <aside aria-label="Orientación Permanente Tutor EVO" className="w-full bg-[#080c14] border-b border-zinc-800/80 px-4 py-2 text-xs font-sans-editorial select-none transition-all print:hidden no-print">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-2">
         {/* Core Orientation: ESTÁS ACÁ • AHORA • DESPUÉS */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-mono">

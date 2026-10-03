@@ -27,14 +27,20 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
   children,
   pageId,
 }) => {
+  const isLast = isBackCover || pageNumber === totalPages;
+
   return (
     <article
       id={pageId}
+      data-page-id={pageId}
+      data-last-page={isLast ? 'true' : undefined}
+      data-is-back-cover={isBackCover ? 'true' : undefined}
       className={`a4-magazine-page relative mx-auto bg-[#08090C] text-zinc-100 overflow-hidden shadow-2xl transition-all duration-200 border border-cyan-950/60 print:border-none print:shadow-none print:m-0 print:p-0 ${
         isCover ? 'bg-[#040608]' : isBackCover ? 'bg-[#030406]' : 'bg-[#07090D]'
       }`}
       style={{
         boxSizing: 'border-box',
+        ...(isLast ? { breakAfter: 'avoid', pageBreakAfter: 'avoid' } : {}),
       }}
     >
       {/* Background Subtle Cyber-Matrix Technical Texture */}

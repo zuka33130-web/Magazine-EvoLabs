@@ -1065,10 +1065,10 @@ function AppContent() {
       <TutorBreadcrumbBar />
 
       {/* Main Body Container */}
-      <div className="flex-1 min-h-screen flex flex-col relative">
+      <div className="flex-1 min-h-screen print:min-h-0 flex flex-col relative print:p-0 print:m-0">
         {/* Subtle Ambient Workspace Top Glow */}
         <div
-          className="absolute top-0 left-0 right-0 h-[380px] pointer-events-none opacity-40 -z-10"
+          className="absolute top-0 left-0 right-0 h-[380px] pointer-events-none opacity-40 -z-10 print:hidden"
           style={{
             background:
               'radial-gradient(ellipse 80% 300px at 50% 0%, rgba(251, 191, 36, 0.05), transparent 70%)',
@@ -1076,7 +1076,7 @@ function AppContent() {
         />
 
         {/* Main View Render Stage */}
-        <main className="flex-1 w-full">
+        <main className="flex-1 w-full print:p-0 print:m-0 print:min-h-0">
           {currentView === 'magazine' && (
             <EvoMagazineView
               onBackToApp={handleNavigateTomo01}

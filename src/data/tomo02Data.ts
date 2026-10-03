@@ -169,6 +169,30 @@ export const TOMO_02_FOLDERS: SystemFolder[] = [
     canDeleteOrClean: 'Se pueden borrar tras su análisis.',
     howToClean: 'Abrirlos con WinDbg Preview (!analyze -v) para hallar el driver culpable antes de borrarlos.',
   },
+  {
+    id: 'f13',
+    path: 'C:\\Windows\\Logs\\CBS',
+    safetyBadge: 'VERDE',
+    purpose: 'Registros de mantenimiento basado en componentes (CBS) y reportes de auditoría de SFC y DISM.',
+    canDeleteOrClean: 'Archivos .log rotados se pueden eliminar con seguridad.',
+    howToClean: 'Revisar cbs.log para diagnosticar archivos corruptos antes de purgar historiales viejos.',
+  },
+  {
+    id: 'f14',
+    path: 'C:\\Windows\\LiveKernelReports',
+    safetyBadge: 'VERDE',
+    purpose: 'Informes y volcados de cuelgues leves generados en tiempo real por el Kernel sin causar BSOD completa.',
+    canDeleteOrClean: 'Totalmente seguro de vaciar.',
+    howToClean: 'Inspeccionar con WinDbg para detectar GPUs o drivers de red con cuelgues intermitentes.',
+  },
+  {
+    id: 'f15',
+    path: 'C:\\Windows\\Fonts',
+    safetyBadge: 'AMARILLO',
+    purpose: 'Repositorio del sistema de tipografías vectoriales TrueType y OpenType registradas en el subsistema GDI.',
+    canDeleteOrClean: 'NO eliminar fuentes del sistema (Segoe UI, Arial, Tahoma).',
+    howToClean: 'Desinstalar fuentes de terceros desde Configuración -> Personalización -> Fuentes.',
+  },
 ];
 
 export const TOMO_02_CASES: GuidedCase[] = [

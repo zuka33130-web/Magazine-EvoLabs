@@ -251,12 +251,12 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
           {pdfExists ? (
             <a
               href={activePdfUrl}
-              download="EVO-LABS-TOMO-02-DOMINA-WINDOWS.pdf"
+              download="EVO-LABS-TOMO-02-LA-BIBLIA-NEGRA-DE-WINDOWS.pdf"
               className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-extrabold hover:brightness-110 transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,210,255,0.4)] cursor-pointer"
               title={`Descargar archivo oficial: ${officialFilename}`}
             >
               <Download className="w-3.5 h-3.5" />
-              <span>DESCARGAR PDF (67 PÁGS)</span>
+              <span>DESCARGAR PDF HISTÓRICO (67 PÁGS)</span>
             </a>
           ) : (
             <button
@@ -269,10 +269,10 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
                 }
               }}
               className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-extrabold hover:brightness-110 transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,210,255,0.4)] cursor-pointer"
-              title="Abrir Revista A4 para exportar o imprimir PDF"
+              title="Abrir Revista A4 para exportar o guardar en PDF"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>IMPRIMIR / EXPORTAR A4</span>
+              <span>DESCARGAR / IMPRIMIR PDF A4</span>
             </button>
           )}
         </div>

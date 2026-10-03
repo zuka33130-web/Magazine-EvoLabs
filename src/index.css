@@ -210,22 +210,26 @@
     padding: 0 !important;
     width: 210mm !important;
     height: auto !important;
-    min-height: 100% !important;
+    min-height: 0 !important;
     overflow: visible !important;
   }
 
-  /* Exclude all interactive web chrome, bars, buttons, scrollbars, modals and navigation */
+  /* Exclude all interactive web chrome, bars, buttons, scrollbars, modals, floating tutor and navigation */
   header,
-  .no-print,
-  header.no-print,
+  aside,
   nav,
   button,
   input,
   select,
+  .no-print,
+  header.no-print,
+  aside.no-print,
   .magazine-header-bar,
   .magazine-quick-help-bar,
   .print\:hidden,
   .modal-overlay,
+  .tutor-drawer,
+  .tutor-floating-btn,
   ::-webkit-scrollbar {
     display: none !important;
   }
@@ -239,10 +243,12 @@
     opacity: 1 !important;
   }
 
-  /* Structural containers flow seamlessly without viewport scroll constraints */
+  /* Structural containers flow seamlessly without viewport scroll constraints or phantom spacing */
   #root,
+  #root > div,
   .magazine-view-wrapper,
-  .magazine-scroll-container {
+  .magazine-scroll-container,
+  main {
     display: block !important;
     padding: 0 !important;
     margin: 0 !important;
@@ -251,6 +257,7 @@
     background: transparent !important;
     overflow: visible !important;
     height: auto !important;
+    min-height: 0 !important;
   }
 
   /* Page print wrapper ignores intermediate flex constraints */
@@ -266,6 +273,8 @@
     max-height: 297mm !important;
     max-width: 210mm !important;
     box-sizing: border-box !important;
+    page-break-before: auto !important;
+    break-before: auto !important;
     page-break-after: always !important;
     break-after: page !important;
     page-break-inside: avoid !important;
@@ -281,10 +290,26 @@
     flex-direction: column !important;
   }
 
+  /* First page must not have a page break before */
+  .a4-magazine-page:first-of-type,
+  [data-page-id="t02-page-01"],
+  [data-page-id="magazine-page-01"],
+  #t02-page-01 {
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+    margin-top: 0 !important;
+  }
+
   /* Avoid phantom trailing empty page after the back cover */
-  .a4-magazine-page:last-child {
+  .a4-magazine-page:last-child,
+  .a4-magazine-page:last-of-type,
+  .a4-magazine-page[data-is-back-cover="true"],
+  [data-page-id="t02-page-38"],
+  [data-page-id="magazine-page-46"],
+  #t02-page-38 {
     page-break-after: avoid !important;
     break-after: avoid !important;
+    margin-bottom: 0 !important;
   }
 
   /* Prevent awkward breaks inside critical editorial elements */

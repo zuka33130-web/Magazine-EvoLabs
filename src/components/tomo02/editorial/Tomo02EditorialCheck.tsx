@@ -1,6 +1,6 @@
 import React from 'react';
 import { HelpCircle, CheckCircle2, ShieldCheck, Sparkles, Activity, FileCheck2 } from 'lucide-react';
-import { TomoModuleItem } from '../../../data/tomo02Data';
+import { TOMO_02_MODULES, TomoModuleItem } from '../../../data/tomo02Data';
 import { CheckQuestion } from '../Tomo02ModuleReader';
 
 interface Tomo02EditorialCheckProps {
@@ -124,7 +124,7 @@ export const Tomo02EditorialCheck: React.FC<Tomo02EditorialCheckProps> = ({
           <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
           ESTÁNDAR DE EVALUACIÓN // RAZONAMIENTO ANTE EVIDENCIA
         </span>
-        <span className="text-cyan-400 font-bold">MÓDULO #{module.moduleNumber} DE 26</span>
+        <span className="text-cyan-400 font-bold">MÓDULO #{module.moduleNumber} DE {TOMO_02_MODULES.length}</span>
       </div>
     </div>
   );

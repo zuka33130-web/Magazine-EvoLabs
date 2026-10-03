@@ -13,11 +13,25 @@ export const Tomo02EditorialCase: React.FC<Tomo02EditorialCaseProps> = ({
   richData,
 }) => {
   const evoCase = richData?.evoCase;
+  const symptomText = evoCase?.symptom || module.summary;
+  const falseHypothesisText =
+    evoCase?.initialHypothesis ||
+    module.falsePositive ||
+    'Reinstalar Windows desde cero, formatear la unidad o desactivar servicios a ciegas.';
+  const rootCauseText =
+    evoCase?.rootCause ||
+    module.scientificFact ||
+    'Incompatibilidad en el despachador de interrupciones o controlador con latencia DPC elevada.';
+  const resolutionText =
+    evoCase?.resolution ||
+    module.reversibility ||
+    'Aplicación del protocolo nativo con restablecimiento de dependencias y validación con LatencyMon.';
+  const toolText = module.sysinternalsTool || 'Process Explorer & LatencyMon';
 
   return (
-    <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
-      {/* Top Bar */}
-      <div className="border-b border-cyan-950/80 pb-2.5 flex items-baseline justify-between">
+    <div className="flex flex-col space-y-3 font-sans-editorial">
+      {/* Top Header Bar */}
+      <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
         <div>
           <div className="flex items-center gap-2 text-[10px] font-mono-tech text-cyan-400 uppercase tracking-widest mb-0.5">
             <span className="text-rose-400 font-bold">EXPEDIENTE DE TALLER</span>
@@ -33,83 +47,95 @@ export const Tomo02EditorialCase: React.FC<Tomo02EditorialCaseProps> = ({
         </span>
       </div>
 
-      {/* Case Dossier Grid: 5-Stage Scientific Investigation */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs flex-1 items-stretch min-h-0">
-        {/* Left Column: Victim, Symptom, & False Hypothesis */}
-        <div className="space-y-2.5 flex flex-col justify-between">
-          {/* Victim Profile */}
-          <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950/80 space-y-1">
-            <span className="text-[10px] font-mono-tech text-cyan-400 uppercase tracking-wider font-bold block flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-cyan-400" />
-              PERFIL DEL EQUIPO // ESCENARIO DE CAMPO:
-            </span>
-            <p className="text-zinc-300 text-[11px] leading-snug font-sans-editorial">
-              {evoCase?.victim || 'Estación de trabajo de alto rendimiento / Servidor de control con Windows 10/11 Enterprise.'}
-            </p>
-          </div>
-
-          {/* Symptom */}
-          <div className="p-3 rounded-xl bg-gradient-to-br from-rose-950/20 via-zinc-950/90 to-black border-l-2 border-rose-500 border-t border-r border-b border-rose-950/50 space-y-1 flex-1">
-            <span className="text-[10px] font-mono-tech text-rose-400 uppercase tracking-wider font-bold flex items-center gap-1.5">
-              <AlertOctagon className="w-3.5 h-3.5 text-rose-400" />
-              SÍNTOMA VISIBLE REPORTADO:
-            </span>
-            <blockquote className="text-zinc-200 text-[11px] leading-relaxed italic my-1 font-sans-editorial">
-              “{evoCase?.symptom || module.summary}”
+      {/* Case Dossier Grid: 2 Primary Columns - Natural Height, No Artificial Stretch */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs items-start">
+        {/* Left Card: Incident & False Hypothesis */}
+        <div className="p-4 rounded-xl bg-gradient-to-br from-rose-950/20 via-zinc-950/90 to-black border-l-2 border-rose-500 border-t border-r border-b border-rose-950/50 flex flex-col space-y-3 h-auto">
+          <div>
+            <div className="flex items-center justify-between text-rose-400 text-xs font-mono-tech font-bold uppercase tracking-wider mb-2 pb-1.5 border-b border-rose-950/60">
+              <span className="flex items-center gap-1.5">
+                <AlertOctagon className="w-4 h-4 text-rose-400 shrink-0" />
+                SÍNTOMA VISIBLE REPORTADO
+              </span>
+              <span className="text-[10px] text-zinc-400 font-mono-tech flex items-center gap-1">
+                <Shield className="w-3.5 h-3.5 text-cyan-400 inline" />
+                ESTACIÓN DE CAMPO
+              </span>
+            </div>
+            <blockquote className="text-xs sm:text-sm text-zinc-100 font-sans-editorial italic leading-relaxed my-2">
+              “{symptomText}”
             </blockquote>
           </div>
-
-          {/* False Hypothesis from Internet */}
-          <div className="p-3 rounded-xl bg-gradient-to-br from-amber-950/20 via-zinc-950/90 to-black border-l-2 border-amber-500 border-t border-r border-b border-amber-950/50 space-y-1">
-            <span className="text-[10px] font-mono-tech text-amber-400 uppercase tracking-wider font-bold block flex items-center gap-1.5">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-              HIPÓTESIS FALSA (FOROS O TÉCNICOS SIN MÉTODO):
-            </span>
-            <p className="text-amber-200/90 text-[11px] leading-snug font-sans-editorial">
-              {evoCase?.initialHypothesis || module.falsePositive || 'Reinstalar Windows desde cero, formatear la unidad o desactivar servicios a ciegas.'}
-            </p>
+          <div className="p-3 rounded-xl bg-black/70 border border-rose-950/70 text-xs font-mono-tech text-amber-300/90 h-auto">
+            <strong className="flex items-center gap-1.5 text-amber-400 mb-1 text-xs">
+              <AlertTriangle className="w-3.5 h-3.5 inline" />
+              Hipótesis Falsa (Mala Práctica):
+            </strong>
+            <span className="text-zinc-200 font-sans-editorial leading-relaxed block">{falseHypothesisText}</span>
           </div>
         </div>
 
-        {/* Right Column: Root Cause & Definitive Resolution */}
-        <div className="space-y-2.5 flex flex-col justify-between">
-          {/* Real Root Cause */}
-          <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-950/20 via-zinc-950/90 to-black border-l-2 border-cyan-400 border-t border-r border-b border-cyan-950/50 space-y-1">
-            <span className="text-[10px] font-mono-tech text-cyan-400 uppercase tracking-wider font-bold flex items-center gap-1.5">
-              <Search className="w-3.5 h-3.5 text-cyan-400" />
-              CAUSA RAÍZ AISLADA POR TELEMETRÍA KERNEL:
-            </span>
-            <p className="text-zinc-200 text-[11px] leading-relaxed font-sans-editorial">
-              {evoCase?.rootCause || module.scientificFact || 'Incompatibilidad en el despachador de interrupciones o controlador con latencia DPC elevada.'}
+        {/* Right Card: Root Cause & Resolution */}
+        <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-950/30 via-zinc-950/90 to-black border-l-2 border-cyan-400 border-t border-r border-b border-cyan-950/50 flex flex-col space-y-3 h-auto">
+          <div>
+            <div className="flex items-center justify-between text-cyan-400 text-xs font-mono-tech font-bold uppercase tracking-wider mb-2 pb-1.5 border-b border-cyan-950/60">
+              <span className="flex items-center gap-1.5">
+                <Search className="w-4 h-4 text-cyan-400 shrink-0" />
+                CAUSA RAÍZ AISLADA EN KERNEL
+              </span>
+              <span className="text-[10px] text-cyan-300 font-mono-tech flex items-center gap-1 font-bold">
+                <Wrench className="w-3.5 h-3.5 inline" />
+                {toolText}
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-zinc-100 font-sans-editorial leading-relaxed my-2">
+              {rootCauseText}
             </p>
           </div>
-
-          {/* Resolution */}
-          <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-950/20 via-zinc-950/90 to-black border-l-2 border-emerald-400 border-t border-r border-b border-emerald-950/50 space-y-1 flex-1">
-            <span className="text-[10px] font-mono-tech text-emerald-400 uppercase tracking-wider font-bold flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              RESOLUCIÓN PERICIAL DEFINITIVA:
-            </span>
-            <p className="text-zinc-300 text-[11px] font-sans-editorial leading-relaxed">
-              {evoCase?.resolution || module.reversibility || 'Aplicación del protocolo nativo con restablecimiento de dependencias y validación con LatencyMon.'}
-            </p>
-          </div>
-
-          {/* Sysinternals Tool Badge */}
-          <div className="p-2.5 rounded-lg bg-zinc-950/90 border border-zinc-900 font-mono-tech text-[10px] text-zinc-400 flex items-center justify-between">
-            <span className="flex items-center gap-1.5">
-              <Wrench className="w-3.5 h-3.5 text-cyan-400" />
-              INSTRUMENTAL DE ANÁLISIS:
-            </span>
-            <span className="text-cyan-300 font-bold">{module.sysinternalsTool || 'Process Explorer & LatencyMon'}</span>
+          <div className="p-3 rounded-xl bg-black/70 border border-cyan-950/70 text-xs font-mono-tech text-emerald-300 h-auto">
+            <strong className="flex items-center gap-1.5 text-emerald-400 mb-1 text-xs">
+              <CheckCircle2 className="w-3.5 h-3.5 inline" />
+              Resolución Pericial Definitiva:
+            </strong>
+            <span className="text-zinc-200 font-sans-editorial leading-relaxed block">{resolutionText}</span>
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="pt-2 border-t border-cyan-950/60 flex items-center justify-between text-[10px] font-mono-tech text-zinc-500">
-        <span>BANCO DE PRUEBAS DE TALLER // MÉTODO FORENSE DETERMINÍSTICO</span>
-        <span className="text-cyan-400 font-bold">CASO #{module.moduleNumber} RESUELTO</span>
+      {/* Forensic Diagnostic Triad Bar - Content Driven */}
+      <div className="p-3.5 rounded-xl bg-black/80 border border-cyan-900/60 font-mono-tech text-xs space-y-2.5 h-auto">
+        <div className="flex items-center justify-between text-cyan-400 text-xs uppercase font-bold tracking-wider">
+          <span className="flex items-center gap-1.5">
+            <Wrench className="w-4 h-4" />
+            MÉTODO DETERMINÍSTICO // AISLAMIENTO Y VERIFICACIÓN
+          </span>
+          <span className="text-zinc-500 hidden sm:inline text-[10px]">ESTÁNDAR DE LABORATORIO EVO</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs items-start">
+          <div className="p-2.5 rounded-lg bg-zinc-950 border border-cyan-950 space-y-1 h-auto">
+            <span className="text-zinc-300 text-xs block font-bold">1. TELEMETRÍA:</span>
+            <span className="text-zinc-300 font-sans-editorial leading-snug block">Captura de hilos, llamadas a sistema y descriptores en tiempo real.</span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-cyan-950/20 border border-cyan-500/30 space-y-1 h-auto">
+            <span className="text-cyan-300 text-xs block font-bold">2. DIAGNÓSTICO:</span>
+            <span className="text-zinc-200 font-sans-editorial leading-snug block">Correlación causa-efecto sin asumir diagnósticos apresurados.</span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/30 space-y-1 h-auto">
+            <span className="text-emerald-300 text-xs block font-bold">3. COMPROBACIÓN:</span>
+            <span className="text-emerald-100 font-sans-editorial leading-snug block">Verificación de estabilidad y reversibilidad del procedimiento.</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Standardized Bottom Bar - Content Driven */}
+      <div className="p-3 rounded-xl bg-zinc-950/90 border border-cyan-950 text-xs font-mono-tech flex items-center justify-between text-zinc-300 h-auto">
+        <div>
+          <strong className="text-cyan-400 font-bold mr-1.5">REGLA FORENSE DE TALLER:</strong>
+          <span className="text-zinc-200 font-sans-editorial">“El síntoma visible nunca es la causa raíz: medí antes de formatear.”</span>
+        </div>
+        <span className="text-rose-400 text-xs uppercase hidden sm:inline shrink-0 font-bold">
+          CASO #{module.moduleNumber} RESUELTO
+        </span>
       </div>
     </div>
   );

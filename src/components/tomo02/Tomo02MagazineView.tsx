@@ -275,6 +275,58 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [totalPages]);
 
+  // Ensure continuous DOM for native browser print (Ctrl+P or Browser Menu) and set precise Tomo 02 title
+  useEffect(() => {
+    let originalTitle = document.title;
+    const handleBeforePrint = () => {
+      originalTitle = document.title;
+      setViewMode('continuous');
+      document.title = 'EVO-LABS-MAGAZINE-TOMO-02-LA-BIBLIA-NEGRA-DE-WINDOWS';
+    };
+    const handleAfterPrint = () => {
+      document.title = originalTitle;
+    };
+    window.addEventListener('beforeprint', handleBeforePrint);
+    window.addEventListener('afterprint', handleAfterPrint);
+    return () => {
+      window.removeEventListener('beforeprint', handleBeforePrint);
+      window.removeEventListener('afterprint', handleAfterPrint);
+    };
+  }, []);
+
+  // Listen for direct URL print parameter (?print=true or ?pdf=true) to auto-invoke native print
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('print') === 'true' || params.get('pdf') === 'true') {
+        setViewMode('continuous');
+        document.title = 'EVO-LABS-MAGAZINE-TOMO-02-LA-BIBLIA-NEGRA-DE-WINDOWS';
+
+        const triggerAutoPrint = async () => {
+          try {
+            if (document.fonts?.ready) {
+              await document.fonts.ready;
+            }
+          } catch {
+            // ignore
+          }
+
+          setTimeout(() => {
+            try {
+              window.print();
+            } catch (err) {
+              console.warn('Auto-print falló o requiere interacción del usuario:', err);
+            }
+          }, 800);
+        };
+
+        triggerAutoPrint();
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const handleCopySnippet = (snippet: string) => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(snippet);
@@ -286,10 +338,18 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   const handleNativePrint = () => {
     setViewMode('continuous');
     setIsPreparingPrint(true);
-    setTimeout(() => {
+    document.title = 'EVO-LABS-MAGAZINE-TOMO-02-LA-BIBLIA-NEGRA-DE-WINDOWS';
+    setTimeout(async () => {
+      try {
+        if (document.fonts?.ready) {
+          await document.fonts.ready;
+        }
+      } catch {
+        // ignore
+      }
       window.print();
       setIsPreparingPrint(false);
-    }, 300);
+    }, 400);
   };
 
   const handleDownloadOfflineHtml = () => {
@@ -297,31 +357,35 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>${TOMO_02_META.title}</title>
+  <title>EVO-LABS-MAGAZINE-TOMO-02-LA-BIBLIA-NEGRA-DE-WINDOWS</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #08090C; color: #E4E4E7; margin: 0; padding: 20px; }
-    h1 { color: #00D2FF; font-size: 28px; border-bottom: 2px solid #00D2FF; padding-bottom: 8px; }
-    h2 { color: #38BDF8; margin-top: 30px; }
-    pre { background: #0F172A; padding: 12px; border-radius: 6px; border: 1px solid #1E293B; overflow-x: auto; color: #38BDF8; }
-    .box { border: 1px solid #1E293B; background: #0D1117; padding: 16px; margin-bottom: 16px; border-radius: 8px; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; background: rgba(0, 210, 255, 0.2); color: #00D2FF; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #08090C; color: #E4E4E7; margin: 0; padding: 24px; max-width: 900px; margin: 0 auto; }
+    h1 { color: #00D2FF; font-size: 28px; border-bottom: 2px solid #00D2FF; padding-bottom: 8px; margin-top: 10px; }
+    h2 { color: #38BDF8; margin-top: 24px; margin-bottom: 6px; }
+    pre { background: #070B12; padding: 12px; border-radius: 6px; border: 1px solid #102A45; overflow-x: auto; color: #38BDF8; font-family: monospace; }
+    .box { border: 1px solid #102A45; background: #090D16; padding: 18px; margin-bottom: 18px; border-radius: 10px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; background: rgba(0, 210, 255, 0.2); color: #00D2FF; margin-bottom: 8px; }
+    @media print {
+      body { background: #08090C !important; color: #fff !important; padding: 0 !important; }
+      .box { page-break-inside: avoid; break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
-  <h1>${TOMO_02_META.title}</h1>
-  <p><strong>${TOMO_02_META.subtitle}</strong></p>
-  <p><em>${TOMO_02_META.manifestoPhrase}</em></p>
-  <hr style="border-color: #1E293B;">
+  <h1>EVO LABS // TOMO 02: LA BIBLIA NEGRA DE WINDOWS</h1>
+  <p><strong>Edición Oficial Completa // 38 Páginas A4</strong></p>
+  <p><em>“SI NO PODÉS REVERTIRLO, NO LO TOQUES.”</em></p>
+  <hr style="border-color: #102A45; margin: 20px 0;">
   ${TOMO_02_MODULES.map(
     (m) => `
     <div class="box">
       <span class="badge">MÓDULO ${m.moduleNumber} // ${m.categoryTag}</span>
       <h2>${m.title}</h2>
-      <p><em>${m.subtitle}</em></p>
+      <p style="color: #00D2FF; font-size: 13px;"><em>${m.subtitle}</em></p>
       <p>${m.forensicGoal || m.summary}</p>
-      <pre><code>${m.powershellCommand || m.forensicCommand || m.practicalCommand || ''}</code></pre>
+      ${m.powershellCommand || m.forensicCommand || m.practicalCommand ? `<pre><code>${m.powershellCommand || m.forensicCommand || m.practicalCommand}</code></pre>` : ''}
       <p><strong>Regla de Reversibilidad:</strong> ${m.reversibility || m.scientificFact || ''}</p>
-      <p><strong>Falso Positivo:</strong> ${m.falsePositive || m.warningNotice || ''}</p>
+      <p><strong>Falso Positivo / Advertencia:</strong> ${m.falsePositive || m.warningNotice || ''}</p>
     </div>`
   ).join('')}
 </body>
@@ -330,7 +394,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'EVO_LABS_TOMO_02_BIBLIA_NEGRA_WINDOWS.html';
+    a.download = 'EVO-LABS-MAGAZINE-TOMO-02-LA-BIBLIA-NEGRA-DE-WINDOWS.html';
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -958,7 +1022,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
           >
             <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
               <div>
-                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest block font-bold">
+                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest block font-bold mb-0.5">
                   MANIFIESTO TÉCNICO
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-display font-black text-white uppercase tracking-tight">
@@ -970,54 +1034,54 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               </div>
 
               {/* 6 Inmutable Rules Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs font-mono-tech">
-                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
-                  <span className="text-cyan-400 font-bold block text-[11px]">01 // OBSERVAR</span>
-                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs font-mono-tech">
+                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+                  <span className="text-cyan-300 font-bold block text-xs tracking-wider">01 // OBSERVAR</span>
+                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     Identificar el fenómeno antes de actuar. Registrar el estado en reposo sin precipitarse.
                   </p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
-                  <span className="text-cyan-400 font-bold block text-[11px]">02 // ENTENDER</span>
-                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+                  <span className="text-cyan-300 font-bold block text-xs tracking-wider">02 // ENTENDER</span>
+                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     Comprender qué componente es dueño de la función. No asumir que todo lo desconocido es basura.
                   </p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
-                  <span className="text-cyan-400 font-bold block text-[11px]">03 // INVESTIGAR</span>
-                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+                  <span className="text-cyan-300 font-bold block text-xs tracking-wider">03 // INVESTIGAR</span>
+                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     Consultar la documentación oficial (Microsoft Learn) y no foros anónimos sin sustento.
                   </p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
-                  <span className="text-cyan-400 font-bold block text-[11px]">04 // MEDIR</span>
-                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+                  <span className="text-cyan-300 font-bold block text-xs tracking-wider">04 // MEDIR</span>
+                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     Establecer una métrica objetiva con unidades de medida: milisegundos, bytes o ciclos de reloj.
                   </p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
-                  <span className="text-cyan-400 font-bold block text-[11px]">05 // INTERVENIR</span>
-                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+                  <span className="text-cyan-300 font-bold block text-xs tracking-wider">05 // INTERVENIR</span>
+                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     Cambiar un único parámetro por vez de manera deliberada y documentada.
                   </p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1">
-                  <span className="text-cyan-400 font-bold block text-[11px]">06 // REVERTIR</span>
-                  <p className="text-[10.5px] text-zinc-400 font-sans-editorial leading-snug">
+                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+                  <span className="text-cyan-300 font-bold block text-xs tracking-wider">06 // REVERTIR</span>
+                  <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     La regla de oro: si no podés revertir el cambio en cinco segundos, no tenés permiso de tocar.
                   </p>
                 </div>
               </div>
 
               {/* Semáforo de Intervención EVO */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono-tech border-b border-cyan-950 pb-1">
-                  <span className="text-cyan-400 font-bold uppercase tracking-wider">
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between text-xs font-mono-tech border-b border-cyan-950 pb-1.5">
+                  <span className="text-cyan-400 font-bold uppercase tracking-wider text-xs">
                     EL SEMÁFORO DE INTERVENCIÓN // CÓDIGO DE RIESGO
                   </span>
                   <span className="text-zinc-500 text-[10px]">
@@ -1026,37 +1090,37 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                 </div>
 
                 <div className="space-y-2 text-xs font-mono-tech">
-                  <div className="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-500/30 flex items-start gap-2.5">
+                  <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 flex items-start gap-3">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 mt-1 shrink-0 shadow-[0_0_8px_#34d399]" />
                     <div>
-                      <span className="text-emerald-300 font-bold block text-[11px]">
+                      <span className="text-emerald-300 font-bold block text-xs tracking-wide">
                         NIVEL VERDE // OBSERVACIÓN & CONSULTA SEGURA
                       </span>
-                      <p className="text-[10.5px] text-zinc-400 font-sans-editorial">
+                      <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed mt-0.5">
                         Comandos de sólo lectura, consultas en PowerShell, inspección de procesos, atajos del sistema y telemetría pasiva. No altera el estado de Windows.
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-amber-950/20 border border-amber-500/30 flex items-start gap-2.5">
+                  <div className="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30 flex items-start gap-3">
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-400 mt-1 shrink-0 shadow-[0_0_8px_#fbbf24]" />
                     <div>
-                      <span className="text-amber-300 font-bold block text-[11px]">
+                      <span className="text-amber-300 font-bold block text-xs tracking-wide">
                         NIVEL AMARILLO // MODIFICACIÓN CONTROLADA CON PRE-CONDICIÓN
                       </span>
-                      <p className="text-[10.5px] text-zinc-400 font-sans-editorial">
+                      <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed mt-0.5">
                         Desactivación de aplicaciones de inicio, cambios en tareas programadas de terceros o ajuste de preferencias. Requiere documentar el estado original antes de accionar.
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-rose-950/20 border border-rose-500/30 flex items-start gap-2.5">
+                  <div className="p-3 rounded-xl bg-rose-950/20 border border-rose-500/30 flex items-start gap-3">
                     <span className="w-2.5 h-2.5 rounded-full bg-rose-400 mt-1 shrink-0 shadow-[0_0_8px_#f43f5e]" />
                     <div>
-                      <span className="text-rose-300 font-bold block text-[11px]">
+                      <span className="text-rose-300 font-bold block text-xs tracking-wide">
                         NIVEL ROJO // ZONA CRÍTICA (REGISTRO & SUBSISTEMAS)
                       </span>
-                      <p className="text-[10.5px] text-zinc-400 font-sans-editorial">
+                      <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed mt-0.5">
                         Edición directa de colmenas del Registro, modificación de servicios dependientes del kernel o borrado de carpetas protegidas. Prohibido ejecutar sin backup .reg y Punto de Restauración previo.
                       </p>
                     </div>
@@ -1065,16 +1129,16 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               </div>
 
               {/* Axioma Editorial Supremo */}
-              <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/50 flex items-center justify-between font-mono-tech text-xs">
+              <div className="p-3.5 rounded-xl bg-cyan-950/30 border border-cyan-500/50 flex items-center justify-between font-mono-tech text-xs">
                 <div>
-                  <span className="text-[9px] text-cyan-400 uppercase tracking-widest block font-bold">
+                  <span className="text-[10px] text-cyan-400 uppercase tracking-widest block font-bold">
                     ADVERTENCIA // AXIOMA EDITORIAL SUPREMO
                   </span>
-                  <span className="text-white font-bold text-sm tracking-wide">
+                  <span className="text-white font-bold text-base sm:text-lg tracking-wide">
                     “SI NO PODÉS REVERTIRLO, NO LO TOQUES.”
                   </span>
                 </div>
-                <span className="px-3 py-1 rounded bg-cyan-500 text-black font-extrabold text-[10px] tracking-wider">
+                <span className="px-3.5 py-1.5 rounded-lg bg-cyan-500 text-black font-extrabold text-xs tracking-wider">
                   CUSTODIA EVO
                 </span>
               </div>
@@ -1110,33 +1174,34 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             pageNumber={5}
             totalPages={totalPages}
             sectionTitle="MAPA DE ALMACENAMIENTO"
-            subSlug="LAS 15 CARPETAS MAESTRAS"
+            subSlug={`LAS ${TOMO_02_FOLDERS.length} CARPETAS MAESTRAS`}
             accentColor="#00D2FF"
           >
-            <div className="h-full flex flex-col justify-between space-y-3">
+            <div className="h-full flex flex-col justify-between space-y-2.5 font-sans-editorial">
               <div>
-                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest">
+                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest block font-bold mb-0.5">
                   CARTOGRAFÍA FORENSE
                 </span>
-                <h2 className="text-2xl font-display font-black text-white tracking-tight">
-                  LAS 15 CARPETAS CRÍTICAS DEL SISTEMA
+                <h2 className="text-2xl font-display font-black text-white tracking-tight uppercase">
+                  LAS {TOMO_02_FOLDERS.length} CARPETAS CRÍTICAS DEL SISTEMA
                 </h2>
-                <p className="text-xs font-mono-tech text-zinc-400">
-                  Qué contiene cada una, por qué crecen y cuáles podés depurar con seguridad total.
+                <p className="text-xs font-mono-tech text-zinc-400 mt-0.5">
+                  Qué contiene cada una, por qué crecen y cuáles podés depurar con seguridad pericial.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs font-mono-tech">
-                {TOMO_02_FOLDERS.slice(0, 9).map((f) => (
+              {/* 15 Folders Grid - Crisp Typography */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs font-mono-tech">
+                {TOMO_02_FOLDERS.map((f) => (
                   <div
                     key={f.id}
-                    className="p-2.5 rounded-lg bg-zinc-950/80 border border-cyan-950 flex flex-col justify-between"
+                    className="p-2.5 rounded-lg bg-zinc-950/80 border border-cyan-950/90 flex flex-col justify-between space-y-1"
                   >
                     <div>
-                      <div className="flex items-center justify-between text-[10px] mb-1">
-                        <span className="text-cyan-400 font-bold">{f.path}</span>
+                      <div className="flex items-center justify-between text-xs mb-1 gap-1.5">
+                        <span className="text-cyan-300 font-bold truncate">{f.path}</span>
                         <span
-                          className={`px-1.5 py-0.2 rounded text-[8px] font-bold ${
+                          className={`px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0 ${
                             f.safetyBadge === 'VERDE'
                               ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                               : f.safetyBadge === 'AMARILLO'
@@ -1147,20 +1212,20 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                           {f.safetyBadge}
                         </span>
                       </div>
-                      <p className="text-[10px] text-zinc-300 font-sans-editorial leading-tight mb-1">
+                      <p className="text-[11px] text-zinc-200 font-sans-editorial leading-snug mb-1">
                         {f.purpose}
                       </p>
                     </div>
-                    <div className="text-[9px] text-zinc-500 border-t border-zinc-900 pt-1">
+                    <div className="text-[10px] text-zinc-400 border-t border-zinc-900/80 pt-1 truncate font-mono-tech">
                       {f.dangerNotice || f.canDeleteOrClean}
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-900/50 text-xs font-mono-tech text-cyan-300 flex items-center justify-between">
-                <span>COMANDO PARA DEPURAR COMPONENTES OBSOLETOS EN WINSXS:</span>
-                <code className="bg-black/60 px-2 py-1 rounded text-white border border-cyan-900">
+              <div className="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-900/50 text-xs font-mono-tech text-cyan-300 flex items-center justify-between">
+                <span className="font-bold">DEPURACIÓN SEGURA DE COMPONENTES EN WINSXS:</span>
+                <code className="bg-black/80 px-2.5 py-1 rounded text-white border border-cyan-900 text-xs font-mono-tech">
                   dism.exe /online /cleanup-image /startcomponentcleanup
                 </code>
               </div>
@@ -1177,23 +1242,24 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             pageNumber={6}
             totalPages={totalPages}
             sectionTitle="SUMARIO EJECUTIVO"
-            subSlug="ÍNDICE DE 27 MÓDULOS"
+            subSlug={`ÍNDICE DE ${TOMO_02_MODULES.length} MÓDULOS`}
             accentColor="#00D2FF"
           >
-            <div className="h-full flex flex-col justify-between space-y-3">
+            <div className="h-full flex flex-col justify-between space-y-2.5 font-sans-editorial">
               <div>
-                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest">
+                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest block font-bold mb-0.5">
                   ESTRUCTURA DE CONSULTA
                 </span>
-                <h2 className="text-2xl font-display font-black text-white tracking-tight">
+                <h2 className="text-2xl font-display font-black text-white tracking-tight uppercase">
                   ÍNDICE MAESTRO FORENSE DE WINDOWS
                 </h2>
-                <p className="text-xs font-mono-tech text-zinc-400">
-                  27 áreas de conocimiento autónomas, desde el arranque EFI hasta la telemetría del Kernel.
+                <p className="text-xs font-mono-tech text-zinc-400 mt-0.5">
+                  {TOMO_02_MODULES.length} áreas de conocimiento autónomas, desde el arranque EFI hasta la telemetría del Kernel.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-mono-tech overflow-y-auto max-h-[720px] pr-1">
+              {/* Clean 2-Column Grid: Number + Title + Reading Time */}
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono-tech">
                 {TOMO_02_MODULES.map((m, mIdx) => (
                   <div
                     key={m.id}
@@ -1204,28 +1270,26 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                       const el = document.getElementById(`t02-mod-${m.moduleNumber}`);
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="p-2 rounded bg-zinc-950/60 border border-cyan-950 hover:border-cyan-500/60 transition-all flex items-start gap-2.5 cursor-pointer group"
+                    className="p-2 sm:p-2.5 rounded-lg bg-zinc-950/80 border border-cyan-950/90 hover:border-cyan-500/60 transition-all flex items-center justify-between gap-2.5 cursor-pointer group"
                   >
-                    <span className="text-cyan-400 font-bold group-hover:text-cyan-300">
-                      [{m.moduleNumber}]
-                    </span>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-white text-[11px] group-hover:text-cyan-200">
-                          {m.title}
-                        </span>
-                        <span className="text-[9px] text-zinc-500">{m.readTime}</span>
-                      </div>
-                      <p className="text-[10px] text-zinc-400 line-clamp-1">
-                        {m.subtitle}
-                      </p>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="text-cyan-400 font-bold text-xs shrink-0 font-mono-tech">
+                        [{m.moduleNumber}]
+                      </span>
+                      <span className="font-bold text-white text-xs truncate uppercase font-mono-tech group-hover:text-cyan-200">
+                        {m.title}
+                      </span>
                     </div>
+                    <span className="text-[10.5px] text-cyan-400/80 font-mono-tech shrink-0 font-medium">
+                      {m.readTime}
+                    </span>
                   </div>
                 ))}
               </div>
 
-              <div className="text-[10px] font-mono-tech text-zinc-500 text-center">
-                HAZ CLIC EN CUALQUIER MÓDULO PARA NAVEGAR DIRECTO A SU INVESTIGACIÓN
+              <div className="text-xs font-mono-tech text-zinc-400 text-center py-1.5 border-t border-zinc-900 flex items-center justify-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                <span>HAZ CLIC EN CUALQUIER MÓDULO PARA NAVEGAR DIRECTO A SU INVESTIGACIÓN</span>
               </div>
             </div>
           </Tomo02MasterPage>
@@ -1308,8 +1372,8 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                 />
               )}
 
-              {/* Discrete synchronization CTA to Interactive Module */}
-              <div className="pt-2 border-t border-cyan-950/70 flex items-center justify-between text-[10px] font-mono-tech mt-2">
+              {/* Discrete synchronization CTA to Interactive Module (Hidden in Print / PDF export) */}
+              <div className="pt-2 border-t border-cyan-950/70 flex items-center justify-between text-[10px] font-mono-tech mt-2 print:hidden no-print">
                 <span className="text-zinc-500">
                   MÓDULO {mod.moduleNumber} // {mod.categoryTag}
                 </span>
@@ -1346,47 +1410,71 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             subSlug="CASOS REALES DE TALLER"
             accentColor="#00D2FF"
           >
-            <div className="h-full flex flex-col justify-between space-y-3">
+            <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
               <div>
-                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest">
+                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest block font-bold mb-0.5">
                   BANCO DE PRUEBAS RESUELTO
                 </span>
-                <h2 className="text-2xl font-display font-black text-white tracking-tight">
+                <h2 className="text-2xl font-display font-black text-white tracking-tight uppercase">
                   CASOS FORENSES GUIADOS
                 </h2>
-                <p className="text-xs font-mono-tech text-zinc-400">
-                  4 incidentes reales analizados con el método EVO: del síntoma a la causa raíz.
+                <p className="text-xs font-mono-tech text-zinc-400 mt-0.5">
+                  4 incidentes reales analizados con el método EVO: del síntoma a la causa raíz sin formatear.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono-tech">
+              {/* 4 Clean Editorial Rows */}
+              <div className="space-y-2.5 text-xs font-mono-tech">
                 {TOMO_02_CASES.map((c) => (
                   <div
                     key={c.id}
-                    className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950 flex flex-col justify-between space-y-2"
+                    className="p-3 rounded-xl bg-zinc-950/85 border border-cyan-950/90 space-y-2"
                   >
-                    <div>
-                      <div className="flex items-center justify-between text-[10px] text-cyan-400 border-b border-zinc-900 pb-1 mb-1.5">
-                        <span className="font-bold">{c.title}</span>
-                        <span className="text-zinc-500">{c.toolUsed}</span>
+                    <div className="flex items-center justify-between border-b border-zinc-900 pb-1.5">
+                      <span className="font-bold text-white text-xs sm:text-sm tracking-wide">
+                        {c.title}
+                      </span>
+                      <span className="text-[10.5px] font-bold text-cyan-400 bg-cyan-950/80 px-2.5 py-0.5 rounded border border-cyan-500/40">
+                        {c.toolUsed}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+                      <div>
+                        <strong className="text-zinc-400 block text-[10.5px] uppercase font-bold mb-0.5 font-mono-tech">
+                          SÍNTOMA:
+                        </strong>
+                        <p className="text-zinc-300 font-sans-editorial leading-snug">
+                          {c.symptom}
+                        </p>
                       </div>
-                      <div className="text-[11px] text-zinc-300 space-y-1">
-                        <p><strong className="text-zinc-400">Síntoma:</strong> {c.symptom}</p>
-                        <p><strong className="text-amber-400">Hipótesis falsa:</strong> {c.hypothesis}</p>
-                        <p><strong className="text-cyan-400">Causa Raíz:</strong> {c.rootCause}</p>
+                      <div>
+                        <strong className="text-amber-400 block text-[10.5px] uppercase font-bold mb-0.5 font-mono-tech">
+                          HIPÓTESIS FALSA:
+                        </strong>
+                        <p className="text-amber-200/90 font-sans-editorial leading-snug">
+                          {c.hypothesis}
+                        </p>
+                      </div>
+                      <div>
+                        <strong className="text-cyan-400 block text-[10.5px] uppercase font-bold mb-0.5 font-mono-tech">
+                          CAUSA RAÍZ:
+                        </strong>
+                        <p className="text-cyan-200 font-sans-editorial leading-snug">
+                          {c.rootCause}
+                        </p>
                       </div>
                     </div>
-                    <div className="pt-2 border-t border-zinc-900 text-[10px] text-emerald-400">
-                      <strong>Acción pericial:</strong> {c.resolution}
+                    <div className="pt-1.5 border-t border-zinc-900 text-xs text-emerald-400 font-mono-tech">
+                      <strong>ACCIÓN PERICIAL:</strong> {c.resolution}
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="p-3 rounded-xl bg-black/60 border border-cyan-950 text-xs font-mono-tech text-zinc-300 flex items-center justify-between">
+              <div className="p-3 rounded-xl bg-black/70 border border-cyan-950 text-xs font-mono-tech text-zinc-300 flex items-center justify-between">
                 <span>REGLA FORENSE N° 1:</span>
-                <span className="text-cyan-400 font-bold">
-                  “EL SÍNTOMA NUNCA ES LA CAUSA RAÍZ.”
+                <span className="text-cyan-400 font-bold text-xs sm:text-sm">
+                  “EL SÍNTOMA NUNCA ES LA CAUSA RAÍZ: MEDÍ ANTES DE INTERVENIR.”
                 </span>
               </div>
             </div>
@@ -1405,41 +1493,42 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             subSlug="SECRETOS DEL KERNEL"
             accentColor="#00D2FF"
           >
-            <div className="h-full flex flex-col justify-between space-y-3">
+            <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
               <div>
-                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest">
+                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest block font-bold mb-0.5">
                   DOCUMENTACIÓN AVANZADA
                 </span>
-                <h2 className="text-2xl font-display font-black text-white tracking-tight">
+                <h2 className="text-2xl font-display font-black text-white tracking-tight uppercase">
                   LOS 5 SECRETOS FORENSES DEL KERNEL
                 </h2>
-                <p className="text-xs font-mono-tech text-zinc-400">
+                <p className="text-xs font-mono-tech text-zinc-400 mt-0.5">
                   Conceptos que los cursos convencionales callan y la telemetría real desmiente.
                 </p>
               </div>
 
+              {/* 5 Secrets with Generous Breathing Room */}
               <div className="space-y-2.5 text-xs font-mono-tech">
                 {TOMO_02_SECRETS.map((s, sIdx) => (
                   <div
                     key={s.id || sIdx}
-                    className="p-3 rounded-xl bg-zinc-950/70 border border-cyan-950 space-y-1.5"
+                    className="p-3 rounded-xl bg-zinc-950/80 border border-cyan-950/90 space-y-1.5"
                   >
-                    <div className="flex items-center justify-between text-cyan-400">
-                      <span className="font-bold text-white text-[12px]">
+                    <div className="flex items-center justify-between text-cyan-300">
+                      <span className="font-bold text-white text-xs sm:text-sm">
                         SECRETO #{sIdx + 1}: {s.title || s.name}
                       </span>
                     </div>
-                    <p className="text-zinc-300 font-sans-editorial text-[11px] leading-relaxed">
+                    <p className="text-zinc-200 font-sans-editorial text-xs leading-relaxed">
                       {s.explanation || s.description}
                     </p>
-                    <div className="p-2 rounded bg-black/70 border border-cyan-950 text-[10px] text-cyan-300">
-                      <strong>Impacto Técnico Real:</strong> {s.impact || s.whyItMatters}
+                    <div className="p-2 rounded-lg bg-black/70 border border-cyan-950 text-xs text-cyan-300 font-mono-tech">
+                      <strong>IMPACTO TÉCNICO REAL:</strong> {s.impact || s.whyItMatters}
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="p-2.5 rounded bg-cyan-950/20 border border-cyan-900/40 text-[10px] font-mono-tech text-zinc-400 text-center">
+              <div className="p-2.5 rounded-xl bg-cyan-950/20 border border-cyan-900/40 text-xs font-mono-tech text-zinc-400 text-center">
                 DESARROLLADO A PARTIR DE LOS ESTÁNDARES DE MICROSOFT WINDOWS INTERNALS (RUSSINOVICH & SOLOMON).
               </div>
             </div>
@@ -1458,37 +1547,39 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             subSlug="GLOSARIO FORENSE A-Z"
             accentColor="#00D2FF"
           >
-            <div className="h-full flex flex-col justify-between space-y-3">
+            <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
               <div>
-                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest">
+                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest block font-bold mb-0.5">
                   TERMINOLOGÍA PRECISA
                 </span>
-                <h2 className="text-2xl font-display font-black text-white tracking-tight">
+                <h2 className="text-2xl font-display font-black text-white tracking-tight uppercase">
                   GLOSARIO FORENSE DE WINDOWS
                 </h2>
-                <p className="text-xs font-mono-tech text-zinc-400">
+                <p className="text-xs font-mono-tech text-zinc-400 mt-0.5">
                   Conceptos esenciales para hablar con rigor pericial y no con mitos de foro.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono-tech overflow-y-auto max-h-[720px] pr-1">
+              {/* 2 Clean Continuous Editorial Dictionary Columns (Zero Crowded Cards) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-xs font-sans-editorial">
                 {TOMO_02_GLOSSARY.map((g, gIdx) => (
                   <div
                     key={gIdx}
-                    className="p-2.5 rounded-lg bg-zinc-950/70 border border-cyan-950 space-y-1"
+                    className="border-b border-zinc-900/90 pb-2 space-y-0.5"
                   >
-                    <span className="text-cyan-300 font-bold text-[11px]">
+                    <span className="text-cyan-300 font-bold text-xs sm:text-[13px] font-mono-tech block">
                       {g.term}
                     </span>
-                    <p className="text-[10px] text-zinc-400 font-sans-editorial leading-tight">
+                    <p className="text-xs text-zinc-300 leading-relaxed font-sans-editorial">
                       {g.definition || g.technicalDefinition}
                     </p>
                   </div>
                 ))}
               </div>
 
-              <div className="p-2 text-[10px] font-mono-tech text-zinc-500 text-center border-t border-zinc-900">
-                TOTAL DE TÉRMINOS DEFINIDOS: {TOMO_02_GLOSSARY.length} CONCEPTOS CRÍTICOS
+              <div className="p-2.5 text-xs font-mono-tech text-zinc-400 text-center border-t border-zinc-900 flex items-center justify-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                <span>TOTAL DE TÉRMINOS DEFINIDOS: {TOMO_02_GLOSSARY.length} CONCEPTOS CRÍTICOS DEL SISTEMA OPERATIVO</span>
               </div>
             </div>
           </Tomo02MasterPage>
@@ -1506,78 +1597,80 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             subSlug="FICHA DE AUDITORÍA DE WINDOWS"
             accentColor="#00D2FF"
           >
-            <div className="h-full flex flex-col justify-between space-y-4">
+            <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
               <div>
-                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest">
+                <span className="text-xs font-mono-tech text-cyan-400 uppercase tracking-widest block font-bold mb-0.5">
                   HERRAMIENTA DE CAMPO
                 </span>
-                <h2 className="text-2xl font-display font-black text-white tracking-tight">
+                <h2 className="text-2xl font-display font-black text-white tracking-tight uppercase">
                   HOJA DE AUDITORÍA FORENSE DE WINDOWS
                 </h2>
-                <p className="text-xs font-mono-tech text-zinc-400">
+                <p className="text-xs font-mono-tech text-zinc-400 mt-0.5">
                   Completá esta ficha técnica antes y después de intervenir cualquier sistema.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-black/80 border-2 border-dashed border-cyan-900 space-y-4 font-mono-tech text-xs">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-b border-zinc-800 pb-3">
+              {/* Spacious Printable Worksheet */}
+              <div className="p-4 rounded-xl bg-black/80 border-2 border-dashed border-cyan-900/90 space-y-4 font-mono-tech text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-b border-zinc-800 pb-3.5">
                   <div>
-                    <span className="text-[10px] text-zinc-500 block">FECHA DE PERITAJE:</span>
-                    <div className="h-6 border-b border-zinc-700 mt-1"></div>
+                    <span className="text-xs text-zinc-400 block font-bold">FECHA DE PERITAJE:</span>
+                    <div className="h-7 border-b border-zinc-600 mt-1"></div>
                   </div>
                   <div>
-                    <span className="text-[10px] text-zinc-500 block">VERSIÓN DE WINDOWS:</span>
-                    <div className="h-6 border-b border-zinc-700 mt-1"></div>
+                    <span className="text-xs text-zinc-400 block font-bold">VERSIÓN DE WINDOWS:</span>
+                    <div className="h-7 border-b border-zinc-600 mt-1"></div>
                   </div>
                   <div>
-                    <span className="text-[10px] text-zinc-500 block">BUILD NUMBER:</span>
-                    <div className="h-6 border-b border-zinc-700 mt-1"></div>
+                    <span className="text-xs text-zinc-400 block font-bold">BUILD NUMBER:</span>
+                    <div className="h-7 border-b border-zinc-600 mt-1"></div>
                   </div>
                   <div>
-                    <span className="text-[10px] text-zinc-500 block">TÉCNICO A CARGO:</span>
-                    <div className="h-6 border-b border-zinc-700 mt-1"></div>
+                    <span className="text-xs text-zinc-400 block font-bold">TÉCNICO A CARGO:</span>
+                    <div className="h-7 border-b border-zinc-600 mt-1"></div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <span className="text-cyan-400 font-bold text-[11px] block">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="space-y-2.5">
+                    <span className="text-cyan-400 font-bold text-xs uppercase tracking-wide block">
                       LÍNEA BASE INICIAL (PRE-INTERVENCIÓN):
                     </span>
-                    <div className="space-y-1.5 text-[11px] text-zinc-400">
-                      <div>Latencia DPC máxima (µs): ______________</div>
-                      <div>Cantidad de procesos en reposo: ________</div>
-                      <div>Consumo de RAM en reposo (GB): _________</div>
-                      <div>Tiempo de arranque LastBIOS (seg): _____</div>
-                      <div>Servicios no Microsoft activos: ________</div>
+                    <div className="space-y-2 text-xs text-zinc-300">
+                      <div>Latencia DPC máxima (µs): ________________________</div>
+                      <div>Cantidad de procesos en reposo: __________________</div>
+                      <div>Consumo de RAM en reposo (GB): ___________________</div>
+                      <div>Tiempo de arranque LastBIOS (seg): _______________</div>
+                      <div>Servicios no Microsoft activos: __________________</div>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <span className="text-emerald-400 font-bold text-[11px] block">
+                  <div className="space-y-2.5">
+                    <span className="text-emerald-400 font-bold text-xs uppercase tracking-wide block">
                       LÍNEA BASE FINAL (POST-INTERVENCIÓN):
                     </span>
-                    <div className="space-y-1.5 text-[11px] text-zinc-400">
-                      <div>Latencia DPC máxima (µs): ______________</div>
-                      <div>Cantidad de procesos en reposo: ________</div>
-                      <div>Consumo de RAM en reposo (GB): _________</div>
-                      <div>Tiempo de arranque LastBIOS (seg): _____</div>
-                      <div>Delta de mejora verificado (%): ________</div>
+                    <div className="space-y-2 text-xs text-zinc-300">
+                      <div>Latencia DPC máxima (µs): ________________________</div>
+                      <div>Cantidad de procesos en reposo: __________________</div>
+                      <div>Consumo de RAM en reposo (GB): ___________________</div>
+                      <div>Tiempo de arranque LastBIOS (seg): _______________</div>
+                      <div>Delta de mejora verificado (%): __________________</div>
                     </div>
                   </div>
                 </div>
 
                 <div className="pt-3 border-t border-zinc-800">
-                  <span className="text-[10px] text-zinc-500 block mb-1">
+                  <span className="text-xs text-zinc-400 block mb-1 font-bold">
                     FIRMA DE CONFORMIDAD Y PUNTO DE RESTAURACIÓN CREADO:
                   </span>
-                  <div className="h-10 border border-zinc-800 rounded bg-zinc-950/50 p-2 text-[10px] text-zinc-600">
-                    Nombre del Restore Point: EVO_AUDIT_BASELINE_[FECHA] // SHA256 Registro Respaldado
+                  <div className="h-12 border border-zinc-800 rounded-lg bg-zinc-950/70 p-2.5 text-xs text-zinc-400 flex items-center justify-between">
+                    <span>Nombre del Restore Point: EVO_AUDIT_BASELINE_[FECHA]</span>
+                    <span className="text-zinc-600 font-bold">FIRMA: ___________________</span>
                   </div>
                 </div>
               </div>
 
-              <div className="text-[10px] font-mono-tech text-cyan-400 text-center">
+              <div className="text-xs font-mono-tech text-cyan-300 text-center py-1">
                 ESTA FICHA PUEDE IMPRIMIRSE DIRECTAMENTE EN HOJA A4 PARA INCORPORAR AL EXPEDIENTE DE TALLER.
               </div>
             </div>
@@ -1681,75 +1774,96 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+          className="no-print fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
         >
-          <div className="bg-[#0b0e14] border border-cyan-900/80 rounded-2xl max-w-lg w-full p-6 text-white space-y-4 shadow-2xl font-sans-editorial">
-            <div className="flex items-center justify-between border-b border-cyan-950 pb-3">
-              <div className="flex items-center gap-2">
-                <Printer className="w-5 h-5 text-cyan-400" />
-                <h3 className="font-display font-bold text-lg text-white">
-                  Exportar Tomo 02 a PDF A4
+          <div className="bg-[#0b0e15] border-2 border-cyan-400/80 rounded-xl max-w-xl w-full p-5 sm:p-6 shadow-2xl relative font-mono-tech my-auto">
+            <button
+              type="button"
+              onClick={() => setShowExportModal(false)}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 cursor-pointer bg-zinc-900 rounded border border-zinc-800"
+              title="Cerrar ventana"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4 border-b border-zinc-800 pb-3">
+              <div className="w-9 h-9 rounded bg-cyan-400/15 border border-cyan-400/40 flex items-center justify-center text-cyan-400">
+                <Printer className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-sm tracking-wider uppercase flex items-center gap-2">
+                  <span>DESCARGAR PDF EDITORIAL // A4</span>
+                  <span className="px-1.5 py-0.2 bg-cyan-400/20 text-cyan-400 text-[10px] font-bold rounded border border-cyan-400/40">
+                    38 PÁGINAS
+                  </span>
                 </h3>
+                <p className="text-zinc-400 text-[11px]">
+                  EVO LABS MAGAZINE // TOMO 02 // LA BIBLIA NEGRA DE WINDOWS
+                </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowExportModal(false)}
-                className="p-1 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
             </div>
 
-            <div className="space-y-3 text-xs text-zinc-300 font-mono-tech">
-              <p className="font-sans-editorial text-sm">
-                Para obtener un PDF de calidad editorial idéntico a una revista impresa:
-              </p>
-              <div className="p-3 rounded-xl bg-black/60 border border-cyan-950 space-y-1.5 text-[11px]">
-                <div>1. Destino: <strong>Guardar como PDF</strong></div>
-                <div>2. Tamaño de papel: <strong>A4</strong></div>
-                <div>3. Márgenes: <strong>Ninguno / 0 mm</strong></div>
-                <div>4. Gráficos de fondo: <strong>Activado (Obligatorio)</strong></div>
-              </div>
-
-              {isInIframe && (
-                <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-900 text-cyan-300 text-[11px] space-y-2">
-                  <p>
-                    💡 Estás en una vista de previsualización. Para abrir el diálogo de impresión nativo sin restricciones del navegador:
-                  </p>
-                  <a
-                    href={getStandalonePrintUrl()}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500 text-black font-bold hover:bg-cyan-400 transition-colors"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>ABRIR EN PESTAÑA NUEVA PARA IMPRIMIR</span>
-                  </a>
+            {isInIframe && (
+              <div className="mb-4 p-3 bg-cyan-400/10 border border-cyan-400/40 rounded-lg text-xs text-cyan-200 flex items-start gap-2.5">
+                <ExternalLink className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                <div className="leading-relaxed">
+                  <span className="font-bold">Aviso de Entorno Seguro:</span> Al visualizar la app en un recuadro integrado (iFrame), los navegadores restringen la apertura del cuadro de impresión directo. Para generar el PDF con máxima resolución vectorial y las 38 páginas en orden exacto, abrí el documento en pestaña completa:
                 </div>
-              )}
+              </div>
+            )}
+
+            {/* ACTION 1: OPEN IN CLEAN FULLSCREEN TAB (RECOMMENDED & UNBLOCKABLE) */}
+            <div className="space-y-3 mb-5">
+              <a
+                href={getStandalonePrintUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setShowExportModal(false)}
+                className="w-full py-3.5 px-4 bg-cyan-400 hover:bg-cyan-300 active:scale-[0.99] text-black font-black text-xs sm:text-sm uppercase tracking-wider rounded-lg text-center transition-all cursor-pointer flex items-center justify-center gap-2.5 shadow-[0_0_20px_rgba(0,210,255,0.45)] border border-cyan-300"
+              >
+                <Download className="w-4 h-4 stroke-[2.5]" />
+                <span>ABRIR EN PESTAÑA COMPLETA Y GUARDAR PDF</span>
+                <ExternalLink className="w-4 h-4 opacity-80" />
+              </a>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {/* ACTION 2: FORCE PRINT IN CURRENT WINDOW */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowExportModal(false);
+                    handleNativePrint();
+                  }}
+                  className="py-2.5 px-3 bg-[#161a25] hover:bg-[#202738] text-zinc-200 hover:text-white border border-zinc-700/80 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Printer className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Imprimir en esta ventana</span>
+                </button>
+
+                {/* ACTION 3: DOWNLOAD COMPLETE OFFLINE HTML */}
+                <button
+                  type="button"
+                  onClick={handleDownloadOfflineHtml}
+                  className="py-2.5 px-3 bg-[#161a25] hover:bg-[#202738] text-zinc-200 hover:text-white border border-zinc-700/80 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-2"
+                  title="Descargar archivo .html completo con todas las 38 páginas para abrir y guardar offline"
+                >
+                  <FileDown className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Descargar HTML Offline</span>
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-cyan-950">
-              <button
-                type="button"
-                onClick={handleDownloadOfflineHtml}
-                className="px-3 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-mono-tech flex items-center gap-1.5 cursor-pointer"
-              >
-                <FileDown className="w-3.5 h-3.5" />
-                <span>DESCARGAR HTML OFFLINE</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowExportModal(false);
-                  handleNativePrint();
-                }}
-                className="px-4 py-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold text-xs font-mono-tech flex items-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(0,210,255,0.4)]"
-              >
-                <Printer className="w-4 h-4" />
-                <span>IMPRIMIR AHORA</span>
-              </button>
+            {/* Directives for Clean Vector PDF */}
+            <div className="p-3 bg-black/60 border border-zinc-800 rounded-lg text-[11px] text-zinc-300 space-y-1">
+              <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1">
+                ⚙️ Configuración recomendada en el cuadro de impresión:
+              </span>
+              <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-zinc-300">
+                <div>• Destino: <strong className="text-white">Guardar como PDF</strong></div>
+                <div>• Tamaño: <strong className="text-white">A4 (210×297 mm)</strong></div>
+                <div>• Márgenes: <strong className="text-white">Ninguno / 0 mm</strong></div>
+                <div>• Gráficos de fondo: <strong className="text-emerald-400">Activado</strong></div>
+              </div>
             </div>
           </div>
         </div>

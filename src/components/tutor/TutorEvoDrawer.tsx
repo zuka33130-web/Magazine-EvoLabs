@@ -80,7 +80,7 @@ export const TutorEvoDrawer: React.FC = () => {
       role="dialog"
       aria-modal="true"
       aria-label="Tutor EVO"
-      className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-sm flex justify-end animate-in fade-in duration-200"
+      className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-sm flex justify-end animate-in fade-in duration-200 print:hidden no-print"
     >
       {/* Backdrop click to close */}
       <div

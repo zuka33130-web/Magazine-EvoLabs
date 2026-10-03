@@ -49,35 +49,35 @@ export const Tomo02ModuleVisual: React.FC<VisualProps> = ({ module, richData, co
       case 'm00':
         return <AperturaMethodVisual />;
       case 'm01':
-        return <RingArchitectureVisual />;
-      case 'm02':
-        return <MemoryHierarchyVisual />;
-      case 'm03':
-        return <ProcessTreeVisual />;
-      case 'm04':
-        return <DpcIsrLatencyVisual />;
-      case 'm05':
-        return <NtfsMftVisual />;
-      case 'm06':
-        return <NvmeStoragePipelineVisual />;
-      case 'm07':
         return <BootPipelineVisual />;
+      case 'm02':
+        return <GenericKernelVisual module={module} richData={richData} />;
+      case 'm03':
+        return <NtfsMftVisual />;
+      case 'm04':
+        return <NvmeStoragePipelineVisual />;
+      case 'm05':
+        return <GenericKernelVisual module={module} richData={richData} />;
+      case 'm06':
+        return <RingArchitectureVisual />;
+      case 'm07':
+        return <MemoryHierarchyVisual />;
       case 'm08':
-        return <RegistryHiveVisual />;
+        return <DpcIsrLatencyVisual />;
       case 'm09':
-        return <EventLogEtwVisual />;
+        return <GenericKernelVisual module={module} richData={richData} />;
       case 'm10':
         return <NetworkSocketsVisual />;
       case 'm11':
-        return <ScmServicesVisual />;
+        return <AutorunsPersistenceVisual />;
       case 'm12':
-        return <WddmGraphicsVisual />;
+        return <ScmServicesVisual />;
       case 'm13':
         return <TaskSchedulerVisual />;
       case 'm14':
-        return <AutorunsPersistenceVisual />;
+        return <EventLogEtwVisual />;
       case 'm15':
-        return <RegistryHexTypesVisual />;
+        return <RegistryHiveVisual />;
       case 'm16':
         return <TelemetryPipelineVisual />;
       case 'm17':
@@ -2802,125 +2802,59 @@ export function getVisualPedagogicalMeta(moduleId: string, module: TomoModuleIte
 
     case 'm01':
       return {
-        badge: 'DIAGRAMA DE ARQUITECTURA NT',
-        title: 'FRONTERA RING 3 VS RING 0 Y TRANSICIÓN SYSCALL',
+        badge: 'MAPA DE FLUJO SECUENCIAL',
+        title: 'PIPELINE COMPLETO DE ARRANQUE: DE UEFI A ESCRITORIO',
         whatYouAreSeeing:
-          'La división física del espacio de memoria virtual y la compuerta de hardware (SYSCALL / SYSENTER) que separa las aplicaciones de usuario de las estructuras maestras del núcleo ntoskrnl.exe y los controladores HAL.',
+          'Las 5 fases cronológicas obligatorias del arranque de Windows: POST de UEFI, cargador de arranque bootmgfw.efi en la partición ESP, winload.efi, inicialización del kernel ntoskrnl.exe y la transición al escritorio en Sesión 1.',
         focalPoints: [
           {
-            label: 'Instrucción SYSCALL',
-            instruction: 'Mirá la compuerta central de hardware entre ntdll.dll y KiSystemCall64.',
+            label: 'Partición ESP FAT32',
+            instruction: 'Mirá el paso 2 donde se ejecuta bootmgfw.efi.',
             detail:
-              'Es el único punto legal por donde una aplicación de usuario puede solicitar una operación privilegiada al procesador.',
+              'Si esta partición de 100 MB se corrompe, el equipo muestra error 0xc000000e sin importar que el Windows esté intacto en la unidad C:.',
           },
           {
-            label: 'Aislamiento de Memoria',
-            instruction: 'Fijate en los rangos de direcciones virtuales asignados a Ring 3 vs Ring 0.',
+            label: 'ELAM (Early Launch Anti-Malware)',
+            instruction: 'Fijate en la fase 3 bajo winload.efi.',
             detail:
-              'Si una app de usuario intenta leer 0xFFFF8000..., el hardware de la CPU dispara un fallo de página (Page Fault 0xC0000005) antes de tocar el núcleo.',
+              'Carga el driver de seguridad antes que cualquier otro controlador para neutralizar rootkits de arranque.',
           },
           {
-            label: 'Ubicación de Drivers',
-            instruction: 'Comprobá que los controladores de GPU y red residen en Ring 0.',
+            label: 'Aislamiento de Sesión 0 y 1',
+            instruction: 'Observá la transición final en el paso 5.',
             detail:
-              'Explica por qué un bug en el driver gráfico provoca una pantalla azul y no un simple cierre de ventana.',
+              'Los servicios corren en Sesión 0 completamente aislados de la pantalla interactiva del usuario para evitar ataques de inyección DLL.',
           },
         ],
         whyItMatters:
-          'Rompe el mito de que los programas tocan directamente la memoria o el silicio: todo pasa por esta frontera con un costo medible de cambio de contexto (context switch).',
+          'Permite reparar arranques fallidos con comandos exactos (bcdboot, bootrec) identificando exactamente en qué fase se interrumpe la carga.',
       };
 
     case 'm02':
       return {
-        badge: 'RECREACIÓN DIDÁCTICA EVO // RESMON',
-        title: 'LOS 4 NIVELES DE MEMORIA: FÍSICA, STANDBY Y DISPONIBLE REAL',
+        badge: 'MAPA DE DESPLIEGUE // INSTALACIÓN',
+        title: 'PARTICIONADO GPT, TABLA EFI Y ESTRUCTURA DE MEDIOS',
         whatYouAreSeeing:
-          'El mapa completo de asignación de RAM física en un equipo estándar de 16 GB, reflejando exactamente cómo Resource Monitor y RAMMap clasifican cada megabyte entre Reserva de Hardware, En Uso, Modificada, Standby y Libre.',
+          'La estructura obligatoria de particiones para UEFI moderno (GPT, ESP FAT32, MSR y partición NTFS del SO) y el flujo de instalación sin herramientas desestabilizadoras.',
         focalPoints: [
           {
-            label: 'Caché Standby',
-            instruction: 'Mirá el bloque azul (5.3 GB) etiquetado como "En Espera".',
+            label: 'Partición EFI System (ESP)',
+            instruction: 'Observá la partición FAT32 obligatoria de 100 a 260 MB.',
             detail:
-              'Contiene archivos y librerías precargadas por SysMain/SuperFetch. Es memoria DISPONIBLE que se cede al instante si una app la pide.',
+              'Aísla el cargador de arranque del sistema operativo principal, permitiendo arranque seguro Secure Boot.',
           },
           {
-            label: 'Memoria Modificada',
-            instruction: 'Fijate en el bloque ámbar entre En Uso y Standby.',
+            label: 'Alineación de Clústeres',
+            instruction: 'Fijate en los límites de sectores 4K nativos.',
             detail:
-              'Son páginas alteradas por procesos que esperan ser escritas al disco por el Modified Page Writer antes de pasar a la lista de espera o libre.',
-          },
-          {
-            label: 'Métrica Disponible Real',
-            instruction: 'Observá la suma de Standby + Libre en el panel inferior.',
-            detail:
-              'Tener 2 GB "Libres" y 5 GB en "Standby" significa que hay 7 GB listos para usar inmediatamente. Los optimizadores que vacían Standby solo generan tirones de disco.',
+              'Un particionado manual correcto asegura un rendimiento óptimo de lectura/escritura en unidades NVMe y SSD.',
           },
         ],
         whyItMatters:
-          'Permite diagnosticar al instante si un cliente realmente necesita más RAM o si está siendo víctima de un software limpiador que degrada el rendimiento de su SSD.',
+          'Evita errores clásicos como instalaciones en modo heredado MBR en placas base UEFI modernas o particiones huérfanas en múltiples discos.',
       };
 
     case 'm03':
-      return {
-        badge: 'RECREACIÓN DIDÁCTICA EVO // PROCESS EXPLORER',
-        title: 'ÁRBOL GENEALÓGICO DE PROCESOS Y CONTROLADORES DE OBJETO',
-        whatYouAreSeeing:
-          'La jerarquía oficial e indestructible de procesos del sistema operativo Windows: desde System (PID 4) hasta las instancias agrupadas de svchost.exe y la sesión gráfica del usuario.',
-        focalPoints: [
-          {
-            label: 'PID 4 (System)',
-            instruction: 'Mirá la raíz del árbol en la parte superior.',
-            detail:
-              'Representa los hilos de ejecución propios del kernel. Su ejecutable es ntoskrnl.exe y nunca puede tener un padre distinto a la nada.',
-          },
-          {
-            label: 'Línea de Vida de Services.exe',
-            instruction: 'Seguí el camino: System ➔ smss ➔ wininit ➔ services.exe.',
-            detail:
-              'Services.exe es el Service Control Manager (SCM). Es el ÚNICO padre legítimo de todas las instancias de svchost.exe del sistema.',
-          },
-          {
-            label: 'Procesos Críticos Protegidos',
-            instruction: 'Notá los procesos marcados en rojo como csrss.exe.',
-            detail:
-              'Tienen la bandera de proceso crítico activada en su estructura EPROCESS; terminarlos provoca intencionalmente un BSOD CRITICAL_PROCESS_DIED.',
-          },
-        ],
-        whyItMatters:
-          'Es la prueba forense definitiva para detectar troyanos y mineros: cualquier svchost fuera de esta rama es inmediatamente catalogado como intruso.',
-      };
-
-    case 'm04':
-      return {
-        badge: 'INFOGRAFÍA TÉCNICA // LATENCYMON',
-        title: 'TIMELINE DE INTERRUPCIÓN: ISR, COLA DPC Y LATENCIA DE AUDIO',
-        whatYouAreSeeing:
-          'Comparativa cronológica entre un controlador que atiende interrupciones dentro de la norma (&lt;100 µs) y un controlador defectuoso que retiene el procesador en nivel DISPATCH_LEVEL por más de 2000 µs.',
-        focalPoints: [
-          {
-            label: 'ISR (DIRQL)',
-            instruction: 'Mirá la primera fase inmediata al pin físico de interrupción.',
-            detail:
-              'Tiene la máxima prioridad. No procesa datos pesados; solo encola la solicitud en la lista DPC del núcleo y libera el bus.',
-          },
-          {
-            label: 'DPC Queue (IRQL 2)',
-            instruction: 'Observá la barra de tiempo en microsegundos de la rutina DPC.',
-            detail:
-              'Si el driver de red o Wi-Fi se queda atascado acá por 2 milisegundos, ningún hilo de usuario (como el audio de un juego o DAW) puede ejecutarse en ese núcleo.',
-          },
-          {
-            label: 'Umbral Crítico de 1000 µs',
-            instruction: 'Fijate en la línea divisoria roja del gráfico.',
-            detail:
-              'Superar 1000 µs provoca un "buffer underrun" acústico instantáneo (chasquido, crackle o stuttering severo en pantalla).',
-          },
-        ],
-        whyItMatters:
-          'Demuestra científicamente que el "stuttering" en juegos no siempre es falta de GPU o RAM, sino un driver de red o energía mal programado bloqueando la CPU.',
-      };
-
-    case 'm05':
       return {
         badge: 'DIAGRAMA DE ARQUITECTURA EN DISCO',
         title: 'ESTRUCTURA DE REGISTRO MFT DE 1024 BYTES EN SISTEMA NTFS',
@@ -2950,7 +2884,7 @@ export function getVisualPedagogicalMeta(moduleId: string, module: TomoModuleIte
           'Enseña al técnico la diferencia entre fragmentación lógica de clústeres y saturación de la MFT, fundamental para optimizaciones reales de disco sin placebo.',
       };
 
-    case 'm06':
+    case 'm04':
       return {
         badge: 'INFOGRAFÍA DE SUBSISTEMA // PIPELINE DE E/S',
         title: 'PILA DE ALMACENAMIENTO: DE USER-MODE A NVMe CON TRIM',
@@ -2980,64 +2914,118 @@ export function getVisualPedagogicalMeta(moduleId: string, module: TomoModuleIte
           'Permite diagnosticar por qué un SSD NVMe ultrarrápido puede sentirse congelado o lento debido a controladores StorPort obsoletos o minifiltros corruptos.',
       };
 
-    case 'm07':
+    case 'm05':
       return {
-        badge: 'MAPA DE FLUJO SECUENCIAL',
-        title: 'PIPELINE COMPLETO DE ARRANQUE: DE UEFI A ESCRITORIO',
+        badge: 'CICLO DE VIDA DE SOFTWARE // DLL HELL',
+        title: 'QUÉ OCURRE AL INSTALAR: MSI, REGISTRO Y DEPENDENCIAS',
         whatYouAreSeeing:
-          'Las 5 fases cronológicas obligatorias del arranque de Windows: POST de UEFI, cargador de arranque bootmgfw.efi en la partición ESP, winload.efi, inicialización del kernel ntoskrnl.exe y la transición al escritorio en Sesión 1.',
+          'El flujo de despliegue de software en Windows: extracción de binarios en Program Files, registro de DLLs en System32/SysWOW64, claves COM en HKLM\\Software y servicios en el Service Control Manager.',
         focalPoints: [
           {
-            label: 'Partición ESP FAT32',
-            instruction: 'Mirá el paso 2 donde se ejecuta bootmgfw.efi.',
+            label: 'Aislamiento SysWOW64',
+            instruction: 'Observá la redirección de ejecutables de 32 bits en Windows de 64 bits.',
             detail:
-              'Si esta partición de 100 MB se corrompe, el equipo muestra error 0xc000000e sin importar que el Windows esté intacto en la unidad C:.',
+              'System32 aloja binarios de 64 bits y SysWOW64 los de 32 bits; entender este puente evita fallos de carga DLL (0xc000007b).',
           },
           {
-            label: 'ELAM (Early Launch Anti-Malware)',
-            instruction: 'Fijate en la fase 3 bajo winload.efi.',
+            label: 'Registro de Servicios',
+            instruction: 'Fijate en la creación de entradas de arranque automático.',
             detail:
-              'Carga el driver de seguridad antes que cualquier otro controlador para neutralizar rootkits de arranque.',
-          },
-          {
-            label: 'Aislamiento de Sesión 0 y 1',
-            instruction: 'Observá la transición final en el paso 5.',
-            detail:
-              'Los servicios corren en Sesión 0 completamente aislados de la pantalla interactiva del usuario para evitar ataques de inyección DLL.',
+              'Instaladores invasivos suelen agregar servicios en segundo plano y tareas programadas sin consentimiento explícito.',
           },
         ],
         whyItMatters:
-          'Permite reparar arranques fallidos con comandos exactos (bcdboot, bootrec) identificando exactamente en qué fase se interrumpe la carga.',
+          'Capacita al técnico para desinstalar o limpiar software residual de forma manual y quirúrgica sin formatear.',
+      };
+
+    case 'm06':
+      return {
+        badge: 'DIAGRAMA DE ARQUITECTURA NT // ANILLOS DE KERNEL',
+        title: 'FRONTERA RING 3 VS RING 0 Y TRANSICIÓN SYSCALL',
+        whatYouAreSeeing:
+          'La división física del espacio de memoria virtual y la compuerta de hardware (SYSCALL / SYSENTER) que separa las aplicaciones de usuario de las estructuras maestras del núcleo ntoskrnl.exe y los controladores HAL.',
+        focalPoints: [
+          {
+            label: 'Instrucción SYSCALL',
+            instruction: 'Mirá la compuerta central de hardware entre ntdll.dll y KiSystemCall64.',
+            detail:
+              'Es el único punto legal por donde una aplicación de usuario puede solicitar una operación privilegiada al procesador.',
+          },
+          {
+            label: 'Aislamiento de Memoria',
+            instruction: 'Fijate en los rangos de direcciones virtuales asignados a Ring 3 vs Ring 0.',
+            detail:
+              'Si una app de usuario intenta leer 0xFFFF8000..., el hardware de la CPU dispara un fallo de página (Page Fault 0xC0000005) antes de tocar el núcleo.',
+          },
+          {
+            label: 'Ubicación de Drivers',
+            instruction: 'Comprobá que los controladores de GPU y red residen en Ring 0.',
+            detail:
+              'Explica por qué un bug en el driver gráfico provoca una pantalla azul y no un simple cierre de ventana.',
+          },
+        ],
+        whyItMatters:
+          'Rompe el mito de que los programas tocan directamente la memoria o el silicio: todo pasa por esta frontera con un costo medible de cambio de contexto (context switch).',
+      };
+
+    case 'm07':
+      return {
+        badge: 'RECREACIÓN DIDÁCTICA EVO // RESMON & RAMMAP',
+        title: 'LOS 4 NIVELES DE MEMORIA: FÍSICA, STANDBY Y DISPONIBLE REAL',
+        whatYouAreSeeing:
+          'El mapa completo de asignación de RAM física en un equipo estándar de 16 GB, reflejando exactamente cómo Resource Monitor y RAMMap clasifican cada megabyte entre Reserva de Hardware, En Uso, Modificada, Standby y Libre.',
+        focalPoints: [
+          {
+            label: 'Caché Standby',
+            instruction: 'Mirá el bloque azul (5.3 GB) etiquetado como "En Espera".',
+            detail:
+              'Contiene archivos y librerías precargadas por SysMain/SuperFetch. Es memoria DISPONIBLE que se cede al instante si una app la pide.',
+          },
+          {
+            label: 'Memoria Modificada',
+            instruction: 'Fijate en el bloque ámbar entre En Uso y Standby.',
+            detail:
+              'Son páginas alteradas por procesos que esperan ser escritas al disco por el Modified Page Writer antes de pasar a la lista de espera o libre.',
+          },
+          {
+            label: 'Métrica Disponible Real',
+            instruction: 'Observá la suma de Standby + Libre en el panel inferior.',
+            detail:
+              'Tener 2 GB "Libres" y 5 GB en "Standby" significa que hay 7 GB listos para usar inmediatamente. Los optimizadores que vacían Standby solo generan tirones de disco.',
+          },
+        ],
+        whyItMatters:
+          'Permite diagnosticar al instante si un cliente realmente necesita más RAM o si está siendo víctima de un software limpiador que degrada el rendimiento de su SSD.',
       };
 
     case 'm08':
       return {
-        badge: 'DIAGRAMA DE ARQUITECTURA EN MEMORIA',
-        title: 'COLMENAS DEL REGISTRO EN DISCO Y CELDAS HBIN EN MEMORIA',
+        badge: 'INFOGRAFÍA TÉCNICA // LATENCYMON',
+        title: 'TIMELINE DE INTERRUPCIÓN: ISR, COLA DPC Y LATENCIA DE AUDIO',
         whatYouAreSeeing:
-          'La correspondencia entre los archivos físicos de colmena en System32/config (SYSTEM, SOFTWARE, NTUSER.DAT) y su estructura en memoria mapeada dividida en bloques HBIN de 4096 bytes con celdas NK, VK y DATA.',
+          'Comparativa cronológica entre un controlador que atiende interrupciones dentro de la norma (<100 µs) y un controlador defectuoso que retiene el procesador en nivel DISPATCH_LEVEL por más de 2000 µs.',
         focalPoints: [
           {
-            label: 'Archivos .LOG1 y .LOG2',
-            instruction: 'Mirá los archivos de registro transaccional junto a SYSTEM.',
+            label: 'ISR (DIRQL)',
+            instruction: 'Mirá la primera fase inmediata al pin físico de interrupción.',
             detail:
-              'Windows usa Write-Ahead Logging (WAL): primero escribe en el log y luego altera la colmena para evitar corrupción si se corta la energía.',
+              'Tiene la máxima prioridad. No procesa datos pesados; solo encola la solicitud en la lista DPC del núcleo y libera el bus.',
           },
           {
-            label: 'Celdas NK y VK',
-            instruction: 'Fijate en la estructura interna de los bloques HBIN en RAM.',
+            label: 'DPC Queue (IRQL 2)',
+            instruction: 'Observá la barra de tiempo en microsegundos de la rutina DPC.',
             detail:
-              'Las claves y valores son punteros referenciados por offsets relativos. Borrar claves a lo loco rompe punteros cruzados que ningún cleaner repara.',
+              'Si el driver de red o Wi-Fi se queda atascado acá por 2 milisegundos, ningún hilo de usuario (como el audio de un juego o DAW) puede ejecutarse en ese núcleo.',
           },
           {
-            label: 'Asincronía de Escritura',
-            instruction: 'Observá la nota sobre el Flush del Configuration Manager.',
+            label: 'Umbral Crítico de 1000 µs',
+            instruction: 'Fijate en la línea divisoria roja del gráfico.',
             detail:
-              'Editar el Registro modifica la memoria RAM inmediatamente; el volcado a disco ocurre en segundo plano por el worker de sistema.',
+              'Superar 1000 µs provoca un "buffer underrun" acústico instantáneo (chasquido, crackle o stuttering severo en pantalla).',
           },
         ],
         whyItMatters:
-          'Desmitifica el mito de los "limpiadores de registro": borrar 200 claves huérfanas en un archivo de 80 MB ahorra 0% de RAM y expone a un pantallazo azul instantáneo.',
+          'Demuestra científicamente que el "stuttering" en juegos no siempre es falta de GPU o RAM, sino un driver de red o energía mal programado bloqueando la CPU.',
       };
 
     case 'm09':
@@ -3102,6 +3090,36 @@ export function getVisualPedagogicalMeta(moduleId: string, module: TomoModuleIte
 
     case 'm11':
       return {
+        badge: 'MAPA FORENSE DE PERSISTENCIA // AUTORUNS',
+        title: 'VECTORES DE PERSISTENCIA Y PUNTOS DE ENGANCHE AL ARRANQUE',
+        whatYouAreSeeing:
+          'Los puntos neurálgicos donde programas legítimos y malware se registran para iniciar automáticamente con Windows, comparando las claves Run tradicionales con los puntos críticos de Winlogon (Shell y Userinit).',
+        focalPoints: [
+          {
+            label: 'Claves Run Estándar',
+            instruction: 'Mirá el primer recuadro con la ruta de HKLM CurrentVersion Run.',
+            detail:
+              'Es el punto visible que muestra el Administrador de Tareas. Desactivar entradas acá es seguro y no rompe Windows.',
+          },
+          {
+            label: 'Winlogon Shell Hijack',
+            instruction: 'Observá el segundo recuadro con Shell = "explorer.exe".',
+            detail:
+              'Si este valor se altera o se añade un segundo ejecutable separado por coma, el sistema ejecutará el binario intruso antes de abrir el escritorio.',
+          },
+          {
+            label: 'Firma Digital Authenticode',
+            instruction: 'Fijate en la importancia de verificar que el ejecutable esté firmado.',
+            detail:
+              'Todo binario de Microsoft en puntos de arranque críticos debe tener firma criptográfica válida verificable con Get-AuthenticodeSignature.',
+          },
+        ],
+        whyItMatters:
+          'El Administrador de Tareas solo muestra el 20% de los puntos de arranque; un técnico pericial sabe que el 80% restante vive en estos vectores de persistencia.',
+      };
+
+    case 'm12':
+      return {
         badge: 'DIAGRAMA DE ARQUITECTURA // SCM',
         title: 'AGRUPACIÓN DE SERVICIOS EN SVCHOST POR CUENTAS DE SEGURIDAD',
         whatYouAreSeeing:
@@ -3130,42 +3148,12 @@ export function getVisualPedagogicalMeta(moduleId: string, module: TomoModuleIte
           'Explica por qué es normal tener 70+ procesos svchost.exe en el Administrador de Tareas: es una medida de seguridad y estabilidad por diseño, no "bloatware".',
       };
 
-    case 'm12':
-      return {
-        badge: 'INFOGRAFÍA TÉCNICA // WDDM PIPELINE',
-        title: 'COMPOSICIÓN DIRECTCOMPOSITION Y EL WATCHDOG TDR DE LA GPU',
-        whatYouAreSeeing:
-          'El flujo de renderizado gráfico de Windows: desde las llamadas Direct3D de las apps, pasando por el compositor de escritorio DWM.exe, el subsistema de kernel dxgkrnl.sys, el driver de la GPU y el mecanismo de recuperación en caliente TDR.',
-        focalPoints: [
-          {
-            label: 'Composición DWM.exe',
-            instruction: 'Mirá el paso 2 de la composición de ventanas.',
-            detail:
-              'DWM mantiene una textura GPU para cada ventana; por eso mover una ventana no redibuja el fondo ni provoca el clásico "rastro fantasma" de Windows XP.',
-          },
-          {
-            label: 'Kernel dxgkrnl.sys',
-            instruction: 'Fijate en el planificador de GPU en Ring 0.',
-            detail:
-              'Gestiona la cola de renderizado y comparte la memoria de video VRAM entre el juego activo y las ventanas de fondo.',
-          },
-          {
-            label: 'Watchdog TDR (2 Segundos)',
-            instruction: 'Leé con atención el recuadro inferior sobre el TDR.',
-            detail:
-              'Si el driver gráfico se congela por 2 segundos, el kernel reinicia el controlador y restaura la pantalla sin provocar un pantallazo azul forzado.',
-          },
-        ],
-        whyItMatters:
-          'Distingue de inmediato si un cuelgue es un crash de hardware de la tarjeta gráfica o una simple recuperación TDR por overclock inestable o driver corrupto.',
-      };
-
     case 'm13':
       return {
         badge: 'INFOGRAFÍA DE SUBSISTEMA // TASK SCHEDULER',
         title: 'MATRIZ DE DISPARO Y EJECUCIÓN DEL PROGRAMADOR DE TAREAS',
         whatYouAreSeeing:
-          'El funcionamiento interno del servicio Schedule (%SystemRoot%\System32\Tasks) evaluando triggers temporales, de inactividad o de eventos para despachar acciones bajo taskhostw.exe con privilegios controlados.',
+          'El funcionamiento interno del servicio Schedule (%SystemRoot%\\System32\\Tasks) evaluando triggers temporales, de inactividad o de eventos para despachar acciones bajo taskhostw.exe con privilegios controlados.',
         focalPoints: [
           {
             label: 'Triggers vs Condiciones',
@@ -3192,62 +3180,56 @@ export function getVisualPedagogicalMeta(moduleId: string, module: TomoModuleIte
 
     case 'm14':
       return {
-        badge: 'RECREACIÓN DIDÁCTICA EVO // AUTORUNS',
-        title: 'VECTORES DE PERSISTENCIA Y PUNTOS DE ENGANCHE AL ARRANQUE',
+        badge: 'HERRAMIENTAS FORENSES // TERMINAL',
+        title: 'CMD VS POWERSHELL VS WINDOWS TERMINAL: PIPELINES Y OBJETOS',
         whatYouAreSeeing:
-          'Los puntos neurálgicos donde programas legítimos y malware se registran para iniciar automáticamente con Windows, comparando las claves Run tradicionales con los puntos críticos de Winlogon (Shell y Userinit).',
+          'La diferencia fundamental entre la consola basada en texto plano heredado (CMD.EXE) y el pipeline orientado a objetos de PowerShell (PSObject), junto al motor moderno de renderizado de Windows Terminal.',
         focalPoints: [
           {
-            label: 'Claves Run Estándar',
-            instruction: 'Mirá el primer recuadro con la ruta de HKLM CurrentVersion Run.',
+            label: 'Flujo de Objetos vs Texto',
+            instruction: 'Mirá la transferencia de propiedades tipadas a través del pipe (|).',
             detail:
-              'Es el punto visible que muestra el Administrador de Tareas. Desactivar entradas acá es seguro y no rompe Windows.',
+              'PowerShell no envía líneas de texto como Bash o CMD; envía objetos .NET con métodos y propiedades accesibles.',
           },
           {
-            label: 'Winlogon Shell Hijack',
-            instruction: 'Observá el segundo recuadro con Shell = "explorer.exe".',
+            label: 'Privilegios y ExecutionPolicy',
+            instruction: 'Fijate en la directiva de seguridad de ejecución de scripts.',
             detail:
-              'Si este valor se altera o se añade un segundo ejecutable separado por coma, el sistema ejecutará el binario intruso antes de abrir el escritorio.',
-          },
-          {
-            label: 'Firma Digital Authenticode',
-            instruction: 'Fijate en la importancia de verificar que el ejecutable esté firmado.',
-            detail:
-              'Todo binario de Microsoft en puntos de arranque críticos debe tener firma criptográfica válida verificable con Get-AuthenticodeSignature.',
+              'RemoteSigned previene la ejecución de scripts no firmados descargados de Internet, protegiendo el entorno de trabajo.',
           },
         ],
         whyItMatters:
-          'El Administrador de Tareas solo muestra el 20% de los puntos de arranque; un técnico pericial sabe que el 80% restante vive en estos vectores de persistencia.',
+          'Permite al operador construir scripts de auditoría y automatización sin romper el sistema ni parsear texto frágil.',
       };
 
     case 'm15':
       return {
-        badge: 'REPRESENTACIÓN TÉCNICA // REGISTRO HEX',
-        title: 'ESTRUCTURA BINARIA DE TIPOS DE DATOS: DWORD, SZ Y BINARY',
+        badge: 'DIAGRAMA DE ARQUITECTURA EN MEMORIA',
+        title: 'COLMENAS DEL REGISTRO EN DISCO Y CELDAS HBIN EN MEMORIA',
         whatYouAreSeeing:
-          'La representación a bajo nivel de los tipos de datos fundamentales del Registro de Windows: el almacenamiento de enteros de 32 bits en Little Endian, cadenas UTF-16LE terminadas en nulo y matrices binarias en sintaxis de archivo .reg.',
+          'La correspondencia entre los archivos físicos de colmena en System32/config (SYSTEM, SOFTWARE, NTUSER.DAT) y su estructura en memoria mapeada dividida en bloques HBIN de 4096 bytes con celdas NK, VK y DATA.',
         focalPoints: [
           {
-            label: 'REG_DWORD y Little Endian',
-            instruction: 'Mirá la primera columna con el valor dword:00000001.',
+            label: 'Archivos .LOG1 y .LOG2',
+            instruction: 'Mirá los archivos de registro transaccional junto a SYSTEM.',
             detail:
-              'En el archivo físico y en memoria, el byte menos significativo se almacena primero (01 00 00 00). Modificarlo con scripts requiere respetar esta sintaxis.',
+              'Windows usa Write-Ahead Logging (WAL): primero escribe en el log y luego altera la colmena para evitar corrupción si se corta la energía.',
           },
           {
-            label: 'REG_SZ Terminador Nulo',
-            instruction: 'Observá la columna central de cadenas de texto.',
+            label: 'Celdas NK y VK',
+            instruction: 'Fijate en la estructura interna de los bloques HBIN en RAM.',
             detail:
-              'Cada carácter ocupa 2 bytes (Unicode). Si el byte nulo final se corrompe, los programas que leen el valor pueden provocar un desbordamiento de búfer.',
+              'Las claves y valores son punteros referenciados por offsets relativos. Borrar claves a lo loco rompe punteros cruzados que ningún cleaner repara.',
           },
           {
-            label: 'Sintaxis .reg para Respaldo',
-            instruction: 'Fijate en la estructura de exportación nativa.',
+            label: 'Asincronía de Escritura',
+            instruction: 'Observá la nota sobre el Flush del Configuration Manager.',
             detail:
-              'Permite crear archivos de rollback de un solo clic que restauran exactamente el tipo y valor original en caso de error.',
+              'Editar el Registro modifica la memoria RAM inmediatamente; el volcado a disco ocurre en segundo plano por el worker de sistema.',
           },
         ],
         whyItMatters:
-          'Evita el error de novato de crear un valor como "Cadena" cuando el subsistema de Windows esperaba un "DWORD", lo que deja la configuración inoperativa.',
+          'Desmitifica el mito de los "limpiadores de registro": borrar 200 claves huérfanas en un archivo de 80 MB ahorra 0% de RAM y expone a un pantallazo azul instantáneo.',
       };
 
     case 'm16':

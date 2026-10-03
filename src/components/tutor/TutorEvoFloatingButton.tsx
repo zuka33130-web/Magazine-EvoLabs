@@ -40,7 +40,7 @@ export const TutorEvoFloatingButton: React.FC = () => {
   return (
     <div
       ref={flyoutRef}
-      className="fixed bottom-5 right-5 z-[100] flex flex-col items-end font-sans-editorial select-none"
+      className="fixed bottom-5 right-5 z-[100] flex flex-col items-end font-sans-editorial select-none print:hidden no-print"
     >
       {/* Quick Flyout Menu */}
       {isFlyoutOpen && (

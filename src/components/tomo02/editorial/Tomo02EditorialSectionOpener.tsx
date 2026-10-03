@@ -424,22 +424,22 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
 
   if (compact) {
     return (
-      <header className="mb-4 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#020611] via-[#040C20] to-[#010309] border border-cyan-500/40 shadow-xl font-sans-editorial">
-        <div className="flex flex-col md:flex-row items-center gap-4">
+      <header className="mb-3.5 p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-[#020611] via-[#040C20] to-[#010309] border border-cyan-500/40 shadow-xl font-sans-editorial h-auto">
+        <div className="flex flex-col md:flex-row items-center gap-3.5">
           {/* Section Architectural Vector Schematic */}
-          <div className="w-full md:w-56 h-28 rounded-xl overflow-hidden shrink-0 shadow-lg border border-cyan-800/80">
+          <div className="w-full md:w-52 h-24 rounded-lg overflow-hidden shrink-0 shadow-lg border border-cyan-800/80">
             <Tomo02SectionSchematic sectionId={moduleId} isCompact={true} />
           </div>
 
           {/* Section Title, Impact Quote & Metadata */}
-          <div className="flex-1 space-y-1.5 min-w-0">
+          <div className="flex-1 space-y-1 min-w-0 h-auto">
             <div className="flex items-center gap-2 text-[10px] font-mono-tech text-cyan-400 uppercase tracking-widest font-bold">
               <span>SECCIÓN {data.romanNumber} // BLOQUE EDITORIAL MAESTRO</span>
               <span className="text-zinc-600">·</span>
               <span className="text-zinc-400">{sectionModules.length} MÓDULOS</span>
             </div>
 
-            <h2 className="text-lg sm:text-xl font-display font-black text-white uppercase tracking-tight leading-tight truncate">
+            <h2 className="text-base sm:text-lg font-display font-black text-white uppercase tracking-tight leading-tight truncate">
               {data.sectionTitle}
             </h2>
 
@@ -448,7 +448,7 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
             </p>
 
             {/* Quick 2-Column Insight: Qué vas a entender / Qué vas a comprobar */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[10.5px] font-mono-tech border-t border-cyan-950/70">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[10px] font-mono-tech border-t border-cyan-950/70 items-start">
               <div className="truncate">
                 <span className="text-cyan-400 font-bold">▸ ENTENDER: </span>
                 <span className="text-zinc-300 font-sans-editorial">{data.whatYouWillUnderstand}</span>
@@ -462,18 +462,18 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
         </div>
 
         {/* Dynamic Modules list resolved strictly from TOMO_02_MODULES */}
-        <div className="mt-2.5 pt-2 border-t border-cyan-950/80 flex items-center gap-2 overflow-x-auto text-[10px] font-mono-tech scrollbar-none">
+        <div className="mt-2 pt-1.5 border-t border-cyan-950/80 flex items-center gap-2 overflow-x-auto text-[10px] font-mono-tech scrollbar-none h-auto">
           <span className="text-zinc-500 uppercase tracking-wider shrink-0 font-bold">
             MÓDULOS SECCIÓN {data.romanNumber}:
           </span>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
             {sectionModules.map((item) => (
               <span
                 key={item.id}
-                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-cyan-950/60 border border-cyan-900/60 text-[10px]"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-900/60 text-[9.5px]"
               >
                 <span className="text-cyan-400 font-bold">{item.moduleNumber} —</span>
-                <span className="text-zinc-200 font-medium truncate max-w-[220px]">{item.title}</span>
+                <span className="text-zinc-200 font-medium truncate max-w-[200px]">{item.title}</span>
               </span>
             ))}
           </div>
@@ -484,8 +484,8 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
 
   // Full-Page View
   return (
-    <div className="h-full flex flex-col justify-between space-y-3 font-sans-editorial">
-      <div className="border-b border-cyan-950/80 pb-2.5 flex items-baseline justify-between">
+    <div className="flex flex-col space-y-3 font-sans-editorial h-auto">
+      <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
         <div className="flex items-center gap-3">
           <span className="font-display font-black text-2xl sm:text-3xl text-cyan-400">
             SECCIÓN {data.romanNumber}
@@ -502,7 +502,7 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
         </div>
       </div>
 
-      <div className="space-y-1.5 pt-1">
+      <div className="space-y-1 pt-0.5">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-black text-white uppercase tracking-tight leading-[1.08]">
           {data.sectionTitle}
         </h2>
@@ -511,18 +511,18 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 flex-1 items-stretch min-h-0">
-        <div className="lg:col-span-6 flex flex-col justify-between">
-          <div className="h-full rounded-2xl overflow-hidden bg-black border border-cyan-950/80 shadow-2xl relative min-h-[220px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
+        <div className="lg:col-span-6 flex flex-col space-y-2 h-auto">
+          <div className="h-[230px] rounded-2xl overflow-hidden bg-black border border-cyan-950/80 shadow-2xl relative">
             <Tomo02SectionSchematic sectionId={moduleId} isCompact={false} />
           </div>
-          <span className="text-[9.5px] font-mono-tech text-cyan-400/80 uppercase tracking-wider mt-1.5 block">
+          <span className="text-[9.5px] font-mono-tech text-cyan-400/80 uppercase tracking-wider block">
             {data.architectureBadge}
           </span>
         </div>
 
-        <div className="lg:col-span-6 flex flex-col justify-between space-y-2.5">
-          <div className="p-3 rounded-xl bg-zinc-950/90 border border-cyan-950 space-y-1 text-xs">
+        <div className="lg:col-span-6 flex flex-col space-y-2.5 h-auto">
+          <div className="p-3 rounded-xl bg-zinc-950/90 border border-cyan-950 space-y-1 text-xs h-auto">
             <span className="text-[10px] font-mono-tech text-cyan-400 uppercase tracking-wider font-bold block">
               ▸ QUÉ VAS A ENTENDER EN ESTA SECCIÓN:
             </span>
@@ -531,7 +531,7 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
             </p>
           </div>
 
-          <div className="p-3 rounded-xl bg-zinc-950/90 border border-cyan-950 space-y-1 text-xs">
+          <div className="p-3 rounded-xl bg-zinc-950/90 border border-cyan-950 space-y-1 text-xs h-auto">
             <span className="text-[10px] font-mono-tech text-emerald-400 uppercase tracking-wider font-bold block">
               ▸ QUÉ VAS A COMPROBAR EN LABORATORIO:
             </span>
@@ -540,7 +540,7 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
             </p>
           </div>
 
-          <div className="p-3 rounded-xl bg-black/60 border border-cyan-950/80 space-y-2 text-xs flex-1">
+          <div className="p-3 rounded-xl bg-black/60 border border-cyan-950/80 space-y-2 text-xs h-auto">
             <span className="text-[10px] font-mono-tech text-zinc-400 uppercase tracking-wider font-bold block border-b border-zinc-900 pb-1">
               MÓDULOS DE INVESTIGACIÓN INCLUIDOS:
             </span>
