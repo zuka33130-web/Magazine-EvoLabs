@@ -97,21 +97,24 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
   const [agentHealth, setAgentHealth] = useState<AgentHealth | null>(null);
   const [isCheckingAgent, setIsCheckingAgent] = useState<boolean>(false);
   const [realServices, setRealServices] = useState<AgentWindowsService[]>([]);
-  const [realAllowlist, setRealAllowlist] = useState<string[]>(['SysMain', 'WSearch', 'Spooler', 'DiagTrack']);
+  const [realAllowlist, setRealAllowlist] = useState<string[]>([]);
   const [isLoadingRealServices, setIsLoadingRealServices] = useState<boolean>(false);
   const [selectedRealServiceName, setSelectedRealServiceName] = useState<string>('SysMain');
+
+  // Map storing initial state of real services before any experiment
+  const [initialRealStateMap, setInitialRealStateMap] = useState<Record<string, 'RUNNING' | 'STOPPED'>>({});
 
   // Confirmation Modal for Real PC Experiments
   const [pendingRealAction, setPendingRealAction] = useState<PendingRealAction | null>(null);
   const [isExecutingRealAction, setIsExecutingRealAction] = useState<boolean>(false);
 
-  // Check Agent Connection
+  // Check Agent Connection (Strictly: health.status === 'OK' && health.isWindows === true)
   const checkAgentConnection = async () => {
     setIsCheckingAgent(true);
     try {
       const health = await EvoAgentClient.pingAgent(1800);
       setAgentHealth(health);
-      if (health && health.status === 'OK') {
+      if (health && health.status === 'OK' && health.isWindows) {
         await loadRealServices();
       }
     } catch {
@@ -127,7 +130,21 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
       const res = await EvoAgentClient.fetchWindowsServices();
       if (res && res.services) {
         setRealServices(res.services);
-        if (res.experimentAllowlist) {
+
+        // Store initial states for rollback accuracy
+        setInitialRealStateMap((prev) => {
+          const updated = { ...prev };
+          res.services.forEach((s) => {
+            const normalizedName = s.name.toLowerCase();
+            if (!updated[normalizedName]) {
+              updated[normalizedName] = s.state.toLowerCase() === 'running' ? 'RUNNING' : 'STOPPED';
+            }
+          });
+          return updated;
+        });
+
+        // Allowlist strictly from Agent response
+        if (res.experimentAllowlist && Array.isArray(res.experimentAllowlist)) {
           setRealAllowlist(res.experimentAllowlist);
         }
       }
@@ -142,7 +159,9 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
     checkAgentConnection();
   }, []);
 
-  const isRealAgentActive = Boolean(agentHealth && agentHealth.status === 'OK');
+  const isRealAgentActive = Boolean(
+    agentHealth && agentHealth.status === 'OK' && agentHealth.isWindows === true
+  );
 
   const selectedService =
     servicesState.find((s) => s.id === selectedServiceId) || servicesState[0];
@@ -261,7 +280,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
           target.functionalRisk === 'CRÍTICO' || target.functionalRisk === 'ALTO'
             ? 'EMPEORÓ'
             : 'SIN CAMBIO SIGNIFICATIVO',
-        rollbackCommand: `Start-Service -Name "${target.serviceName}"; Set-Service -Name "${target.serviceName}" -StartupType Automatic`
+        rollbackCommand: `Start-Service -Name "${target.serviceName}"`
       });
     }
   };
@@ -276,6 +295,22 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
     }
     setActiveTestResult(null);
     setTelemetryDelta(null);
+  };
+
+  // Rollback real service to its exact initial state recorded before experiment
+  const handleRollbackRealService = (serviceName: string) => {
+    const targetState = initialRealStateMap[serviceName.toLowerCase()] || 'RUNNING';
+    const currentSvc = realServices.find((s) => s.name.toLowerCase() === serviceName.toLowerCase());
+    const currentNormState = currentSvc?.state.toLowerCase() === 'running' ? 'RUNNING' : 'STOPPED';
+
+    if (currentNormState === targetState) {
+      alert(`El servicio ${serviceName} ya se encuentra en su estado inicial (${targetState}).`);
+      return;
+    }
+
+    const rollbackAction: 'START' | 'STOP' = targetState === 'RUNNING' ? 'START' : 'STOP';
+    const rSvc = currentSvc || ({ name: serviceName, displayName: serviceName } as AgentWindowsService);
+    handleRequestRealAction(rSvc, rollbackAction);
   };
 
   // Open Real Action Confirmation
@@ -308,6 +343,15 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
         pendingRealAction.serviceName,
         pendingRealAction.action
       );
+
+      // Record exact initial state before change from res.before
+      if (res && res.before && res.before.state) {
+        const initialStateNorm = res.before.state.toLowerCase() === 'running' ? 'RUNNING' : 'STOPPED';
+        setInitialRealStateMap((prev) => ({
+          ...prev,
+          [res.serviceName.toLowerCase()]: initialStateNorm
+        }));
+      }
 
       await loadRealServices();
 
@@ -346,8 +390,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
           whatYouLost: pendingRealAction.action === 'STOP' ? pendingRealAction.lostFunctionality : 'Ninguna (Restaurado)',
           whatBroke: pendingRealAction.action === 'STOP' ? pendingRealAction.sideEffect : 'Ninguna (Operativo)',
           riskEvaluation: pendingRealAction.risk,
-          scientificConclusion:
-            ramBefore > 0 || ramAfter > 0 ? 'SIN CAMBIO SIGNIFICATIVO' : 'NO HAY DATOS SUFICIENTES (INCONCLUSO)',
+          scientificConclusion: 'NO HAY DATOS SUFICIENTES (INCONCLUSO)',
           rollbackCommand:
             pendingRealAction.action === 'STOP'
               ? `Start-Service -Name "${res.serviceName}"`
@@ -948,10 +991,19 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
             <div className="flex items-center justify-between border-b border-cyan-950 pb-2">
               <span className="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-cyan-400" />
-                GRAFO DE DEPENDENCIAS // {selectedService.serviceName}
+                GRAFO DE DEPENDENCIAS // {engineMode === 'REAL_PC' && selectedRealService ? selectedRealService.name : selectedService.serviceName}
               </span>
-              <span className="text-zinc-500 text-[10px]">SCM DEPENDENCY TREE</span>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${engineMode === 'REAL_PC' ? 'bg-amber-950 text-amber-300 border border-amber-500/40' : 'text-zinc-500'}`}>
+                {engineMode === 'REAL_PC' ? 'REFERENCE // CATÁLOGO EVO' : 'SCM DEPENDENCY TREE'}
+              </span>
             </div>
+
+            {engineMode === 'REAL_PC' && (
+              <div className="p-2 rounded bg-amber-950/30 border border-amber-500/30 text-[10.5px] font-mono text-amber-200 flex items-center justify-between">
+                <span>DATOS DE GRAFO Y CONSECUENCIAS: <strong>REFERENCE // CATÁLOGO EVO</strong> (Modelo pedagógico, no provisto por Agent)</span>
+                <span className="px-1.5 py-0.2 bg-amber-400 text-black font-black text-[9px] rounded">REFERENCE</span>
+              </div>
+            )}
 
             {/* Dynamic Dependency Chain */}
             <div className="space-y-1.5 text-xs">
@@ -1009,9 +1061,16 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
             {/* Impact Consequence Matrix: Qué depende, Qué se apaga, Qué puede fallar */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-2 border-t border-cyan-950 text-[11px] font-sans-editorial">
               <div className="p-2.5 rounded-lg bg-black/60 border border-cyan-950 space-y-1">
-                <span className="font-mono text-[10px] font-bold text-cyan-300 uppercase block">
-                  1. QUÉ DEPENDE DE ÉL:
-                </span>
+                <div className="flex justify-between items-center">
+                  <span className="font-mono text-[10px] font-bold text-cyan-300 uppercase block">
+                    1. QUÉ DEPENDE DE ÉL:
+                  </span>
+                  {engineMode === 'REAL_PC' && (
+                    <span className="text-[8px] font-mono font-bold text-amber-400 bg-amber-950 px-1 rounded border border-amber-800">
+                      REFERENCE
+                    </span>
+                  )}
+                </div>
                 <p className="text-zinc-300 leading-snug">
                   {selectedService.dependents.length > 0
                     ? selectedService.dependents.join(', ')
@@ -1020,18 +1079,32 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
               </div>
 
               <div className="p-2.5 rounded-lg bg-black/60 border border-amber-950/60 space-y-1">
-                <span className="font-mono text-[10px] font-bold text-amber-300 uppercase block">
-                  2. QUÉ SE APAGA:
-                </span>
+                <div className="flex justify-between items-center">
+                  <span className="font-mono text-[10px] font-bold text-amber-300 uppercase block">
+                    2. QUÉ SE APAGA:
+                  </span>
+                  {engineMode === 'REAL_PC' && (
+                    <span className="text-[8px] font-mono font-bold text-amber-400 bg-amber-950 px-1 rounded border border-amber-800">
+                      REFERENCE
+                    </span>
+                  )}
+                </div>
                 <p className="text-zinc-300 leading-snug">
                   {selectedService.telemetryImpact.lostFunctionality}
                 </p>
               </div>
 
               <div className="p-2.5 rounded-lg bg-black/60 border border-rose-950/60 space-y-1">
-                <span className="font-mono text-[10px] font-bold text-rose-300 uppercase block">
-                  3. QUÉ PUEDE FALLAR:
-                </span>
+                <div className="flex justify-between items-center">
+                  <span className="font-mono text-[10px] font-bold text-rose-300 uppercase block">
+                    3. QUÉ PUEDE FALLAR:
+                  </span>
+                  {engineMode === 'REAL_PC' && (
+                    <span className="text-[8px] font-mono font-bold text-amber-400 bg-amber-950 px-1 rounded border border-amber-800">
+                      REFERENCE
+                    </span>
+                  )}
+                </div>
                 <p className="text-zinc-300 leading-snug">
                   {selectedService.telemetryImpact.potentialSideEffect}
                 </p>
@@ -1149,13 +1222,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
                       if (engineMode === 'SIMULATED') {
                         handleRollbackService(selectedService.id);
                       } else {
-                        const rSvc = realServices.find(
-                          (s) => s.name.toLowerCase() === telemetryDelta.serviceName.toLowerCase()
-                        );
-                        if (rSvc && rSvc.experimentAllowed) {
-                          const rollbackAction = rSvc.state.toLowerCase() === 'running' ? 'STOP' : 'START';
-                          handleRequestRealAction(rSvc, rollbackAction);
-                        }
+                        handleRollbackRealService(telemetryDelta.serviceName);
                       }
                     }}
                     className="px-3 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[10.5px] font-bold cursor-pointer flex items-center gap-1"
