@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Copy, Check, ShieldAlert, Cpu, Sparkles, BookOpen } from 'lucide-react';
+import { Terminal, Copy, Check, ShieldAlert, Cpu, Sparkles, BookOpen, Activity, ShieldCheck } from 'lucide-react';
 import { TomoModuleItem } from '../../../data/tomo02Data';
 import { ChapterRichContent } from '../Tomo02ModuleReader';
 import { Tomo02ModuleVisual } from '../Tomo02VisualEngine';
@@ -73,7 +73,7 @@ export const Tomo02EditorialHero: React.FC<Tomo02EditorialHeroProps> = ({
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-black text-white uppercase tracking-tight leading-[1.08]">
             {module.title}
           </h2>
-          <p className="mt-1 font-mono-tech text-xs sm:text-sm text-cyan-400 uppercase tracking-wide">
+          <p className="mt-1 font-mono-tech text-xs sm:text-sm text-cyan-400 uppercase tracking-wide font-semibold">
             {module.subtitle}
           </p>
         </div>
@@ -97,7 +97,7 @@ export const Tomo02EditorialHero: React.FC<Tomo02EditorialHeroProps> = ({
           )}
 
           {/* Simple Analogy & Evo Explains */}
-          <div className="space-y-2 text-xs leading-relaxed text-zinc-300">
+          <div className="space-y-2 text-xs leading-relaxed text-zinc-300 flex-1 flex flex-col justify-between">
             {richData?.simpleAnalogy && (
               <div className="p-2.5 rounded-lg bg-zinc-950/80 border border-zinc-900 text-[11px]">
                 <strong className="text-white block font-mono-tech text-[10px] text-cyan-300 uppercase mb-0.5">
@@ -109,9 +109,9 @@ export const Tomo02EditorialHero: React.FC<Tomo02EditorialHeroProps> = ({
               </div>
             )}
 
-            <div className="p-2.5 rounded-lg bg-black/60 border border-cyan-950 text-[11px]">
+            <div className="p-2.5 rounded-lg bg-black/60 border border-cyan-950/80 text-[11px]">
               <strong className="text-cyan-400 block font-mono-tech text-[10px] uppercase mb-0.5">
-                OBJETIVO PERICIAL:
+                OBJETIVO METODOLÓGICO:
               </strong>
               <p className="text-zinc-300 font-sans-editorial leading-tight">
                 {module.forensicGoal || module.summary}
@@ -135,7 +135,7 @@ export const Tomo02EditorialHero: React.FC<Tomo02EditorialHeroProps> = ({
                   {isCopied ? (
                     <>
                       <Check className="w-2.5 h-2.5 text-emerald-400" />
-                      <span className="text-emerald-400">COPIADO</span>
+                      <span className="text-emerald-400 font-bold">COPIADO</span>
                     </>
                   ) : (
                     <>
@@ -154,12 +154,12 @@ export const Tomo02EditorialHero: React.FC<Tomo02EditorialHeroProps> = ({
 
         {/* Right Column (7 cols): The Visual Graphic Centerpiece */}
         <div className="lg:col-span-7 flex flex-col justify-between space-y-2">
-          <div className="flex-1 min-h-[260px] max-h-[420px] rounded-xl overflow-hidden border border-cyan-900/70 bg-black/80 shadow-2xl relative">
+          <div className="flex-1 min-h-[260px] max-h-[420px] rounded-xl overflow-hidden border border-cyan-900/70 bg-[#040812] shadow-2xl relative">
             <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
           </div>
 
           {/* Key Takeaways Bottom Strip */}
-          <div className="p-2 rounded-lg bg-zinc-950/90 border border-cyan-950 font-mono-tech text-[10px] space-y-1">
+          <div className="p-2.5 rounded-lg bg-zinc-950/90 border border-cyan-950/80 font-mono-tech text-[10px] space-y-1">
             <span className="text-[9px] font-bold text-cyan-400 uppercase tracking-wider block">
               3 DIRECTIVAS CLAVE DEL SISTEMA:
             </span>
@@ -167,7 +167,7 @@ export const Tomo02EditorialHero: React.FC<Tomo02EditorialHeroProps> = ({
               {module.keyTakeaways.slice(0, 3).map((kt, i) => (
                 <div key={i} className="flex items-start gap-1">
                   <span className="text-cyan-400 font-bold">0{i + 1}.</span>
-                  <span className="line-clamp-2 text-[10px]">{kt}</span>
+                  <span className="line-clamp-2 text-[10px] font-sans-editorial">{kt}</span>
                 </div>
               ))}
             </div>
