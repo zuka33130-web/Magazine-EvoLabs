@@ -64,6 +64,7 @@ interface PendingRealAction {
   serviceName: string;
   displayName: string;
   action: 'STOP' | 'START';
+  isRollback?: boolean;
   risk: 'BAJO' | 'MEDIO' | 'ALTO' | 'CRÍTICO';
   dependencies: string[];
   lostFunctionality: string;
@@ -131,7 +132,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
       if (res && res.services) {
         setRealServices(res.services);
 
-        // Store initial states for rollback accuracy
+        // Store initial states ONLY if not previously recorded for a service
         setInitialRealStateMap((prev) => {
           const updated = { ...prev };
           res.services.forEach((s) => {
@@ -169,14 +170,31 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
   const selectedRealService =
     realServices.find((s) => s.name.toLowerCase() === selectedRealServiceName.toLowerCase()) || realServices[0];
 
-  // Build dynamic dependency graph nodes for any selected service
+  // Lookup reference service in pedagogical catalog for selected real service
+  const referenceService = useMemo(() => {
+    if (engineMode !== 'REAL_PC' || !selectedRealService) return null;
+    return (
+      WINDOWS_SERVICES_DATABASE.find(
+        (s) => s.serviceName.toLowerCase() === selectedRealService.name.toLowerCase()
+      ) || null
+    );
+  }, [engineMode, selectedRealService]);
+
+  // Build dynamic dependency graph nodes for selected service or reference service
   const dependencyGraph: DependencyChainNode[] = useMemo(() => {
-    const isTargetRunning = selectedService.state === 'RUNNING';
+    const activeSvc = engineMode === 'REAL_PC' ? referenceService : selectedService;
+    if (!activeSvc) return [];
+
+    const isTargetRunning =
+      engineMode === 'REAL_PC'
+        ? selectedRealService?.state.toLowerCase() === 'running'
+        : activeSvc.state === 'RUNNING';
+
     const chain: DependencyChainNode[] = [];
 
     // 1. Upstream Parents (Dependencies)
-    if (selectedService.dependencies && selectedService.dependencies.length > 0) {
-      selectedService.dependencies.forEach((dep) => {
+    if (activeSvc.dependencies && activeSvc.dependencies.length > 0) {
+      activeSvc.dependencies.forEach((dep) => {
         const parentSvc = servicesState.find(
           (s) => s.serviceName.toLowerCase() === dep.toLowerCase() || s.id.toLowerCase().includes(dep.toLowerCase())
         );
@@ -199,15 +217,15 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
 
     // 2. Target Service
     chain.push({
-      name: selectedService.serviceName,
-      role: selectedService.displayName,
+      name: activeSvc.serviceName,
+      role: activeSvc.displayName,
       isTarget: true,
       state: isTargetRunning ? 'RUNNING' : 'STOPPED'
     });
 
     // 3. Downstream Consumers (Dependents / Apps)
-    if (selectedService.dependents && selectedService.dependents.length > 0) {
-      selectedService.dependents.slice(0, 3).forEach((dep) => {
+    if (activeSvc.dependents && activeSvc.dependents.length > 0) {
+      activeSvc.dependents.slice(0, 3).forEach((dep) => {
         chain.push({
           name: dep,
           role: 'Consumidor / API dependiente downstream',
@@ -225,7 +243,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
     }
 
     return chain;
-  }, [selectedService, servicesState]);
+  }, [engineMode, referenceService, selectedService, selectedRealService, servicesState]);
 
   // Stop simulated service
   const handleSimulateStop = (svcId: string) => {
@@ -299,8 +317,9 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
 
   // Rollback real service to its exact initial state recorded before experiment
   const handleRollbackRealService = (serviceName: string) => {
-    const targetState = initialRealStateMap[serviceName.toLowerCase()] || 'RUNNING';
-    const currentSvc = realServices.find((s) => s.name.toLowerCase() === serviceName.toLowerCase());
+    const normName = serviceName.toLowerCase();
+    const targetState = initialRealStateMap[normName] || 'RUNNING';
+    const currentSvc = realServices.find((s) => s.name.toLowerCase() === normName);
     const currentNormState = currentSvc?.state.toLowerCase() === 'running' ? 'RUNNING' : 'STOPPED';
 
     if (currentNormState === targetState) {
@@ -310,11 +329,15 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
 
     const rollbackAction: 'START' | 'STOP' = targetState === 'RUNNING' ? 'START' : 'STOP';
     const rSvc = currentSvc || ({ name: serviceName, displayName: serviceName } as AgentWindowsService);
-    handleRequestRealAction(rSvc, rollbackAction);
+    handleRequestRealAction(rSvc, rollbackAction, true);
   };
 
   // Open Real Action Confirmation
-  const handleRequestRealAction = (realSvc: AgentWindowsService, action: 'STOP' | 'START') => {
+  const handleRequestRealAction = (
+    realSvc: AgentWindowsService,
+    action: 'STOP' | 'START',
+    isRollback = false
+  ) => {
     // Map service risks and dependencies safely
     const simMatch = WINDOWS_SERVICES_DATABASE.find(
       (s) => s.serviceName.toLowerCase() === realSvc.name.toLowerCase()
@@ -324,6 +347,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
       serviceName: realSvc.name,
       displayName: realSvc.displayName,
       action,
+      isRollback,
       risk: simMatch?.functionalRisk || 'MEDIO',
       dependencies: simMatch?.dependencies || ['RPCSS'],
       lostFunctionality: simMatch?.telemetryImpact.lostFunctionality || 'Detención temporal del servicio en SO.',
@@ -344,58 +368,72 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
         pendingRealAction.action
       );
 
-      // Record exact initial state before change from res.before
-      if (res && res.before && res.before.state) {
+      const normName = pendingRealAction.serviceName.toLowerCase();
+
+      // Record exact initial state ONCE when starting experiment (never overwrite during rollback)
+      if (!pendingRealAction.isRollback && res && res.before && res.before.state) {
         const initialStateNorm = res.before.state.toLowerCase() === 'running' ? 'RUNNING' : 'STOPPED';
-        setInitialRealStateMap((prev) => ({
-          ...prev,
-          [res.serviceName.toLowerCase()]: initialStateNorm
-        }));
+        setInitialRealStateMap((prev) => {
+          if (!prev[normName]) {
+            return { ...prev, [normName]: initialStateNorm };
+          }
+          return prev;
+        });
       }
 
       await loadRealServices();
 
       if (res && res.success) {
-        const ramBefore = res.before?.workingSetMb ?? 0;
-        const ramAfter = res.after?.workingSetMb ?? 0;
-        const ramDelta = ramAfter - ramBefore;
+        if (pendingRealAction.isRollback) {
+          // On successful rollback: return to initial state and CLEAR experiment record for that service
+          setTelemetryDelta(null);
+          setInitialRealStateMap((prev) => {
+            const updated = { ...prev };
+            delete updated[normName];
+            return updated;
+          });
+        } else {
+          const ramBefore = res.before?.workingSetMb ?? 0;
+          const ramAfter = res.after?.workingSetMb ?? 0;
+          const ramDelta = ramAfter - ramBefore;
 
-        setTelemetryDelta({
-          metricType: 'SYSTEM_REPORTED',
-          serviceName: res.serviceName,
-          before: {
-            ramUsedMb: ramBefore,
-            cpuIdlePercent: -1,
-            runningProcesses: -1,
-            runningServices: -1,
-            diskQueueLength: -1
-          },
-          after: {
-            ramUsedMb: ramAfter,
-            cpuIdlePercent: -1,
-            runningProcesses: -1,
-            runningServices: -1,
-            diskQueueLength: -1
-          },
-          delta: {
-            ramMb: +ramDelta.toFixed(1),
-            cpuPercent: 0,
-            processes: 0,
-            services: 0
-          },
-          whatYouGained:
-            pendingRealAction.action === 'STOP'
-              ? `Memoria de proceso (WorkingSet) reportada por SO: -${Math.abs(ramDelta).toFixed(1)} MB`
-              : `Servicio iniciado en SO. Memoria asignada: ${ramAfter} MB`,
-          whatYouLost: pendingRealAction.action === 'STOP' ? pendingRealAction.lostFunctionality : 'Ninguna (Restaurado)',
-          whatBroke: pendingRealAction.action === 'STOP' ? pendingRealAction.sideEffect : 'Ninguna (Operativo)',
-          riskEvaluation: pendingRealAction.risk,
-          scientificConclusion: 'NO HAY DATOS SUFICIENTES (INCONCLUSO)',
-          rollbackCommand:
-            pendingRealAction.action === 'STOP'
-              ? `Start-Service -Name "${res.serviceName}"`
-              : `Stop-Service -Name "${res.serviceName}"`
-        });
+          setTelemetryDelta({
+            metricType: 'SYSTEM_REPORTED',
+            serviceName: res.serviceName,
+            before: {
+              ramUsedMb: ramBefore,
+              cpuIdlePercent: -1,
+              runningProcesses: -1,
+              runningServices: -1,
+              diskQueueLength: -1
+            },
+            after: {
+              ramUsedMb: ramAfter,
+              cpuIdlePercent: -1,
+              runningProcesses: -1,
+              runningServices: -1,
+              diskQueueLength: -1
+            },
+            delta: {
+              ramMb: +ramDelta.toFixed(1),
+              cpuPercent: 0,
+              processes: 0,
+              services: 0
+            },
+            whatYouGained:
+              pendingRealAction.action === 'STOP'
+                ? `Memoria de proceso (WorkingSet) reportada por SO: -${Math.abs(ramDelta).toFixed(1)} MB`
+                : `Servicio iniciado en SO. Memoria asignada: ${ramAfter} MB`,
+            whatYouLost: pendingRealAction.action === 'STOP' ? pendingRealAction.lostFunctionality : 'Ninguna (Restaurado)',
+            whatBroke: pendingRealAction.action === 'STOP' ? pendingRealAction.sideEffect : 'Ninguna (Operativo)',
+            riskEvaluation: pendingRealAction.risk,
+            scientificConclusion: 'NO HAY DATOS SUFICIENTES (INCONCLUSO)',
+            rollbackCommand:
+              pendingRealAction.action === 'STOP'
+                ? `Start-Service -Name "${res.serviceName}"`
+                : `Stop-Service -Name "${res.serviceName}"`
+          });
+        }
       }
     } catch (err: any) {
       alert(`FALLO EN ACCIÓN REAL: ${err?.message || 'Error en EVO Agent.'}`);
@@ -1007,55 +1045,64 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
 
             {/* Dynamic Dependency Chain */}
             <div className="space-y-1.5 text-xs">
-              {dependencyGraph.map((node, nIdx) => (
-                <div key={nIdx} className="space-y-1">
-                  <div
-                    className={`p-2.5 rounded-xl border transition-all flex items-center justify-between ${
-                      node.state === 'RUNNING'
-                        ? node.isTarget
-                          ? 'bg-cyan-950/40 border-cyan-400 text-white shadow-[0_0_12px_rgba(6,182,212,0.25)] ring-1 ring-cyan-400'
-                          : 'bg-black/60 border-zinc-800 text-zinc-200'
-                        : 'bg-rose-950/30 border-rose-500/50 text-rose-300 opacity-90'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span
-                        className={`w-2 h-2 rounded-full ${
-                          node.state === 'RUNNING'
-                            ? 'bg-emerald-400 shadow-[0_0_6px_#10B981]'
-                            : 'bg-rose-500 shadow-[0_0_6px_#F43F5E]'
-                        }`}
-                      />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-xs">{node.name}</span>
-                          {node.isTarget && (
-                            <span className="px-1.5 py-0.2 bg-cyan-400 text-black text-[9px] font-black rounded uppercase">
-                              SELECCIONADO
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-zinc-400 font-sans-editorial">{node.role}</span>
-                      </div>
-                    </div>
-                    <span
-                      className={`text-[9px] font-bold px-2 py-0.5 rounded ${
+              {dependencyGraph.length > 0 ? (
+                dependencyGraph.map((node, nIdx) => (
+                  <div key={nIdx} className="space-y-1">
+                    <div
+                      className={`p-2.5 rounded-xl border transition-all flex items-center justify-between ${
                         node.state === 'RUNNING'
-                          ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'
-                          : 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                          ? node.isTarget
+                            ? 'bg-cyan-950/40 border-cyan-400 text-white shadow-[0_0_12px_rgba(6,182,212,0.25)] ring-1 ring-cyan-400'
+                            : 'bg-black/60 border-zinc-800 text-zinc-200'
+                          : 'bg-rose-950/30 border-rose-500/50 text-rose-300 opacity-90'
                       }`}
                     >
-                      {node.state === 'RUNNING' ? 'ACTIVO' : 'AFECTADO'}
-                    </span>
-                  </div>
-
-                  {nIdx < dependencyGraph.length - 1 && (
-                    <div className="flex justify-center text-cyan-500 text-xs font-bold leading-none py-0.5">
-                      ↓
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            node.state === 'RUNNING'
+                              ? 'bg-emerald-400 shadow-[0_0_6px_#10B981]'
+                              : 'bg-rose-500 shadow-[0_0_6px_#F43F5E]'
+                          }`}
+                        />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-xs">{node.name}</span>
+                            {node.isTarget && (
+                              <span className="px-1.5 py-0.2 bg-cyan-400 text-black text-[9px] font-black rounded uppercase">
+                                SELECCIONADO
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-zinc-400 font-sans-editorial">{node.role}</span>
+                        </div>
+                      </div>
+                      <span
+                        className={`text-[9px] font-bold px-2 py-0.5 rounded ${
+                          node.state === 'RUNNING'
+                            ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'
+                            : 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                        }`}
+                      >
+                        {node.state === 'RUNNING' ? 'ACTIVO' : 'AFECTADO'}
+                      </span>
                     </div>
-                  )}
+
+                    {nIdx < dependencyGraph.length - 1 && (
+                      <div className="flex justify-center text-cyan-500 text-xs font-bold leading-none py-0.5">
+                        ↓
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 text-center space-y-1 font-mono">
+                  <span className="font-bold text-amber-400 text-xs uppercase block">REFERENCE NO DISPONIBLE</span>
+                  <p className="text-[11px] text-zinc-400 font-sans-editorial">
+                    No existe catálogo pedagógico de referencia para el servicio {selectedRealService?.name || 'seleccionado'}.
+                  </p>
                 </div>
-              ))}
+              )}
             </div>
 
             {/* Impact Consequence Matrix: Qué depende, Qué se apaga, Qué puede fallar */}
@@ -1072,7 +1119,13 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
                   )}
                 </div>
                 <p className="text-zinc-300 leading-snug">
-                  {selectedService.dependents.length > 0
+                  {engineMode === 'REAL_PC'
+                    ? referenceService
+                      ? referenceService.dependents.length > 0
+                        ? referenceService.dependents.join(', ')
+                        : 'Pila base de usuario'
+                      : 'REFERENCE NO DISPONIBLE'
+                    : selectedService.dependents.length > 0
                     ? selectedService.dependents.join(', ')
                     : 'Pila base de usuario'}
                 </p>
@@ -1090,7 +1143,11 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
                   )}
                 </div>
                 <p className="text-zinc-300 leading-snug">
-                  {selectedService.telemetryImpact.lostFunctionality}
+                  {engineMode === 'REAL_PC'
+                    ? referenceService
+                      ? referenceService.telemetryImpact.lostFunctionality
+                      : 'REFERENCE NO DISPONIBLE'
+                    : selectedService.telemetryImpact.lostFunctionality}
                 </p>
               </div>
 
@@ -1106,7 +1163,11 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
                   )}
                 </div>
                 <p className="text-zinc-300 leading-snug">
-                  {selectedService.telemetryImpact.potentialSideEffect}
+                  {engineMode === 'REAL_PC'
+                    ? referenceService
+                      ? referenceService.telemetryImpact.potentialSideEffect
+                      : 'REFERENCE NO DISPONIBLE'
+                    : selectedService.telemetryImpact.potentialSideEffect}
                 </p>
               </div>
             </div>
