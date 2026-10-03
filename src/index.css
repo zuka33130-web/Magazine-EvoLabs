@@ -214,22 +214,14 @@
     overflow: visible !important;
   }
 
-  /* Exclude all interactive web chrome, bars, buttons, scrollbars, modals, floating tutor and navigation */
-  header,
-  aside,
-  nav,
-  button,
-  input,
-  select,
+  /* Exclude only explicit web chrome, non-print UI, modals, floating tutor and bars */
   .no-print,
-  header.no-print,
-  aside.no-print,
+  .print\:hidden,
   .magazine-header-bar,
   .magazine-quick-help-bar,
-  .print\:hidden,
-  .modal-overlay,
   .tutor-drawer,
   .tutor-floating-btn,
+  .modal-overlay,
   ::-webkit-scrollbar {
     display: none !important;
   }

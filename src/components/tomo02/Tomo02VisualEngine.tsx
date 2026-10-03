@@ -604,7 +604,7 @@ const MemoryHierarchyVisual: React.FC = () => {
           title="Hardware Reserved: 1.2 GB"
         >
           <span className="font-bold">RES</span>
-          <span className="text-[8px] text-zinc-300">1.2 GB</span>
+          <span className="text-[10px] text-zinc-200 font-bold">1.2 GB</span>
         </div>
         <div
           style={{ width: '37%' }}
@@ -612,7 +612,7 @@ const MemoryHierarchyVisual: React.FC = () => {
           title="En uso (In Use): 5.9 GB"
         >
           <span className="font-bold">EN USO</span>
-          <span className="text-[8px] text-cyan-100">5.9 GB</span>
+          <span className="text-[10px] text-cyan-100 font-bold">5.9 GB</span>
         </div>
         <div
           style={{ width: '10%' }}
@@ -620,7 +620,7 @@ const MemoryHierarchyVisual: React.FC = () => {
           title="Modificada (Modified): 1.6 GB"
         >
           <span className="font-bold">MOD</span>
-          <span className="text-[8px] text-amber-100">1.6 GB</span>
+          <span className="text-[10px] text-amber-100 font-bold">1.6 GB</span>
         </div>
         <div
           style={{ width: '33%' }}
@@ -628,7 +628,7 @@ const MemoryHierarchyVisual: React.FC = () => {
           title="En Espera (Standby Cache): 5.3 GB"
         >
           <span className="font-bold">STANDBY (EN ESPERA)</span>
-          <span className="text-[8px] text-blue-100">5.3 GB</span>
+          <span className="text-[10px] text-blue-100 font-bold">5.3 GB</span>
         </div>
         <div
           style={{ width: '12%' }}
@@ -636,7 +636,7 @@ const MemoryHierarchyVisual: React.FC = () => {
           title="Libre (Free/Zeroed): 2.0 GB"
         >
           <span className="font-bold">LIBRE</span>
-          <span className="text-[8px] text-emerald-100">2.0 GB</span>
+          <span className="text-[10px] text-emerald-100 font-bold">2.0 GB</span>
         </div>
       </div>
 
@@ -1174,7 +1174,7 @@ const ScmServicesVisual: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-zinc-950 border border-cyan-800/80 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-cyan-300 font-bold">SVCHOST #1</span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-400 text-[9px]">LOCAL SYSTEM</span>
+            <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 text-[10px] font-bold border border-cyan-800/60">LOCAL SYSTEM</span>
           </div>
           <div className="space-y-1 text-[11px] text-zinc-400">
             <div className="p-1.5 rounded bg-black border border-cyan-950 text-zinc-200">
@@ -1191,7 +1191,7 @@ const ScmServicesVisual: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-zinc-950 border border-blue-900/60 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-blue-300 font-bold">SVCHOST #2</span>
-            <span className="px-1.5 py-0.2 rounded bg-blue-950 text-blue-400 text-[9px]">NETWORK SERVICE</span>
+            <span className="px-2 py-0.5 rounded bg-blue-950 text-blue-400 text-[10px] font-bold border border-blue-800/60">NETWORK SERVICE</span>
           </div>
           <div className="space-y-1 text-[11px] text-zinc-400">
             <div className="p-1.5 rounded bg-black border border-blue-950 text-zinc-200">
@@ -1208,7 +1208,7 @@ const ScmServicesVisual: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-zinc-950 border border-emerald-900/60 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-emerald-300 font-bold">SVCHOST #3</span>
-            <span className="px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 text-[9px]">LOCAL SERVICE</span>
+            <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px] font-bold border border-emerald-800/60">LOCAL SERVICE</span>
           </div>
           <div className="space-y-1 text-[11px] text-zinc-400">
             <div className="p-1.5 rounded bg-black border border-emerald-950 text-zinc-200">
@@ -1322,7 +1322,7 @@ const AutorunsPersistenceVisual: React.FC = () => {
         <div className="p-3 rounded-xl bg-zinc-950 border border-cyan-950 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-cyan-300 font-bold">CLAVES RUN & RUNONCE</span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-400 text-[9px]">REGISTRO</span>
+            <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 text-[10px] font-bold border border-cyan-800/60">REGISTRO</span>
           </div>
           <code className="text-[10px] text-zinc-400 block bg-black p-1.5 rounded">
             HKLM\Software\Microsoft\Windows\CurrentVersion\Run
@@ -1335,7 +1335,7 @@ const AutorunsPersistenceVisual: React.FC = () => {
         <div className="p-3 rounded-xl bg-zinc-950 border border-cyan-950 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-cyan-300 font-bold">WINLOGON SHELL & USERINIT</span>
-            <span className="px-1.5 py-0.2 rounded bg-rose-950 text-rose-400 text-[9px]">ALTO RIESGO</span>
+            <span className="px-2 py-0.5 rounded bg-rose-950 text-rose-400 text-[10px] font-bold border border-rose-800/60">ALTO RIESGO</span>
           </div>
           <code className="text-[10px] text-zinc-400 block bg-black p-1.5 rounded">
             HKLM\...\Winlogon\Shell = "explorer.exe"
@@ -1527,11 +1527,11 @@ const WinreBcdPipelineVisual: React.FC = () => {
           <div className="p-3 rounded-lg bg-zinc-950 border border-cyan-950 text-cyan-300">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] text-zinc-500">PARTICIÓN 1 (100 MB)</span>
-              <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-400 text-[9px]">FAT32</span>
+              <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 text-[10px] font-bold border border-cyan-800/60">FAT32</span>
             </div>
-            <strong className="block text-white">ESP (EFI SYSTEM)</strong>
+            <strong className="block text-white text-xs">ESP (EFI SYSTEM)</strong>
             <span className="text-[10px] text-cyan-400">\EFI\Microsoft\Boot\BCD</span>
-            <p className="text-[10px] text-zinc-400 mt-1 font-sans-editorial">
+            <p className="text-[10.5px] text-zinc-300 mt-1 font-sans-editorial">
               Si se corrompe ➔ Error 0xc000000e. Solución: <code>bcdboot C:\Windows /s S: /f UEFI</code>.
             </p>
           </div>
@@ -1539,11 +1539,11 @@ const WinreBcdPipelineVisual: React.FC = () => {
           <div className="p-3 rounded-lg bg-zinc-950 border border-cyan-950 text-cyan-300 sm:col-span-1">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] text-zinc-500">PARTICIÓN 2 (Resto GB)</span>
-              <span className="px-1.5 py-0.2 rounded bg-blue-950 text-blue-400 text-[9px]">NTFS</span>
+              <span className="px-2 py-0.5 rounded bg-blue-950 text-blue-400 text-[10px] font-bold border border-blue-800/60">NTFS</span>
             </div>
-            <strong className="block text-white">VOLUMEN C: (SISTEMA)</strong>
+            <strong className="block text-white text-xs">VOLUMEN C: (SISTEMA)</strong>
             <span className="text-[10px] text-blue-300">\Windows\System32\winload.efi</span>
-            <p className="text-[10px] text-zinc-400 mt-1 font-sans-editorial">
+            <p className="text-[10.5px] text-zinc-300 mt-1 font-sans-editorial">
               Tus archivos, programas y usuarios viven acá. Formatear este volumen es el último recurso.
             </p>
           </div>
@@ -1551,11 +1551,11 @@ const WinreBcdPipelineVisual: React.FC = () => {
           <div className="p-3 rounded-lg bg-zinc-950 border border-emerald-950 text-emerald-300">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] text-zinc-500">PARTICIÓN 3 (~600 MB)</span>
-              <span className="px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 text-[9px]">OCULTA</span>
+              <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px] font-bold border border-emerald-800/60">OCULTA</span>
             </div>
-            <strong className="block text-white">WINRE (RECUPERACIÓN)</strong>
+            <strong className="block text-white text-xs">WINRE (RECUPERACIÓN)</strong>
             <span className="text-[10px] text-emerald-400">\Recovery\WindowsRE\winre.wim</span>
-            <p className="text-[10px] text-zinc-400 mt-1 font-sans-editorial">
+            <p className="text-[10.5px] text-zinc-300 mt-1 font-sans-editorial">
               Se carga en RAM X:\ para consola de rescate, DISM offline y puntos de restauración.
             </p>
           </div>
@@ -1664,7 +1664,7 @@ const LowResourceHddIoVisual: React.FC = () => {
           <div className="p-3 rounded-lg bg-zinc-950 border border-rose-900/60 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-rose-400 font-bold">HDD MECÁNICO (5400 RPM)</span>
-              <span className="px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 text-[9px]">SATURACIÓN</span>
+              <span className="px-2 py-0.5 rounded bg-rose-950 text-rose-300 text-[10px] font-bold border border-rose-800/60">SATURACIÓN</span>
             </div>
             <div className="space-y-1 text-[11px] text-zinc-300">
               <div className="flex justify-between">
@@ -1684,7 +1684,7 @@ const LowResourceHddIoVisual: React.FC = () => {
                 <strong className="text-rose-400">Cola: 6.8 [TRABADO]</strong>
               </div>
             </div>
-            <p className="text-[10px] text-zinc-500 font-sans-editorial">
+            <p className="text-[10px] text-zinc-400 font-sans-editorial">
               El cabezal electromecánico viaja de un sector a otro. El 100% de uso indica que el brazo mecánico no da abasto.
             </p>
           </div>
@@ -1692,7 +1692,7 @@ const LowResourceHddIoVisual: React.FC = () => {
           <div className="p-3 rounded-lg bg-zinc-950 border border-emerald-900/60 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-emerald-400 font-bold">SSD SATA BÁSICO (NAND FLASH)</span>
-              <span className="px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 text-[9px]">FLUIDEZ TOTAL</span>
+              <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 text-[10px] font-bold border border-emerald-800/60">FLUIDEZ TOTAL</span>
             </div>
             <div className="space-y-1 text-[11px] text-zinc-300">
               <div className="flex justify-between">
@@ -1712,7 +1712,7 @@ const LowResourceHddIoVisual: React.FC = () => {
                 <strong className="text-emerald-400">Cola: 0.1 [DESPEJADO]</strong>
               </div>
             </div>
-            <p className="text-[10px] text-zinc-500 font-sans-editorial">
+            <p className="text-[10px] text-zinc-400 font-sans-editorial">
               Sin partes móviles. 1.000 veces más operaciones por segundo resuelven el cuello de botella instantáneamente.
             </p>
           </div>
@@ -1753,12 +1753,12 @@ const EmergencyProtocolsVisual: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-zinc-950 border border-amber-900/60 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-amber-400 font-bold">1. PANTALLA NEGRA CON CURSOR</span>
-            <span className="px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 text-[9px]">DWM VIVO</span>
+            <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-bold border border-amber-800/60">DWM VIVO</span>
           </div>
-          <p className="text-[11px] text-zinc-400 font-sans-editorial">
+          <p className="text-[11px] text-zinc-300 font-sans-editorial">
             El mouse se mueve: el kernel y el driver de video responden. Lo que colapsó es el shell <code className="text-white">explorer.exe</code>.
           </p>
-          <div className="p-2 rounded bg-black border border-amber-950/80 text-[10px] space-y-1">
+          <div className="p-2 rounded bg-black border border-amber-950/80 text-[10.5px] space-y-1">
             <div className="text-amber-300 font-bold">ACCIONES DE RESCATE:</div>
             <div className="text-zinc-300">▸ <strong>Win + Ctrl + Shift + B</strong> (Reinicia driver GPU)</div>
             <div className="text-zinc-300">▸ <strong>Ctrl + Shift + Esc</strong> (Abre Taskmgr)</div>
@@ -1770,12 +1770,12 @@ const EmergencyProtocolsVisual: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-zinc-950 border border-rose-900/60 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-rose-400 font-bold">2. BUCLE BSOD EN ARRANQUE</span>
-            <span className="px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 text-[9px]">BUGCHECK</span>
+            <span className="px-2 py-0.5 rounded bg-rose-950 text-rose-300 text-[10px] font-bold border border-rose-800/60">BUGCHECK</span>
           </div>
-          <p className="text-[11px] text-zinc-400 font-sans-editorial">
+          <p className="text-[11px] text-zinc-300 font-sans-editorial">
             El sistema detiene la CPU para evitar corrupción de almacenamiento. El código Stop revela la causa exacta.
           </p>
-          <div className="p-2 rounded bg-black border border-rose-950/80 text-[10px] space-y-1">
+          <div className="p-2 rounded bg-black border border-rose-950/80 text-[10.5px] space-y-1">
             <div className="text-rose-300 font-bold">CÓDIGOS FRECUENTES:</div>
             <div className="text-zinc-300">▸ <strong>0x7B:</strong> Controlador almacenamiento/AHCI</div>
             <div className="text-zinc-300">▸ <strong>0xD1:</strong> Driver tocó memoria inválida</div>
@@ -1787,12 +1787,12 @@ const EmergencyProtocolsVisual: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-zinc-950 border border-cyan-900/60 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-cyan-400 font-bold">3. DISCO RUIDOSO / I/O CORRUPTO</span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 text-[9px]">ALERTA FÍSICA</span>
+            <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 text-[10px] font-bold border border-cyan-800/60">ALERTA FÍSICA</span>
           </div>
-          <p className="text-[11px] text-zinc-400 font-sans-editorial">
+          <p className="text-[11px] text-zinc-300 font-sans-editorial">
             Sectores pendientes en SMART o chasquidos mecánicos. El error más grave es ejecutar chkdsk /r.
           </p>
-          <div className="p-2 rounded bg-black border border-cyan-950/80 text-[10px] space-y-1">
+          <div className="p-2 rounded bg-black border border-cyan-950/80 text-[10.5px] space-y-1">
             <div className="text-cyan-300 font-bold">ORDEN DE PROCEDIMIENTO:</div>
             <div className="text-rose-400 font-bold">❌ NUNCA chkdsk antes de clonar</div>
             <div className="text-zinc-300">1. Clonar a nivel de bloque (ddrescue)</div>
@@ -1820,7 +1820,7 @@ const ForensicCaseStudiesVisual: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-zinc-950 border border-cyan-950 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-cyan-400 font-bold">CASO 01: 60 FPS MENTIROSOS (VRM THROTTLING)</span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 text-[9px]">HARDWARE</span>
+            <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 text-[10px] font-bold border border-cyan-800/60">HARDWARE</span>
           </div>
           <div className="p-2 rounded bg-black text-[11px] space-y-1 text-zinc-300 font-sans-editorial">
             <div><strong className="text-rose-400 font-mono">Síntoma:</strong> 60 FPS promedio pero micro-pausas constantes de 15 FPS.</div>
@@ -1833,7 +1833,7 @@ const ForensicCaseStudiesVisual: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-zinc-950 border border-cyan-950 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-cyan-400 font-bold">CASO 02: FUGA DE 20 GB DIARIOS EN DISCO</span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 text-[9px]">ALMACENAMIENTO</span>
+            <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 text-[10px] font-bold border border-cyan-800/60">ALMACENAMIENTO</span>
           </div>
           <div className="p-2 rounded bg-black text-[11px] space-y-1 text-zinc-300 font-sans-editorial">
             <div><strong className="text-rose-400 font-mono">Síntoma:</strong> Disco C: perdía 20 GB por noche sin descargar archivos.</div>
@@ -1846,7 +1846,7 @@ const ForensicCaseStudiesVisual: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-zinc-950 border border-cyan-950 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-cyan-400 font-bold">CASO 03: INTERNET CAÍDO CON IP VÁLIDA</span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 text-[9px]">REDES WINSOCK</span>
+            <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 text-[10px] font-bold border border-cyan-800/60">REDES WINSOCK</span>
           </div>
           <div className="p-2 rounded bg-black text-[11px] space-y-1 text-zinc-300 font-sans-editorial">
             <div><strong className="text-rose-400 font-mono">Síntoma:</strong> Navegadores no abren páginas pero ping a 8.8.8.8 responde perfecto.</div>
@@ -1859,7 +1859,7 @@ const ForensicCaseStudiesVisual: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-zinc-950 border border-cyan-950 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-cyan-400 font-bold">CASO 04: DOBLE ANTIVIRUS // DEADLOCK I/O</span>
-            <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 text-[9px]">SISTEMA DE ARCHIVOS</span>
+            <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 text-[10px] font-bold border border-cyan-800/60">SISTEMA DE ARCHIVOS</span>
           </div>
           <div className="p-2 rounded bg-black text-[11px] space-y-1 text-zinc-300 font-sans-editorial">
             <div><strong className="text-rose-400 font-mono">Síntoma:</strong> PC se congela 30 segundos cada vez que se abre un ejecutable.</div>
@@ -2208,7 +2208,7 @@ const GlossaryMatrixVisual: React.FC = () => {
                   </span>
                 </div>
                 <span
-                  className={`text-[9px] px-1.5 py-0.5 rounded font-bold shrink-0 ${
+                  className={`text-[10px] px-2 py-0.5 rounded font-bold shrink-0 ${
                     item.category === 'MEMORIA'
                       ? 'bg-cyan-950 text-cyan-300 border border-cyan-800'
                       : item.category === 'KERNEL'
@@ -2488,15 +2488,15 @@ const InvestigatorPassportVisual: React.FC = () => {
                     {isExp && (
                       <div className="pt-2 border-t border-cyan-950/80 space-y-1.5 animate-in fade-in duration-150">
                         <div>
-                          <span className="text-[9px] text-cyan-300 font-bold uppercase block">
+                          <span className="text-[10px] text-cyan-300 font-bold uppercase block">
                             COMANDO PERICIAL DE AUDITORÍA:
                           </span>
-                          <code className="text-[10px] text-cyan-200 bg-black p-1.5 rounded block border border-cyan-950 select-all font-mono-tech">
+                          <code className="text-[10.5px] text-cyan-200 bg-black p-1.5 rounded block border border-cyan-950 select-all font-mono-tech">
                             {comp.cmd}
                           </code>
                         </div>
                         <div>
-                          <span className="text-[9px] text-zinc-400 font-bold uppercase block">
+                          <span className="text-[10px] text-zinc-400 font-bold uppercase block">
                             POR QUÉ IMPORTA EN EL TALLER:
                           </span>
                           <p className="text-[11px] text-zinc-300 font-sans-editorial leading-relaxed">
