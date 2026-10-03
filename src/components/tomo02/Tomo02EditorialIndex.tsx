@@ -35,42 +35,56 @@ interface Tomo02EditorialIndexProps {
 }
 
 // Group modules logically into 6 thematic editorial dossiers
-const EDITORIAL_SECTIONS = [
+export interface EditorialSectionConfig {
+  sectionNumber: string;
+  sectionTitle: string;
+  sectionSubtitle: string;
+  moduleIds: string[];
+  labTargetScenario: string;
+}
+
+const EDITORIAL_SECTIONS: EditorialSectionConfig[] = [
   {
     sectionNumber: 'I',
     sectionTitle: 'ARQUITECTURA DE ARRANQUE & DESPLIEGUE',
     sectionSubtitle: 'De la inyección de energía al primer píxel del shell',
     moduleIds: ['m00', 'm01', 'm02'],
+    labTargetScenario: 'Cadena UEFI, partición ESP y almacén BCD',
   },
   {
     sectionNumber: 'II',
     sectionTitle: 'SISTEMA DE ARCHIVOS & ALMACENAMIENTO',
     sectionSubtitle: 'NTFS, Journaling, System32, SysWOW64 y WinSxS',
     moduleIds: ['m03', 'm04', 'm05'],
+    labTargetScenario: 'WinSxS, repositorios DriverStore y compresión Compact',
   },
   {
     sectionNumber: 'III',
     sectionTitle: 'NÚCLEO, PROCESOS & MEMORIA VIRTUAL',
     sectionSubtitle: 'Ring 0 vs Ring 3, Commit Charge, Drivers y Latencias DPC',
     moduleIds: ['m06', 'm07', 'm08', 'm09'],
+    labTargetScenario: 'Diagnóstico de Working Set, Pool Paged/Non-Paged y DPC Latencies',
   },
   {
     sectionNumber: 'IV',
     sectionTitle: 'CONECTIVIDAD, SERVICIOS & AUTOMATIZACIÓN',
     sectionSubtitle: 'Sockets de red, Svchost, SysMain y el Programador de Tareas',
     moduleIds: ['m10', 'm11', 'm12', 'm13'],
+    labTargetScenario: 'Aislamiento de svchost.exe y telemetría de eventos de red',
   },
   {
     sectionNumber: 'V',
     sectionTitle: 'TERMINAL, REGISTRO & CIBERSEGURIDAD',
     sectionSubtitle: 'PowerShell, Hives del Registry, UAC y Telemetría racional',
     moduleIds: ['m14', 'm15', 'm16', 'm17', 'm18'],
+    labTargetScenario: 'Auditoría de colmenas del Registro y políticas de elevación UAC',
   },
   {
     sectionNumber: 'VI',
-    sectionTitle: 'METROLOGÍA, RECUPERACIÓN & CASOS PERICIALES',
+    sectionTitle: 'METROLOGÍA, RECUPERACIÓN & CASOS FORENSES DE TALLER',
     sectionSubtitle: 'WinRE, BCD, rescate en bajos recursos y casos de taller',
     moduleIds: ['m19', 'm20', 'm21', 'm22', 'm23', 'm24', 'm25', 'm26'],
+    labTargetScenario: 'Triage de emergencias en vivo y reparación in-place no destructiva',
   },
 ];
 
@@ -183,13 +197,13 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
           <span className="w-3 h-3 bg-cyan-400 inline-block shadow-[0_0_10px_#00D2FF]" />
           <div>
             <span className="font-mono-tech text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">
-              EDICIÓN OFICIAL FACSIMILAR // 67 PÁGINAS A4
+              EDICIÓN DIGITAL MAGAZINE A4 // 38 PÁGINAS DIAGRAMADAS
             </span>
             <h3 className="font-display font-black text-base sm:text-lg text-white uppercase tracking-tight">
-              REVISTA OFICIAL DOMINÁ WINDOWS — 67 Páginas
+              MAGAZINE DOMINÁ WINDOWS — 38 Páginas Web
             </h3>
             <p className="text-xs text-zinc-300 font-sans-editorial max-w-2xl mt-0.5">
-              Lectura oficial en pliego A4 con desmontaje del Kernel NT, auditoría de memoria virtual, colmenas del Registro y descarga PDF.
+              Lectura en pliego editorial A4 con desmontaje del Kernel NT, auditoría de memoria virtual, colmenas del Registro y descarga PDF.
             </p>
           </div>
         </div>
@@ -211,8 +225,8 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
               <Award className="w-4 h-4 text-cyan-400" />
               <span>
                 {hasPassedFinalExam
-                  ? 'TOMO 02 // COMPLETADO Y ACREDITADO'
-                  : 'EVALUACIÓN PERICIAL // HABILITADA'}
+                  ? 'TOMO 02 // COMPLETADO CON ÉXITO'
+                  : 'EVALUACIÓN FINAL EVO // HABILITADA'}
               </span>
             </div>
             <h3 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight">
@@ -222,8 +236,8 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
             </h3>
             <p className="font-sans-editorial text-xs sm:text-sm text-zinc-300 max-w-2xl leading-relaxed">
               {hasPassedFinalExam
-                ? 'Has demostrado criterio técnico y conocimiento metódico del sistema operativo. Podés acceder a la acreditación y al laboratorio Windows Matrix.'
-                : 'Completaste los 26 módulos de La Biblia Negra. Demostrá tus conocimientos resolviendo el examen pericial con casos reales de taller.'}
+                ? 'Has demostrado criterio técnico y conocimiento metódico del sistema operativo. Podés acceder a tu comprobación EVO y al laboratorio Windows Matrix.'
+                : 'Completaste los 27 módulos de La Biblia Negra. Demostrá tus conocimientos resolviendo la evaluación final EVO con casos reales de taller.'}
             </p>
           </div>
 
@@ -285,6 +299,20 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
                 <p className="text-xs font-mono-tech text-zinc-400 mt-0.5">
                   {sec.sectionSubtitle}
                 </p>
+
+                {/* 5-Step Pedagogical Pipeline */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-2 text-[10px] font-mono-tech text-zinc-500">
+                  <span className="text-cyan-400 font-semibold">CADENA METÓDICA:</span>
+                  <span>LECTURA</span>
+                  <span className="text-zinc-600">→</span>
+                  <span>VISUAL</span>
+                  <span className="text-zinc-600">→</span>
+                  <span>PRÁCTICA</span>
+                  <span className="text-zinc-600">→</span>
+                  <span className="text-cyan-300 font-bold">LABORATORIO</span>
+                  <span className="text-zinc-600">→</span>
+                  <span>COMPROBACIÓN</span>
+                </div>
               </div>
 
               {/* Modules in this Section */}
@@ -345,6 +373,27 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
                   );
                 })}
               </div>
+
+              {/* Section Laboratory Integration Bridge */}
+              {onOpenWindowsMatrixLab && (
+                <div className="pt-3 border-t border-cyan-950/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono-tech bg-black/40 p-3 rounded-xl border border-cyan-950/60">
+                  <div>
+                    <span className="text-cyan-400 font-bold text-[10px] uppercase block">
+                      🧪 LABORATORIO ASOCIADO // SECCIÓN {sec.sectionNumber}
+                    </span>
+                    <span className="text-zinc-300 text-[11px]">
+                      {sec.labTargetScenario}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={onOpenWindowsMatrixLab}
+                    className="px-3.5 py-1.5 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 hover:text-white font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer shrink-0"
+                  >
+                    ABRIR EN MATRIX LAB →
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

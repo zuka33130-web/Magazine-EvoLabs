@@ -282,16 +282,22 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
           NOTIFICATION BAR: PHYSICAL PDF PATH STATUS
       ======================================================== */}
       {pdfExists === false && (
-        <div className="bg-amber-950/40 border-b border-amber-500/40 px-4 py-2 flex items-center justify-between text-xs font-mono-tech text-amber-200">
+        <div className="bg-cyan-950/40 border-b border-cyan-500/40 px-4 py-2 flex items-center justify-between text-xs font-mono-tech text-cyan-200">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+            <AlertCircle className="w-4 h-4 text-cyan-400 shrink-0" />
             <span>
-              <strong>Ruta preparada:</strong> <code className="bg-black/60 px-1.5 py-0.5 rounded text-cyan-300">public/magazines/tomo02/EVO-LABS-TOMO-02-DOMINA-WINDOWS.pdf</code>. Colocá el archivo físico para visualización directa en el lector.
+              <strong>Edición Digital Activa:</strong> La edición web diagramada completa cuenta con 38 páginas consecutivas. (Referencia de archivo PDF histórico: 67 págs).
             </span>
           </div>
-          <span className="text-[10px] text-amber-400/80 uppercase tracking-widest hidden sm:inline">
-            ARCHIVO ORIGINAL: {officialFilename}
-          </span>
+          {onOpenA4Magazine && (
+            <button
+              type="button"
+              onClick={onOpenA4Magazine}
+              className="px-3 py-1 rounded bg-cyan-400 text-black font-bold text-[10px] hover:bg-cyan-300 transition-colors cursor-pointer"
+            >
+              VER EDICIÓN WEB (38 PÁGS) →
+            </button>
+          )}
         </div>
       )}
 
@@ -460,44 +466,48 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
 
                   <div className="my-auto text-center space-y-4 max-w-lg mx-auto">
                     <div className="w-16 h-16 rounded-2xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-400 mx-auto flex items-center justify-center">
-                      <FileText className="w-8 h-8 text-cyan-400" />
+                      <BookOpen className="w-8 h-8 text-cyan-400" />
                     </div>
                     <h3 className="text-2xl font-display font-black text-white uppercase">
-                      PÁGINA {String(currentPage).padStart(2, '0')} // EDICIÓN OFICIAL 67 PÁGINAS
+                      EDICIÓN WEB COMPLETA // 38 PÁGINAS A4
                     </h3>
                     <p className="text-xs text-zinc-400 font-mono-tech">
-                      Visualizador conectado a <code className="text-cyan-300">public/magazines/tomo02/EVO-LABS-TOMO-02-DOMINA-WINDOWS.pdf</code>.
+                      La edición web diagramada cuenta con 38 páginas reales consecutivas con navegación fluida, casos y laboratorios.
                     </p>
                     <div className="p-4 rounded-xl bg-black/60 border border-cyan-900/40 text-xs font-mono-tech text-left space-y-2 text-zinc-300">
                       <div className="flex items-center gap-2 text-cyan-400 font-bold">
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>ARCHIVO ASOCIADO: {officialFilename}</span>
+                        <span>EDICIÓN DISPONIBLE: MAGAZINE WEB A4</span>
                       </div>
                       <p className="text-[11px] text-zinc-400">
-                        Podés colocar el archivo PDF en la carpeta pública del proyecto para navegación vectorial nativa de las 67 páginas, o usar la descarga directa.
+                        La edición facsimilar histórica en archivo PDF de 67 páginas se encuentra registrada como referencia de biblioteca. Para lectura directa e inmediata, utilizá la edición web diagramada.
                       </p>
                     </div>
 
                     <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                      <button
-                        type="button"
-                        onClick={handlePrevPage}
-                        className="px-4 py-2 rounded-xl bg-zinc-900 border border-cyan-900 text-xs text-cyan-300 hover:text-white cursor-pointer"
-                      >
-                        ← Página Anterior
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleNextPage}
-                        className="px-4 py-2 rounded-xl bg-cyan-400 text-black font-bold text-xs hover:bg-cyan-300 cursor-pointer"
-                      >
-                        Página Siguiente →
-                      </button>
+                      {onOpenA4Magazine && (
+                        <button
+                          type="button"
+                          onClick={onOpenA4Magazine}
+                          className="px-5 py-2.5 rounded-xl bg-cyan-400 text-black font-extrabold text-xs hover:bg-cyan-300 cursor-pointer shadow-lg shadow-cyan-400/25"
+                        >
+                          ABRIR MAGAZINE WEB (38 PÁGS) →
+                        </button>
+                      )}
+                      {onOpenInteractive && (
+                        <button
+                          type="button"
+                          onClick={onOpenInteractive}
+                          className="px-4 py-2.5 rounded-xl bg-zinc-900 border border-cyan-900 text-xs text-cyan-300 hover:text-white cursor-pointer"
+                        >
+                          ABRIR TOMO INTERACTIVO
+                        </button>
+                      )}
                     </div>
                   </div>
 
                   <div className="border-t border-cyan-950 pt-3 flex items-center justify-between text-[10px] font-mono-tech text-zinc-500">
-                    <span>COLECCIÓN FORENSE EVO // 67 PÁGINAS A4</span>
+                    <span>COLECCIÓN FORENSE EVO // 38 PÁGINAS A4 WEB</span>
                     <span>PÁGINA {currentPage} / {totalPages}</span>
                   </div>
                 </div>

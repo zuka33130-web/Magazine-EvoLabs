@@ -420,6 +420,11 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             setSubView('index');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
+          onOpenMagazine={(page?: number) => {
+            if (page) setCurrentPage(page);
+            setSubView('a4_magazine');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
           onSelectModule={handleSelectModule}
           onMarkCompleted={handleMarkCompleted}
           isCompleted={moduleProgress[TOMO_02_MODULES[selectedModuleIndex]?.id] === 'completed'}
@@ -1027,12 +1032,12 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 03: CÓMO USAR EL TOMO // GUÍA METODOLÓGICA
+            PAGE 04: CÓMO USAR EL TOMO // GUÍA METODOLÓGICA
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 3) && (
+        {(viewMode === 'continuous' || currentPage === 4) && (
           <Tomo02MasterPage
-            pageId="t02-page-03"
-            pageNumber={3}
+            pageId="t02-page-04"
+            pageNumber={4}
             totalPages={totalPages}
             sectionTitle="GUÍA METODOLÓGICA"
             subSlug="CÓMO USAR EL TOMO & ARCHIVO EVO"
@@ -1046,12 +1051,12 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 04: LAS 15 CARPETAS MAESTRAS DE WINDOWS
+            PAGE 05: LAS 15 CARPETAS MAESTRAS DE WINDOWS
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 4) && (
+        {(viewMode === 'continuous' || currentPage === 5) && (
           <Tomo02MasterPage
-            pageId="t02-page-04"
-            pageNumber={4}
+            pageId="t02-page-05"
+            pageNumber={5}
             totalPages={totalPages}
             sectionTitle="MAPA DE ALMACENAMIENTO"
             subSlug="LAS 15 CARPETAS MAESTRAS"
@@ -1113,15 +1118,15 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 05: ÍNDICE MAESTRO DE LOS 26 MÓDULOS
+            PAGE 06: ÍNDICE MAESTRO DE LOS 27 MÓDULOS
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 5) && (
+        {(viewMode === 'continuous' || currentPage === 6) && (
           <Tomo02MasterPage
-            pageId="t02-page-05"
-            pageNumber={5}
+            pageId="t02-page-06"
+            pageNumber={6}
             totalPages={totalPages}
             sectionTitle="SUMARIO EJECUTIVO"
-            subSlug="ÍNDICE DE 26 MÓDULOS"
+            subSlug="ÍNDICE DE 27 MÓDULOS"
             accentColor="#00D2FF"
           >
             <div className="h-full flex flex-col justify-between space-y-3">
@@ -1133,7 +1138,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                   ÍNDICE MAESTRO FORENSE DE WINDOWS
                 </h2>
                 <p className="text-xs font-mono-tech text-zinc-400">
-                  26 áreas de conocimiento autónomas, desde el arranque EFI hasta la telemetría del Kernel.
+                  27 áreas de conocimiento autónomas, desde el arranque EFI hasta la telemetría del Kernel.
                 </p>
               </div>
 
@@ -1143,7 +1148,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                     key={m.id}
                     onClick={() => {
                       if (viewMode === 'single') {
-                        setCurrentPage(6 + mIdx);
+                        setCurrentPage(7 + mIdx);
                       }
                       const el = document.getElementById(`t02-mod-${m.moduleNumber}`);
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -1176,10 +1181,10 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            MODULE PAGES: 26 TECHNICAL MODULES (A4 EDITORIAL SPREADS)
+            MODULE PAGES: 27 TECHNICAL MODULES (A4 EDITORIAL SPREADS)
         ======================================================== */}
         {TOMO_02_MODULES.map((mod, idx) => {
-          const modPageNumber = 6 + idx;
+          const modPageNumber = 7 + idx;
           if (viewMode === 'single' && currentPage !== modPageNumber) {
             return null;
           }
@@ -1237,17 +1242,40 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                   questionData={MODULE_QUESTIONS[mod.id]}
                 />
               )}
+
+              {/* Discrete synchronization CTA to Interactive Module */}
+              <div className="pt-2 border-t border-cyan-950/70 flex items-center justify-between text-[10px] font-mono-tech mt-2">
+                <span className="text-zinc-500">
+                  MÓDULO {mod.moduleNumber} // {mod.categoryTag}
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectModule(idx)}
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <span>[ PRACTICAR ESTE TEMA ]</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectModule(idx)}
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold transition-colors cursor-pointer shadow-sm"
+                  >
+                    <span>VER MÓDULO INTERACTIVO →</span>
+                  </button>
+                </div>
+              </div>
             </Tomo02MasterPage>
           );
         })}
 
         {/* ========================================================
-            PAGE 33: CASOS FORENSES DE WINDOWS GUIADOS
+            PAGE 34: CASOS FORENSES DE WINDOWS GUIADOS
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 33) && (
+        {(viewMode === 'continuous' || currentPage === 34) && (
           <Tomo02MasterPage
-            pageId="t02-page-33"
-            pageNumber={33}
+            pageId="t02-page-34"
+            pageNumber={34}
             totalPages={totalPages}
             sectionTitle="EXPEDIENTES FORENSES"
             subSlug="CASOS REALES DE TALLER"
@@ -1301,12 +1329,12 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 34: LOS 5 SECRETOS DEL KERNEL
+            PAGE 35: LOS 5 SECRETOS DEL KERNEL
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 34) && (
+        {(viewMode === 'continuous' || currentPage === 35) && (
           <Tomo02MasterPage
-            pageId="t02-page-34"
-            pageNumber={34}
+            pageId="t02-page-35"
+            pageNumber={35}
             totalPages={totalPages}
             sectionTitle="MICRO-ARQUITECTURA"
             subSlug="SECRETOS DEL KERNEL"
@@ -1354,12 +1382,12 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 35: GLOSARIO FORENSE A-Z
+            PAGE 36: GLOSARIO FORENSE A-Z
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 35) && (
+        {(viewMode === 'continuous' || currentPage === 36) && (
           <Tomo02MasterPage
-            pageId="t02-page-35"
-            pageNumber={35}
+            pageId="t02-page-36"
+            pageNumber={36}
             totalPages={totalPages}
             sectionTitle="DICCIONARIO TÉCNICO"
             subSlug="GLOSARIO FORENSE A-Z"
@@ -1402,12 +1430,12 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 36: PASAPORTE / FICHA DE AUDITORÍA FORENSE IMPRIMIBLE
+            PAGE 37: PASAPORTE / FICHA DE AUDITORÍA FORENSE IMPRIMIBLE
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 36) && (
+        {(viewMode === 'continuous' || currentPage === 37) && (
           <Tomo02MasterPage
-            pageId="t02-page-36"
-            pageNumber={36}
+            pageId="t02-page-37"
+            pageNumber={37}
             totalPages={totalPages}
             sectionTitle="INSTRUMENTO DE TALLER"
             subSlug="FICHA DE AUDITORÍA DE WINDOWS"
@@ -1492,12 +1520,12 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 37: BACK COVER / CONTRATAPA
+            PAGE 38: BACK COVER / CONTRATAPA
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === totalPages) && (
+        {(viewMode === 'continuous' || currentPage === 38 || currentPage === totalPages) && (
           <Tomo02MasterPage
-            pageId="t02-page-37"
-            pageNumber={totalPages}
+            pageId="t02-page-38"
+            pageNumber={38}
             totalPages={totalPages}
             isBackCover
             hideHeaderFooter

@@ -2393,7 +2393,7 @@ const InvestigatorPassportVisual: React.FC = () => {
               PASAPORTE DE INVESTIGADOR DE KERNEL NT
             </h3>
             <p className="text-xs text-zinc-400 font-sans-editorial">
-              Constancia de dominio de los 26 subsistemas de arquitectura interna de Windows.
+              Registro de dominio de los 27 módulos (00 al 26) de arquitectura interna de Windows.
             </p>
           </div>
           <div className="text-right">
@@ -2401,7 +2401,7 @@ const InvestigatorPassportVisual: React.FC = () => {
               ESTADO: 100% AUDITADO
             </span>
             <span className="text-[10px] text-emerald-400 block mt-1 font-bold">
-              26 MÓDULOS DE LABORATORIO SUPERADOS
+              27 MÓDULOS DE LABORATORIO SUPERADOS
             </span>
           </div>
         </div>

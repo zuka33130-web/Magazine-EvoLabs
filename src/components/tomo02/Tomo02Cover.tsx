@@ -69,7 +69,7 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
             </span>
             <span className="text-zinc-600 hidden sm:inline">|</span>
             <span className="text-cyan-400 font-bold uppercase tracking-wider hidden sm:inline text-[11px]">
-              67 PÁGINAS A4 OFICIAL
+              38 PÁGINAS A4 // EDICIÓN WEB
             </span>
           </div>
 
@@ -123,7 +123,7 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
               </div>
 
               <p className="text-sm sm:text-base text-zinc-300 font-sans-editorial leading-relaxed max-w-xl pt-1">
-                Lo usás todos los días. Ahora descubrí qué hace cuando no estás mirando. Del arranque UEFI y el Kernel NT a la memoria virtual, los procesos svchost compartidos y el diagnóstico pericial sin mitos.
+                Lo usás todos los días. Ahora descubrí qué hace cuando no estás mirando. Del arranque UEFI y el Kernel NT a la memoria virtual, los procesos svchost compartidos y el diagnóstico metodológico sin mitos.
               </p>
             </div>
 
@@ -235,40 +235,39 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
               </div>
             </div>
 
-            {/* THREE PRIMARY ACTION BUTTONS */}
+            {/* ACTION BUTTONS: 1 DOMINANT PRIMARY ACTION + MAX 2 SECONDARY ACTIONS */}
             <div className="pt-2 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
-              {/* Button 1: LEER / DESCARGAR MAGAZINE */}
-              <button
-                id="btn-leer-descargar-magazine-tomo02"
-                type="button"
-                onClick={onOpenMagazine}
-                className="inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl font-mono-tech font-extrabold text-xs tracking-wider uppercase bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 text-black hover:brightness-110 transition-all duration-200 cursor-pointer shadow-xl shadow-cyan-500/25 group"
-              >
-                <BookOpen className="w-4 h-4 text-black" />
-                <span>LEER / DESCARGAR MAGAZINE</span>
-              </button>
-
-              {/* Button 2: ABRIR TOMO INTERACTIVO */}
+              {/* ACCIÓN PRINCIPAL DOMINANTE: COMENZAR TOMO 02 */}
               <button
                 id="btn-abrir-tomo-interactivo-tomo02"
                 type="button"
                 onClick={onOpenInteractive}
-                className="inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-white text-black hover:bg-cyan-300 hover:text-black transition-all duration-200 cursor-pointer shadow-xl group"
+                className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-mono-tech font-black text-xs sm:text-sm tracking-wider uppercase bg-cyan-400 text-black hover:bg-cyan-300 transition-all duration-200 cursor-pointer shadow-xl shadow-cyan-400/25 hover:shadow-cyan-400/35 group"
               >
-                <Sparkles className="w-4 h-4 text-black group-hover:scale-110 transition-transform" />
-                <span>ABRIR TOMO INTERACTIVO</span>
+                <span>COMENZAR TOMO 02</span>
                 <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" />
               </button>
 
-              {/* Button 3: LABORATORIO ASOCIADO */}
+              {/* ACCIÓN SECUNDARIA 1: LEER MAGAZINE A4 */}
+              <button
+                id="btn-leer-descargar-magazine-tomo02"
+                type="button"
+                onClick={onOpenMagazine}
+                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700/80 transition-all duration-200 cursor-pointer shadow-md group"
+              >
+                <BookOpen className="w-4 h-4 text-cyan-400" />
+                <span>📖 LEER MAGAZINE A4</span>
+              </button>
+
+              {/* ACCIÓN SECUNDARIA 2: LABORATORIO ASOCIADO */}
               <button
                 id="btn-laboratorio-asociado-tomo02"
                 type="button"
                 onClick={onOpenLab}
-                className="inline-flex items-center justify-center gap-2.5 px-5 py-4 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-[#09101E] border border-cyan-500/50 text-cyan-200 hover:bg-cyan-950 hover:border-cyan-400 hover:text-white transition-all duration-200 cursor-pointer shadow-lg"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900/90 hover:bg-zinc-800 border border-cyan-950 hover:border-cyan-500/50 text-cyan-300 hover:text-cyan-200 transition-all duration-200 cursor-pointer shadow-md"
               >
                 <Layers className="w-4 h-4 text-cyan-400" />
-                <span>LABORATORIO ASOCIADO</span>
+                <span>🧪 WINDOWS MATRIX LAB</span>
               </button>
             </div>
           </div>
@@ -315,7 +314,7 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
             </div>
 
             <p className="mt-3 text-[11px] font-mono-tech text-zinc-400 text-right tracking-wider uppercase">
-              Portada oficial // La Biblia Negra de Windows — Edición Coleccionable 67 Págs
+              Portada // La Biblia Negra de Windows — Edición Web 38 Págs (Ref. Archivo PDF: 67 Págs)
             </p>
           </div>
         </div>

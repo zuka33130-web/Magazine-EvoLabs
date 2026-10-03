@@ -48,7 +48,7 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
 
         <div className="flex items-center gap-2 text-emerald-400 font-bold">
           <CheckCircle2 className="w-4 h-4" />
-          <span className="uppercase tracking-widest text-[11px]">TOMO 02 ACREDITADO</span>
+          <span className="uppercase tracking-widest text-[11px]">TOMO 02 COMPLETADO</span>
         </div>
       </nav>
 
@@ -65,7 +65,7 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
             </div>
             <div>
               <span className="font-mono-tech text-[10px] text-cyan-400 uppercase tracking-widest font-bold block">
-                ACADEMIA EVO LABS // CONSTANCIA PERICIAL
+                ACADEMIA EVO LABS // CERTIFICADO EVO
               </span>
               <h1 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight">
                 TOMO 02 SUPERADO CON ÉXITO
@@ -78,7 +78,7 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
               CALIFICACIÓN: {score} / 10
             </span>
             <span className="text-[10px] text-zinc-500 block mt-1">
-              ESTADO: CERTIFICADO REGISTRADO
+              ESTADO: COMPROBACIÓN EVO SUPERADA
             </span>
           </div>
         </div>
@@ -99,7 +99,7 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
         {/* Competencies Checklist */}
         <div className="relative z-10 p-5 rounded-2xl bg-black/60 border border-cyan-950 space-y-3 font-mono-tech text-xs">
           <span className="text-cyan-400 font-bold uppercase tracking-wider block">
-            COMPETENCIAS PERICIALES ACREDITADAS:
+            COMPETENCIAS TÉCNICAS VERIFICADAS EVO:
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div className="flex items-start gap-2 text-zinc-200">
@@ -196,7 +196,7 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
             className="p-4 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-cyan-950 hover:border-cyan-500/60 text-zinc-300 hover:text-white transition-all text-center cursor-pointer"
           >
             <span className="font-bold block mb-1">REVISTA A4 COMPLETA</span>
-            <span className="text-[11px] text-zinc-500">Ver 36 páginas diagramadas</span>
+            <span className="text-[11px] text-zinc-500">Ver 38 páginas diagramadas</span>
           </button>
         )}
 

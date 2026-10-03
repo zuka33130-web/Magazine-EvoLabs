@@ -219,8 +219,9 @@ export const TOMO_02_META = {
   themeColor: '#00D2FF',
   secondaryColor: '#38BDF8',
   badge: 'INGENIERÍA DEL SISTEMA OPERATIVO',
-  edition: 'Edición Coleccionable 2026 // A4 210×297mm',
-  totalPages: 67,
+  edition: 'Edición Digital 2026 // A4 210×297mm // 38 Páginas',
+  totalPages: 38,
+  pdfArchivePages: 67,
   manifestoPhrase: 'SI NO PODÉS REVERTIRLO, NO LO TOQUES.',
   description: 'Ingeniería del sistema operativo, desmontaje del Kernel NT, metrología de memoria, procesos, servicios y telemetría bajo escrutinio forense.',
 };

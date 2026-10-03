@@ -16,7 +16,7 @@ export interface Tomo02MasterPageProps {
 
 export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
   pageNumber,
-  totalPages = 67,
+  totalPages = 38,
   sectionTitle = 'INGENIERÍA DEL SISTEMA OPERATIVO',
   subSlug = 'DOMINÁ WINDOWS',
   pageFooterRight,

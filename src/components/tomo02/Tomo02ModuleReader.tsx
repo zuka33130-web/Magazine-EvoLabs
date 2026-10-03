@@ -35,6 +35,7 @@ import { Tomo02ModuleVisual } from './Tomo02VisualEngine';
 interface Tomo02ModuleReaderProps {
   moduleIndex: number;
   onBackToIndex: () => void;
+  onOpenMagazine?: (page?: number) => void;
   onSelectModule: (index: number) => void;
   onMarkCompleted: (moduleId: string) => void;
   isCompleted: boolean;
@@ -1752,7 +1753,7 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
     simpleAnalogy:
       'Un conductor aficionado que solo aprendió a manejar por una única calle de su barrio se pierde en cuanto cortan una esquina o cambian el sentido de circulación. Un navegante profesional con brújula y carta náutica entiende la topografía del terreno: no importa si hay tormenta, desvíos o niebla, siempre sabe dónde está la costa, cuál es la profundidad del agua y cómo llevar el barco seguro a puerto. El Tomo 02 fue tu carta náutica de Windows.',
     evoExplains:
-      'Has llegado a la meta del Tomo 02 — La Biblia Negra de Windows. A lo largo de estos 26 módulos recorriste el sistema operativo capa por capa: desde el encendido del silicio en la placa madre con UEFI y la partición ESP, pasando por la barrera infranqueable entre Ring 3 y Ring 0, la gestión científica de la memoria virtual sin mitos de vaciado, el control de latencias DPC en controladores, la estructura atómica de NTFS y el Registro, hasta las técnicas no destructivas de reparación in-place y el triage de emergencias en vivo. Este último módulo no agrega más teoría: audita tu "Pasaporte del Investigador", consolida tu "Archivo EVO" personal (el repositorio de bitácoras, scripts y mediciones con el que vas a respaldar tus intervenciones profesionales) y establece el puente editorial hacia el TOMO 03, donde llevaremos esta misma mentalidad analítica al universo de Linux y el software de código abierto.',
+      'Has llegado a la meta del Tomo 02 — La Biblia Negra de Windows. A lo largo de estos 27 módulos (del 00 al 26) recorriste el sistema operativo capa por capa: desde el encendido del silicio en la placa madre con UEFI y la partición ESP, pasando por la barrera infranqueable entre Ring 3 y Ring 0, la gestión científica de la memoria virtual sin mitos de vaciado, el control de latencias DPC en controladores, la estructura atómica de NTFS y el Registro, hasta las técnicas no destructivas de reparación in-place y el triage de emergencias en vivo. Este último módulo no agrega más teoría: audita tu "Pasaporte del Investigador", consolida tu "Archivo EVO" personal (el repositorio de bitácoras, scripts y mediciones con el que vas a respaldar tus intervenciones profesionales) y establece el puente editorial hacia el TOMO 03, donde llevaremos esta misma mentalidad analítica al universo de Linux y el software de código abierto.',
     mythVsReality: {
       myth: 'Para ser un experto en Windows hay que memorizar de memoria los cientos de miles de claves del Registro y comandos de consola.',
       reality:
@@ -1809,6 +1810,7 @@ export const CHAPTERS_01_TO_09_DATA: Record<string, ChapterRichContent> = {
 export const Tomo02ModuleReader: React.FC<Tomo02ModuleReaderProps> = ({
   moduleIndex,
   onBackToIndex,
+  onOpenMagazine,
   onSelectModule,
   onMarkCompleted,
   isCompleted,
@@ -1904,6 +1906,19 @@ export const Tomo02ModuleReader: React.FC<Tomo02ModuleReaderProps> = ({
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          {onOpenMagazine && (
+            <button
+              type="button"
+              onClick={() => onOpenMagazine(7 + moduleIndex)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-cyan-950 border border-zinc-800 hover:border-cyan-500/50 text-zinc-300 hover:text-cyan-300 text-[10px] font-bold transition-all cursor-pointer"
+              title="Abrir este contenido en el Magazine A4"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden sm:inline">VER EN MAGAZINE (PÁG. {String(7 + moduleIndex).padStart(2, '0')})</span>
+              <span className="sm:hidden">MAGAZINE</span>
+            </button>
+          )}
+
           {isCompleted ? (
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 text-[10px] font-bold">
               <Check className="w-3 h-3" />
@@ -1931,7 +1946,7 @@ export const Tomo02ModuleReader: React.FC<Tomo02ModuleReaderProps> = ({
           <div className="flex items-center justify-between border-b border-cyan-950/80 pb-2">
             <div className="flex items-center gap-2 text-cyan-400 font-bold uppercase">
               <Compass className="w-4 h-4 text-cyan-400" />
-              <span>ESTÁS ACÁ // MÓDULO {currentMod.moduleNumber} DE {totalModules - 1}</span>
+              <span>ESTÁS ACÁ // MÓDULO {currentMod.moduleNumber} (27 MÓDULOS [00–26])</span>
             </div>
             <span className="text-[10px] text-zinc-500 uppercase">{currentMod.categoryTag}</span>
           </div>
@@ -2425,7 +2440,7 @@ export const Tomo02ModuleReader: React.FC<Tomo02ModuleReaderProps> = ({
                 onClick={onFinishTomo}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-mono-tech font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_25px_rgba(0,210,255,0.4)] flex items-center justify-center gap-2 cursor-pointer shrink-0"
               >
-                <span>VER CONSTANCIA PERICIAL Y PASAPORTE →</span>
+                <span>VER CERTIFICADO EVO Y PASAPORTE →</span>
                 <ArrowRight className="w-4 h-4 text-black" />
               </button>
             </div>
