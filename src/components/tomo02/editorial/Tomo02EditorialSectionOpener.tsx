@@ -117,10 +117,12 @@ export const SECTION_OPENERS_DATA: Record<string, SectionOpenerMeta> = {
 
 interface Tomo02EditorialSectionOpenerProps {
   moduleId: string;
+  integrated?: boolean;
 }
 
 export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpenerProps> = ({
   moduleId,
+  integrated = false,
 }) => {
   const data = SECTION_OPENERS_DATA[moduleId] || SECTION_OPENERS_DATA.m00;
 
@@ -133,6 +135,74 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
     TOMO_02_MODULES.find((m) => m.id === data.heroVisualModuleId) ||
     TOMO_02_MODULES.find((m) => m.id === moduleId) ||
     sectionModules[0];
+
+  if (integrated) {
+    return (
+      <div className="flex flex-col gap-2 font-sans-editorial shrink-0 pb-1">
+        {/* 1. Top Section Metadata Bar */}
+        <div className="border-b border-cyan-950/80 pb-1.5 flex items-baseline justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <span className="text-[11px] font-mono-tech tracking-widest uppercase font-black px-2 py-0.5 rounded bg-cyan-950/90 border border-cyan-500/50 text-cyan-300">
+              SECCIÓN {data.romanNumber}
+            </span>
+            <span className="text-[10px] font-mono-tech uppercase tracking-widest text-zinc-300 font-bold">
+              APERTURA EDITORIAL MAESTRA
+            </span>
+          </div>
+          <span className="text-[9.5px] font-mono-tech text-cyan-400 uppercase tracking-wider hidden sm:inline font-bold">
+            DIVISIÓN DE INGENIERÍA & KERNEL NT
+          </span>
+        </div>
+
+        {/* 2. Main Grand Title & Subtitle */}
+        <div className="space-y-0.5 shrink-0">
+          <h2 className="font-display font-black text-xl sm:text-2xl lg:text-3xl text-white uppercase tracking-tight leading-[1.08]">
+            {data.sectionTitle}
+          </h2>
+          <p className="font-mono-tech text-xs uppercase tracking-wider font-semibold text-cyan-400">
+            {data.subtitle}
+          </p>
+        </div>
+
+        {/* 3. Hero Visual Stage (Dominant Centerpiece 180-220px) */}
+        <div className="relative rounded-xl overflow-hidden border border-cyan-900/80 bg-[#040812] shadow-xl h-[180px] sm:h-[200px] shrink-0 flex flex-col justify-between group">
+          {/* Visual Engine Graphic */}
+          <div className="flex-1 w-full h-full relative overflow-hidden">
+            <Tomo02ModuleVisual module={heroModule} compact={true} />
+          </div>
+
+          {/* Technical Caption Overlay with Pulsing Status Indicator */}
+          <div className="relative z-20 px-3 py-1.5 backdrop-blur-md bg-black/80 border-t border-cyan-500/30 flex items-center justify-between text-xs font-mono-tech select-none shrink-0">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 shrink-0 animate-pulse rounded-full bg-cyan-400 shadow-[0_0_8px_#00D2FF]" />
+              <span className="text-[10px] sm:text-[11px] text-cyan-200 tracking-wide font-medium">
+                {data.imageCaption}
+              </span>
+            </div>
+            <span className="text-[9px] text-cyan-400/80 uppercase tracking-widest hidden sm:inline font-bold">
+              INFOGRAFÍA DE ARQUITECTURA NT
+            </span>
+          </div>
+        </div>
+
+        {/* 4. Principle Callout Banner */}
+        <div className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-950/40 via-zinc-950 to-black border-l-2 border-cyan-400 border border-cyan-950/60 flex items-center justify-between gap-3 text-xs shrink-0">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <span className="text-[10px] font-mono-tech text-cyan-400 font-bold uppercase shrink-0">
+              PRINCIPIO:
+            </span>
+            <span className="text-[11px] text-zinc-200 font-sans-editorial italic font-medium truncate">
+              “{data.impactPhrase}”
+            </span>
+          </div>
+          <span className="text-[9.5px] font-mono-tech text-zinc-400 uppercase tracking-wider shrink-0 hidden md:inline">
+            {sectionModules.length} MÓDULOS EN ESTA SECCIÓN
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col justify-between space-y-3.5 font-sans-editorial">

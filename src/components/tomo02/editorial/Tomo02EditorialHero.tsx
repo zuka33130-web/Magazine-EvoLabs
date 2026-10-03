@@ -9,6 +9,7 @@ interface Tomo02EditorialHeroProps {
   richData?: ChapterRichContent;
   onCopySnippet?: (text: string) => void;
   copiedSnippet?: string | null;
+  isSectionOpener?: boolean;
 }
 
 export const Tomo02EditorialHero: React.FC<Tomo02EditorialHeroProps> = ({
@@ -16,6 +17,7 @@ export const Tomo02EditorialHero: React.FC<Tomo02EditorialHeroProps> = ({
   richData,
   onCopySnippet,
   copiedSnippet,
+  isSectionOpener = false,
 }) => {
   const [localCopied, setLocalCopied] = useState<boolean>(false);
 
@@ -33,7 +35,7 @@ export const Tomo02EditorialHero: React.FC<Tomo02EditorialHeroProps> = ({
   const isCopied = copiedSnippet === command || localCopied;
 
   return (
-    <div className="flex flex-col space-y-3 font-sans-editorial h-auto">
+    <div className={`flex flex-col space-y-2.5 font-sans-editorial ${isSectionOpener ? 'flex-1 min-h-0 justify-between' : 'h-auto'}`}>
       {/* Top Editorial Kicker Bar */}
       <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
         <div className="flex items-center gap-3">
@@ -154,7 +156,7 @@ export const Tomo02EditorialHero: React.FC<Tomo02EditorialHeroProps> = ({
 
         {/* Right Column (7 cols): The Visual Graphic Centerpiece */}
         <div className="lg:col-span-7 flex flex-col space-y-2 h-auto">
-          <div className="h-[260px] rounded-xl overflow-hidden border border-cyan-900/70 bg-[#040812] shadow-2xl relative">
+          <div className={`${isSectionOpener ? 'h-[140px] sm:h-[160px]' : 'h-[260px]'} rounded-xl overflow-hidden border border-cyan-900/70 bg-[#040812] shadow-2xl relative`}>
             <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
           </div>
 

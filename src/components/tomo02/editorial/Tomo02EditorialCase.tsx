@@ -7,11 +7,13 @@ import { Tomo02ModuleVisual } from '../Tomo02VisualEngine';
 interface Tomo02EditorialCaseProps {
   module: TomoModuleItem;
   richData?: ChapterRichContent;
+  isSectionOpener?: boolean;
 }
 
 export const Tomo02EditorialCase: React.FC<Tomo02EditorialCaseProps> = ({
   module,
   richData,
+  isSectionOpener = false,
 }) => {
   const evoCase = richData?.evoCase;
   const symptomText = evoCase?.symptom || module.summary;
@@ -30,7 +32,7 @@ export const Tomo02EditorialCase: React.FC<Tomo02EditorialCaseProps> = ({
   const toolText = module.sysinternalsTool || 'Process Explorer & LatencyMon';
 
   return (
-    <div className="h-full flex flex-col gap-3 font-sans-editorial">
+    <div className={`${isSectionOpener ? 'flex-1 min-h-0' : 'h-full'} flex flex-col gap-2.5 font-sans-editorial justify-between`}>
       {/* Top Header Bar */}
       <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
         <div>
@@ -129,7 +131,7 @@ export const Tomo02EditorialCase: React.FC<Tomo02EditorialCaseProps> = ({
       </div>
 
       {/* Subsystem Visual Stage - Absorbs Remaining Space */}
-      <div className="flex-1 min-h-[160px] max-h-[250px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative">
+      <div className={`flex-1 ${isSectionOpener ? 'min-h-[100px] max-h-[150px]' : 'min-h-[160px] max-h-[250px]'} rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative`}>
         <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
       </div>
 

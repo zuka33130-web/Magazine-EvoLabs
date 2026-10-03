@@ -1322,54 +1322,58 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               subSlug={mod.categoryTag}
               accentColor="#00D2FF"
             >
-              {/* Contenido Editorial del Módulo / Apertura de Sección */}
-              {hasSectionOpener ? (
+              {/* Apertura de Sección Hero Integrada (para m00, m03, m06, m10, m14, m19) */}
+              {hasSectionOpener && (
                 <Tomo02EditorialSectionOpener
                   moduleId={mod.id}
+                  integrated={true}
                 />
-              ) : (
-                <>
-                  {variant === 'hero' && (
-                    <Tomo02EditorialHero
-                      module={mod}
-                      richData={richData}
-                      onCopySnippet={handleCopySnippet}
-                      copiedSnippet={copiedSnippet}
-                    />
-                  )}
-                  {variant === 'diagram' && (
-                    <Tomo02EditorialDiagram
-                      module={mod}
-                      richData={richData}
-                    />
-                  )}
-                  {variant === 'comparison' && (
-                    <Tomo02EditorialComparison
-                      module={mod}
-                      richData={richData}
-                    />
-                  )}
-                  {variant === 'practice' && (
-                    <Tomo02EditorialPractice
-                      module={mod}
-                      richData={richData}
-                      onCopySnippet={handleCopySnippet}
-                      copiedSnippet={copiedSnippet}
-                    />
-                  )}
-                  {variant === 'case' && (
-                    <Tomo02EditorialCase
-                      module={mod}
-                      richData={richData}
-                    />
-                  )}
-                  {variant === 'check' && (
-                    <Tomo02EditorialCheck
-                      module={mod}
-                      questionData={MODULE_QUESTIONS[mod.id]}
-                    />
-                  )}
-                </>
+              )}
+
+              {/* Contenido Editorial Real del Módulo (Conserva variant original) */}
+              {variant === 'hero' && (
+                <Tomo02EditorialHero
+                  module={mod}
+                  richData={richData}
+                  onCopySnippet={handleCopySnippet}
+                  copiedSnippet={copiedSnippet}
+                  isSectionOpener={hasSectionOpener}
+                />
+              )}
+              {variant === 'diagram' && (
+                <Tomo02EditorialDiagram
+                  module={mod}
+                  richData={richData}
+                />
+              )}
+              {variant === 'comparison' && (
+                <Tomo02EditorialComparison
+                  module={mod}
+                  richData={richData}
+                  isSectionOpener={hasSectionOpener}
+                />
+              )}
+              {variant === 'practice' && (
+                <Tomo02EditorialPractice
+                  module={mod}
+                  richData={richData}
+                  onCopySnippet={handleCopySnippet}
+                  copiedSnippet={copiedSnippet}
+                  isSectionOpener={hasSectionOpener}
+                />
+              )}
+              {variant === 'case' && (
+                <Tomo02EditorialCase
+                  module={mod}
+                  richData={richData}
+                  isSectionOpener={hasSectionOpener}
+                />
+              )}
+              {variant === 'check' && (
+                <Tomo02EditorialCheck
+                  module={mod}
+                  questionData={MODULE_QUESTIONS[mod.id]}
+                />
               )}
 
               {/* Discrete synchronization CTA to Interactive Module (Hidden in Print / PDF export) */}

@@ -9,6 +9,7 @@ interface Tomo02EditorialPracticeProps {
   richData?: ChapterRichContent;
   onCopySnippet?: (text: string) => void;
   copiedSnippet?: string | null;
+  isSectionOpener?: boolean;
 }
 
 export const Tomo02EditorialPractice: React.FC<Tomo02EditorialPracticeProps> = ({
@@ -16,6 +17,7 @@ export const Tomo02EditorialPractice: React.FC<Tomo02EditorialPracticeProps> = (
   richData,
   onCopySnippet,
   copiedSnippet,
+  isSectionOpener = false,
 }) => {
   const [localCopied, setLocalCopied] = useState<boolean>(false);
 
@@ -35,7 +37,7 @@ export const Tomo02EditorialPractice: React.FC<Tomo02EditorialPracticeProps> = (
   const practice = richData?.practiceDetails;
 
   return (
-    <div className="h-full flex flex-col gap-3 font-sans-editorial">
+    <div className={`${isSectionOpener ? 'flex-1 min-h-0' : 'h-full'} flex flex-col gap-2.5 font-sans-editorial justify-between`}>
       {/* Top Header */}
       <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
         <div>
@@ -166,7 +168,7 @@ export const Tomo02EditorialPractice: React.FC<Tomo02EditorialPracticeProps> = (
       </div>
 
       {/* Subsystem Visual Stage - Absorbs Remaining Space */}
-      <div className="flex-1 min-h-[200px] max-h-[300px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative">
+      <div className={`flex-1 ${isSectionOpener ? 'min-h-[110px] max-h-[160px]' : 'min-h-[200px] max-h-[300px]'} rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative`}>
         <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
       </div>
 

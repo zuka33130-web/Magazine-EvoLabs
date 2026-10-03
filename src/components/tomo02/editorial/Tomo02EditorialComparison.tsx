@@ -7,17 +7,19 @@ import { Tomo02ModuleVisual } from '../Tomo02VisualEngine';
 interface Tomo02EditorialComparisonProps {
   module: TomoModuleItem;
   richData?: ChapterRichContent;
+  isSectionOpener?: boolean;
 }
 
 export const Tomo02EditorialComparison: React.FC<Tomo02EditorialComparisonProps> = ({
   module,
   richData,
+  isSectionOpener = false,
 }) => {
   const myth = richData?.mythVsReality?.myth || module.falsePositive || 'Consejo popular desinformado de internet.';
   const reality = richData?.mythVsReality?.reality || module.scientificFact || module.summary;
 
   return (
-    <div className="h-full flex flex-col gap-3 font-sans-editorial">
+    <div className={`${isSectionOpener ? 'flex-1 min-h-0' : 'h-full'} flex flex-col gap-2.5 font-sans-editorial justify-between`}>
       {/* Top Section Header */}
       <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
         <div>
@@ -107,7 +109,7 @@ export const Tomo02EditorialComparison: React.FC<Tomo02EditorialComparisonProps>
       )}
 
       {/* Subsystem Visual Stage - Absorbs Remaining Space */}
-      <div className="flex-1 min-h-[200px] max-h-[300px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative">
+      <div className={`flex-1 ${isSectionOpener ? 'min-h-[120px] max-h-[170px]' : 'min-h-[200px] max-h-[300px]'} rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative`}>
         <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
       </div>
 
