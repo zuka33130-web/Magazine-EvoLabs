@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { useEvoOperatingMode } from '../../../../hooks/useEvoOperatingMode';
 import { EvoOperatingModeSelector } from '../../../common/EvoOperatingModeSelector';
+import { EvoWindowsXRayLab } from './EvoWindowsXRayLab';
 
 export interface EvoWindowsMatrixLabProps {
   initialBuild?: 'win10-22h2' | 'win10-ltsc' | 'win11-23h2' | 'win11-24h2';
@@ -556,6 +557,11 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
           </div>
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* EVO WINDOWS X-RAY // EXPERIENCIA GUIADA DEL TOMO 02                      */}
+      {/* ========================================================================= */}
+      <EvoWindowsXRayLab initialScenario={initialScenario} />
 
       {/* ========================================================================= */}
       {/* SECCIÓN A: SELECTOR MATRICIAL DE COMPILACIONES DE WINDOWS                */}
