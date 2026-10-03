@@ -138,67 +138,59 @@ export const Tomo02EditorialSectionOpener: React.FC<Tomo02EditorialSectionOpener
 
   if (integrated) {
     return (
-      <div className="flex flex-col gap-2 font-sans-editorial shrink-0 pb-1">
+      <div className="flex flex-col gap-2 font-sans-editorial shrink-0 pb-2 border-b border-cyan-500/30">
         {/* 1. Top Section Metadata Bar */}
-        <div className="border-b border-cyan-950/80 pb-1.5 flex items-baseline justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <span className="text-[11px] font-mono-tech tracking-widest uppercase font-black px-2 py-0.5 rounded bg-cyan-950/90 border border-cyan-500/50 text-cyan-300">
+        <div className="flex items-center justify-between text-[10px] font-mono-tech">
+          <div className="flex items-center gap-2">
+            <span className="font-black px-2.5 py-0.5 rounded bg-cyan-950 border border-cyan-400 text-cyan-300 tracking-widest uppercase text-[11px] shadow-[0_0_10px_rgba(0,210,255,0.4)]">
               SECCIÓN {data.romanNumber}
             </span>
-            <span className="text-[10px] font-mono-tech uppercase tracking-widest text-zinc-300 font-bold">
+            <span className="uppercase tracking-widest text-zinc-300 font-bold text-[10px]">
               APERTURA EDITORIAL MAESTRA
             </span>
+            <span className="text-zinc-600">/</span>
+            <span className="text-cyan-400 font-bold text-[9.5px] uppercase tracking-wider hidden sm:inline">
+              {data.architectureBadge}
+            </span>
           </div>
-          <span className="text-[9.5px] font-mono-tech text-cyan-400 uppercase tracking-wider hidden sm:inline font-bold">
+          <span className="text-[9.5px] font-mono-tech text-cyan-400/90 uppercase tracking-wider hidden md:inline font-bold">
             DIVISIÓN DE INGENIERÍA & KERNEL NT
           </span>
         </div>
 
-        {/* 2. Main Grand Title & Subtitle */}
-        <div className="space-y-0.5 shrink-0">
-          <h2 className="font-display font-black text-xl sm:text-2xl lg:text-3xl text-white uppercase tracking-tight leading-[1.08]">
-            {data.sectionTitle}
-          </h2>
-          <p className="font-mono-tech text-xs uppercase tracking-wider font-semibold text-cyan-400">
-            {data.subtitle}
-          </p>
-        </div>
-
-        {/* 3. Hero Visual Stage (Dominant Centerpiece 180-220px) */}
-        <div className="relative rounded-xl overflow-hidden border border-cyan-900/80 bg-[#040812] shadow-xl h-[180px] sm:h-[200px] shrink-0 flex flex-col justify-between group">
-          {/* Visual Engine Graphic */}
-          <div className="flex-1 w-full h-full relative overflow-hidden">
-            <Tomo02ModuleVisual module={heroModule} compact={true} />
+        {/* 2. Main Grand Title & Subtitle + Module Range */}
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5">
+          <div className="space-y-0.5">
+            <h2 className="font-display font-black text-xl sm:text-2xl text-white uppercase tracking-tight leading-tight">
+              {data.sectionTitle}
+            </h2>
+            <p className="font-mono-tech text-xs uppercase tracking-wider font-semibold text-cyan-400">
+              {data.subtitle}
+            </p>
           </div>
-
-          {/* Technical Caption Overlay with Pulsing Status Indicator */}
-          <div className="relative z-20 px-3 py-1.5 backdrop-blur-md bg-black/80 border-t border-cyan-500/30 flex items-center justify-between text-xs font-mono-tech select-none shrink-0">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 shrink-0 animate-pulse rounded-full bg-cyan-400 shadow-[0_0_8px_#00D2FF]" />
-              <span className="text-[10px] sm:text-[11px] text-cyan-200 tracking-wide font-medium">
-                {data.imageCaption}
-              </span>
-            </div>
-            <span className="text-[9px] text-cyan-400/80 uppercase tracking-widest hidden sm:inline font-bold">
-              INFOGRAFÍA DE ARQUITECTURA NT
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-[9.5px] font-mono-tech text-cyan-300 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-500/40 uppercase tracking-widest font-bold">
+              BLOQUE DE {sectionModules.length} MÓDULOS // M{data.moduleIds[0].replace('m', '')}–M{data.moduleIds[data.moduleIds.length - 1].replace('m', '')}
             </span>
           </div>
         </div>
 
-        {/* 4. Principle Callout Banner */}
-        <div className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-950/40 via-zinc-950 to-black border-l-2 border-cyan-400 border border-cyan-950/60 flex items-center justify-between gap-3 text-xs shrink-0">
-          <div className="flex items-center gap-2 overflow-hidden">
+        {/* 3. Principle Callout Banner + Scope & Caption */}
+        <div className="p-2.5 rounded-lg bg-gradient-to-r from-cyan-950/60 via-zinc-950/90 to-black border-l-3 border-cyan-400 border border-cyan-950/80 flex flex-col md:flex-row md:items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 min-w-0">
             <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-            <span className="text-[10px] font-mono-tech text-cyan-400 font-bold uppercase shrink-0">
+            <span className="text-[9.5px] font-mono-tech text-cyan-400 font-black uppercase shrink-0">
               PRINCIPIO:
             </span>
-            <span className="text-[11px] text-zinc-200 font-sans-editorial italic font-medium truncate">
+            <span className="text-[11.5px] text-zinc-100 font-sans-editorial italic font-medium leading-tight">
               “{data.impactPhrase}”
             </span>
           </div>
-          <span className="text-[9.5px] font-mono-tech text-zinc-400 uppercase tracking-wider shrink-0 hidden md:inline">
-            {sectionModules.length} MÓDULOS EN ESTA SECCIÓN
-          </span>
+
+          <div className="flex items-center gap-2 shrink-0 text-[9px] font-mono-tech text-zinc-400">
+            <span className="text-cyan-300 font-bold hidden lg:inline">INFOGRAFÍA:</span>
+            <span className="text-zinc-300 hidden lg:inline truncate max-w-[280px]">{data.imageCaption}</span>
+          </div>
         </div>
       </div>
     );

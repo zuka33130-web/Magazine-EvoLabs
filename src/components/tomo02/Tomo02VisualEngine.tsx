@@ -30,6 +30,7 @@ import {
   Search,
   FolderTree,
   Book,
+  Wrench,
 } from 'lucide-react';
 import { TomoModuleItem, TOMO_02_FOLDERS } from '../../data/tomo02Data';
 
@@ -47,7 +48,7 @@ export const Tomo02ModuleVisual: React.FC<VisualProps> = ({ module, richData, co
   const renderVisualGraphic = () => {
     switch (moduleId) {
       case 'm00':
-        return <AperturaMethodVisual />;
+        return <AperturaMethodVisual compact={compact} />;
       case 'm01':
         return <BootPipelineVisual />;
       case 'm02':
@@ -59,7 +60,7 @@ export const Tomo02ModuleVisual: React.FC<VisualProps> = ({ module, richData, co
       case 'm05':
         return <GenericKernelVisual module={module} richData={richData} />;
       case 'm06':
-        return <RingArchitectureVisual />;
+        return <RingArchitectureVisual compact={compact} />;
       case 'm07':
         return <MemoryHierarchyVisual />;
       case 'm08':
@@ -95,11 +96,11 @@ export const Tomo02ModuleVisual: React.FC<VisualProps> = ({ module, richData, co
       case 'm23':
         return <ForensicCaseStudiesVisual />;
       case 'm24':
-        return <EliteToolsMatrixVisual />;
+        return <EliteToolsMatrixVisual compact={compact} />;
       case 'm25':
-        return <GlossaryMatrixVisual />;
+        return <GlossaryMatrixVisual compact={compact} />;
       case 'm26':
-        return <InvestigatorPassportVisual />;
+        return <InvestigatorPassportVisual compact={compact} />;
       default:
         return <GenericKernelVisual module={module} richData={richData} />;
     }
@@ -110,8 +111,10 @@ export const Tomo02ModuleVisual: React.FC<VisualProps> = ({ module, richData, co
 
   if (compact) {
     return (
-      <div className="w-full h-full flex flex-col justify-center items-center overflow-auto p-1.5 sm:p-2.5">
-        {renderVisualGraphic()}
+      <div className="w-full h-full flex flex-col justify-start items-stretch overflow-y-auto no-scrollbar p-2 text-xs">
+        <div className="w-full flex flex-col justify-start items-stretch min-h-0">
+          {renderVisualGraphic()}
+        </div>
       </div>
     );
   }
@@ -231,7 +234,7 @@ export const Tomo02ModuleVisual: React.FC<VisualProps> = ({ module, richData, co
 /* =========================================================================
    0. MODULE 00: APERTURA & MÉTODO CIENTÍFICO EVO // LAS 15 CARPETAS
 ========================================================================= */
-const AperturaMethodVisual: React.FC = () => {
+const AperturaMethodVisual: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
   const [activeTab, setActiveTab] = useState<'METODO' | 'CARPETAS' | 'PACTO'>('METODO');
   const [folderFilter, setFolderFilter] = useState<'TODAS' | 'ROJO' | 'AMARILLO' | 'VERDE'>('TODAS');
   const [selectedFolderId, setSelectedFolderId] = useState<string>('f01');
@@ -252,6 +255,42 @@ const AperturaMethodVisual: React.FC = () => {
     { num: '6', title: 'COMPROBAR', desc: 'Evaluación de razonamiento crítico e interpretación del visual sin preguntas de memoria.' },
     { num: '7', title: 'AVANZAR', desc: 'Consolidación de competencias en el Archivo EVO y puente editorial al siguiente módulo.' },
   ];
+
+  if (compact) {
+    return (
+      <div className="w-full space-y-2 font-mono-tech select-none">
+        <div className="flex items-center justify-between text-[10px] text-cyan-400 border-b border-cyan-950 pb-1">
+          <span className="font-bold flex items-center gap-1.5">
+            <Award className="w-3.5 h-3.5 text-cyan-400" />
+            MÉTODO DETERMINISTA EVO // CADENA DE 7 FASES
+          </span>
+          <span className="text-zinc-500">SECUENCIA FORENSE</span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-1.5 text-center text-xs">
+          {methodSteps.map((st) => (
+            <div
+              key={st.num}
+              className="p-1.5 rounded-lg bg-zinc-950/90 border border-cyan-950/80 flex flex-col justify-between space-y-0.5"
+            >
+              <div className="w-4 h-4 mx-auto rounded-full bg-cyan-950 border border-cyan-500/40 text-cyan-300 flex items-center justify-center font-bold text-[9px]">
+                {st.num}
+              </div>
+              <strong className="text-white text-[9.5px] block font-mono-tech">{st.title}</strong>
+              <p className="text-[8.5px] text-zinc-400 font-sans-editorial leading-tight line-clamp-2">
+                {st.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="p-1.5 rounded-lg bg-cyan-950/30 border border-cyan-900/40 flex items-center justify-between text-[9.5px] text-cyan-300">
+          <span>REGLA FORENSE N° 1: NO LO CREAS, COMPROBALO.</span>
+          <span className="text-zinc-400">SI NO PODÉS REVERTIRLO, NO LO TOQUES</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 font-mono-tech">
@@ -482,7 +521,64 @@ const AperturaMethodVisual: React.FC = () => {
 /* =========================================================================
    1. MODULE 01: RING ARCHITECTURE & NT KERNEL BOUNDARY
 ========================================================================= */
-const RingArchitectureVisual: React.FC = () => {
+const RingArchitectureVisual: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
+  if (compact) {
+    return (
+      <div className="w-full space-y-1.5 font-mono-tech select-none">
+        <div className="flex items-center justify-between text-[10px] text-cyan-400 border-b border-cyan-950 pb-1">
+          <span className="font-bold flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-cyan-400" />
+            ANILLOS DE PRIVILEGIO // AISLAMIENTO DETERMINISTA
+          </span>
+          <span className="text-zinc-500">TRAP GATE HARDWARE</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+          {/* Ring 3 */}
+          <div className="p-2.5 rounded-lg bg-blue-950/20 border border-blue-500/40 space-y-1">
+            <div className="flex items-center justify-between text-[10px] text-blue-400 font-bold">
+              <span>RING 3: USER MODE</span>
+              <span className="text-[9px] bg-blue-950 px-1 rounded">AISLADO</span>
+            </div>
+            <p className="text-[10px] text-zinc-300 font-sans-editorial leading-tight">
+              Apps (Chrome, juegos), DLLs cliente y procesos base (explorer.exe).
+            </p>
+            <div className="text-[9px] text-zinc-400 font-mono-tech pt-0.5 border-t border-blue-900/40 truncate">
+              Crash ➔ Afecta sólo al proceso
+            </div>
+          </div>
+
+          {/* Syscall Gate */}
+          <div className="p-2.5 rounded-lg bg-cyan-950/30 border border-cyan-500/50 space-y-1">
+            <div className="flex items-center justify-between text-[10px] text-cyan-300 font-bold">
+              <span>CPU TRAP GATE</span>
+              <span className="text-[9px] bg-cyan-950 px-1 rounded text-cyan-300">SYSCALL</span>
+            </div>
+            <p className="text-[10px] text-zinc-300 font-sans-editorial leading-tight">
+              ntdll.dll ➔ KiSystemCall64 conmuta CR3 y salva registros de CPU.
+            </p>
+            <div className="text-[9px] text-emerald-400 font-mono-tech pt-0.5 border-t border-cyan-900/40 truncate">
+              Protección por Hardware x64
+            </div>
+          </div>
+
+          {/* Ring 0 */}
+          <div className="p-2.5 rounded-lg bg-rose-950/20 border border-rose-500/40 space-y-1">
+            <div className="flex items-center justify-between text-[10px] text-rose-400 font-bold">
+              <span>RING 0: KERNEL NT</span>
+              <span className="text-[9px] bg-rose-950 px-1 rounded text-rose-300">PRIVILEGIADO</span>
+            </div>
+            <p className="text-[10px] text-zinc-300 font-sans-editorial leading-tight">
+              ntoskrnl.exe, HAL.dll, Drivers de GPU, NVMe y Red. Acceso total a RAM.
+            </p>
+            <div className="text-[9px] text-rose-300 font-mono-tech pt-0.5 border-t border-rose-900/40 truncate">
+              Excepción no controlada ➔ BSOD
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1875,7 +1971,44 @@ const ForensicCaseStudiesVisual: React.FC = () => {
 /* =========================================================================
    24. MODULE 24: ELITE TOOLS MATRIX & RELIABILITY MONITOR
 ========================================================================= */
-const EliteToolsMatrixVisual: React.FC = () => {
+const EliteToolsMatrixVisual: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
+  if (compact) {
+    return (
+      <div className="w-full space-y-1.5 font-mono-tech select-none">
+        <div className="flex items-center justify-between text-[10px] text-cyan-400 border-b border-cyan-950 pb-1">
+          <span className="font-bold flex items-center gap-1.5">
+            <Wrench className="w-3.5 h-3.5 text-cyan-400" />
+            INSTRUMENTAL DE TALLER // APPLETS CPL & MONITOR DE CONFIABILIDAD
+          </span>
+          <span className="text-emerald-400 text-[9px] font-bold">PERFMON /REL</span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div className="p-2 rounded bg-zinc-950 border border-cyan-950">
+            <code className="text-cyan-300 font-bold text-xs block">ncpa.cpl</code>
+            <span className="text-[9.5px] text-zinc-400 font-sans-editorial">Adaptadores de Red</span>
+          </div>
+          <div className="p-2 rounded bg-zinc-950 border border-cyan-950">
+            <code className="text-cyan-300 font-bold text-xs block">sysdm.cpl</code>
+            <span className="text-[9.5px] text-zinc-400 font-sans-editorial">Propiedades de Sistema</span>
+          </div>
+          <div className="p-2 rounded bg-zinc-950 border border-cyan-950">
+            <code className="text-cyan-300 font-bold text-xs block">devmgmt.msc</code>
+            <span className="text-[9.5px] text-zinc-400 font-sans-editorial">Controladores & Dispositivos</span>
+          </div>
+          <div className="p-2 rounded bg-zinc-950 border border-cyan-950">
+            <code className="text-cyan-300 font-bold text-xs block">diskmgmt.msc</code>
+            <span className="text-[9.5px] text-zinc-400 font-sans-editorial">Particiones & Volúmenes</span>
+          </div>
+        </div>
+
+        <div className="p-2 rounded bg-zinc-950 border border-cyan-900/60 flex items-center justify-between text-[10px]">
+          <span className="text-zinc-300 font-mono-tech">MONITOR DE ESTABILIDAD:</span>
+          <span className="text-emerald-400 font-bold">HISTORIAL DE 1 A 10 SIN INSTALAR NADA</span>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-4 font-mono-tech">
       <div className="flex items-center justify-between text-xs text-cyan-400">
@@ -2111,7 +2244,58 @@ const GLOSSARY_FORENSIC_ITEMS: GlossaryCardData[] = [
   },
 ];
 
-const GlossaryMatrixVisual: React.FC = () => {
+const GlossaryMatrixVisual: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
+  if (compact) {
+    return (
+      <div className="w-full space-y-2 font-mono-tech select-none">
+        <div className="flex items-center justify-between text-[10px] text-cyan-400 border-b border-cyan-950 pb-1">
+          <span className="font-bold flex items-center gap-1.5">
+            <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
+            GLOSARIO FUNDACIONAL // 4 PILARES DEL KERNEL NT
+          </span>
+          <span className="text-zinc-500">DICCIONARIO FORENSE</span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div className="p-2 rounded-lg bg-zinc-950 border border-cyan-950 space-y-1">
+            <div className="flex items-center justify-between text-[10px] text-cyan-300 font-bold">
+              <span>COMMIT CHARGE</span>
+            </div>
+            <p className="text-[9.5px] text-zinc-300 font-sans-editorial leading-tight">
+              Límite de memoria virtual prometida a los procesos antes de un fallo por memoria agotada (OOM).
+            </p>
+          </div>
+
+          <div className="p-2 rounded-lg bg-zinc-950 border border-cyan-950 space-y-1">
+            <div className="flex items-center justify-between text-[10px] text-cyan-300 font-bold">
+              <span>LATENCIA DPC</span>
+            </div>
+            <p className="text-[9.5px] text-zinc-300 font-sans-editorial leading-tight">
+              Llamadas diferidas a procedimiento. Si superan 1000 µs causan stuttering en juegos y audio.
+            </p>
+          </div>
+
+          <div className="p-2 rounded-lg bg-zinc-950 border border-cyan-950 space-y-1">
+            <div className="flex items-center justify-between text-[10px] text-cyan-300 font-bold">
+              <span>TABLA MFT</span>
+            </div>
+            <p className="text-[9.5px] text-zinc-300 font-sans-editorial leading-tight">
+              Master File Table de NTFS: cada archivo es un registro de 1024 bytes con cabecera y atributos.
+            </p>
+          </div>
+
+          <div className="p-2 rounded-lg bg-zinc-950 border border-cyan-950 space-y-1">
+            <div className="flex items-center justify-between text-[10px] text-cyan-300 font-bold">
+              <span>SECURE DESKTOP</span>
+            </div>
+            <p className="text-[9.5px] text-zinc-300 font-sans-editorial leading-tight">
+              Escritorio aislado donde corre la confirmación de elevación UAC, inmune a clics falsos de malware.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const [activeCategory, setActiveCategory] = useState<string>('TODOS');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedTermId, setSelectedTermId] = useState<string>('commit-charge');
@@ -2298,7 +2482,39 @@ const GlossaryMatrixVisual: React.FC = () => {
 /* =========================================================================
    26. MODULE 26: INVESTIGATOR PASSPORT & FINAL EDITORIAL ENDORSEMENT
 ========================================================================= */
-const InvestigatorPassportVisual: React.FC = () => {
+const InvestigatorPassportVisual: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
+  if (compact) {
+    return (
+      <div className="w-full space-y-1.5 font-mono-tech select-none">
+        <div className="flex items-center justify-between text-[10px] text-cyan-400 border-b border-cyan-950 pb-1">
+          <span className="font-bold flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            PASAPORTE PERICIAL // PROTOCOLO DE INTERVENCIÓN CERRADO
+          </span>
+          <span className="text-emerald-400 text-[9px] font-bold">CUSTODIA EVO</span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div className="p-2 rounded bg-zinc-950 border border-emerald-950/60 space-y-0.5">
+            <span className="text-[9.5px] font-bold text-emerald-300 block">1. LÍNEA BASE</span>
+            <span className="text-[9px] text-zinc-400 font-sans-editorial">Registro de DPC, RAM e hilos.</span>
+          </div>
+          <div className="p-2 rounded bg-zinc-950 border border-emerald-950/60 space-y-0.5">
+            <span className="text-[9.5px] font-bold text-emerald-300 block">2. RESPALDO VSS</span>
+            <span className="text-[9px] text-zinc-400 font-sans-editorial">Punto de restauración y backup .reg.</span>
+          </div>
+          <div className="p-2 rounded bg-zinc-950 border border-emerald-950/60 space-y-0.5">
+            <span className="text-[9.5px] font-bold text-emerald-300 block">3. INTERVENCIÓN</span>
+            <span className="text-[9px] text-zinc-400 font-sans-editorial">Una sola variable con orden pericial.</span>
+          </div>
+          <div className="p-2 rounded bg-zinc-950 border border-emerald-950/60 space-y-0.5">
+            <span className="text-[9.5px] font-bold text-emerald-300 block">4. VALIDACIÓN</span>
+            <span className="text-[9px] text-zinc-400 font-sans-editorial">Delta medido y comprobación en bitácora.</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const [activeTab, setActiveTab] = useState<'COMPETENCIAS' | 'ARCHIVO_EVO' | 'BIBLIOGRAFIA' | 'TOMO_03'>('COMPETENCIAS');
   const [expandedCompetency, setExpandedCompetency] = useState<number | null>(0);
 

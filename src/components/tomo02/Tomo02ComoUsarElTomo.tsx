@@ -52,8 +52,8 @@ export const Tomo02ComoUsarElTomo: React.FC<Tomo02ComoUsarElTomoProps> = ({
           </h2>
         </div>
         <div className="text-right hidden sm:block">
-          <span className="font-mono-tech text-xs text-cyan-400 font-extrabold uppercase tracking-wider block">
-            LEMA: SI NO PODÉS REVERTIRLO, NO LO TOQUES
+          <span className="font-mono-tech text-xs text-cyan-400 font-bold uppercase tracking-wider block">
+            EXPEDIENTE EDITORIAL // GUÍA
           </span>
           <span className="font-mono-tech text-[10px] text-zinc-500 uppercase tracking-wider">
             REF: EVO-T02-SYS-001
@@ -62,9 +62,9 @@ export const Tomo02ComoUsarElTomo: React.FC<Tomo02ComoUsarElTomoProps> = ({
       </div>
 
       {/* Main Grid: 2 Columns (Sistema de Lectura + Archivo Forense EVO) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 flex-1 items-stretch min-h-0">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 flex-1 items-stretch min-h-0">
         {/* Left Column (7 cols): Las 2 Velocidades & Los 3 Niveles de Riesgo */}
-        <div className="lg:col-span-7 flex flex-col justify-between space-y-2.5">
+        <div className="md:col-span-7 flex flex-col justify-between space-y-2.5">
           {/* 1. Las 2 Velocidades de Lectura */}
           <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-2">
             <span className="text-xs font-mono-tech font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -130,7 +130,7 @@ export const Tomo02ComoUsarElTomo: React.FC<Tomo02ComoUsarElTomoProps> = ({
         </div>
 
         {/* Right Column (5 cols): El Archivo Forense EVO (C:\EVO_LABS) */}
-        <div className="lg:col-span-5 flex flex-col justify-between space-y-2.5">
+        <div className="md:col-span-5 flex flex-col justify-between space-y-2.5">
           <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#060D1A] via-zinc-950 to-black border border-cyan-900/80 space-y-2.5 text-xs flex-1">
             <div className="flex items-center justify-between border-b border-cyan-950 pb-1.5">
               <span className="text-xs font-mono-tech font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -204,12 +204,6 @@ export const Tomo02ComoUsarElTomo: React.FC<Tomo02ComoUsarElTomoProps> = ({
             </span>
           </div>
         </div>
-      </div>
-
-      {/* Bottom Footer Callout */}
-      <div className="pt-2 border-t border-cyan-950/60 flex items-center justify-between text-xs font-mono-tech text-zinc-500">
-        <span>EVO LABS // GUÍA METODOLÓGICA Y ARQUITECTURA FORENSE</span>
-        <span className="text-cyan-400 font-bold">PÁGINA 04 // GUÍA METODOLÓGICA & ARCHIVO EVO</span>
       </div>
     </div>
   );

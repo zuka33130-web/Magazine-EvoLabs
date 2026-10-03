@@ -35,7 +35,7 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
       data-page-id={pageId}
       data-last-page={isLast ? 'true' : undefined}
       data-is-back-cover={isBackCover ? 'true' : undefined}
-      className={`a4-magazine-page relative mx-auto bg-[#08090C] text-zinc-100 overflow-hidden shadow-2xl transition-all duration-200 border border-cyan-950/60 print:border-none print:shadow-none print:m-0 print:p-0 ${
+      className={`a4-magazine-page relative mx-auto bg-[#08090C] text-zinc-100 overflow-hidden shadow-2xl transition-all duration-200 border border-cyan-950/60 print:border-none print:shadow-none print:m-0 print:p-0 flex flex-col ${
         isCover ? 'bg-[#040608]' : isBackCover ? 'bg-[#030406]' : 'bg-[#07090D]'
       }`}
       style={{
@@ -56,7 +56,7 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
       </div>
 
       {!hideHeaderFooter && (
-        <header className="relative z-20 px-8 pt-4 pb-2.5 border-b border-cyan-950/70 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-zinc-400 select-none">
+        <header className="relative z-20 shrink-0 px-6 sm:px-8 pt-3.5 sm:pt-4 pb-2 border-b border-cyan-950/70 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-zinc-400 select-none">
           <div className="flex items-center gap-2">
             <span
               className="w-2 h-2 inline-block shadow-[0_0_8px_#00D2FF]"
@@ -78,29 +78,31 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
       )}
 
       {/* Page Content Body */}
-      <div
-        className={`relative z-10 w-full flex flex-col justify-between ${
-          hideHeaderFooter ? 'h-full p-0' : 'h-[calc(100%-62px)] px-6 sm:px-8 py-3.5'
-        }`}
-      >
-        <div className="flex-1 w-full flex flex-col justify-between min-h-0 overflow-hidden">{children}</div>
+      {hideHeaderFooter ? (
+        <div className="relative z-10 w-full h-full flex flex-col min-h-0">
+          {children}
+        </div>
+      ) : (
+        <div className="relative z-10 w-full flex-1 min-h-0 px-6 sm:px-8 py-2.5 sm:py-3 flex flex-col">
+          <div className="flex-1 w-full flex flex-col justify-between min-h-0">{children}</div>
+        </div>
+      )}
 
-        {!hideHeaderFooter && (
-          <footer className="mt-auto pt-2.5 border-t border-cyan-950/70 flex items-center justify-between text-[9.5px] font-mono-tech text-zinc-500 select-none">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-zinc-400 uppercase tracking-wider">
-                EVO LABS // {sectionTitle || 'COLECCIÓN PERICIAL'}
-              </span>
-            </div>
+      {!hideHeaderFooter && (
+        <footer className="relative z-20 shrink-0 px-6 sm:px-8 pt-2 pb-2.5 sm:pb-3 border-t border-cyan-950/70 flex items-center justify-between text-[9.5px] font-mono-tech text-zinc-500 select-none">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-zinc-400 uppercase tracking-wider">
+              EVO LABS // {sectionTitle || 'COLECCIÓN PERICIAL'}
+            </span>
+          </div>
 
-            <div className="flex items-center gap-2 text-right">
-              <span className="text-cyan-400/90 font-medium tracking-wide uppercase">
-                {pageFooterRight || 'LEMA: SI NO PODÉS REVERTIRLO, NO LO TOQUES'}
-              </span>
-            </div>
-          </footer>
-        )}
-      </div>
+          <div className="flex items-center gap-2 text-right">
+            <span className="text-cyan-400/90 font-medium tracking-wide uppercase">
+              {pageFooterRight || 'LEMA: SI NO PODÉS REVERTIRLO, NO LO TOQUES'}
+            </span>
+          </div>
+        </footer>
+      )}
     </article>
   );
 };

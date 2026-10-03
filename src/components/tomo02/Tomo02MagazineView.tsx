@@ -757,7 +757,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               <div className="relative z-10 mt-4 mb-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-zinc-800/80 pb-3.5">
                 <div>
                   <div className="flex items-baseline gap-2">
-                    <h1 className="font-display font-black text-5xl sm:text-7xl md:text-8xl tracking-tight uppercase leading-[0.82] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
+                    <h1 className="font-display font-black text-5xl sm:text-7xl md:text-8xl tracking-tight uppercase leading-[0.92] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
                       EVO LABS
                     </h1>
                   </div>
@@ -819,7 +819,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                 <div className="relative z-10 px-5 sm:px-7 md:px-8 pb-5 sm:pb-6 space-y-2.5">
                   {/* Título Principal */}
                   <div>
-                    <h2 className="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white tracking-tight leading-[0.88] uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+                    <h2 className="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white tracking-tight leading-[0.92] uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
                       DOMINÁ WINDOWS
                     </h2>
                     <p className="font-display font-bold text-sm sm:text-base md:text-lg text-cyan-300 mt-1.5 tracking-wide drop-shadow">
@@ -1034,7 +1034,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               </div>
 
               {/* 6 Inmutable Rules Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs font-mono-tech">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs font-mono-tech">
                 <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
                   <span className="text-cyan-300 font-bold block text-xs tracking-wider">01 // OBSERVAR</span>
                   <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
@@ -1191,7 +1191,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               </div>
 
               {/* 15 Folders Grid - Crisp Typography */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs font-mono-tech">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs font-mono-tech">
                 {TOMO_02_FOLDERS.map((f) => (
                   <div
                     key={f.id}
@@ -1322,80 +1322,84 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               subSlug={mod.categoryTag}
               accentColor="#00D2FF"
             >
-              {/* Apertura de Sección Hero Integrada (para m00, m03, m06, m10, m14, m19) */}
-              {hasSectionOpener && (
-                <Tomo02EditorialSectionOpener
-                  moduleId={mod.id}
-                  integrated={true}
-                />
-              )}
+              <div className="flex-1 w-full flex flex-col justify-between min-h-0 gap-2">
+                {/* Apertura de Sección Hero Integrada (para m00, m03, m06, m10, m14, m19) */}
+                {hasSectionOpener && (
+                  <Tomo02EditorialSectionOpener
+                    moduleId={mod.id}
+                    integrated={true}
+                  />
+                )}
 
-              {/* Contenido Editorial Real del Módulo (Conserva variant original) */}
-              {variant === 'hero' && (
-                <Tomo02EditorialHero
-                  module={mod}
-                  richData={richData}
-                  onCopySnippet={handleCopySnippet}
-                  copiedSnippet={copiedSnippet}
-                  isSectionOpener={hasSectionOpener}
-                />
-              )}
-              {variant === 'diagram' && (
-                <Tomo02EditorialDiagram
-                  module={mod}
-                  richData={richData}
-                />
-              )}
-              {variant === 'comparison' && (
-                <Tomo02EditorialComparison
-                  module={mod}
-                  richData={richData}
-                  isSectionOpener={hasSectionOpener}
-                />
-              )}
-              {variant === 'practice' && (
-                <Tomo02EditorialPractice
-                  module={mod}
-                  richData={richData}
-                  onCopySnippet={handleCopySnippet}
-                  copiedSnippet={copiedSnippet}
-                  isSectionOpener={hasSectionOpener}
-                />
-              )}
-              {variant === 'case' && (
-                <Tomo02EditorialCase
-                  module={mod}
-                  richData={richData}
-                  isSectionOpener={hasSectionOpener}
-                />
-              )}
-              {variant === 'check' && (
-                <Tomo02EditorialCheck
-                  module={mod}
-                  questionData={MODULE_QUESTIONS[mod.id]}
-                />
-              )}
+                {/* Contenido Editorial Real del Módulo (Conserva variant original) */}
+                <div className="flex-1 min-h-0 flex flex-col justify-between">
+                  {variant === 'hero' && (
+                    <Tomo02EditorialHero
+                      module={mod}
+                      richData={richData}
+                      onCopySnippet={handleCopySnippet}
+                      copiedSnippet={copiedSnippet}
+                      isSectionOpener={hasSectionOpener}
+                    />
+                  )}
+                  {variant === 'diagram' && (
+                    <Tomo02EditorialDiagram
+                      module={mod}
+                      richData={richData}
+                    />
+                  )}
+                  {variant === 'comparison' && (
+                    <Tomo02EditorialComparison
+                      module={mod}
+                      richData={richData}
+                      isSectionOpener={hasSectionOpener}
+                    />
+                  )}
+                  {variant === 'practice' && (
+                    <Tomo02EditorialPractice
+                      module={mod}
+                      richData={richData}
+                      onCopySnippet={handleCopySnippet}
+                      copiedSnippet={copiedSnippet}
+                      isSectionOpener={hasSectionOpener}
+                    />
+                  )}
+                  {variant === 'case' && (
+                    <Tomo02EditorialCase
+                      module={mod}
+                      richData={richData}
+                      isSectionOpener={hasSectionOpener}
+                    />
+                  )}
+                  {variant === 'check' && (
+                    <Tomo02EditorialCheck
+                      module={mod}
+                      questionData={MODULE_QUESTIONS[mod.id]}
+                    />
+                  )}
+                </div>
 
-              {/* Discrete synchronization CTA to Interactive Module (Hidden in Print / PDF export) */}
-              <div className="pt-2 border-t border-cyan-950/70 flex items-center justify-between text-[10px] font-mono-tech mt-2 print:hidden no-print">
-                <span className="text-zinc-500">
-                  MÓDULO {mod.moduleNumber} // {mod.categoryTag}
-                </span>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleSelectModule(idx)}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 hover:text-white transition-colors cursor-pointer"
-                  >
-                    <span>[ PRACTICAR ESTE TEMA ]</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSelectModule(idx)}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold transition-colors cursor-pointer shadow-sm"
-                  >
-                    <span>VER MÓDULO INTERACTIVO →</span>
-                  </button>
+                {/* Discrete synchronization CTA to Interactive Module (Hidden in Print / PDF export) */}
+                <div className="pt-1.5 border-t border-cyan-950/70 flex items-center justify-between text-[9.5px] font-mono-tech shrink-0 print:hidden no-print">
+                  <span className="text-zinc-500">
+                    MÓDULO {mod.moduleNumber} // {mod.categoryTag}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleSelectModule(idx)}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 hover:text-white transition-colors cursor-pointer"
+                    >
+                      <span>[ PRACTICAR ESTE TEMA ]</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectModule(idx)}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold transition-colors cursor-pointer shadow-sm"
+                    >
+                      <span>VER MÓDULO INTERACTIVO →</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </Tomo02MasterPage>

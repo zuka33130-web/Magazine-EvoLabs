@@ -14,9 +14,9 @@ export const Tomo02EditorialCheck: React.FC<Tomo02EditorialCheckProps> = ({
   questionData,
 }) => {
   return (
-    <div className="h-full flex flex-col gap-3 font-sans-editorial">
+    <div className="flex-1 min-h-0 flex flex-col justify-between gap-2 font-sans-editorial">
       {/* Top Header */}
-      <div className="border-b border-cyan-950/80 pb-2.5 flex items-baseline justify-between">
+      <div className="border-b border-cyan-950/80 pb-1.5 flex items-baseline justify-between shrink-0">
         <div>
           <div className="flex items-center gap-2 text-[10px] font-mono-tech text-cyan-400 uppercase tracking-widest mb-0.5">
             <span className="text-purple-400 font-bold">DESAFÍO DE COMPROBACIÓN TÉCNICA</span>
@@ -118,12 +118,12 @@ export const Tomo02EditorialCheck: React.FC<Tomo02EditorialCheckProps> = ({
       </div>
 
       {/* 3. Subsystem Visual Stage (Absorbs remaining vertical space) */}
-      <div className="flex-1 min-h-[220px] max-h-[300px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative">
+      <div className="flex-1 min-h-[150px] max-h-[220px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative shrink-0">
         <Tomo02ModuleVisual module={module} compact={true} />
       </div>
 
       {/* 4. Bottom Technical Note (Consecutive, h-auto) */}
-      <div className="p-2.5 rounded-lg bg-black/60 border border-cyan-950 font-mono-tech text-[10px] text-zinc-400 flex items-center justify-between h-auto">
+      <div className="p-2.5 rounded-lg bg-black/60 border border-cyan-950 font-mono-tech text-[10px] text-zinc-400 flex items-center justify-between h-auto shrink-0">
         <span className="flex items-center gap-1.5 text-cyan-300">
           <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
           ESTÁNDAR DE EVALUACIÓN // RAZONAMIENTO ANTE EVIDENCIA

@@ -30,7 +30,11 @@ import {
 } from 'lucide-react';
 import { useEvoOperatingMode } from '../../../../hooks/useEvoOperatingMode';
 import { EvoOperatingModeSelector } from '../../../common/EvoOperatingModeSelector';
-import { EvoWindowsXRayLab, WindowsXRayMode } from './EvoWindowsXRayLab';
+import { MatrixEngineMode } from './engine/types';
+import { WindowsBootExperienceLab } from './boot/WindowsBootExperienceLab';
+import { WindowsInstallExperienceLab } from './install/WindowsInstallExperienceLab';
+import { WindowsServicesTelemetryLab } from './services/WindowsServicesTelemetryLab';
+import { WindowsFailureRepairLab } from './repair/WindowsFailureRepairLab';
 
 export interface EvoWindowsMatrixLabProps {
   initialBuild?: 'win10-22h2' | 'win10-ltsc' | 'win11-23h2' | 'win11-24h2';
@@ -185,34 +189,14 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
   const { isPericial } = useEvoOperatingMode();
   const isElite = true;
 
-  type MatrixExperienceMode = WindowsXRayMode | 'SILICON';
-
-  const resolveExperienceMode = (scenario?: string): MatrixExperienceMode => {
-    if (!scenario) return 'BOOT';
-    const value = scenario.toLowerCase();
-
-    if (value.includes('install') || value.includes('format')) return 'INSTALL';
-    if (value.includes('service')) return 'SERVICES';
-    if (
-      value.includes('repair') ||
-      value.includes('failure') ||
-      value.includes('falla') ||
-      value.includes('diagnostic')
-    ) return 'FAILURES';
-    if (
-      value.includes('scheduler') ||
-      value.includes('silicon') ||
-      value.includes('dpc') ||
-      value.includes('timer') ||
-      value.includes('vcache')
-    ) return 'SILICON';
-
-    return 'BOOT';
-  };
-
-  const [activeExperienceMode, setActiveExperienceMode] = useState<MatrixExperienceMode>(() =>
-    resolveExperienceMode(initialScenario)
-  );
+  // Master Experience Engine Mode
+  const [activeMode, setActiveMode] = useState<MatrixEngineMode>(() => {
+    if (initialScenario === 'install' || initialScenario?.includes('install')) return 'install';
+    if (initialScenario === 'services' || initialScenario?.includes('services')) return 'services';
+    if (initialScenario === 'repair' || initialScenario?.includes('repair')) return 'repair';
+    if (initialScenario === 'silicon' || initialScenario?.includes('version')) return 'silicon-matrix';
+    return 'boot';
+  });
 
   // State: Windows Build Matrix
   const [selectedBuildId, setSelectedBuildId] = useState<string>(initialBuild);
@@ -240,8 +224,6 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
 
   // Pre-load scenario when prop changes
   useEffect(() => {
-    setActiveExperienceMode(resolveExperienceMode(initialScenario));
-
     if (initialScenario) {
       if (initialScenario === 'boot-sequence') {
         setSelectedBuildId('win10-22h2');
@@ -532,7 +514,7 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
     return () => {
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [dpcMetrics, driverProfile]);
+  }, [dpcMetrics, driverProfile, activeMode]);
 
   // Copy PowerShell diagnostic script
   const handleCopyDiagScript = () => {
@@ -554,21 +536,37 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-2.5 py-0.5 rounded text-[10px] font-black bg-cyan-400/20 text-cyan-300 border border-cyan-400/40 uppercase tracking-wider">
-                KERNEL NT 10.0 // RING 0 FORENSICS
+                {activeMode === 'silicon-matrix'
+                  ? 'KERNEL NT 10.0 // RING 0 FORENSICS'
+                  : 'EVO WINDOWS X-RAY // WINDOWS EXPERIENCE LAB'}
               </span>
               <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                THREAD DIRECTOR 2.0 & DPC LAB
+                {activeMode === 'silicon-matrix'
+                  ? 'THREAD DIRECTOR 2.0 & DPC LAB'
+                  : 'DIGITAL TWIN & TELEMETRÍA'}
+              </span>
+              <span className="px-2 py-0.5 rounded text-[9px] font-mono bg-zinc-900 border border-zinc-700 text-zinc-400">
+                [ SIMULATED / REFERENCE MODEL ]
               </span>
             </div>
 
             <h1 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight">
-              MATRIZ DE VERSIONES & PLANIFICADOR DE KERNEL
+              {activeMode === 'silicon-matrix' ? (
+                'MATRIZ DE VERSIONES & PLANIFICADOR DE KERNEL'
+              ) : (
+                <span className="flex flex-wrap items-baseline gap-x-2.5">
+                  <span>EVO WINDOWS X-RAY</span>
+                  <span className="text-cyan-400 font-bold text-lg sm:text-2xl">// WINDOWS EXPERIENCE LAB</span>
+                </span>
+              )}
             </h1>
 
             <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial max-w-3xl leading-relaxed">
-              {isPericial
-                ? 'Simulador determinista de planificadores NTOSKRNL, mitigaciones VBS/HVCI, direccionamiento de hilos heterogéneos y análisis oscilográfico de latencias diferidas DPC en microsegundos.'
-                : 'Explorá cómo cada versión de Windows impacta tus FPS y latencia: descubrí por qué Windows 10 se traba con procesadores modernos y cómo reducir los micro-tirones en 1 clic.'}
+              {activeMode === 'silicon-matrix'
+                ? (isPericial
+                  ? 'Simulador determinista de planificadores NTOSKRNL, mitigaciones VBS/HVCI, direccionamiento de hilos heterogéneos y análisis oscilográfico de latencias diferidas DPC en microsegundos.'
+                  : 'Explorá cómo cada versión de Windows impacta tus FPS y latencia de referencia: observá cómo el planificador de hilos interactúa con procesadores modernos y cómo reducir micro-tirones modelados.')
+                : 'Windows por fuera. Windows por dentro. Windows bajo investigación.'}
             </p>
           </div>
 
@@ -587,49 +585,162 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
             )}
           </div>
         </div>
-      </div>
 
-      {/* ========================================================================= */}
-      {/* EVO WINDOWS EXPERIENCE ENGINE // NAVEGACIÓN MAESTRA                      */}
-      {/* ========================================================================= */}
-      <div className="p-2 rounded-2xl border border-zinc-800 bg-black/70 overflow-x-auto">
-        <div className="flex min-w-max gap-2">
-          {[
-            { id: 'BOOT' as MatrixExperienceMode, label: 'BOOT LAB', icon: <Play className="w-3.5 h-3.5" /> },
-            { id: 'INSTALL' as MatrixExperienceMode, label: 'INSTALL LAB', icon: <HardDrive className="w-3.5 h-3.5" /> },
-            { id: 'SERVICES' as MatrixExperienceMode, label: 'SERVICES LAB', icon: <Server className="w-3.5 h-3.5" /> },
-            { id: 'FAILURES' as MatrixExperienceMode, label: 'REPAIR LAB', icon: <ShieldAlert className="w-3.5 h-3.5" /> },
-            { id: 'SILICON' as MatrixExperienceMode, label: 'PLANIFICADOR & SILICIO', icon: <Cpu className="w-3.5 h-3.5" /> },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveExperienceMode(tab.id)}
-              className={`px-3.5 py-2 rounded-xl border text-[10px] sm:text-xs font-black flex items-center gap-1.5 transition-all ${
-                activeExperienceMode === tab.id
-                  ? 'bg-cyan-400 text-black border-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.28)]'
-                  : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-600'
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
+        {/* Master Experience Engine Navigation Tabs */}
+        <div className="flex items-center gap-2 p-1.5 bg-black/80 rounded-xl border border-cyan-950 overflow-x-auto text-xs mt-4 relative z-10">
+          <button
+            type="button"
+            onClick={() => setActiveMode('boot')}
+            className={`px-3.5 py-2 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              activeMode === 'boot'
+                ? 'bg-cyan-500 text-black shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <span>🚀 BOOT LAB</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveMode('install')}
+            className={`px-3.5 py-2 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              activeMode === 'install'
+                ? 'bg-cyan-500 text-black shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <span>💽 INSTALL LAB</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveMode('services')}
+            className={`px-3.5 py-2 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              activeMode === 'services'
+                ? 'bg-cyan-500 text-black shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <span>⚙️ SERVICES LAB</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveMode('repair')}
+            className={`px-3.5 py-2 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              activeMode === 'repair'
+                ? 'bg-rose-500 text-black shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <span>🛠️ REPAIR LAB (36+ CASOS)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveMode('silicon-matrix')}
+            className={`px-3.5 py-2 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              activeMode === 'silicon-matrix'
+                ? 'bg-amber-400 text-black shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <span>🔬 PLANIFICADOR & SILICIO</span>
+          </button>
+        </div>
+
+        {/* EVO TIME MACHINE — Visual Stage Bar */}
+        <div className="mt-4 pt-3 border-t border-cyan-950/80 relative z-10 space-y-2">
+          <div className="flex items-center justify-between text-[10px] font-mono-tech">
+            <span className="text-cyan-400 font-bold uppercase flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-cyan-400" />
+              EVO TIME MACHINE // LÍNEA TEMPORAL DE EJECUCIÓN NT
+            </span>
+            <span className="text-zinc-500">
+              ETAPA ACTIVA: {
+                activeMode === 'boot'
+                  ? 'BOOT & KERNEL INIT'
+                  : activeMode === 'install'
+                  ? 'POWER & MEDIA BOOT'
+                  : activeMode === 'services'
+                  ? 'DESKTOP & STABILIZATION'
+                  : activeMode === 'repair'
+                  ? '⚠️ FAILURE POINT (DETECTADO)'
+                  : 'KERNEL & STABILIZATION'
+              }
+            </span>
+          </div>
+
+          <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-mono-tech">
+            {[
+              { id: 'POWER', label: 'POWER', activeOn: ['install'] },
+              { id: 'BOOT', label: 'BOOT', activeOn: ['boot', 'install'] },
+              { id: 'KERNEL', label: 'KERNEL', activeOn: ['boot', 'silicon-matrix'] },
+              { id: 'LOGIN', label: 'LOGIN', activeOn: ['boot'] },
+              { id: 'DESKTOP', label: 'DESKTOP', activeOn: ['services'] },
+              { id: 'STABILIZATION', label: 'STABLE', activeOn: ['services', 'silicon-matrix'] },
+              { id: 'FAILURE', label: 'FAILURE', activeOn: ['repair'], isFail: true }
+            ].map((stage) => {
+              const isCurrent = stage.activeOn.includes(activeMode);
+              const isFailureMode = activeMode === 'repair' && stage.id === 'FAILURE';
+
+              return (
+                <div
+                  key={stage.id}
+                  className={`p-1.5 rounded-lg border transition-all ${
+                    isFailureMode
+                      ? 'bg-rose-950/70 border-rose-500 text-rose-300 font-black shadow-[0_0_10px_rgba(244,63,94,0.4)] animate-pulse'
+                      : isCurrent
+                      ? 'bg-cyan-950/60 border-cyan-400 text-cyan-300 font-bold shadow-[0_0_8px_rgba(6,182,212,0.3)]'
+                      : 'bg-black/40 border-zinc-900 text-zinc-600'
+                  }`}
+                >
+                  <span className="block truncate">{stage.label}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {activeExperienceMode !== 'SILICON' && (
-        <EvoWindowsXRayLab
-          initialScenario={initialScenario}
-          forcedMode={activeExperienceMode as WindowsXRayMode}
-          hideModeTabs
+      {/* ========================================================================= */}
+      {/* 1. BOOT LAB (PASO POR PASO & FALLAS INYECTABLES)                          */}
+      {/* ========================================================================= */}
+      {activeMode === 'boot' && (
+        <WindowsBootExperienceLab
+          onOpenTomo={onOpenTomo}
+          onNavigateToRepair={() => setActiveMode('repair')}
         />
       )}
 
-      <div className={activeExperienceMode === 'SILICON' ? 'contents' : 'hidden'}>
       {/* ========================================================================= */}
-      {/* SECCIÓN A: SELECTOR MATRICIAL DE COMPILACIONES DE WINDOWS                */}
+      {/* 2. INSTALL LAB (DE UN DISCO VACÍO A WINDOWS FUNCIONAL)                    */}
       {/* ========================================================================= */}
+      {activeMode === 'install' && (
+        <WindowsInstallExperienceLab />
+      )}
+
+      {/* ========================================================================= */}
+      {/* 3. SERVICES TELEMETRY LAB (SIMULATED & REAL PC DUAL ENGINE)               */}
+      {/* ========================================================================= */}
+      {activeMode === 'services' && (
+        <WindowsServicesTelemetryLab isLocalAgentConnected={false} />
+      )}
+
+      {/* ========================================================================= */}
+      {/* 4. REPAIR LAB (DIAGNÓSTICO PERICIAL DE 36+ CASOS REALES)                 */}
+      {/* ========================================================================= */}
+      {activeMode === 'repair' && (
+        <WindowsFailureRepairLab
+          onNavigateToInstallLab={() => setActiveMode('install')}
+        />
+      )}
+
+      {/* ========================================================================= */}
+      {/* 5. SECCIÓN SILICIO & PLANIFICADOR DE KERNEL NT                            */}
+      {/* ========================================================================= */}
+      {activeMode === 'silicon-matrix' && (
+        <>
       <div className="p-5 sm:p-6 rounded-2xl bg-[#0b0e14]/80 border border-zinc-800/90 shadow-xl space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3">
           <div className="flex items-center gap-2.5">
@@ -775,7 +886,7 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
             <div className="flex justify-between text-[10px] text-zinc-400">
               <span>Sobrecarga VBS/HVCI:</span>
               <span className={vbsEnabled ? 'text-amber-300 font-bold' : 'text-emerald-300 font-bold'}>
-                {vbsEnabled ? '+14.2% (Hipervisor activo)' : '0% (Kernel nativo)'}
+                {vbsEnabled ? 'Modelo EVO: +14.2% en este escenario SIMULATED (Hipervisor activo)' : '0% (Kernel nativo SIMULATED)'}
               </span>
             </div>
           </div>
@@ -1357,7 +1468,7 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
               </div>
 
               <p className="text-[11px] text-zinc-400 font-sans-editorial leading-relaxed pt-1">
-                La resolución forzada a 0.500 ms reduce la variabilidad del frametime entre un 40% y 65% en motores como Unreal Engine y Source 2, sincronizando las llamadas de renderizado con el escaneo de la GPU.
+                El efecto depende del motor, hardware y versión de Windows. Este laboratorio muestra un resultado SIMULATED donde la reducción del quantum jitter estabiliza los percentiles 1% Low en motores sensibles al tiempo de cuadro.
               </p>
 
               {/* Statistical 1% Low Math Box */}
@@ -1389,6 +1500,8 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
           </div>
         </div>
       </div>
+      </>
+      )}
 
       {/* Footer Navigation Bar */}
       <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 flex flex-wrap items-center justify-between gap-3 text-xs">
@@ -1408,7 +1521,6 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
             </button>
           </div>
         )}
-      </div>
       </div>
 
     </div>

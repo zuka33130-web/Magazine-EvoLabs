@@ -19,9 +19,9 @@ export const Tomo02EditorialComparison: React.FC<Tomo02EditorialComparisonProps>
   const reality = richData?.mythVsReality?.reality || module.scientificFact || module.summary;
 
   return (
-    <div className={`${isSectionOpener ? 'flex-1 min-h-0' : 'h-full'} flex flex-col gap-2.5 font-sans-editorial justify-between`}>
+    <div className="flex-1 min-h-0 flex flex-col justify-between gap-2 font-sans-editorial">
       {/* Top Section Header */}
-      <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
+      <div className="border-b border-cyan-950/80 pb-1.5 flex items-baseline justify-between shrink-0">
         <div>
           <div className="flex items-center gap-2 text-[10px] font-mono-tech text-cyan-400 uppercase tracking-widest mb-0.5">
             <span className="text-amber-400 font-bold">EXPEDIENTE MITO VS REALIDAD</span>
@@ -108,13 +108,15 @@ export const Tomo02EditorialComparison: React.FC<Tomo02EditorialComparisonProps>
         </div>
       )}
 
-      {/* Subsystem Visual Stage - Absorbs Remaining Space */}
-      <div className={`flex-1 ${isSectionOpener ? 'min-h-[120px] max-h-[170px]' : 'min-h-[200px] max-h-[300px]'} rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative`}>
-        <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
-      </div>
+      {/* Subsystem Visual Stage - Absorbs Remaining Space when NOT in Section Opener */}
+      {!isSectionOpener && (
+        <div className="flex-1 min-h-[160px] max-h-[230px] rounded-xl overflow-hidden border border-cyan-900/60 bg-[#040812] shadow-xl relative shrink-0">
+          <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
+        </div>
+      )}
 
       {/* Bottom Metrological Rule - Content Driven */}
-      <div className="p-2.5 rounded-lg bg-zinc-950/90 border border-cyan-950 text-xs font-mono-tech flex items-center justify-between text-zinc-300 h-auto">
+      <div className="p-2.5 rounded-lg bg-zinc-950/90 border border-cyan-950 text-xs font-mono-tech flex items-center justify-between text-zinc-300 h-auto shrink-0">
         <div>
           <strong className="text-cyan-400 font-bold mr-1">REGLA DE VERACIDAD EVO:</strong>
           <span className="text-zinc-300">{module.reversibility || 'Ningún optimizador puede sustituir al conocimiento determinístico del sistema.'}</span>

@@ -16,9 +16,9 @@ export const Tomo02EditorialDiagram: React.FC<Tomo02EditorialDiagramProps> = ({
   const meta = getVisualPedagogicalMeta(module.id, module, richData);
 
   return (
-    <div className="flex flex-col space-y-3 font-sans-editorial h-auto">
+    <div className="flex-1 min-h-0 flex flex-col justify-between gap-2 font-sans-editorial">
       {/* Header Bar */}
-      <div className="border-b border-cyan-950/80 pb-2 flex items-baseline justify-between">
+      <div className="border-b border-cyan-950/80 pb-1.5 flex items-baseline justify-between shrink-0">
         <div>
           <div className="flex items-center gap-2 text-[10px] font-mono-tech text-cyan-400 uppercase tracking-widest mb-0.5">
             <span>EXPEDIENTE VISUAL [{module.moduleNumber}]</span>
@@ -40,7 +40,7 @@ export const Tomo02EditorialDiagram: React.FC<Tomo02EditorialDiagramProps> = ({
       </div>
 
       {/* Center Dominant Visual Stage */}
-      <div className="h-[280px] rounded-xl overflow-hidden border border-cyan-900/80 bg-[#040812] shadow-2xl relative">
+      <div className="h-[210px] sm:h-[230px] rounded-xl overflow-hidden border border-cyan-900/80 bg-[#040812] shadow-2xl relative shrink-0">
         <Tomo02ModuleVisual module={module} richData={richData} compact={true} />
       </div>
 

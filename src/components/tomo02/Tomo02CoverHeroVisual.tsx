@@ -13,15 +13,13 @@ export const Tomo02CoverHeroVisual: React.FC = () => {
   return (
     <div className="relative w-full my-auto py-2 font-mono-tech select-none">
       {/* Precision Corner Metric Ticks */}
-      <div className="absolute top-0 left-0 text-[9px] text-cyan-500/60 tracking-wider">
-        SYS.ARCH // MAPA ESTRUCTURAL DEL KERNEL NT 10.0
-      </div>
-      <div className="absolute top-0 right-0 text-[9px] text-cyan-500/60 tracking-wider hidden sm:block">
-        CANONICAL 64-BIT VIRTUAL MEMORY SPLIT
+      <div className="flex items-center justify-between text-[9px] text-cyan-500/70 tracking-wider mb-2">
+        <span>SYS.ARCH // MAPA ESTRUCTURAL DEL KERNEL NT 10.0</span>
+        <span className="hidden sm:inline">CANONICAL 64-BIT VIRTUAL MEMORY SPLIT</span>
       </div>
 
       {/* SVG Diagram Canvas */}
-      <div className="w-full relative mt-4">
+      <div className="w-full relative">
         <svg
           viewBox="0 0 760 350"
           fill="none"
