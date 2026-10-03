@@ -73,48 +73,63 @@ interface Tomo02MagazineViewProps {
 
 type ViewMode = 'continuous' | 'single';
 
+export const SECTION_START_MODULES: Record<string, string> = {
+  m00: 'I',
+  m03: 'II',
+  m06: 'III',
+  m10: 'IV',
+  m14: 'V',
+  m19: 'VI',
+};
+
 const getModuleEditorialVariant = (
   modId: string
-): 'section_opener' | 'hero' | 'diagram' | 'comparison' | 'practice' | 'case' | 'check' => {
+): 'hero' | 'diagram' | 'comparison' | 'practice' | 'case' | 'check' => {
   switch (modId) {
-    // 6 GRAND SECTION OPENERS (TYPE A)
-    case 'm00': // Sección I: Arquitectura de Arranque & Despliegue
-    case 'm03': // Sección II: Sistema de Archivos & Almacenamiento
-    case 'm06': // Sección III: Núcleo, Procesos & Memoria Virtual
-    case 'm10': // Sección IV: Conectividad, Servicios & Automatización
-    case 'm14': // Sección V: Terminal, Registro & Ciberseguridad
-    case 'm19': // Sección VI: Metrología, Recuperación & Casos Forenses
-      return 'section_opener';
+    // HERO:
+    case 'm00':
+    case 'm07':
+    case 'm12':
+    case 'm17':
+    case 'm26':
+      return 'hero';
 
-    // TYPE B: CONTENIDO & DIAGRAMA ARQUITECTÓNICO (Texto + Visual Engine)
-    case 'm01': // Ring 0 vs Ring 3 & Compuertas Syscall
-    case 'm07': // Cadena de Booteo UEFI & Winload.efi
-    case 'm11': // Service Control Manager & Svchost
-    case 'm15': // Estructura Hexadecimal & Colmenas del Registro
-    case 'm16': // Telemetría de Diagnóstico & ETW
-    case 'm21': // Optimización E/S en Bajos Recursos
-    case 'm25': // Glosario Arquitectónico & Reparación In-Place
+    // DIAGRAM:
+    case 'm01':
+    case 'm05':
+    case 'm15':
+    case 'm25':
       return 'diagram';
 
-    // TYPE C: LABORATORIO / PRÁCTICA (Objetivo, Pasos, Qué Observar, Rollback)
-    case 'm02': // Jerarquía de Memoria & Boot Pipeline
-    case 'm05': // NTFS Master File Table ($MFT)
-    case 'm13': // Programador de Tareas & Desencadenadores
-    case 'm18': // UAC, Tokens & Secure Desktop
-    case 'm20': // Metrología DPC con LatencyMon
-    case 'm24': // Matriz de Herramientas de Élite
-    case 'm26': // Pasaporte del Investigador & Ficha Técnica Final
+    // COMPARISON:
+    case 'm03':
+    case 'm06':
+    case 'm11':
+    case 'm16':
+    case 'm21':
+      return 'comparison';
+
+    // PRACTICE:
+    case 'm02':
+    case 'm10':
+    case 'm13':
+    case 'm20':
       return 'practice';
 
-    // TYPE D: CASO / EXPEDIENTE DE TALLER (Síntoma, Evidencia, Hipótesis, Causa, Resolución)
-    case 'm04': // Latencias DPC/ISR & Controladores
-    case 'm08': // Fuga en Non-Paged Pool por driver de red
-    case 'm09': // Event Log & Saturación de Disco 100%
-    case 'm12': // Pipeline Gráfico WDDM & BSOD de Video
-    case 'm17': // Servicing Stack CBS & Almacén WinSxS
-    case 'm22': // Protocolos de Emergencia & BD PROCHOT 800MHz
-    case 'm23': // Expedientes Forenses de Taller & Winsock
+    // CASE:
+    case 'm04':
+    case 'm09':
+    case 'm14':
+    case 'm19':
+    case 'm22':
+    case 'm23':
       return 'case';
+
+    // CHECK:
+    case 'm08':
+    case 'm18':
+    case 'm24':
+      return 'check';
 
     default:
       return 'diagram';
@@ -1186,6 +1201,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
 
           const richData = CHAPTERS_01_TO_09_DATA[mod.id];
           const variant = getModuleEditorialVariant(mod.id);
+          const hasSectionOpener = Boolean(SECTION_START_MODULES[mod.id]);
 
           return (
             <Tomo02MasterPage
@@ -1193,17 +1209,23 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               pageId={`t02-mod-${mod.moduleNumber}`}
               pageNumber={modPageNumber}
               totalPages={totalPages}
-              sectionTitle={variant === 'section_opener' ? `SECCIÓN // ${mod.categoryTag}` : `MÓDULO ${mod.moduleNumber}`}
+              sectionTitle={
+                hasSectionOpener
+                  ? `SECCIÓN ${SECTION_START_MODULES[mod.id]} // MÓDULO ${mod.moduleNumber}`
+                  : `MÓDULO ${mod.moduleNumber}`
+              }
               subSlug={mod.categoryTag}
               accentColor="#00D2FF"
             >
-              {variant === 'section_opener' && (
+              {/* Encabezado Editorial de Apertura de Sección (Compacto) */}
+              {hasSectionOpener && (
                 <Tomo02EditorialSectionOpener
-                  module={mod}
-                  moduleIndex={idx}
-                  onSelectModule={handleSelectModule}
+                  moduleId={mod.id}
+                  compact={true}
                 />
               )}
+
+              {/* Contenido Editorial Real del Módulo */}
               {variant === 'hero' && (
                 <Tomo02EditorialHero
                   module={mod}
