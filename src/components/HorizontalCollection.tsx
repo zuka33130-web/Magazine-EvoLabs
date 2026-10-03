@@ -32,10 +32,10 @@ export const HorizontalCollection: React.FC<HorizontalCollectionProps> = ({
             </span>
           </div>
           <h2 className="font-display font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
-            Serie de 4 tomos
+            Serie de 10 tomos
           </h2>
           <p className="text-sm text-zinc-300 font-sans-editorial mt-1 max-w-xl">
-            Cada volumen se desbloquea al dominar los conceptos y mediciones del tomo anterior.
+            Diez tomos conectados por la metodología EVO: entender, practicar, comprobar y avanzar.
           </p>
         </div>
 
