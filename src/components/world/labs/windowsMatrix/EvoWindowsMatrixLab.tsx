@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import { useEvoOperatingMode } from '../../../../hooks/useEvoOperatingMode';
 import { EvoOperatingModeSelector } from '../../../common/EvoOperatingModeSelector';
-import { EvoWindowsXRayLab } from './EvoWindowsXRayLab';
+import { EvoWindowsXRayLab, WindowsXRayMode } from './EvoWindowsXRayLab';
 
 export interface EvoWindowsMatrixLabProps {
   initialBuild?: 'win10-22h2' | 'win10-ltsc' | 'win11-23h2' | 'win11-24h2';
@@ -185,6 +185,35 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
   const { isPericial } = useEvoOperatingMode();
   const isElite = true;
 
+  type MatrixExperienceMode = WindowsXRayMode | 'SILICON';
+
+  const resolveExperienceMode = (scenario?: string): MatrixExperienceMode => {
+    if (!scenario) return 'BOOT';
+    const value = scenario.toLowerCase();
+
+    if (value.includes('install') || value.includes('format')) return 'INSTALL';
+    if (value.includes('service')) return 'SERVICES';
+    if (
+      value.includes('repair') ||
+      value.includes('failure') ||
+      value.includes('falla') ||
+      value.includes('diagnostic')
+    ) return 'FAILURES';
+    if (
+      value.includes('scheduler') ||
+      value.includes('silicon') ||
+      value.includes('dpc') ||
+      value.includes('timer') ||
+      value.includes('vcache')
+    ) return 'SILICON';
+
+    return 'BOOT';
+  };
+
+  const [activeExperienceMode, setActiveExperienceMode] = useState<MatrixExperienceMode>(() =>
+    resolveExperienceMode(initialScenario)
+  );
+
   // State: Windows Build Matrix
   const [selectedBuildId, setSelectedBuildId] = useState<string>(initialBuild);
   const [vbsEnabled, setVbsEnabled] = useState<boolean>(WINDOWS_BUILDS[initialBuild]?.vbsDefault ?? true);
@@ -211,6 +240,8 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
 
   // Pre-load scenario when prop changes
   useEffect(() => {
+    setActiveExperienceMode(resolveExperienceMode(initialScenario));
+
     if (initialScenario) {
       if (initialScenario === 'boot-sequence') {
         setSelectedBuildId('win10-22h2');
@@ -559,10 +590,43 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
       </div>
 
       {/* ========================================================================= */}
-      {/* EVO WINDOWS X-RAY // EXPERIENCIA GUIADA DEL TOMO 02                      */}
+      {/* EVO WINDOWS EXPERIENCE ENGINE // NAVEGACIÓN MAESTRA                      */}
       {/* ========================================================================= */}
-      <EvoWindowsXRayLab initialScenario={initialScenario} />
+      <div className="p-2 rounded-2xl border border-zinc-800 bg-black/70 overflow-x-auto">
+        <div className="flex min-w-max gap-2">
+          {[
+            { id: 'BOOT' as MatrixExperienceMode, label: 'BOOT LAB', icon: <Play className="w-3.5 h-3.5" /> },
+            { id: 'INSTALL' as MatrixExperienceMode, label: 'INSTALL LAB', icon: <HardDrive className="w-3.5 h-3.5" /> },
+            { id: 'SERVICES' as MatrixExperienceMode, label: 'SERVICES LAB', icon: <Server className="w-3.5 h-3.5" /> },
+            { id: 'FAILURES' as MatrixExperienceMode, label: 'REPAIR LAB', icon: <ShieldAlert className="w-3.5 h-3.5" /> },
+            { id: 'SILICON' as MatrixExperienceMode, label: 'PLANIFICADOR & SILICIO', icon: <Cpu className="w-3.5 h-3.5" /> },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveExperienceMode(tab.id)}
+              className={`px-3.5 py-2 rounded-xl border text-[10px] sm:text-xs font-black flex items-center gap-1.5 transition-all ${
+                activeExperienceMode === tab.id
+                  ? 'bg-cyan-400 text-black border-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.28)]'
+                  : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-600'
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
+      {activeExperienceMode !== 'SILICON' && (
+        <EvoWindowsXRayLab
+          initialScenario={initialScenario}
+          forcedMode={activeExperienceMode as WindowsXRayMode}
+          hideModeTabs
+        />
+      )}
+
+      <div className={activeExperienceMode === 'SILICON' ? 'contents' : 'hidden'}>
       {/* ========================================================================= */}
       {/* SECCIÓN A: SELECTOR MATRICIAL DE COMPILACIONES DE WINDOWS                */}
       {/* ========================================================================= */}
@@ -1344,6 +1408,7 @@ export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
             </button>
           </div>
         )}
+      </div>
       </div>
 
     </div>
