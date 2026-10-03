@@ -84,7 +84,7 @@ export class WindowsServicesExperimentManager {
       "  }",
       "}",
       "$items | Sort-Object DisplayName | ConvertTo-Json -Depth 3 -Compress",
-    ].join('; ');
+    ].join('\n');
 
     const { stdout } = await execFileAsync(
       'powershell.exe',
@@ -137,7 +137,7 @@ export class WindowsServicesExperimentManager {
 
     const command =
       action === 'STOP'
-        ? `Stop-Service -Name '${canonical}' -Force -ErrorAction Stop`
+        ? `Stop-Service -Name '${canonical}' -ErrorAction Stop`
         : `Start-Service -Name '${canonical}' -ErrorAction Stop`;
 
     const script = [
