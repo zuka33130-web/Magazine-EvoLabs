@@ -30,7 +30,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { TOMO_02_MODULES, TomoModuleItem, TOMO_02_META } from '../../data/tomo02Data';
-import { Tomo02ModuleVisual } from './Tomo02VisualEngine';
+import { Tomo02ModuleVisual } from './Tomo02VisualEngine';\nimport { Tomo02PracticeLab } from './Tomo02PracticeLabs';
 
 interface Tomo02ModuleReaderProps {
   moduleIndex: number;
@@ -2117,6 +2117,11 @@ export const Tomo02ModuleReader: React.FC<Tomo02ModuleReaderProps> = ({
 
           <Tomo02ModuleVisual module={currentMod} richData={richData} />
         </section>
+
+        {/* ========================================================
+            6B. LABORATORIO PRÁCTICO DIFERENCIAL // FASE 15B
+        ======================================================== */}
+        <Tomo02PracticeLab moduleId={currentMod.id} />
 
         {/* ========================================================
             7. CASO REAL / CASO EVO DE TALLER
