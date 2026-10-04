@@ -1,19 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import {
-  Activity,
-  AlertTriangle,
-  CheckCircle2,
-  ChevronRight,
-  FileDiff,
-  History,
-  KeyRound,
-  RotateCcw,
-  Search,
-  Server,
-  ShieldAlert,
-  Terminal,
-  Wrench,
-} from 'lucide-react';
+import React, { useState } from 'react';
+import { RotateCcw, Terminal } from 'lucide-react';
 
 type Provenance = 'SIMULATED' | 'SYSTEM_REPORTED' | 'DERIVED' | 'ESTIMATED' | 'UNKNOWN';
 
