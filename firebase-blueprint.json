@@ -1,0 +1,46 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile document stored in Firestore users collection",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique Firebase Authentication UID"
+        },
+        "email": {
+          "type": "string",
+          "description": "User primary email address"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name or alias",
+          "maxLength": 100
+        },
+        "role": {
+          "type": "string",
+          "description": "User authorization role (USER, ADMIN, SUPPORT, OWNER)",
+          "enum": ["USER", "ADMIN", "SUPPORT", "OWNER"]
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp ISO string or server timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp ISO string or server timestamp"
+        }
+      },
+      "required": ["uid", "email"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
+      },
+      "description": "User private profile documents"
+    }
+  }
+}

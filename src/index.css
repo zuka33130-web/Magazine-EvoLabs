@@ -1,0 +1,897 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: 'Epilogue', sans-serif;
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --evo-motion-fast: 140ms;
+    --evo-motion-standard: 200ms;
+    --evo-motion-structural: 320ms;
+    --evo-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #07090e;
+    color: #e4e4e7;
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  p, span, div, h1, h2, h3, h4, h5, h6, li, td, th {
+    overflow-wrap: break-word;
+  }
+
+  code, pre, kbd, samp {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+.font-display {
+  font-family: 'Epilogue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.font-mono-tech {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.font-sans-editorial {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Subtle editorial technical grid overlay */
+.bg-tech-grid {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-tech-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Custom fine scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #07090e;
+}
+::-webkit-scrollbar-thumb {
+  background: #1c2230;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2a3449;
+}
+
+/* Elite Shell & Laboratory Glow Effects */
+.evo-shell-glow-amber {
+  box-shadow: 0 0 20px -3px rgba(251, 191, 36, 0.2), inset 0 1px 0 0 rgba(251, 191, 36, 0.3);
+}
+
+.evo-shell-glow-cyan {
+  box-shadow: 0 0 20px -3px rgba(34, 211, 238, 0.2), inset 0 1px 0 0 rgba(34, 211, 238, 0.3);
+}
+
+.evo-shell-glow-emerald {
+  box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.2), inset 0 1px 0 0 rgba(16, 185, 129, 0.3);
+}
+
+.evo-shell-glow-purple {
+  box-shadow: 0 0 20px -3px rgba(192, 132, 252, 0.2), inset 0 1px 0 0 rgba(192, 132, 252, 0.3);
+}
+
+.evo-glass-panel {
+  background: linear-gradient(180deg, rgba(16, 20, 30, 0.75) 0%, rgba(8, 10, 15, 0.9) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.evo-active-nav-indicator {
+  position: absolute;
+  left: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+}
+
+/* Laboratory environmental animations */
+@keyframes evo-fan-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-evo-fan {
+  animation: evo-fan-spin 3.5s linear infinite;
+}
+
+.animate-evo-fan-slow {
+  animation: evo-fan-spin 8s linear infinite;
+}
+
+@keyframes evo-cable-pulse {
+  0% {
+    stroke-dashoffset: 60;
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.3;
+  }
+}
+
+.animate-evo-pulse-line {
+  stroke-dasharray: 8, 8;
+  animation: evo-cable-pulse 3s linear infinite;
+}
+
+@keyframes evo-crt-flicker {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.98; }
+  85% { opacity: 0.75; }
+}
+
+.animate-evo-flicker {
+  animation: evo-crt-flicker 4s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   EVO LABS MAGAZINE — A4 EDITORIAL SYSTEM & PDF PRINT STYLES
+   ========================================================================== */
+
+.magazine-dropcap::first-letter {
+  font-family: var(--font-display);
+  float: left;
+  font-size: 3.5rem;
+  line-height: 0.85;
+  padding-top: 4px;
+  padding-right: 10px;
+  padding-bottom: 2px;
+  font-weight: 900;
+  color: #eab308;
+}
+
+/* Authentic editorial column rules */
+.editorial-column-rule {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Screen representation of A4 page */
+.a4-magazine-page {
+  width: 100%;
+  max-width: 820px;
+  height: 1160px;
+  min-height: 1160px;
+  max-height: 1160px;
+  aspect-ratio: 210 / 297;
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  /* Enforce exact color rendering and background graphics */
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html, body {
+    background-color: #090A0E !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Exclude only explicit web chrome, non-print UI, modals, floating tutor and bars */
+  .no-print,
+  .print\:hidden,
+  .magazine-header-bar,
+  .magazine-quick-help-bar,
+  .tutor-drawer,
+  .tutor-floating-btn,
+  .modal-overlay,
+  footer.no-print,
+  footer.print\:hidden,
+  .app-global-footer,
+  ::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Force print containers to be visible regardless of responsive/hidden classes */
+  .print\:block,
+  .continuous-editorial-stack,
+  [data-print-container="true"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Structural containers flow seamlessly without viewport scroll constraints or phantom spacing */
+  #root,
+  #root > div,
+  .magazine-view-wrapper,
+  .magazine-scroll-container,
+  main {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    background: transparent !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* Page print wrapper ignores intermediate flex constraints */
+  .page-print-wrapper {
+    display: contents !important;
+  }
+
+  /* Exact A4 Vertical Dimensions per Page: 210mm x 297mm */
+  .a4-magazine-page {
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    max-width: 210mm !important;
+    box-sizing: border-box !important;
+    page-break-before: auto !important;
+    break-before: auto !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* First page must not have a page break before */
+  .a4-magazine-page:first-of-type,
+  [data-page-id="t02-page-01"],
+  [data-page-id="magazine-page-01"],
+  #t02-page-01 {
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+    margin-top: 0 !important;
+  }
+
+  /* Avoid phantom trailing empty page after the back cover */
+  .a4-magazine-page:last-child,
+  .a4-magazine-page:last-of-type,
+  .a4-magazine-page[data-is-back-cover="true"],
+  [data-page-id="t02-page-38"],
+  [data-page-id="magazine-page-46"],
+  #t02-page-38 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Prevent awkward breaks inside critical editorial elements */
+  img,
+  table,
+  pre,
+  code,
+  h1, h2, h3, h4, h5, h6,
+  .break-inside-avoid,
+  .lab-command-block,
+  .internet-dice-block,
+  .technical-callout,
+  .editorial-card,
+  .ficha-evo-card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Preserve pure editorial dark backgrounds across rendering engines */
+  .bg-\[\#090A0E\],
+  .bg-\[\#060709\],
+  .bg-\[\#050608\],
+  .bg-\[\#0A0C10\],
+  .bg-\[\#0e1118\],
+  .bg-\[\#0b0d13\],
+  .bg-\[\#081216\],
+  .bg-\[\#12151d\] {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* ==========================================================================
+   EVO LABS UNIFIED GLOBAL TYPOGRAPHY SYSTEM (FASE 05)
+   ========================================================================== */
+
+.evo-hero-title {
+  font-family: 'Epilogue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: clamp(34px, 4.2vw, 56px);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.evo-page-title {
+  font-family: 'Epilogue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.evo-section-title {
+  font-family: 'Epilogue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: clamp(18px, 2.2vw, 22px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.evo-card-title {
+  font-family: 'Epilogue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: clamp(15px, 1.8vw, 18px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.evo-body-primary {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(14px, 1.5vw, 16px);
+  font-weight: 400;
+  line-height: 1.6;
+  color: #d4d4d8; /* zinc-300 */
+}
+
+.evo-body-secondary {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(13px, 1.3vw, 14px);
+  font-weight: 400;
+  line-height: 1.5;
+  color: #a1a1aa; /* zinc-400 */
+}
+
+.evo-label-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(10px, 1vw, 11px);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #a1a1aa; /* zinc-400 */
+}
+
+.evo-metadata-tech {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(10px, 1.1vw, 12px);
+  font-weight: 400;
+  line-height: 1.35;
+  color: #71717a; /* zinc-500 */
+}
+
+/* ==========================================================================
+   EVO LABS ART DIRECTION PASS (FASE 06)
+   ========================================================================== */
+
+/* Surfaces Definitions */
+.evo-surface-level0 {
+  background-color: #050608 !important;
+}
+
+.evo-surface-level1 {
+  background-color: #080a0f !important;
+}
+
+.evo-surface-level2 {
+  background-color: #0c0f17 !important;
+  border: 1px solid rgba(113, 113, 122, 0.15) !important; /* ultra fine zinc border */
+}
+
+.evo-surface-level3 {
+  background-color: #121624 !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  box-shadow: 0 0 15px -3px rgba(245, 158, 11, 0.12) !important;
+}
+
+/* EVO TRACE Elements */
+.evo-trace-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.25) 20%, rgba(245, 158, 11, 0.25) 80%, transparent);
+  position: relative;
+}
+
+.evo-trace-node {
+  width: 5px;
+  height: 5px;
+  background-color: #f59e0b;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #f59e0b;
+  display: inline-block;
+  animation: evo-node-pulse 2s infinite ease-in-out;
+}
+
+@keyframes evo-node-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #f59e0b; }
+}
+
+.evo-trace-dashed-border {
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 4px;
+}
+
+/* EVO LAB FRAME - Technical corner brackets & instrument feel */
+.evo-lab-frame {
+  position: relative;
+  background: #080a0f;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.evo-lab-frame::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #f59e0b;
+  border-left: 2px solid #f59e0b;
+  pointer-events: none;
+}
+
+.evo-lab-frame::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-bottom: 2px solid #22d3ee;
+  border-right: 2px solid #22d3ee;
+  pointer-events: none;
+}
+
+.evo-lab-frame-accent-emerald::before {
+  border-top-color: #10b981;
+  border-left-color: #10b981;
+}
+
+.evo-lab-frame-accent-purple::before {
+  border-top-color: #a855f7;
+  border-left-color: #a855f7;
+}
+
+.evo-lab-frame-accent-cyan::before {
+  border-top-color: #22d3ee;
+  border-left-color: #22d3ee;
+}
+
+/* EVO PROOF STATE - Custom states with slow microglow respirando & ambient scanlines */
+.evo-proof-observando {
+  position: relative;
+  overflow: hidden;
+  border-left: 2px solid #f59e0b;
+}
+
+.evo-proof-observando::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 100%;
+  background: linear-gradient(180deg, transparent 0%, rgba(245, 158, 11, 0.02) 50%, transparent 100%);
+  animation: evo-scanline 6s infinite linear;
+  pointer-events: none;
+}
+
+.evo-proof-midiendo {
+  position: relative;
+  overflow: hidden;
+  border-left: 2px solid #22d3ee;
+}
+
+.evo-proof-midiendo::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 100%;
+  background: linear-gradient(180deg, transparent 0%, rgba(34, 211, 238, 0.03) 50%, transparent 100%);
+  animation: evo-scanline 4s infinite linear;
+  pointer-events: none;
+}
+
+.evo-proof-simulando {
+  position: relative;
+  border-left: 2px solid #818cf8;
+}
+
+.evo-proof-validado {
+  border-left: 2px solid #10b981;
+  background-color: rgba(16, 185, 129, 0.02);
+}
+
+@keyframes evo-scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* EVO EVIDENCE RAIL */
+.evo-evidence-rail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.evo-evidence-rail-line {
+  flex-grow: 1;
+  height: 2px;
+  background: linear-gradient(90deg, #10b981, #22d3ee, #f59e0b, #a855f7);
+  opacity: 0.75;
+}
+
+/* EVO LABS // FONDO GLOBAL UNIFICADO: #07090E + Cuadrícula 26x26px estática */
+.evo-global-ambient-bg {
+  background-color: #07090e !important;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px) !important;
+  background-size: 26px 26px, 26px 26px !important;
+  background-attachment: fixed !important;
+  background-position: 0 0 !important;
+  background-repeat: repeat !important;
+}
+
+/* ==========================================================================
+   EVO LABS PREMIUM BUTTON SYSTEM (ULTRA MODERN TACTILE INTERFACE)
+   ========================================================================== */
+
+.evo-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #d97706 100%);
+  color: #000000 !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: 44px;
+  padding-left: 22px;
+  padding-right: 22px;
+  border-radius: 10px;
+  border: 1px solid rgba(254, 240, 138, 0.4);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.evo-btn-primary:hover {
+  transform: translateY(-1.5px) scale(1.01);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.evo-btn-primary:active {
+  transform: translateY(0.5px) scale(0.98);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+.evo-btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #000, 0 0 0 4px rgba(245, 158, 11, 0.8);
+}
+
+.evo-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: rgba(12, 15, 23, 0.8);
+  color: #f4f4f5 !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  height: 42px;
+  padding-left: 18px;
+  padding-right: 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.evo-btn-secondary:hover {
+  background-color: rgba(24, 28, 42, 0.9);
+  color: #ffffff !important;
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 12px rgba(245, 158, 11, 0.1);
+  transform: translateY(-1px);
+}
+
+.evo-btn-secondary:active {
+  transform: translateY(0.5px) scale(0.98);
+  background-color: #090b11;
+}
+
+.evo-btn-tactical {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(6, 8, 13, 0.6);
+  color: #00d2ff !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.evo-btn-tactical:hover {
+  background: rgba(0, 210, 255, 0.1);
+  border-color: rgba(0, 210, 255, 0.6);
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.evo-btn-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+
+.evo-btn-status-completed {
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.evo-btn-status-pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.evo-btn-status-locked {
+  background: rgba(39, 39, 42, 0.4);
+  color: #71717a;
+  border-color: rgba(63, 63, 70, 0.4);
+}
+
+.evo-btn-tertiary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  color: #a1a1aa !important; /* zinc-400 */
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all var(--evo-motion-standard) var(--evo-ease);
+  cursor: pointer;
+}
+
+.evo-btn-tertiary:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.evo-btn-tertiary:hover svg {
+  transform: translateX(2px);
+}
+
+.evo-btn-tertiary svg {
+  transition: transform var(--evo-motion-standard) var(--evo-ease);
+}
+
+.evo-btn-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  height: 36px;
+  padding-left: 14px;
+  padding-right: 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background-color: rgba(10, 12, 18, 0.6);
+  color: #94a3b8;
+  backdrop-filter: blur(8px);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  position: relative;
+}
+
+.evo-btn-nav:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(18, 22, 32, 0.8);
+}
+
+.evo-btn-nav-active {
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.12), inset 0 1px 0 rgba(251, 191, 36, 0.3);
+}
+
+/* Semi-floating elements and utilities */
+.evo-btn-floating {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #0c0f17;
+  color: #ffffff !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  height: 36px;
+  padding-left: 14px;
+  padding-right: 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 10px rgba(245, 158, 11, 0.08);
+  transition: all var(--evo-motion-standard) var(--evo-ease);
+  cursor: pointer;
+}
+
+.evo-btn-floating:hover {
+  transform: translateY(-1px);
+  background-color: #121624;
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35), 0 0 12px rgba(245, 158, 11, 0.15);
+}
+
+/* ==========================================================================
+   EVO MOTION & MICROINTERACTIONS SYSTEM (FASE 08)
+   ========================================================================== */
+
+.evo-section-fade-in {
+  animation: evoFadeInUp var(--evo-motion-structural) var(--evo-ease) forwards;
+}
+
+@keyframes evoFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Accessible reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .evo-section-fade-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .evo-btn-primary,
+  .evo-btn-secondary,
+  .evo-btn-tertiary,
+  .evo-btn-floating,
+  .evo-btn-nav,
+  .evo-surface-level2 {
+    transition: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .animate-pulse,
+  .animate-ping,
+  .animate-evo-fan,
+  .animate-evo-fan-slow {
+    animation: none !important;
+  }
+}
+
+
+
+
+/* APRENDER CARDS: Graphite subtle pulse in normal state, EVO yellow on hover */
+@keyframes evo-graphite-pulse {
+  0%, 100% {
+    border-color: rgba(39, 39, 42, 0.65);
+  }
+  50% {
+    border-color: rgba(63, 63, 70, 0.9);
+  }
+}
+
+.evo-card-graphite {
+  border-color: rgba(39, 39, 42, 0.65);
+  animation: evo-graphite-pulse 4s ease-in-out infinite;
+  transition: border-color 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.evo-card-graphite:hover {
+  animation: none;
+  border-color: rgba(245, 158, 11, 0.8) !important;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.1) !important;
+}

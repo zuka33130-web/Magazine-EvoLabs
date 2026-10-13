@@ -1,0 +1,6 @@
+{
+  "name": "EVO LABS MAGAZINE, Tomo 01, Conocé tu PC",
+  "description": "Revista digital profesional de ingeniería de computadoras, topología de silicio, telemetría y diagnóstico forense. Formato editorial A4 vertical listo para PDF.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

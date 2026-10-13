@@ -1,0 +1,15 @@
+{
+  "name": "evo-local-agent",
+  "version": "1.0.0",
+  "description": "EVO Local Agent for Windows CIM/WMI Native Hardware Inventory and Telemetry",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "keywords": ["evo-core", "hardware", "telemetry", "wmi", "cim", "windows"],
+  "author": "EVO LABS",
+  "license": "ISC"
+}
