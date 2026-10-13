@@ -49,6 +49,7 @@ interface Tomo02EditorialIndexProps {
   onOpenSector08?: () => void;
   onOpenSector09?: () => void;
   onOpenSector10?: () => void;
+  onOpenAdvancedSector?: (number: string) => void;
   onSelectModule?: (moduleIndex: number) => void;
   onStartFinalExam?: () => void;
   onOpenCompletionScreen?: () => void;
@@ -125,6 +126,8 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
   onOpenSector08,
   onOpenSector09,
   onOpenSector10,
+  onOpenAdvancedSector,
+  moduleProgress = {},
 }) => {
   const [selectedGroup, setSelectedGroup] = useState<string>('all');
   const [searchFilter, setSearchFilter] = useState('');
@@ -1269,7 +1272,7 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
                 );
               }
 
-              // SECTORS 04 TO 39 (LOCKED WITH FULL CANONICAL TEMARIO)
+              // Canonical sectors 11–39: individual readers and existing syllabus preserved.
               return (
                 <div
                   key={sector.sectorId}
@@ -1284,8 +1287,8 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
                       <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
                         <span className="font-bold text-[#60CDFF]">[SECTOR {sector.sectorNumber}]</span>
                         <span className="px-1.5 py-0.2 rounded bg-[#11161D] border border-zinc-800 text-zinc-400 font-bold text-[9px] flex items-center gap-1">
-                          <Lock className="w-2.5 h-2.5 text-zinc-400" />
-                          BLOQUEADO
+                          <CheckCircle2 className="w-2.5 h-2.5 text-cyan-400" />
+                          {moduleProgress[sector.sectorId] === 'completed' ? 'COMPLETADO' : 'DISPONIBLE'}
                         </span>
                         <span className="text-zinc-600 text-[10px]">•</span>
                         <span className="text-zinc-400 text-[10px]">
@@ -1321,10 +1324,10 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
                         <span>{isExpanded ? 'Ocultar Temario' : 'Ver Temario'}</span>
                         {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                       </button>
-                      <span className="text-[10px] font-mono text-zinc-500 flex items-center gap-1">
-                        <Lock className="w-3 h-3 text-zinc-500" />
-                        Bloqueado
-                      </span>
+                      <button type="button" onClick={() => onOpenAdvancedSector?.(sector.sectorNumber)}
+                        className="px-3 py-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-mono font-bold">
+                        Abrir Sector {sector.sectorNumber}
+                      </button>
                     </div>
                   </div>
 
@@ -1370,7 +1373,7 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
                       {sector.methodology && (
                         <div className="p-3 rounded-lg bg-[#11161D] border border-sky-500/20 text-xs font-mono text-zinc-300">
                           <span className="text-[#60CDFF] font-bold block mb-1">PROTOCOLO DE EXPEDIENTE:</span>
-                          <span className="text-zinc-400">{sector.methodology}</span>
+                          <span className="text-zinc-400">Biblioteca con cantidad real y fuentes identificadas en el lector. Síntoma → hipótesis → prueba → evidencia → descarte → causa → solución → validación.</span>
                         </div>
                       )}
                     </div>

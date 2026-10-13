@@ -453,7 +453,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Donde Windows recuerda cómo debe comportarse',
     level: 'NIVEL II',
     levelTitle: 'ADMINISTRAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 32,
     artefactOrLab: 'Lab: Registry Sandbox.',
     investigationsList: [
@@ -498,7 +498,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'De “C:” a entender realmente el almacenamiento',
     level: 'NIVEL II',
     levelTitle: 'ADMINISTRAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 25,
     artefactOrLab: 'Lab: Virtual Disk Lab.',
     investigationsList: [
@@ -536,7 +536,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Instalación, reinstalación y recuperación',
     level: 'NIVEL II',
     levelTitle: 'ADMINISTRAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 20,
     artefactOrLab: 'Lab: Windows Installation Simulator.',
     investigationsList: [
@@ -569,7 +569,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: '¿El archivo desapareció o todavía existe?',
     level: 'NIVEL II',
     levelTitle: 'ADMINISTRAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 15,
     artefactOrLab: 'Lab: Data Recovery Simulator.',
     investigationsList: [
@@ -597,7 +597,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'El traductor entre Windows y el silicio',
     level: 'NIVEL II',
     levelTitle: 'ADMINISTRAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 26,
     artefactOrLab: 'Lab: Device Manager Forensics.',
     investigationsList: [
@@ -640,7 +640,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Todo lo que enchufás puede fallar',
     level: 'NIVEL III',
     levelTitle: 'DOMINAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 14,
     investigationsList: [
       { id: '16.01', title: 'Instalar impresora USB' },
@@ -666,7 +666,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Cuando “no anda Internet” no significa nada todavía',
     level: 'NIVEL III',
     levelTitle: 'DOMINAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 29,
     artefactOrLab: 'Labs: Wi-Fi Diagnostic Tree + Network Triage.',
     investigationsList: [
@@ -708,7 +708,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Lo que ves en la pantalla no es tan simple',
     level: 'NIVEL III',
     levelTitle: 'DOMINAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 25,
     artefactOrLab: 'Lab: Display Pipeline Lab.',
     investigationsList: [
@@ -746,7 +746,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'El modo de energía “secreto”: ¿más potencia o más calor?',
     level: 'NIVEL III',
     levelTitle: 'DOMINAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 19,
     artefactOrLab: 'Lab: Power Plan A/B.',
     investigationsList: [
@@ -778,7 +778,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'El sistema se modifica mientras vos dormís',
     level: 'NIVEL III',
     levelTitle: 'DOMINAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 16,
     investigationsList: [
       { id: '20.01', title: 'KB' },
@@ -806,7 +806,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: '¿Defender alcanza? La seguridad que ya está instalada',
     level: 'NIVEL III',
     levelTitle: 'DOMINAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 22,
     investigationsList: [
       { id: '21.01', title: 'Defender' },
@@ -840,7 +840,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: '“¿Quién me está mirando?”',
     level: 'NIVEL III',
     levelTitle: 'DOMINAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 23,
     artefactOrLab: 'Lab: Communication Map EVO.',
     investigationsList: [
@@ -876,7 +876,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Lo que Windows hace cuando no estás mirando',
     level: 'NIVEL III',
     levelTitle: 'DOMINAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 15,
     artefactOrLab: 'Lab: 10-Minute Idle Watch.',
     investigationsList: [
@@ -908,7 +908,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Una computadora dentro de tu computadora',
     level: 'NIVEL IV',
     levelTitle: 'DIAGNOSTICAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 17,
     artefactOrLab: 'Lab: Virtual Windows Lab.',
     investigationsList: [
@@ -938,7 +938,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Controlá otra PC desde la tuya',
     level: 'NIVEL IV',
     levelTitle: 'DIAGNOSTICAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 11,
     investigationsList: [
       { id: '25.01', title: 'RDP' },
@@ -961,7 +961,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Programas que Windows “ya no quiere”',
     level: 'NIVEL IV',
     levelTitle: 'DIAGNOSTICAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 11,
     investigationsList: [
       { id: '26.01', title: '32-bit' },
@@ -984,7 +984,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Protocolo de descarte y reparación',
     level: 'NIVEL IV',
     levelTitle: 'DIAGNOSTICAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 16,
     artefactOrLab: 'Lab: Windows Repair Bench.',
     investigationsList: [
@@ -1013,7 +1013,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'La pantalla azul no te está diciendo toda la verdad',
     level: 'NIVEL IV',
     levelTitle: 'DIAGNOSTICAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 15,
     artefactOrLab: 'Lab: BSOD Forensics.',
     investigationsList: [
@@ -1041,7 +1041,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'El tirón de 50 milisegundos',
     level: 'NIVEL IV',
     levelTitle: 'DIAGNOSTICAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 19,
     artefactOrLab: 'Lab: Stutter Investigation Lab.',
     investigationsList: [
@@ -1073,7 +1073,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'De “se siente lento” a una traza de milisegundos',
     level: 'NIVEL IV',
     levelTitle: 'DIAGNOSTICAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 16,
     investigationsList: [
       { id: '30.01', title: 'PerfMon' },
@@ -1101,7 +1101,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'La caja de herramientas profesional de Microsoft',
     level: 'NIVEL IV',
     levelTitle: 'DIAGNOSTICAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 10,
     investigationsList: [
       { id: '31.01', title: 'Process Explorer' },
@@ -1127,7 +1127,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'La zona oscura',
     level: 'NIVEL V',
     levelTitle: 'DESMANTELAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 24,
     investigationsList: [
       { id: '32.01', title: 'Kernel' },
@@ -1163,7 +1163,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: '¿Qué es realmente un archivo?',
     level: 'NIVEL V',
     levelTitle: 'DESMANTELAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 13,
     investigationsList: [
       { id: '33.01', title: 'MFT' },
@@ -1188,7 +1188,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'La carpeta de 20 GB que quizás no ocupe 20 GB',
     level: 'NIVEL V',
     levelTitle: 'DESMANTELAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 8,
     investigationsList: [
       { id: '34.01', title: 'Component Store' },
@@ -1208,7 +1208,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Instalaste un programa para tener menos procesos... y ahora tenés más',
     level: 'NIVEL V',
     levelTitle: 'DESMANTELAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 16,
     artefactOrLab: 'Lab: Software Footprint Lab.',
     investigationsList: [
@@ -1237,7 +1237,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'El motor de diagnóstico central',
     level: 'NIVEL V',
     levelTitle: 'DESMANTELAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 26,
     artefactOrLab: 'Lab: Slow PC Diagnostic Engine.',
     investigationsList: [
@@ -1276,7 +1276,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'No 20 ejemplos.',
     level: 'NIVEL V',
     levelTitle: 'DESMANTELAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 0,
     categories: [
       'Boot', 'Update', 'Drivers', 'Disk', 'RAM', 'CPU', 'GPU', 'Network',
@@ -1293,7 +1293,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'Dejá de descargar herramientas: fabricá las tuyas',
     level: 'NIVEL V',
     levelTitle: 'DESMANTELAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 18,
     investigationsList: [
       { id: '38.01', title: 'EVO System Audit' },
@@ -1323,7 +1323,7 @@ export const TOMO_02_MASTER_SECTORS: MasterSectorMeta[] = [
     subtitle: 'NO ME DIGAS QUE WINDOWS ESTÁ OPTIMIZADO. DEMOSTRALO.',
     level: 'NIVEL V',
     levelTitle: 'DESMANTELAR WINDOWS',
-    status: 'LOCKED',
+    status: 'ACTIVE',
     investigationsCount: 0,
     methodology: 'El usuario debe tomar su propia PC y completar: BASELINE → SÍNTOMA → HIPÓTESIS → MEDICIÓN → INTERVENCIÓN ÚNICA → SEGUNDA MEDICIÓN → DELTA → VEREDICTO → CONSERVAR/REVERTIR.',
     finalOutput: 'Salida final: EXPEDIENTE WINDOWS EVO 001 con evidencia completa.',

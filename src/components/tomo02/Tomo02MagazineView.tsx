@@ -65,6 +65,8 @@ import { Tomo02Sector07View } from './sector07/Tomo02Sector07View';
 import { Tomo02Sector08View } from './sector08/Tomo02Sector08View';
 import { Tomo02Sector09View } from './sector09/Tomo02Sector09View';
 import { Tomo02Sector10View } from './sector10/Tomo02Sector10View';
+import { getAdvancedSector } from '../../data/tomo02AdvancedContent';
+const Tomo02AdvancedSectorView = React.lazy(() => import('./advanced/Tomo02AdvancedSectorView').then((m) => ({ default: m.Tomo02AdvancedSectorView })));
 
 export type Tomo02SubView =
   | 'cover'
@@ -84,7 +86,8 @@ export type Tomo02SubView =
   | 'sector_07'
   | 'sector_08'
   | 'sector_09'
-  | 'sector_10';
+  | 'sector_10'
+  | 'advanced_sector';
 
 interface Tomo02MagazineViewProps {
   onBackToApp?: () => void;
@@ -92,6 +95,7 @@ interface Tomo02MagazineViewProps {
   onOpenLab?: () => void;
   initialPage?: number;
   initialSubView?: Tomo02SubView;
+  initialSectorNumber?: string;
 }
 
 type ViewMode = 'continuous' | 'single';
@@ -165,6 +169,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   onOpenLab,
   initialPage = 1,
   initialSubView,
+  initialSectorNumber,
 }) => {
   // Sub-view management
   const [subView, setSubView] = useState<Tomo02SubView>(() => {
@@ -178,6 +183,8 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     }
     return initialSubView || 'cover';
   });
+
+  const [selectedSectorNumber, setSelectedSectorNumber] = useState(getAdvancedSector(initialSectorNumber || safeStorage.getItem('evo_tomo02_last_sector') || '')?.number || '11');
 
   const [selectedModuleIndex, setSelectedModuleIndex] = useState<number>(0);
 
@@ -417,6 +424,24 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  const handleOpenAdvancedSector = (number: string) => {
+    if (!getAdvancedSector(number)) return;
+    setSelectedSectorNumber(number);
+    setSubView('advanced_sector');
+    safeStorage.setItem('evo_tomo02_last_sector', number);
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
+  };
+
+  if (subView === 'advanced_sector') {
+    const content = getAdvancedSector(selectedSectorNumber)!;
+    return <div className="min-h-screen bg-[#07090e] text-zinc-100">
+      <React.Suspense fallback={<p role="status" className="p-8 text-cyan-300">Cargando Sector {content.number}…</p>}>
+        <Tomo02AdvancedSectorView key={content.number} content={content} completed={moduleProgress[`sector-${content.number}`] === 'completed'}
+          onBack={() => setSubView('index')} onNavigate={handleOpenAdvancedSector} onComplete={handleMarkCompleted} />
+      </React.Suspense>
+    </div>;
+  }
 
   // If subView is 'cover', 'pdf_magazine', 'index', 'reader', 'exam', 'completion', 'sector_00', or 'sector_01', render their respective view
   if (subView === 'sector_00') {
@@ -780,7 +805,13 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     return (
       <div className="min-h-screen bg-[#060709] text-zinc-100 flex flex-col font-sans-editorial px-4 sm:px-8">
         <div className="max-w-7xl mx-auto w-full">
+          {getAdvancedSector(safeStorage.getItem('evo_tomo02_last_sector') || '') && <button type="button"
+            onClick={() => handleOpenAdvancedSector(safeStorage.getItem('evo_tomo02_last_sector')!)}
+            className="mt-4 px-4 py-2 rounded-xl border border-cyan-400 text-cyan-300 text-sm">
+            Continuar último sector: {safeStorage.getItem('evo_tomo02_last_sector')}
+          </button>}
           <Tomo02EditorialIndex
+            onOpenAdvancedSector={handleOpenAdvancedSector}
             onBackToCover={() => {
               setSubView('cover');
               window.scrollTo({ top: 0, behavior: 'smooth' });
