@@ -4,10 +4,11 @@ import { MundoMaxProject } from './MundoMaxProject';
 
 interface GameForgeStudioProps {
   onClose: () => void;
+  initialTab?: 'logic' | 'math' | 'mundomax';
 }
 
-export const GameForgeStudio: React.FC<GameForgeStudioProps> = ({ onClose }) => {
-  const [activeTab, setActiveTab] = useState<'logic' | 'math' | 'mundomax' | 'catalog'>('logic');
+export const GameForgeStudio: React.FC<GameForgeStudioProps> = ({ onClose, initialTab }) => {
+  const [activeTab, setActiveTab] = useState<'logic' | 'math' | 'mundomax' | 'catalog'>(initialTab || 'logic');
 
   // LAB 1: Game Logic State
   const [targetFps, setTargetFps] = useState<number>(60);

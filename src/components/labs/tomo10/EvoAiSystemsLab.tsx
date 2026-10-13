@@ -40,6 +40,7 @@ import {
 
 interface EvoAiSystemsLabProps {
   onClose?: () => void;
+  initialSubLabId?: string;
 }
 
 const TOMO_10_SUBLABS: SubLabModule[] = [
@@ -309,8 +310,9 @@ const TOMO_10_GUIDED_CASES: GuidedCase[] = [
 
 export const EvoAiSystemsLab: React.FC<EvoAiSystemsLabProps> = ({
   onClose,
+  initialSubLabId,
 }) => {
-  const [activeSubLabId, setActiveSubLabId] = useState<string>('10a-prompt-bench');
+  const [activeSubLabId, setActiveSubLabId] = useState<string>(() => TOMO_10_SUBLABS.some((lab) => lab.id === initialSubLabId) ? initialSubLabId! : '10a-prompt-bench');
 
   // 10A Prompt Bench State
   const [promptStructured, setPromptStructured] = useState<boolean>(false);

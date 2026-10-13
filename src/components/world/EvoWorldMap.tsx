@@ -13,6 +13,8 @@ import { EvoTomeCardExpanded } from './EvoTomeCardExpanded';
 import { EvoHomeExperience } from '../home/EvoHomeExperience';
 import { EvoQuickSearchBar } from './EvoQuickSearchBar';
 import { EvoPublicLabsCatalog } from '../public/EvoPublicLabsCatalog';
+import { getPracticeLab, PracticeTarget } from '../../data/evoCatalog';
+import { EvoPracticeLabView } from './labs/EvoPracticeLabView';
 import {
   EVO_SCHOOL_LEVELS,
   EVO_TOMES_PEDAGOGY,
@@ -131,7 +133,11 @@ export interface EvoWorldMapProps {
   onNavigateBootLab?: () => void;
   onNavigateHotSwapLab?: (panel?: 'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all') => void;
   onNavigateWindowsMatrixLab?: (scenario?: string) => void;
-  onNavigateLabCore?: () => void;
+  onNavigateLabCore?: (phase?: 'SELECT_PC' | 'BUILD_PC' | 'LAB_ACTIVE', mission?: 'IDLE' | 'REPAIR' | 'TEST' | 'BOTTLENECK' | 'OPTIMIZE' | 'UPGRADE') => void;
+  onNavigateWindowsXRayLab?: (scenario?: string) => void;
+  onNavigatePracticeChapter?: (chapter: '02' | '03' | '07') => void;
+  initialPracticeLabId?: string;
+  onPracticeLabConsumed?: () => void;
   onOpenForensicBench?: (target: ForensicBenchTarget) => void;
   onOpenDossier?: (tomoId: string) => void;
   onNavigateMagazine?: () => void;
@@ -376,6 +382,10 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
   onNavigateHotSwapLab,
   onNavigateWindowsMatrixLab,
   onNavigateLabCore,
+  onNavigateWindowsXRayLab,
+  onNavigatePracticeChapter,
+  initialPracticeLabId,
+  onPracticeLabConsumed,
   onOpenForensicBench,
   onOpenDossier,
   onNavigateMagazine,
@@ -393,6 +403,9 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
   onIntentionChange,
   onSubViewStateChange,
 }) => {
+  const [practiceLabId, setPracticeLabId] = useState<string | null>(null);
+  const practiceLab = practiceLabId ? getPracticeLab(practiceLabId) : undefined;
+
   // Navigation State
   const [activeIntention, setActiveIntention] = useState<MainIntention>(initialIntention);
   const { canAccess, openUpgradeModal, isFreeUser } = useEvoAccess();
@@ -420,7 +433,12 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
     onIntentionChangeRef.current?.(activeIntention);
   }, [activeIntention]);
 
+  useEffect(() => {
+    if (activeIntention !== 'laboratorios') setPracticeLabId(null);
+  }, [activeIntention]);
+
   const hasSubView =
+    practiceLabId !== null ||
     selectedTomeProfile !== null ||
     selectedLevelNumber !== null ||
     selectedLabGuide !== null ||
@@ -443,6 +461,10 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
   useEffect(() => {
     if (subViewBackHandlerRef) {
       subViewBackHandlerRef.current = () => {
+        if (practiceLabId) {
+          setPracticeLabId(null);
+          return true;
+        }
         if (selectedTomeProfile !== null) {
           setSelectedTomeProfile(null);
           return true;
@@ -508,6 +530,7 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
       }
     };
   }, [
+    practiceLabId,
     selectedTomeProfile,
     selectedLabGuide,
     selectedLevelNumber,
@@ -981,6 +1004,40 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
       },
     });
   };
+
+  const openPracticeLab = (labId: string) => {
+    const lab = getPracticeLab(labId);
+    if (!lab || lab.status !== 'DISPONIBLE' || !lab.target) return;
+    const target: PracticeTarget = lab.target;
+    switch (target.type) {
+      case 'boot': onNavigateBootLab?.(); break;
+      case 'windows': onNavigateWindowsMatrixLab?.(target.scenario); break;
+      case 'xray': onNavigateWindowsXRayLab?.(target.scenario); break;
+      case 'hotswap': onNavigateHotSwapLab?.(target.panel); break;
+      case 'core': onNavigateLabCore?.(target.phase, target.mission); break;
+      case 'chapter': onNavigatePracticeChapter?.(target.chapter); break;
+      case 'modal':
+        if (target.modal === 'cases') setIsCaseResolverOpen(true);
+        if (target.modal === 'twin') setIsDigitalTwinOpen(true);
+        if (target.modal === 'transfer') setIsTransferModalOpen(true);
+        break;
+      case 'embedded':
+        // Same access boundary as the original premium tome readers.
+        if (isFreeUser && ['network', 'security', 'performance', 'code', 'ai', 'electronics', 'game', 'sector01'].includes(target.engine)) {
+          openUpgradeModal(lab.title);
+          return;
+        }
+        setPracticeLabId(lab.id);
+        break;
+      case 'campus': setPracticeLabId(lab.id); break;
+    }
+  };
+
+  useEffect(() => {
+    if (!initialPracticeLabId) return;
+    openPracticeLab(initialPracticeLabId);
+    onPracticeLabConsumed?.();
+  }, [initialPracticeLabId]);
 
   return (
     <div className="relative w-full min-h-[calc(100vh-65px)] evo-global-ambient-bg text-[#f4f4f5] overflow-x-hidden font-sans-editorial flex flex-col justify-between select-none">
@@ -1548,44 +1605,11 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
       {/* ========================================================================= */}
       {activeIntention === 'laboratorios' && (
         <div className="relative z-10 flex-1 max-w-[1280px] mx-auto w-full px-4 sm:px-6 py-4">
-          <EvoPublicLabsCatalog
-            onOpenBootLab={() => {
-              if (onNavigateBootLab) onNavigateBootLab();
-              else if (onOpenTomo) onOpenTomo('08');
-            }}
-            onOpenWindowsMatrixLab={(scenario) => {
-              if (onNavigateWindowsMatrixLab) onNavigateWindowsMatrixLab(scenario);
-            }}
-            onOpenHotSwapLab={(subPanel) => {
-              if (onNavigateHotSwapLab) onNavigateHotSwapLab(subPanel);
-            }}
-            onOpenDigitalTwin={() => setIsDigitalTwinOpen(true)}
-            onOpenCaseResolver={() => {
-              if (onNavigateWindowsMatrixLab) onNavigateWindowsMatrixLab('crash-repair');
-            }}
-            onOpenTomo={onOpenTomo}
-            onOpenPerfMetrology={() => {
-              if (onNavigateHotSwapLab) onNavigateHotSwapLab('telemetry');
-            }}
-            onOpenNetForensics={() => {
-              if (onOpenTomo) onOpenTomo('05');
-            }}
-            onOpenDefensiveSec={() => {
-              if (onOpenTomo) onOpenTomo('06');
-            }}
-            onOpenCodeEng={() => {
-              if (onOpenTomo) onOpenTomo('09');
-            }}
-            onOpenAiSystems={() => {
-              if (onOpenTomo) onOpenTomo('10');
-            }}
-            onOpenGameForge={() => {
-              if (onOpenTomo) onOpenTomo('12');
-            }}
-            onOpenTransferChallenge={() => {
-              if (onNavigateWindowsMatrixLab) onNavigateWindowsMatrixLab('services');
-            }}
-          />
+          {practiceLab && <EvoPracticeLabView key={practiceLab.id} lab={practiceLab} passport={passport}
+            onBack={() => setPracticeLabId(null)} onOpenTomo={onOpenTomo} />}
+          <div hidden={Boolean(practiceLab)}>
+            <EvoPublicLabsCatalog onOpenRegisteredLab={openPracticeLab} />
+          </div>
         </div>
       )}
 

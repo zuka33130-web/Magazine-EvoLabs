@@ -11,6 +11,7 @@ import { EvoPlanConfiguratorModal } from '../commerce/EvoPlanConfiguratorModal';
 import { EvoOrderSummaryModal } from '../commerce/EvoOrderSummaryModal';
 
 export type PublicNavigationTarget =
+  | { type: 'PRACTICE_LAB'; labId: string }
   | { type: 'APP_HOME' }
   | { type: 'TOME'; tomeNumber: string }
   | { type: 'BOOT_LAB' }
@@ -168,86 +169,7 @@ export const PublicShell: React.FC<PublicShellProps> = ({
         )}
         {activeSection === 'laboratorios' && (
           <EvoPublicLabsCatalog
-            onOpenHotSwapLab={(subPanel) => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'HOTSWAP', subPanel: subPanel || 'hardware' });
-              }
-            }}
-            onOpenWindowsMatrixLab={(scenario) => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'WINDOWS_MATRIX', scenario });
-              }
-            }}
-            onOpenWindowsXRayLab={(scenario) => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'WINDOWS_XRAY', scenario });
-              }
-            }}
-            onOpenBootLab={() => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'BOOT_LAB' });
-              }
-            }}
-            onOpenLabCore={(phase) => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'LAB_CORE', phase: phase || 'SELECT_PC' });
-              }
-            }}
-            onOpenCampusLab={(labId) => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'CAMPUS_ZONE', zoneId: labId });
-              }
-            }}
-            onOpenTomo={(tomeNum) => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'TOME', tomeNumber: tomeNum });
-              }
-            }}
-            onOpenCaseResolver={() => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'TOOL', toolId: 'diag-case-resolver' });
-              }
-            }}
-            onOpenDigitalTwin={() => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'TOOL', toolId: 'inv-digital-twin' });
-              }
-            }}
-            onOpenTransferChallenge={() => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'TOOL', toolId: 'doc-transfer-challenge' });
-              }
-            }}
-            onOpenPerfMetrology={() => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'TOOL', toolId: 'med-frametime-analyzer' });
-              }
-            }}
-            onOpenNetForensics={() => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'TOME', tomeNumber: '05' });
-              }
-            }}
-            onOpenDefensiveSec={() => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'TOME', tomeNumber: '06' });
-              }
-            }}
-            onOpenCodeEng={() => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'TOME', tomeNumber: '09' });
-              }
-            }}
-            onOpenAiSystems={() => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'TOME', tomeNumber: '10' });
-              }
-            }}
-            onOpenGameForge={() => {
-              if (onNavigateTarget) {
-                onNavigateTarget({ type: 'TOME', tomeNumber: '12' });
-              }
-            }}
+            onOpenRegisteredLab={(labId) => onNavigateTarget?.({ type: 'PRACTICE_LAB', labId })}
           />
         )}
         {activeSection === 'herramientas' && (

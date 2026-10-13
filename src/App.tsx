@@ -312,7 +312,11 @@ function AppContent({
       try {
         localStorage.setItem('evo_academia_intro_dismissed', 'true');
       } catch {}
-      if (initialPendingTarget.type === 'TOME') {
+      if (initialPendingTarget.type === 'PRACTICE_LAB') {
+        setCampusSection('laboratorios');
+        setCurrentView('world-map');
+        setInitialPracticeLabId(initialPendingTarget.labId);
+      } else if (initialPendingTarget.type === 'TOME') {
         const tomoNum = getTomeNumberFromTarget(initialPendingTarget);
         if (tomoNum) {
           handleNavigateTomo(tomoNum);
@@ -501,6 +505,8 @@ function AppContent({
     }
     return 'world-map';
   });
+
+  const [initialPracticeLabId, setInitialPracticeLabId] = useState<string | undefined>(undefined);
 
   // Sub-panel & Lab states
   const [activeZoneId, setActiveZoneId] = useState<string | undefined>(undefined);
@@ -1171,6 +1177,10 @@ function AppContent({
   };
 
   const handleBackToIndex = () => {
+    if (historyStack.at(-1)?.view === 'world-map' && historyStack.at(-1)?.campusSection === 'laboratorios') {
+      handleGlobalBack();
+      return;
+    }
     setChaptersList(computeChaptersList());
     setCurrentView('index');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1543,7 +1553,8 @@ function AppContent({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleNavigateLabCore = (phase?: 'SELECT_PC' | 'BUILD_PC' | 'LAB_ACTIVE') => {
+  const handleNavigateLabCore = (phase?: 'SELECT_PC' | 'BUILD_PC' | 'LAB_ACTIVE', mission?: 'IDLE' | 'REPAIR' | 'TEST' | 'BOTTLENECK' | 'OPTIMIZE' | 'UPGRADE') => {
+    if (mission) setActiveLabMission(mission);
     if (phase) {
       setLabCorePhase(phase);
     }
@@ -2019,6 +2030,19 @@ function AppContent({
           {currentView === 'world-map' && (
             <EvoWorldMap
               initialIntention={campusSection}
+              initialPracticeLabId={initialPracticeLabId}
+              onPracticeLabConsumed={() => setInitialPracticeLabId(undefined)}
+              onNavigateWindowsXRayLab={(scenario) => {
+                setMatrixInitialScenario(scenario);
+                setCurrentView('windows-xray-lab');
+              }}
+              onNavigatePracticeChapter={(chapter) => {
+                if (chapter === '02') {
+                  setC02TargetStation('lab');
+                  setCurrentView('chapter-02');
+                } else if (chapter === '03') handleStartChapter03();
+                else handleStartChapter07();
+              }}
               initialZoneId={activeZoneId}
               subViewBackHandlerRef={subViewBackHandlerRef}
               onSubViewStateChange={setHasWorldMapSubView}
@@ -2463,6 +2487,8 @@ function getTargetFriendlyLabel(target: PublicNavigationTarget | null): string |
   switch (target.type) {
     case 'TOME':
       return `Tomo ${target.tomeNumber}`;
+    case 'PRACTICE_LAB':
+      return 'Laboratorio de PRACTICAR';
     case 'BOOT_LAB':
       return 'Laboratorio de Arranque y POST';
     case 'HOTSWAP':

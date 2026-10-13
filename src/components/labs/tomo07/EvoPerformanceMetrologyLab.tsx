@@ -34,6 +34,7 @@ import {
 
 interface EvoPerformanceMetrologyLabProps {
   onClose?: () => void;
+  initialSubLabId?: string;
 }
 
 const TOMO_07_SUBLABS: SubLabModule[] = [
@@ -317,8 +318,9 @@ const TOMO_07_GUIDED_CASES: GuidedCase[] = [
 
 export const EvoPerformanceMetrologyLab: React.FC<EvoPerformanceMetrologyLabProps> = ({
   onClose,
+  initialSubLabId,
 }) => {
-  const [activeSubLabId, setActiveSubLabId] = useState<string>('07a-frametime');
+  const [activeSubLabId, setActiveSubLabId] = useState<string>(() => TOMO_07_SUBLABS.some((lab) => lab.id === initialSubLabId) ? initialSubLabId! : '07a-frametime');
 
   // 07A Frametime State
   const [ramConfig, setRamConfig] = useState<'single_cl40' | 'dual_cl30'>('single_cl40');

@@ -38,6 +38,7 @@ import {
 
 interface EvoCodeEngineeringLabProps {
   onClose?: () => void;
+  initialSubLabId?: string;
 }
 
 const TOMO_09_SUBLABS: SubLabModule[] = [
@@ -308,8 +309,9 @@ const TOMO_09_GUIDED_CASES: GuidedCase[] = [
 
 export const EvoCodeEngineeringLab: React.FC<EvoCodeEngineeringLabProps> = ({
   onClose,
+  initialSubLabId,
 }) => {
-  const [activeSubLabId, setActiveSubLabId] = useState<string>('09a-logic');
+  const [activeSubLabId, setActiveSubLabId] = useState<string>(() => TOMO_09_SUBLABS.some((lab) => lab.id === initialSubLabId) ? initialSubLabId! : '09a-logic');
 
   // 09A Logic State
   const [executionStep, setExecutionStep] = useState<number>(1);

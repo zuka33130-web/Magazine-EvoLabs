@@ -68,7 +68,7 @@ export const EvoMasterLabSuite: React.FC<EvoMasterLabSuiteProps> = ({
   const [activePanel, setActivePanel] = useState<'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>(initialPanel);
 
   // Beginner (Principiante / Guiado) vs Technical (Técnico / Sysinternals) View Mode
-  const [uiMode, setUiMode] = useState<'principiante' | 'tecnico'>('principiante');
+  const [uiMode, setUiMode] = useState<'principiante' | 'tecnico'>(initialPanel === 'sandbox' ? 'principiante' : 'tecnico');
 
   // Interactive Section for Beginners (Novato targets)
   const [activeNovatoSection, setActiveNovatoSection] = useState<'procesador' | 'memoria' | 'gpu' | 'almacenamiento' | 'energia' | 'temperatura'>('procesador');

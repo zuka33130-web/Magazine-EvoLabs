@@ -39,6 +39,7 @@ import {
 
 interface EvoDefensiveSecurityLabProps {
   onClose?: () => void;
+  initialSubLabId?: string;
 }
 
 const TOMO_06_SUBLABS: SubLabModule[] = [
@@ -323,8 +324,9 @@ const TOMO_06_GUIDED_CASES: GuidedCase[] = [
 
 export const EvoDefensiveSecurityLab: React.FC<EvoDefensiveSecurityLabProps> = ({
   onClose,
+  initialSubLabId,
 }) => {
-  const [activeSubLabId, setActiveSubLabId] = useState<string>('06a-surface');
+  const [activeSubLabId, setActiveSubLabId] = useState<string>(() => TOMO_06_SUBLABS.some((lab) => lab.id === initialSubLabId) ? initialSubLabId! : '06a-surface');
 
   // 06A Surface State
   const [rdpOpen, setRdpOpen] = useState<boolean>(true);

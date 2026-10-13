@@ -5,11 +5,13 @@ import { Activity, Zap, CheckCircle2, AlertTriangle, Play, RotateCcw, Wrench, Sp
 
 interface Tomo11MasterPageProps {
   onBack?: () => void;
+  initialLabTab?: 'multimeter' | 'ohms' | 'diagnosis';
+  onCloseLab?: () => void;
 }
 
-export const Tomo11MasterPage: React.FC<Tomo11MasterPageProps> = ({ onBack }) => {
-  const [showLabHub, setShowLabHub] = useState(false);
-  const [activeLabTab, setActiveLabTab] = useState<'multimeter' | 'ohms' | 'diagnosis' | 'catalog'>('multimeter');
+export const Tomo11MasterPage: React.FC<Tomo11MasterPageProps> = ({ onBack, initialLabTab, onCloseLab }) => {
+  const [showLabHub, setShowLabHub] = useState(Boolean(initialLabTab));
+  const [activeLabTab, setActiveLabTab] = useState<'multimeter' | 'ohms' | 'diagnosis' | 'catalog'>(initialLabTab || 'multimeter');
 
   // LAB 1: Multimeter State
   const [meterMode, setMeterMode] = useState<'voltage' | 'resistance' | 'diode' | 'continuity'>('voltage');
@@ -75,7 +77,7 @@ export const Tomo11MasterPage: React.FC<Tomo11MasterPageProps> = ({ onBack }) =>
               </div>
 
               <button
-                onClick={() => setShowLabHub(false)}
+                onClick={() => onCloseLab ? onCloseLab() : setShowLabHub(false)}
                 className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-700 text-xs font-mono"
               >
                 CERRAR

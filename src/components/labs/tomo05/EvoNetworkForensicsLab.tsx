@@ -37,6 +37,7 @@ import {
 
 interface EvoNetworkForensicsLabProps {
   onClose?: () => void;
+  initialSubLabId?: string;
 }
 
 const TOMO_05_SUBLABS: SubLabModule[] = [
@@ -367,8 +368,9 @@ const TOMO_05_GUIDED_CASES: GuidedCase[] = [
 
 export const EvoNetworkForensicsLab: React.FC<EvoNetworkForensicsLabProps> = ({
   onClose,
+  initialSubLabId,
 }) => {
-  const [activeSubLabId, setActiveSubLabId] = useState<string>('05a-map');
+  const [activeSubLabId, setActiveSubLabId] = useState<string>(() => TOMO_05_SUBLABS.some((lab) => lab.id === initialSubLabId) ? initialSubLabId! : '05a-map');
 
   // Interactive state for 05A: Map
   const [linkSpeedMode, setLinkSpeedMode] = useState<'100M' | '1000M' | '2.5G'>('100M');
