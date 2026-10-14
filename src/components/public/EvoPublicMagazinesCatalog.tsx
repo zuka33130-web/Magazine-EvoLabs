@@ -122,20 +122,24 @@ export const EvoPublicMagazinesCatalog: React.FC<EvoPublicMagazinesCatalogProps>
               {/* Portada Vertical */}
               <div
                 onClick={mag.onOpen}
-                className="w-full h-56 rounded-xl overflow-hidden bg-black border border-zinc-800 relative cursor-pointer shadow-md"
+                className={`w-full ${mag.tomoNum === '02' ? 'aspect-[210/297]' : 'h-56'} rounded-xl overflow-hidden bg-black border border-zinc-800 relative cursor-pointer shadow-md`}
               >
                 <img
                   src={mag.coverImage}
                   alt={mag.title}
-                  className="w-full h-full object-contain bg-zinc-950 opacity-90 group-hover:opacity-100 transition-opacity"
+                  className={mag.tomoNum === '02' ? 'block w-full h-full object-contain' : 'w-full h-full object-contain bg-zinc-950 opacity-90 group-hover:opacity-100 transition-opacity'}
                   loading="lazy"
                 />
+                {mag.tomoNum !== '02' && (
+                  <>
                 <span className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/85 text-[10px] font-mono-tech font-bold text-white border border-zinc-700">
                   {mag.edition}
                 </span>
                 <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-cyan-950/80 text-[10px] font-mono-tech font-bold text-cyan-200 border border-cyan-700/60">
                   TOMO {mag.tomoNum}
                 </span>
+                  </>
+                )}
               </div>
 
               <div className="space-y-1">

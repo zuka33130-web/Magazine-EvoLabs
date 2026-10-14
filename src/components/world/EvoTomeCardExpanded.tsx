@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TOMO_01_COVER } from '../../data/tomoCoversData';
+import { TOMO_01_COVER, TOMO_02_COVER } from '../../data/tomoCoversData';
 import {
   BookOpen,
   Zap,
@@ -184,10 +184,10 @@ export const EvoTomeCardExpanded: React.FC<EvoTomeCardExpandedProps> = ({
             A) COLUMNA 1: MINI PORTADA EDITORIAL (Portada Real & Branding)
            =================================================================== */}
         <div className="lg:col-span-3 flex flex-col items-center sm:items-start justify-between h-full gap-4">
-          {tome.number === '01' ? (
+          {tome.number === '01' || tome.number === '02' ? (
             <div className="relative w-full max-w-[200px] sm:max-w-[220px] aspect-[210/297] rounded-xl bg-zinc-950 border-2 border-zinc-800/80 group-hover:border-zinc-700 shadow-2xl overflow-hidden">
               <img
-                src={TOMO_01_COVER}
+                src={tome.number === '01' ? TOMO_01_COVER : TOMO_02_COVER}
                 alt={`Portada ${tome.title}`}
                 className="block w-full h-full object-contain"
               />

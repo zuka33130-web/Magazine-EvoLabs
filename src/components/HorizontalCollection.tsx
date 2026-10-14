@@ -88,6 +88,15 @@ export const HorizontalCollection: React.FC<HorizontalCollectionProps> = ({
               }`}
             >
               {/* Real Mini Magazine Cover Visual */}
+              {volume.id === 'tomo-02' ? (
+                <div className="relative aspect-[210/297] w-full overflow-hidden bg-[#0a0b0e] border-b border-zinc-800/80">
+                  <img
+                    src={volume.coverImage}
+                    alt={`Portada de ${volume.volumeLabel}: ${volume.title}`}
+                    className="block w-full h-full object-contain"
+                  />
+                </div>
+              ) : (
               <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#0a0b0e] border-b border-zinc-800/80">
                 <img
                   src={volume.coverImage}
@@ -133,6 +142,7 @@ export const HorizontalCollection: React.FC<HorizontalCollectionProps> = ({
                   </h3>
                 </div>
               </div>
+              )}
 
               {/* Editorial Info under the mini-cover */}
               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">

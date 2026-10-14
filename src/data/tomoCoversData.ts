@@ -1,3 +1,5 @@
+import tomo02FinalCover from '../assets/images/tomo-02-final.png';
+
 // EVO LABS // PORTADAS TÉCNICAS OFICIALES 01 - 12
 // Totalmente originales, sin marcas externas, con temática visual pericial única para cada Tomo.
 
@@ -98,7 +100,7 @@ function createCoverSvg({
 // Artwork for each Tomo
 export const TOMO_01_COVER = '/covers/tomo-01-final.png';
 
-export const TOMO_02_COVER = '/covers/tomo-02.jpg';
+export const TOMO_02_COVER = tomo02FinalCover;
 
 export const TOMO_03_COVER = createCoverSvg({
   tomoNum: '03',

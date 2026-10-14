@@ -4,7 +4,7 @@ import {
   ArrowLeft,
   Layers,
 } from 'lucide-react';
-import coverHeroImg from '../../assets/images/cover_tomo2_win_1789531499967.jpg';
+import { TOMO_02_COVER as coverHeroImg } from '../../data/tomoCoversData';
 import { VOLUMES_COLLECTION } from '../../data/collections';
 import { VolumeItem } from '../../types';
 import { HorizontalCollection } from '../HorizontalCollection';
@@ -201,7 +201,7 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
               <img
                 src={coverHeroImg}
                 alt="Fotografía editorial // Dominá Windows — La Biblia Negra de Windows"
-                className="w-full aspect-[4/3] object-cover object-center filter contrast-[1.04] brightness-[0.97] transition-transform duration-500 hover:scale-[1.015]"
+                className="block w-full h-auto object-contain"
               />
             </div>
             <p className="mt-3 text-[11px] font-mono-tech text-zinc-300 text-right tracking-wider uppercase">
