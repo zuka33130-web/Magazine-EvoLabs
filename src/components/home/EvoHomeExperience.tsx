@@ -53,7 +53,7 @@ import { UserHardwarePassport } from '../../types';
 import heroSilicon from '../../assets/images/evo_silicon_hero_1789530430709.jpg';
 import hardwareHero from '../../assets/images/hardware_sculpture_hero_1789530888503.jpg';
 import pcbDetail from '../../assets/images/pcb_traces_detail_1789530447414.jpg';
-import coverTomo01 from '../../assets/images/cover_tomo_01_1789531234552.jpg';
+import { TOMO_01_COVER as coverTomo01 } from '../../data/tomoCoversData';
 import cap01Silicon from '../../assets/images/cap_01_silicon_1789531835511.jpg';
 import cap03Frametime from '../../assets/images/cap_03_frametime_1789531858625.jpg';
 import cap05Kernel from '../../assets/images/cap_05_kernel_1789531884339.jpg';

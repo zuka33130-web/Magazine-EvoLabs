@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowRight, ArrowLeft, Sparkles, HelpCircle, Compass } from 'lucide-react';
 import { EditorialHeadline } from '../types';
+import { TOMO_01_COVER } from '../data/tomoCoversData';
 import { TutorTomo01TourModal } from './tutor/TutorTomo01TourModal';
 import { TutorTomo01WelcomeModal } from './tutor/TutorTomo01WelcomeModal';
 import { useTutorEvo } from './tutor/TutorEvoContext';
@@ -153,14 +154,14 @@ export const MagazineCover: React.FC<MagazineCoverProps> = ({
           <div className="rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-900 shadow-2xl transition-all duration-300 hover:border-zinc-800">
             {/* Pure image: No technical labels, no badges, no overlays */}
             <img
-              src="/src/assets/images/evo_silicon_hero_1789530430709.jpg"
-              alt="Fotografía macro editorial de silicio de microprocesador y sustrato de placa madre"
+              src={TOMO_01_COVER}
+              alt="Portada definitiva de EVO LABS — Tomo 01: Conocé tu PC"
               referrerPolicy="no-referrer"
-              className="w-full aspect-[4/5] lg:aspect-[3/4] object-cover object-center filter contrast-[1.03] brightness-[0.94] transition-transform duration-500 hover:scale-[1.01]"
+              className="w-full h-auto object-contain"
             />
           </div>
           <p className="mt-3.5 text-[10px] font-mono-tech text-zinc-500 text-right tracking-widest uppercase">
-            Sustrato de Silicio // Laboratorio de Ensayo EVO
+            EVO LABS // Tomo 01 — Conocé tu PC
           </p>
         </div>
 

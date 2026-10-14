@@ -96,7 +96,7 @@ function createCoverSvg({
 }
 
 // Artwork for each Tomo
-export const TOMO_01_COVER = '/covers/tomo-01.jpg';
+export const TOMO_01_COVER = '/covers/tomo-01-final.png';
 
 export const TOMO_02_COVER = '/covers/tomo-02.jpg';
 

@@ -2,7 +2,7 @@
 // Diseño técnico editorial pericial, alta definición, sin dependencias externas ni marcas ajenas.
 
 export const TOMO_COVERS: Record<string, string> = {
-  '01': '/covers/tomo-01.jpg',
+  '01': '/covers/tomo-01-final.png',
   '02': '/covers/tomo-02.jpg',
   '03': `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600">
     <rect width="400" height="600" fill="%23060d0a"/>
