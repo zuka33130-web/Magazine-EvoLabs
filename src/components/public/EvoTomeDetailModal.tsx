@@ -127,9 +127,11 @@ export const EvoTomeDetailModal: React.FC<EvoTomeDetailModalProps> = ({
                 alt={tome.title}
                 className="w-full h-full object-contain bg-zinc-950"
               />
+              {tome.number !== '02' && (
               <span className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/85 text-[9px] font-mono-tech font-black text-amber-400 border border-amber-400/30">
                 TOMO {tome.number}
               </span>
+              )}
             </div>
 
             {/* Ficha Resumen */}

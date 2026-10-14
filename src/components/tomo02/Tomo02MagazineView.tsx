@@ -337,8 +337,9 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             // ignore
           }
 
-          setTimeout(() => {
+          setTimeout(async () => {
             try {
+              await document.querySelector<HTMLImageElement>('#t02-page-01 img')?.decode();
               window.print();
             } catch (err) {
               console.warn('Auto-print falló o requiere interacción del usuario:', err);
@@ -373,6 +374,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
       } catch {
         // ignore
       }
+      await document.querySelector<HTMLImageElement>('#t02-page-01 img')?.decode();
       window.print();
       setIsPreparingPrint(false);
     }, 400);

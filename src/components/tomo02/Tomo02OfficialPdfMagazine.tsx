@@ -320,7 +320,7 @@ export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps>
             </div>
           ) : (
             /* Standalone / Fallback Cover & Reading Deck when physical PDF is waiting */
-            <div className="w-[820px] max-w-full min-h-[1100px] bg-[#03060B] border border-cyan-900/60 rounded-3xl p-6 sm:p-10 shadow-2xl relative flex flex-col justify-between">
+            <div className={`w-[820px] max-w-full bg-[#03060B] border border-cyan-900/60 rounded-3xl shadow-2xl relative flex flex-col justify-between ${currentPage === 1 ? 'aspect-[210/297] overflow-hidden' : 'min-h-[1100px] p-6 sm:p-10'}`}>
               {/* Atmospheric Background Tech Matrix */}
               {currentPage !== 1 && (
                 <>
