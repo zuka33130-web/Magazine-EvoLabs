@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, ChevronDown, FlaskConical, Search } from 'lucide-react';
 import { CANONICAL_LABS, CANONICAL_TOMES, CanonicalPracticeLab } from '../../data/evoCatalog';
 
+import { EvoLabEditorialCard } from './EvoLabEditorialCard';
+import { EvoTomeLabsEditorialHeader } from './EvoTomeLabsEditorialHeader';
+
 export interface EvoPublicLabsCatalogProps {
   onOpenRegisteredLab: (labId: string) => void;
 }
@@ -105,13 +108,14 @@ export const EvoPublicLabsCatalog: React.FC<EvoPublicLabsCatalogProps> = ({ onOp
       {filtered.length === 0 && <div className="p-6 border border-zinc-800 rounded-xl text-sm text-zinc-300">No hay laboratorios que coincidan con estos filtros. <button type="button" onClick={reset} className="text-amber-400 underline">Mostrar todos</button></div>}
       {groups.filter((group) => group.labs.length > 0 || (query === '' && category === 'ALL' && kind === 'ALL' && status === 'ALL' && tomo === 'ALL')).map((group) => (
         <details key={group.id} data-tomo-group={group.id} open={!closedGroups[group.id]} onToggle={event=>{const closed=!event.currentTarget.open;if(closed!==!!closedGroups[group.id])setClosedGroups(prev=>({...prev,[group.id]:closed}));}} className="space-y-5" aria-label={group.title}>
-          <summary className="cursor-pointer"><h2 className="inline font-display font-black text-xl uppercase text-amber-400 border-b border-zinc-700 pb-3">{group.title} <span className="text-zinc-400 text-sm">({group.labs.length})</span></h2></summary>
+          <summary className={group.id === '01' ? 'list-none cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8bbac3] [&::-webkit-details-marker]:hidden' : 'cursor-pointer'}>{group.id === '01' ? <EvoTomeLabsEditorialHeader tome={CANONICAL_TOMES.find(tome => tome.id === group.id)!} labs={CANONICAL_LABS.filter(lab => lab.tomo === group.id)} matchingCount={group.labs.length} expanded={!closedGroups[group.id]} /> : <h2 className="inline font-display font-black text-xl uppercase text-amber-400 border-b border-zinc-700 pb-3">{group.title} <span className="text-zinc-400 text-sm">({group.labs.length})</span></h2>}</summary>
           {group.labs.length === 0 && <p className="text-xs text-zinc-500">Sin laboratorios registrados en este tomo.</p>}
           {categories.filter((value) => group.labs.some((lab) => lab.category === value)).map((value) => (
             <section key={value} className="space-y-4" aria-label={value}>
-              <h3 className="font-display font-bold text-lg uppercase text-cyan-400 border-b border-zinc-800 pb-2">{value} <span className="text-zinc-500 text-sm">({group.labs.filter((lab) => lab.category === value).length})</span></h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {group.id === '01' ? <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#303841] pb-3 pt-3"><h3 className="font-display text-sm font-semibold uppercase tracking-wider text-[#bdd3d8]">{value}</h3><span className="font-mono-tech text-[10px] text-zinc-400">{group.labs.filter(lab => lab.category === value).length} experiencias</span></div> : <h3 className="font-display font-bold text-lg uppercase text-cyan-400 border-b border-zinc-800 pb-2">{value} <span className="text-zinc-500 text-sm">({group.labs.filter((lab) => lab.category === value).length})</span></h3>}
+              <div data-lab-grid={group.id === '01' ? value : undefined} className={group.id === '01' ? `grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch ${group.labs.some(lab => lab.category === value && expanded === lab.id) ? '' : 'auto-rows-fr'}` : 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'}>
                 {group.labs.filter((lab) => lab.category === value).map((lab) => {
+                  if (group.id === '01') return <EvoLabEditorialCard key={lab.id} lab={lab} expanded={expanded === lab.id} onToggleDetail={() => setExpanded(expanded === lab.id ? null : lab.id)} onOpen={onOpenRegisteredLab} />;
                   const tome = CANONICAL_TOMES.find((item) => item.id === lab.tomo);
                   const available = lab.status === 'DISPONIBLE' && lab.target !== null;
                   const hasDetail = Boolean(lab.problem || lab.experiment || lab.outcome || lab.evidence);
