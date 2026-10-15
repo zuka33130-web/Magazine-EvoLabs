@@ -1,6 +1,6 @@
 {
   "name": "evo-local-agent",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "EVO Local Agent for Windows CIM/WMI Native Hardware Inventory and Telemetry",
   "type": "module",
   "main": "dist/index.js",

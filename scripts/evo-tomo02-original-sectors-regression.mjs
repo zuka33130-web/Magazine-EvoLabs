@@ -15,7 +15,7 @@ const numbers=Array.from({length:29},(_,i)=>String(i+11));
 const imports=numbers.map(n=>`import * as s${n} from './src/data/tomo02Sector${n}Data';`).join('\n');
 const source=`import React from 'react';import {createRoot} from 'react-dom/client';import {Tomo02MagazineView} from './src/components/tomo02/Tomo02MagazineView';import {TutorEvoProvider} from './src/components/tutor/TutorEvoContext';${imports}\nwindow.originalData={${numbers.map(n=>`'${n}':s${n}`).join(',')}};createRoot(document.getElementById('root')).render(<TutorEvoProvider><Tomo02MagazineView initialSubView="index"/></TutorEvoProvider>);`;
 await build({stdin:{contents:source,resolveDir:root,loader:'tsx'},outfile:path.join(output,'app.js'),bundle:true,format:'esm',platform:'browser',loader:{'.png':'dataurl','.jpg':'dataurl','.webp':'dataurl'},define:{'process.env.NODE_ENV':'"production"'},alias:{components:path.join(root,'src/components')}});
-const cssFile=fs.readdirSync(path.join(root,'dist/assets')).find(file=>file.endsWith('.css'));
+const cssFile=fs.readdirSync(path.join(root,'dist/assets')).find(file=>file.startsWith('index-')&&file.endsWith('.css'));
 const server=http.createServer((req,res)=>{
  if(req.url==='/app.js'){res.setHeader('Content-Type','text/javascript');res.end(fs.readFileSync(path.join(output,'app.js')));}
  else if(req.url==='/styles.css'){res.setHeader('Content-Type','text/css');res.end(fs.readFileSync(path.join(root,'dist/assets',cssFile)));}

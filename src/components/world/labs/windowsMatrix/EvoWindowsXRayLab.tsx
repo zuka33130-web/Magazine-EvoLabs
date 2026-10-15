@@ -1361,7 +1361,7 @@ export const EvoWindowsXRayLab: React.FC<EvoWindowsXRayLabProps> = ({
                 {serviceMode === 'REAL' && agentTelemetry && (
                   <div className="flex flex-wrap gap-3 text-[9px]">
                     <span className="text-zinc-400">
-                      CPU <strong className="text-white">{agentTelemetry.cpu.utilizationPercent}%</strong>{' '}
+                      CPU <strong className="text-white">{agentTelemetry.cpu.utilizationPercent === null ? 'UNKNOWN' : `${agentTelemetry.cpu.utilizationPercent}%`}</strong>{' '}
                       <em className="text-zinc-600">{agentTelemetry.cpu.provenance}</em>
                     </span>
                     <span className="text-zinc-400">

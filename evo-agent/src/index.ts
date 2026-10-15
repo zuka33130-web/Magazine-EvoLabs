@@ -12,6 +12,7 @@
 // ============================================================================
 
 import http from 'http';
+import { EOE_AGENT_VERSION } from './observabilityProtocol.js';
 import { AgentSecurityManager } from './security.js';
 import { WindowsInventoryCollector } from './inventory.js';
 import { AgentTelemetryManager } from './telemetry.js';
@@ -28,7 +29,7 @@ if (HOST.startsWith('0.0.0.0')) {
   process.exit(1);
 }
 
-const security = new AgentSecurityManager();
+const security = new AgentSecurityManager(code => console.log(`[PAIRING] Código local (5 minutos, un uso): ${code}`));
 const inventoryCollector = new WindowsInventoryCollector();
 const telemetryManager = new AgentTelemetryManager();
 const windowsServicesManager = new WindowsServicesExperimentManager();
@@ -80,7 +81,9 @@ const server = http.createServer(async (req, res) => {
   }
 
   // 2. Path Sanitization & Route Matching
-  const cleanPath = security.sanitizePath(url);
+  let cleanPath: string;
+  try { cleanPath = security.sanitizePath(url); }
+  catch { res.writeHead(400, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'INVALID_REQUEST_PATH' })); return; }
 
   // Prohibited commands / Arbitrary execution prevention
   if (
@@ -112,7 +115,7 @@ const server = http.createServer(async (req, res) => {
       res.end(
         JSON.stringify({
           error: 'UNAUTHORIZED_TOKEN',
-          message: 'Token de sesión local no válido o ausente. Consultá GET /health para sincronizar.',
+          message: 'Emparejamiento requerido. Ingresá el código de la consola del agente en ANALIZAR MI PC → Observabilidad.',
         })
       );
       return;
@@ -143,7 +146,7 @@ const server = http.createServer(async (req, res) => {
       const payload: AgentHealthResponse = {
         status: 'OK',
         agent: 'EVO_LOCAL_AGENT',
-        version: '1.0.0',
+        version: EOE_AGENT_VERSION,
         protocol: 'EVO_LOCAL_AGENT_V1',
         platform: process.platform,
         isWindows: process.platform === 'win32',
@@ -151,7 +154,7 @@ const server = http.createServer(async (req, res) => {
         uptimeSeconds: Math.floor(process.uptime()),
         address: HOST,
         port: PORT,
-        sessionToken: security.getSessionToken(),
+        pairingRequired: !security.validateToken(req),
         timestamp: new Date().toISOString(),
       };
 
@@ -160,6 +163,25 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (method === 'POST' && cleanPath === '/v1/pair') {
+      try {
+        const body = await readJsonBody(req);
+        const result = security.pair(body?.code, req.headers.origin);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (error: any) {
+        const message = String(error?.message || 'PAIRING_FAILED');
+        res.writeHead(message === 'PAIRING_RATE_LIMITED' ? 429 : 400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: message }));
+      }
+      return;
+    }
+    if (method === 'POST' && cleanPath === '/v1/pair/revoke') {
+      security.revoke(req.headers.origin);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'REVOKED' }));
+      return;
+    }
     if (method === 'GET' && cleanPath === '/v1/capabilities') {
       const capabilities = AgentCapabilitiesProvider.getCapabilities();
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -209,14 +231,15 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (method === 'GET' && cleanPath === '/v1/telemetry') {
-      const telemetry = telemetryManager.getLiveMetrics();
+      const telemetry = await telemetryManager.getLiveMetrics();
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(telemetry, null, 2));
       return;
     }
 
     if (method === 'POST' && cleanPath === '/v1/telemetry/start') {
-      const result = telemetryManager.startSampling();
+      const body = await readJsonBody(req);
+      const result = telemetryManager.startSampling(Number(body?.intervalMs ?? 2000));
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, ...result, timestamp: new Date().toISOString() }));
       return;
@@ -334,6 +357,8 @@ const server = http.createServer(async (req, res) => {
         message: `Endpoint '${cleanPath}' no existe en EVO Local Agent.`,
         allowedEndpoints: [
           'GET /health',
+          'POST /v1/pair',
+          'POST /v1/pair/revoke',
           'GET /v1/machine',
           'GET /v1/capabilities',
           'GET /v1/telemetry',
@@ -362,7 +387,7 @@ server.listen(PORT, HOST, () => {
   console.log('================================================================');
   console.log(` [OK] Servidor escuchando en: http://${HOST}:${PORT}`);
   console.log(` [OK] Plataforma detectada: ${process.platform} (${process.arch})`);
-  console.log(` [OK] Token de sesión: ${security.getSessionToken().substring(0, 8)}...`);
+  console.log(' [OK] Emparejamiento por código local; /health no entrega credenciales.');
   console.log(' [OK] Endpoints activos:');
   console.log('      - GET  /health');
   console.log('      - GET  /v1/machine');
@@ -377,11 +402,13 @@ server.listen(PORT, HOST, () => {
 });
 
 // Graceful shutdown
-process.on('SIGINT', () => {
+const shutdown = () => {
   console.log('\n[EvoAgent] Deteniendo servidor local...');
   telemetryManager.stopSampling();
   server.close(() => {
     console.log('[EvoAgent] Servidor cerrado con éxito.');
     process.exit(0);
   });
-});
+};
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);

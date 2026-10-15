@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
 import {
   EvoLabZone,
   UserHardwarePassport,
@@ -172,7 +172,9 @@ type MainIntention =
   | 'planes';
 
 type LabSubTab = 'todos' | 'guiados' | 'simuladores' | 'experimentos' | 'casos';
-type DiagnoseSubTab = 'expedientes' | 'consola' | 'pcb' | 'sectores';
+const EvoObservabilityCenter = lazy(() => import('../observability/EvoObservabilityCenter'));
+
+type DiagnoseSubTab = 'expedientes' | 'consola' | 'pcb' | 'sectores' | 'observability';
 
 const ToolMicrovisual: React.FC<{ toolId: string; actionKey: string; simpleName: string; accentColor: string }> = ({
   toolId,
@@ -408,6 +410,7 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
 
   // Navigation State
   const [activeIntention, setActiveIntention] = useState<MainIntention>(initialIntention);
+  const [diagnoseTab, setDiagnoseTab] = useState<DiagnoseSubTab>(() => initialZoneId ? 'consola' : 'expedientes');
   const { canAccess, openUpgradeModal, isFreeUser } = useEvoAccess();
   const [selectedLevelNumber, setSelectedLevelNumber] = useState<number | null>(null);
   const [selectedTomeProfile, setSelectedTomeProfile] = useState<EvoTomePedagogicalProfile | null>(null);
@@ -438,6 +441,7 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
   }, [activeIntention]);
 
   const hasSubView =
+    (activeIntention === 'diagnosticar' && diagnoseTab === 'observability') ||
     practiceLabId !== null ||
     selectedTomeProfile !== null ||
     selectedLevelNumber !== null ||
@@ -521,6 +525,10 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
           setIsBuildArchitectOpen(false);
           return true;
         }
+        if (activeIntention === 'diagnosticar' && diagnoseTab === 'observability') {
+          setDiagnoseTab('expedientes');
+          return true;
+        }
         return false;
       };
     }
@@ -546,6 +554,8 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
     isLatencyCalculatorOpen,
     isBuildArchitectOpen,
     subViewBackHandlerRef,
+    activeIntention,
+    diagnoseTab,
   ]);
 
   // Event listeners para apertura canónica y herramientas técnicas desacopladas
@@ -675,7 +685,6 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
 
   // Sub-navigation tabs
   const [labSubTab, setLabSubTab] = useState<LabSubTab>('todos');
-  const [diagnoseTab, setDiagnoseTab] = useState<DiagnoseSubTab>(() => initialZoneId ? 'consola' : 'expedientes');
 
   // Diagnostic area sub-state
   const [activeConsoleZoneId, setActiveConsoleZoneId] = useState<string>(() => initialZoneId || 'zona-1');
@@ -1651,6 +1660,17 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
             </button>
           </div>
 
+          <button type="button" onClick={() => setDiagnoseTab('observability')}
+            className="w-full text-left p-4 rounded-xl bg-[#19232d] border border-[#667e92] text-slate-100 hover:bg-[#243340] focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-300"
+            aria-expanded={diagnoseTab === 'observability'}>
+            <span className="block text-sm font-bold">EVO LIVE TELEMETRY PRO →</span>
+            <span className="block mt-1 text-xs text-slate-300">Observabilidad local · métricas, fuentes e integridad de medición</span>
+          </button>
+          {diagnoseTab === 'observability' ? (
+            <Suspense fallback={<p role="status">Cargando centro de observabilidad…</p>}>
+              <EvoObservabilityCenter onBack={() => setDiagnoseTab('expedientes')} />
+            </Suspense>
+          ) : <>
           {/* Banner Principal: ACÁ NO SIMULAMOS. ACÁ ANALIZAMOS TU EQUIPO. */}
           <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#170e24] via-[#0e1017] to-[#080a11] border border-purple-500/30 shadow-xl">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center">
@@ -2222,6 +2242,7 @@ export const EvoWorldMap: React.FC<EvoWorldMapProps> = ({
               <EvoLiveBenchSuite passport={passport} />
             </div>
           )}
+          </>}
         </div>
       )}
 
