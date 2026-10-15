@@ -19,7 +19,7 @@ async function run(){
  flushSync(()=>root.render(<TutorEvoProvider><Tomo02MagazineView initialSubView="index"/></TutorEvoProvider>));await pause(20);
  let count=0;
  for(const content of TOMO_02_ADVANCED_CONTENT){
-  click(`Abrir Sector ${content.number}`);await waitFor(()=>!!document.querySelector(`[data-sector="${content.number}"]`),'Sector did not open');
+  click(`Investigaciones ampliadas del Sector ${content.number}`);await waitFor(()=>!!document.querySelector(`[data-sector="${content.number}"]`),'Sector did not open');
   const invs=getSectorInvestigations(content);assert(document.querySelectorAll('[data-investigation-link]').length===invs.length,'Sidebar count '+content.number);
   for(const inv of invs){
    const button=document.querySelector<HTMLButtonElement>(`[data-investigation-link="${inv.id}"]`)!;flushSync(()=>button.click());
@@ -49,12 +49,12 @@ async function run(){
   click('Test');assert(document.body.textContent!.includes(content.questions[0].question),'Missing original test');
   assert([...document.querySelectorAll('button')].find(b=>b.textContent==='Completar sector con evidencia')?.disabled,'Unearned completion');
   click('Volver a investigación');assert(document.querySelector('[data-investigation]')?.getAttribute('data-investigation')===first.id,'Return changed active investigation');
-  click('ÍNDICE');await pause();click(`Abrir Sector ${content.number}`);await waitFor(()=>!!document.querySelector(`[data-sector="${content.number}"]`),'Reopen failed');
+  click('ÍNDICE');await pause();click(`Investigaciones ampliadas del Sector ${content.number}`);await waitFor(()=>!!document.querySelector(`[data-sector="${content.number}"]`),'Reopen failed');
   assert(document.querySelector('[data-investigation]')?.getAttribute('data-investigation')===first.id,'Active not persisted');assert(document.querySelector('[data-investigation-progress]')!.textContent!.startsWith('1 /'),'Evidence not persisted');click('ÍNDICE');await pause();
  }
  const saved=JSON.parse(localStorage.getItem('evo_tomo02_sector11_learning_v1')!);assert(saved.note===legacy.note&&saved.decision===legacy.decision&&saved.answers[0]===legacy.answers[0],'Legacy evidence overwritten');
  assert(JSON.parse(localStorage.getItem('evo_tomo02_progress')!).m00==='completed','Original sector progress lost');assert(localStorage.getItem('evo_tomo02_completed')==='false','False certification');
- click('Abrir Sector 11');await waitFor(()=>!!document.querySelector('[data-sector="11"]'),'Final open failed');
+ click('Investigaciones ampliadas del Sector 11');await waitFor(()=>!!document.querySelector('[data-sector="11"]'),'Final open failed');
  document.getElementById('result')!.textContent=`PASS: Chromium 29 sectors / ${count} individual contents; all sidebar destinations and six stages; checks and microchallenges with feedback; evidence, active selection, legacy progress preserved; mission/test return; 18 tool codes; experimental JSON export with provenance; desktop columns. Actual Tomo 02 components.`;
 }
 run().catch(e=>document.getElementById('result')!.textContent='FAIL: '+e.stack+' | '+document.querySelector('[data-investigation]')?.getAttribute('data-investigation'));

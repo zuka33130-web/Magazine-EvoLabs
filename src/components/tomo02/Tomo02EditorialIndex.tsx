@@ -49,6 +49,7 @@ interface Tomo02EditorialIndexProps {
   onOpenSector08?: () => void;
   onOpenSector09?: () => void;
   onOpenSector10?: () => void;
+  onOpenOriginalSector?: (number: string) => void;
   onOpenAdvancedSector?: (number: string) => void;
   onSelectModule?: (moduleIndex: number) => void;
   onStartFinalExam?: () => void;
@@ -126,6 +127,7 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
   onOpenSector08,
   onOpenSector09,
   onOpenSector10,
+  onOpenOriginalSector,
   onOpenAdvancedSector,
   moduleProgress = {},
 }) => {
@@ -1315,7 +1317,7 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
                       <p className="text-[11px] text-zinc-400 line-clamp-1">{sector.subtitle}</p>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
                       <button
                         type="button"
                         onClick={() => toggleSectorDetails(sector.sectorId)}
@@ -1324,10 +1326,14 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
                         <span>{isExpanded ? 'Ocultar Temario' : 'Ver Temario'}</span>
                         {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                       </button>
-                      <button type="button" onClick={() => onOpenAdvancedSector?.(sector.sectorNumber)}
+                      <button type="button" onClick={() => (onOpenOriginalSector || onOpenAdvancedSector)?.(sector.sectorNumber)}
                         className="px-3 py-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-mono font-bold">
                         Abrir Sector {sector.sectorNumber}
                       </button>
+                      {onOpenOriginalSector && onOpenAdvancedSector && <button type="button" onClick={() => onOpenAdvancedSector(sector.sectorNumber)}
+                        className="px-3 py-2 rounded-lg border border-sky-500/20 text-cyan-300 text-xs font-mono">
+                        Investigaciones ampliadas del Sector {sector.sectorNumber}
+                      </button>}
                     </div>
                   </div>
 
