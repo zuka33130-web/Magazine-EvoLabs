@@ -1,11 +1,25 @@
 import React from 'react';
 import {
   Activity, ArrowRight, Boxes, ChevronDown, CircuitBoard, Cpu, FlaskConical,
-  Gamepad2, Gauge, GitCompareArrows, Microscope, ScanLine, SearchCheck, Waypoints,
+  Gamepad2, Gauge, Monitor, Terminal, Settings2, ShieldCheck, HardDrive, FileSearch, GitCompareArrows, Microscope, ScanLine, SearchCheck, Waypoints,
 } from 'lucide-react';
 import type { CanonicalPracticeLab } from '../../data/evoCatalog';
 
 const icons: Record<string, typeof Cpu> = {
+  'chapter-05': Activity,
+  'lab-windows-services': Settings2,
+  'lab-windows-bsod': ShieldCheck,
+  'lab-uefi-bcd': Waypoints,
+  'lab-clean-install': HardDrive,
+  'lab-windows-repair': FileSearch,
+  'lab-software-dpc': Gauge,
+  'windows-scheduler': Cpu,
+  'windows-matrix': Monitor,
+  'windows-advisor': SearchCheck,
+  'xray-boot': ScanLine,
+  'xray-install': HardDrive,
+  'xray-services': Terminal,
+  'sector01-boot': Waypoints,
   'chapter-04': SearchCheck,
   'chapter-06': Microscope,
   'lab-hardware-latency': Activity,
