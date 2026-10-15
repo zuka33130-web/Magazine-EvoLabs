@@ -52,7 +52,7 @@ interface EvoMasterLabSuiteProps {
   onNavigateTomo?: (tomoId: string) => void;
   onNavigateHome?: () => void;
   passport?: UserHardwarePassport | null;
-  initialPanel?: 'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all';
+  initialPanel?: 'sandbox' | 'gaming' | 'architecture' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all';
   initialScenario?: string;
 }
 
@@ -65,7 +65,7 @@ export const EvoMasterLabSuite: React.FC<EvoMasterLabSuiteProps> = ({
   initialScenario,
 }) => {
   const { mode, isPericial } = useEvoOperatingMode();
-  const [activePanel, setActivePanel] = useState<'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>(initialPanel);
+  const [activePanel, setActivePanel] = useState<'sandbox' | 'gaming' | 'architecture' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>(initialPanel);
 
   // Beginner (Principiante / Guiado) vs Technical (Técnico / Sysinternals) View Mode
   const [uiMode, setUiMode] = useState<'principiante' | 'tecnico'>(initialPanel === 'sandbox' ? 'principiante' : 'tecnico');
@@ -967,9 +967,10 @@ ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
         <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 space-y-8">
           
           {/* FEATURED: EL SIMULADOR DEFINITIVO EVO (ULTIMATE SANDBOX) */}
-          {(activePanel === 'sandbox' || activePanel === 'all') && (
+          {(activePanel === 'sandbox' || activePanel === 'gaming' || activePanel === 'all') && (
             <div className="space-y-4">
               <EvoUltimateSandbox
+                initialStep={activePanel === 'gaming' ? 'gaming' : 'assembler'}
                 passport={liveHardware || passport}
                 onNavigateToHardwareBench={() => setActivePanel('hardware')}
                 onOpenTomo={onNavigateTomo}
@@ -1078,7 +1079,7 @@ ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
           )}
 
           {/* PANEL A: LABORATORIO DE PRUEBA DE COMPONENTES */}
-          {(activePanel === 'hardware' || activePanel === 'all') && (
+          {(activePanel === 'hardware' || activePanel === 'architecture' || activePanel === 'all') && (
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
                 <div className="flex items-center gap-2">
@@ -1093,7 +1094,7 @@ ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
               </div>
 
               {/* Render full hardware hot-swap component */}
-              <Sector02HardwareHotSwap />
+              <Sector02HardwareHotSwap initialFocus={activePanel === 'architecture' ? 'cpu' : undefined}/>
             </div>
           )}
 

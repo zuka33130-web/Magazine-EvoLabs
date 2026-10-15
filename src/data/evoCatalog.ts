@@ -24,7 +24,7 @@ export interface CanonicalTomo {
   commercialStatus: CommercialStatus;
   magazineStatus: MagazineStatus;
   accessType: AccessType;
-  associatedLabs: string[]; // Lab IDs
+  associatedLabs: string[]; // Legacy theme tags; resolve lab IDs through getTomeLabs.
   associatedTools: string[]; // Tool IDs
   description: string;
 }
@@ -249,8 +249,7 @@ export function getPublishedMagazines(): CanonicalTomo[] {
 }
 
 export function getTomeLabs(tomoId: string): string[] {
-  const tomo = getTomeById(tomoId);
-  return tomo ? tomo.associatedLabs : [];
+  return CANONICAL_LABS.filter((lab) => lab.tomo === tomoId).map((lab) => lab.id);
 }
 
 export function getTomeTools(tomoId: string): string[] {
@@ -268,10 +267,10 @@ export type PracticeCategory = 'Arranque y firmware' | 'Windows y kernel' | 'Har
 export type PracticeTarget =
   | { type: 'boot' }
   | { type: 'windows' | 'xray'; scenario: string }
-  | { type: 'hotswap'; panel: 'hardware' | 'software' | 'sandbox' | 'telemetry' }
+  | { type: 'hotswap'; panel: 'hardware' | 'software' | 'sandbox' | 'telemetry' | 'gaming' | 'architecture' }
   | { type: 'core'; phase: 'SELECT_PC' | 'BUILD_PC'; mission: 'IDLE' | 'REPAIR' | 'TEST' | 'BOTTLENECK' | 'OPTIMIZE' | 'UPGRADE' }
   | { type: 'modal'; modal: 'cases' | 'twin' | 'transfer' }
-  | { type: 'chapter'; chapter: '02' | '03' | '07' }
+  | { type: 'chapter'; chapter: '02' | '03' | '04' | '05' | '06' | '07' }
   | { type: 'campus'; zone: string }
   | { type: 'embedded'; engine: 'network' | 'security' | 'performance' | 'code' | 'ai' | 'sector01' | 'pcb' | 'live-bench'; module?: string }
   | { type: 'embedded'; engine: 'electronics'; tab: 'multimeter' | 'ohms' | 'diagnosis' }
@@ -293,6 +292,10 @@ export interface CanonicalPracticeLab {
 }
 
 const REGISTERED_PRACTICE_LABS: CanonicalPracticeLab[] = [
+  {id:'chapter-04',title:'Encontrá el límite: experimento controlado',description:'Contrastá sospechas, cadencia CPU/GPU y otros limitantes; registrá una prueba de una sola variable y su matriz de evidencia.',category:'Hardware y silicio',tomo:'01',kind:'GUIADO',status:'DISPONIBLE',target:{type:'chapter',chapter:'04'}},
+  {id:'chapter-05',title:'Primera intervención: procesos y carga de Windows',description:'Observá procesos, carga y servicios; documentá una intervención reversible en las ocho estaciones del capítulo existente.',category:'Windows y kernel',tomo:'02',kind:'GUIADO',status:'DISPONIBLE',target:{type:'chapter',chapter:'05'}},
+  {id:'chapter-06',title:'Taller de diagnóstico deductivo de PC',description:'Construí hipótesis, seleccioná pruebas y documentá el cierre del caso con las estaciones del taller existente.',category:'Hardware y silicio',tomo:'01',kind:'GUIADO',status:'DISPONIBLE',target:{type:'chapter',chapter:'06'}},
+
   {
     id: "lab-boot-seq",
     title: "Simulador de Secuencia de Boot y 35 Estados POST",
@@ -413,7 +416,7 @@ const REGISTERED_PRACTICE_LABS: CanonicalPracticeLab[] = [
     tomo: "01",
     kind: "SIMULADOR",
     status: "DISPONIBLE",
-    target: {"type": "hotswap", "panel": "sandbox"},
+    target: {"type": "hotswap", "panel": "architecture"},
     problem: "Incapacidad de visualizar cómo interactúan los registros internos, la memoria caché y el controlador de memoria principal.",
     experiment: "Explorarás el mapa interactivo de la CPU observando el paso de instrucciones por los niveles de caché y buses de datos.",
     outcome: "Aprenderás la arquitectura física interna que determina la velocidad de un procesador moderno.",
@@ -446,6 +449,16 @@ const REGISTERED_PRACTICE_LABS: CanonicalPracticeLab[] = [
     experiment: "Montarás la PC en el banco universal, probarás la fuente con carga simulada y medirás tolerancia en rieles ATX.",
     outcome: "Aprenderás a descartar problemas eléctricos con instrumental sin dañar componentes probando al azar.",
     evidence: "Lectura de voltajes bajo norma ATX (±5%), prueba de cortocircuito y dictamen de fuente.",
+  },
+  {
+    id: 'lab-gaming-simulator',
+    title: 'SIMULADOR DE JUEGOS EVO',
+    description: 'Probá resolución, carga gráfica, FPS y presión de VRAM en la etapa de juegos de Ultimate Sandbox.',
+    category: 'Hardware y silicio',
+    tomo: '01',
+    kind: 'SIMULADOR',
+    status: 'DISPONIBLE',
+    target: { type: 'hotswap', panel: 'gaming' },
   },
   {
     id: "lab-pc-builder",
@@ -618,7 +631,7 @@ const REGISTERED_PRACTICE_LABS: CanonicalPracticeLab[] = [
     title: "Simuladores físicos de rendimiento",
     description: "Experimentá con resolución, carga, temperatura y latencia de RAM.",
     category: "Rendimiento y metrología",
-    tomo: "07",
+    tomo: "01",
     kind: "SIMULADOR",
     status: "DISPONIBLE",
     target: {"type": "embedded", "engine": "live-bench"},

@@ -337,7 +337,7 @@ function AppContent({
         } else {
           setCurrentView('hotswap-lab');
           const sp = (initialPendingTarget as any).subPanel;
-          if (sp && ['sandbox', 'hardware', 'software', 'telemetry', 'matrix', 'all'].includes(sp)) {
+          if (sp && ['sandbox', 'gaming', 'architecture', 'hardware', 'software', 'telemetry', 'matrix', 'all'].includes(sp)) {
             setActiveLabPanel(sp);
           } else {
             setActiveLabPanel('hardware');
@@ -510,7 +510,7 @@ function AppContent({
 
   // Sub-panel & Lab states
   const [activeZoneId, setActiveZoneId] = useState<string | undefined>(undefined);
-  const [activeLabPanel, setActiveLabPanel] = useState<'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>('sandbox');
+  const [activeLabPanel, setActiveLabPanel] = useState<'sandbox' | 'gaming' | 'architecture' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>('sandbox');
   const [activeLabMission, setActiveLabMission] = useState<'IDLE' | 'REPAIR' | 'TEST' | 'BOTTLENECK' | 'OPTIMIZE' | 'UPGRADE'>('IDLE');
   const [labCorePhase, setLabCorePhase] = useState<'SELECT_PC' | 'BUILD_PC' | 'LAB_ACTIVE'>('SELECT_PC');
   const [matrixInitialScenario, setMatrixInitialScenario] = useState<string | undefined>(undefined);
@@ -1545,7 +1545,7 @@ function AppContent({
     setShowCaseHistoryModal(true);
   };
 
-  const handleNavigateHotSwapLab = (subPanel?: 'sandbox' | 'hardware' | 'software' | 'telemetry' | 'all') => {
+  const handleNavigateHotSwapLab = (subPanel?: 'sandbox' | 'gaming' | 'architecture' | 'hardware' | 'software' | 'telemetry' | 'all') => {
     if (subPanel) {
       setActiveLabPanel(subPanel);
     }
@@ -2041,6 +2041,9 @@ function AppContent({
                   setC02TargetStation('lab');
                   setCurrentView('chapter-02');
                 } else if (chapter === '03') handleStartChapter03();
+                else if (chapter === '04') handleStartChapter04();
+                else if (chapter === '05') handleStartChapter05();
+                else if (chapter === '06') handleStartChapter06();
                 else handleStartChapter07();
               }}
               initialZoneId={activeZoneId}

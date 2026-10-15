@@ -1,3 +1,5 @@
+import { getPracticeLab } from './evoCatalog';
+
 // EVO LABS // MAPA DE PROPIEDAD CANÓNICA (FASE C)
 // Define el dueño único de cada una de las 34 entradas del catálogo.
 
@@ -133,4 +135,9 @@ export function getToolIdsByOwner(owner: EvoCanonicalSection): string[] {
   return Object.entries(EVO_CANONICAL_OWNERSHIP_MAP)
     .filter(([, section]) => section === owner)
     .map(([id]) => id);
+}
+
+/** Lab ownership is derived from the canonical catalog, never from its shared engine. */
+export function getLabOwnerTomo(labId: string): string | null | undefined {
+  return getPracticeLab(labId)?.tomo;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Cpu, 
   Layers, 
@@ -366,7 +366,9 @@ const COOLING_PRESETS: CoolingPreset[] = [
   },
 ];
 
-export const Sector02HardwareHotSwap: React.FC = () => {
+export const Sector02HardwareHotSwap: React.FC<{initialFocus?:'cpu'}> = ({initialFocus}) => {
+  const cpuSection = useRef<HTMLDivElement>(null);
+  useEffect(()=>{if(initialFocus==='cpu')cpuSection.current?.scrollIntoView({block:'start'});},[initialFocus]);
   const { isPericial } = useEvoOperatingMode();
 
   // State
@@ -817,7 +819,7 @@ INTEGRIDAD     : SU VALIDEZ DEPENDE DEL ENTORNO DEL USUARIO
         <div className="lg:col-span-7 space-y-6">
           
           {/* STEP 1: CPU SELECTOR & MICROARCHITECTURE */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#0c0e15] border border-zinc-800 space-y-3.5">
+          <div ref={cpuSection} data-hardware-section="cpu" className="p-4 sm:p-5 rounded-2xl bg-[#0c0e15] border border-zinc-800 space-y-3.5">
             <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
               <span className="text-xs font-bold text-amber-400 uppercase flex items-center gap-2">
                 <Cpu className="w-4 h-4" />

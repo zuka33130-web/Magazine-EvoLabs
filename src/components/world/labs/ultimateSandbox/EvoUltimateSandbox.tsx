@@ -953,12 +953,14 @@ export function analyzeSystemStateConditional(input: SystemAnalysisInput): EvoMa
 }
 
 interface EvoUltimateSandboxProps {
+  initialStep?: 'assembler' | 'windows' | 'gaming';
   onNavigateToHardwareBench?: () => void;
   onOpenTomo?: (tomoId: string) => void;
   passport?: UserHardwarePassport | null;
 }
 
 export const EvoUltimateSandbox: React.FC<EvoUltimateSandboxProps> = ({
+  initialStep = 'assembler',
   onNavigateToHardwareBench,
   onOpenTomo,
   passport,
@@ -967,7 +969,7 @@ export const EvoUltimateSandbox: React.FC<EvoUltimateSandboxProps> = ({
   const initialHardware = useMemo(() => detectHardwareFromTelemetry(passport), [passport]);
 
   // Navigation step
-  const [activeStep, setActiveStep] = useState<'assembler' | 'windows' | 'gaming'>('assembler');
+  const [activeStep, setActiveStep] = useState<'assembler' | 'windows' | 'gaming'>(initialStep);
 
   // Hardware State initialized directly from telemetry
   const [selectedCpuId, setSelectedCpuId] = useState<string>(() => initialHardware.cpuId);
@@ -1160,7 +1162,11 @@ export const EvoUltimateSandbox: React.FC<EvoUltimateSandboxProps> = ({
   const [maintenanceCelebration, setMaintenanceCelebration] = useState<boolean>(false);
 
   // View Mode: 'deep_dive' | 'single_truth'
-  const [viewMode, setViewMode] = useState<'deep_dive' | 'single_truth'>('single_truth');
+  const [viewMode, setViewMode] = useState<'deep_dive' | 'single_truth'>(initialStep === 'gaming' ? 'deep_dive' : 'single_truth');
+  useEffect(() => {
+    setActiveStep(initialStep);
+    if (initialStep === 'gaming') setViewMode('deep_dive');
+  }, [initialStep]);
 
   // Sub-Navigation within Stage 3 (Simulador de Juegos)
   const [gamingSubTab, setGamingSubTab] = useState<'render_fps' | 'bios_memory' | 'latency_network'>('render_fps');

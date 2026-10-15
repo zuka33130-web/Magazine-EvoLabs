@@ -131,11 +131,11 @@ export interface EvoWorldMapProps {
   onChangeProfile?: (profile: EvoNarrativeProfile) => void;
   onOpenTomo?: (tomoId: string) => void;
   onNavigateBootLab?: () => void;
-  onNavigateHotSwapLab?: (panel?: 'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all') => void;
+  onNavigateHotSwapLab?: (panel?: 'sandbox' | 'gaming' | 'architecture' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all') => void;
   onNavigateWindowsMatrixLab?: (scenario?: string) => void;
   onNavigateLabCore?: (phase?: 'SELECT_PC' | 'BUILD_PC' | 'LAB_ACTIVE', mission?: 'IDLE' | 'REPAIR' | 'TEST' | 'BOTTLENECK' | 'OPTIMIZE' | 'UPGRADE') => void;
   onNavigateWindowsXRayLab?: (scenario?: string) => void;
-  onNavigatePracticeChapter?: (chapter: '02' | '03' | '07') => void;
+  onNavigatePracticeChapter?: (chapter: '02' | '03' | '04' | '05' | '06' | '07') => void;
   initialPracticeLabId?: string;
   onPracticeLabConsumed?: () => void;
   onOpenForensicBench?: (target: ForensicBenchTarget) => void;
