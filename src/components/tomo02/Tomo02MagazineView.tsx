@@ -1,4 +1,3 @@
-import { Tomo02OriginalSectorView } from './Tomo02OriginalSectorView';
 import React, { useState, useEffect } from 'react';
 import { safeStorage } from '../../utils/safeStorage';
 import {
@@ -442,22 +441,14 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     if (Number(number) < 11) {
       setSubView(`sector_${number}` as Tomo02SubView);
     } else {
-      setSelectedSectorNumber(number);
-      setSubView('original_sector');
+      handleOpenAdvancedSector(number);
     }
     try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
   };
 
-  if (subView === 'original_sector') {
-    return <Tomo02OriginalSectorView number={selectedSectorNumber}
-      onBack={() => setSubView('index')} onNavigate={handleOpenOriginalSector}
-      onOpenAdvanced={handleOpenAdvancedSector} />;
-  }
-
-  if (subView === 'advanced_sector') {
+  if (subView === 'advanced_sector' || subView === 'original_sector') {
     const content = getAdvancedSector(selectedSectorNumber)!;
     return <div className="min-h-screen bg-[#07090e] text-zinc-100">
-      <button type="button" onClick={() => handleOpenOriginalSector(content.number)} className="m-3 px-3 py-2 rounded-lg border border-sky-500/20 text-xs text-cyan-300">Sector original {content.number}</button>
       <React.Suspense fallback={<p role="status" className="p-8 text-cyan-300">Cargando Sector {content.number}…</p>}>
         <Tomo02AdvancedSectorView key={content.number} content={content} completed={moduleProgress[`sector-${content.number}`] === 'completed'}
           onBack={() => setSubView('index')} onNavigate={handleOpenAdvancedSector} onComplete={handleMarkCompleted} />

@@ -3,6 +3,8 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { loadSectorResources } from '../src/components/tomo02/advanced/tomo02ResourceRegistry';
+import { complementaryNotes, uniqueNoteFields } from '../src/components/tomo02/advanced/Tomo02SectorResources';
 import { TOMO_02_ADVANCED_CONTENT, getAdvancedSector } from '../src/data/tomo02AdvancedContent';
 import { TOMO_02_MASTER_SECTORS } from '../src/data/tomo02MasterSectors';
 import { TOMO_02_CASE_LIBRARY } from '../src/data/tomo02CaseLibrary';
@@ -26,7 +28,7 @@ let canonicalCount = 0, individualCount = 0;
 for (const content of TOMO_02_ADVANCED_CONTENT) {
   const meta = TOMO_02_MASTER_SECTORS.find((sector) => sector.sectorNumber === content.number)!;
   assert.equal(meta.status, 'ACTIVE');
-  assert.ok(indexHtml.includes(`Abrir Sector ${content.number}`), `Missing individual entry ${content.number}`);
+  assert.ok(indexHtml.includes(`Ingresar al Sector ${content.number}`), `Missing individual entry ${content.number}`);
   assert.ok(content.lessons.length >= 3 && content.commands.length >= 2 && content.procedure.length >= 4);
   assert.ok(new Set(content.lessons.map((item) => item.text)).size === content.lessons.length);
   for (const command of content.commands) assert.ok(command.code && command.purpose && command.example && command.interpretation);
@@ -112,3 +114,16 @@ const baselineFiles = baselineDir ? ['src/components/tomo02','src/data'].flatMap
 const protectedFiles = baselineFiles.filter((file) => /\/sector(?:0\d|10)\//.test(file) || /tomo02Sector(?:0\d|10)/.test(file));
 for (const file of protectedFiles) assert.equal(fs.readFileSync(file,'utf8'), baselineText(file), `Changed original sector: ${file}`);
 console.log(`PASS: 29 unified readers; 501 canonical investigations, 112 preserved cases, 9 protocol stages (622 individually rendered); 18 tool modules; ${TOMO_02_ADVANCED_CONTENT.reduce((count, sector) => count + sector.commands.length, 0)} command examples; 58 checks; ${TOMO_02_CASE_LIBRARY.length} didactic cases across 22 categories; ${protectedFiles.length} original files unchanged. Experiment math, provenance and progress gates verified.`);
+
+// Every distinct original explanation remains reachable from the single reader or its mission.
+const leafText=(value:unknown):string[]=>typeof value==='string'?[value]:value&&typeof value==='object'?Object.values(value).flatMap(leafText):[];
+let supplementaryCount=0;
+for(const content of TOMO_02_ADVANCED_CONTENT){
+ const resources=await loadSectorResources(content.number);const invs=getSectorInvestigations(content);const reached=new Set<string>();
+ for(const inv of invs)for(const tab of ['reader','mission'] as const)for(const note of complementaryNotes(content.number,resources.investigations,inv.id,tab)){
+  reached.add(note.code);const fields=uniqueNoteFields(note,inv);const available=new Set([...leafText(inv),...leafText(fields)].map(text=>text.replace(/\s+/g,' ').trim()));
+  for(const [key,value] of Object.entries(note))if(!['id','code','title'].includes(key))for(const text of leafText(value))assert.ok(available.has(text.replace(/\s+/g,' ').trim()),`Lost complementary text ${note.code}: ${key}`);
+ }
+ assert.equal(reached.size,resources.investigations.length,`Unreachable sources ${content.number}`);supplementaryCount+=reached.size;
+}
+assert.equal(supplementaryCount,531);console.log('PASS: all 531 supplementary sources reachable; every distinct textual field retained without new investigation IDs or progress keys.');
