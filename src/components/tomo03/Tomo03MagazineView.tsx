@@ -20,6 +20,7 @@ import {
   Award,
 } from 'lucide-react';
 import { Tomo03MasterPage } from './Tomo03MasterPage';
+import { Tomo03WorkbenchView } from './Tomo03WorkbenchView';
 import { EvoTomeExamEngine } from '../exam/EvoTomeExamEngine';
 import {
   TOMO_03_META,
@@ -48,6 +49,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
   const [isExamOpen, setIsExamOpen] = useState<boolean>(false);
+  const [isWorkbenchOpen, setIsWorkbenchOpen] = useState<boolean>(false);
 
   const totalPages = TOMO_03_META.totalPages;
 
@@ -264,7 +266,16 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
 
           <button
             type="button"
-            onClick={() => setIsExamOpen(true)}
+            onClick={() => { setIsWorkbenchOpen(true); setIsExamOpen(false); }}
+            className="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-bold text-xs flex items-center gap-1.5 hover:bg-emerald-400"
+          >
+            <Wrench className="w-3.5 h-3.5"/>
+            <span>BANCO INTERACTIVO</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setIsExamOpen(true); setIsWorkbenchOpen(false); }}
             className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-emerald-400 font-bold border border-emerald-500/40 text-xs flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)] cursor-pointer"
           >
             <Award className="w-3.5 h-3.5 text-emerald-400" />
@@ -290,6 +301,8 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
             onBackToIndex={() => setIsExamOpen(false)}
           />
         </div>
+      ) : isWorkbenchOpen ? (
+        <Tomo03WorkbenchView onBack={() => setIsWorkbenchOpen(false)} />
       ) : (
         /* Main Magazine Pages Container */
         <main className="flex-1 py-8 px-2 sm:px-4 flex flex-col items-center gap-8 print:p-0 print:m-0 print:gap-0">
@@ -444,7 +457,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
             pageId="t03-page-03"
             pageNumber={3}
             sectionTitle="SUMARIO DE TALLER"
-            subSlug="ÍNDICE DE 32 MÓDULOS"
+            subSlug="ÍNDICE DE 35 MÓDULOS"
             accentColor="#10B981"
           >
             <div className="h-full flex flex-col justify-between space-y-3">
@@ -456,7 +469,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                   ÍNDICE MAESTRO DE SERVICIO TÉCNICO
                 </h2>
                 <p className="text-xs font-mono-tech text-zinc-400">
-                  32 módulos estructurados según la cadena física de arranque de una PC de escritorio.
+                  35 módulos estructurados según la cadena física de arranque de una PC de escritorio.
                 </p>
               </div>
 
@@ -466,7 +479,8 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                     key={m.id}
                     onClick={() => {
                       if (viewMode === 'single') {
-                        setCurrentPage(4);
+                        setCurrentPage(4 + TOMO_03_MODULES.indexOf(m));
+                        return;
                       }
                       const el = document.getElementById(`t03-mod-${m.moduleNumber}`);
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -499,7 +513,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            MODULE PAGES: 32 DESKTOP REPAIR MODULES (A4 SPREADS)
+            MODULE PAGES: 35 DESKTOP REPAIR MODULES (A4 SPREADS)
         ======================================================== */}
         {TOMO_03_MODULES.map((mod, idx) => {
           const modPageNumber = 4 + idx;
@@ -646,7 +660,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                 {/* Footer Callout */}
                 <div className="p-2 rounded bg-emerald-950/20 border border-emerald-900/40 text-[10px] font-mono-tech text-emerald-300 flex items-center justify-between">
                   <span>EVO LABS // GUÍA DE SERVICIO TÉCNICO DE ESCRITORIO</span>
-                  <span className="text-zinc-500">MÓDULO {mod.moduleNumber} / 32</span>
+                  <span className="text-zinc-500">MÓDULO {mod.moduleNumber} / {TOMO_03_MODULES.length}</span>
                 </div>
               </div>
             </Tomo03MasterPage>
@@ -883,7 +897,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                     HABILIDADES DE BANCO ADQUIRIDAS:
                   </span>
                   <p className="text-zinc-400">
-                    ✔ Testeo completo de fuentes ATX con multímetro y puente verde-negro.<br />
+                    ✔ Interpretación de tensiones ATX sin abrir la fuente.<br />
                     ✔ Decodificación pericial de beeps del BIOS y luces Q-LED.<br />
                     ✔ Montaje y prueba en banco aislado fuera del gabinete.<br />
                     ✔ Descarte de bucles de reinicio y falsos contactos de RAM.
