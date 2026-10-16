@@ -27,7 +27,11 @@ for (let i = 0; i <= 10; i++) {
   const reader = read(folder + 'View.tsx');
   const test = read(folder + 'TestView.tsx');
   const mission = read(folder + 'MissionView.tsx');
-  has(magazine, '<Tomo02Sector' + n + 'View\\n        onSectorProgress={handleSectorProgress}'.replace('\\n', '\n'), 'Conexión sector ' + n);
+  const opening = magazine.indexOf('<Tomo02Sector' + n + 'View');
+  assert.ok(opening >= 0, 'No existe el componente del sector ' + n);
+  assert.ok(magazine.slice(opening, opening + 240).includes('onSectorProgress={handleSectorProgress}'),
+    'Falta conectar progreso del sector ' + n);
+  checks += 2;
   has(reader, "useTomo02LegacySectorProgress('" + n + "'", 'Registro sector ' + n);
   has(reader, 'onSectorProgress?:', 'Firma sector ' + n);
   if (i === 0) {
