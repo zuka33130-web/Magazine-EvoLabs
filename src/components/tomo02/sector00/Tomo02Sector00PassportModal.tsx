@@ -79,51 +79,51 @@ export const Tomo02Sector00PassportModal: React.FC<Tomo02Sector00PassportModalPr
   const defaultCompName: PassportFieldData = passport.computerName || {
     fieldKey: 'computerName',
     label: 'Nombre del Equipo',
-    value: 'EVO-WORKSTATION-01',
-    source: 'msinfo32 / hostname',
-    provenance: 'SYSTEM_REPORTED',
-    confidence: 'HIGH',
-    timestamp: new Date().toISOString(),
+    value: '',
+    source: 'No registrado',
+    provenance: 'UNKNOWN',
+    confidence: 'DECLARED_ONLY',
+    timestamp: '',
   };
 
   const defaultMfr: PassportFieldData = passport.systemManufacturer || {
     fieldKey: 'systemManufacturer',
     label: 'Fabricante del Sistema',
-    value: 'EVO LABS RIG / ASUS',
-    source: 'msinfo32 / WMI',
-    provenance: 'SYSTEM_REPORTED',
-    confidence: 'HIGH',
-    timestamp: new Date().toISOString(),
+    value: '',
+    source: 'No registrado',
+    provenance: 'UNKNOWN',
+    confidence: 'DECLARED_ONLY',
+    timestamp: '',
   };
 
   const defaultModel: PassportFieldData = passport.systemModel || {
     fieldKey: 'systemModel',
     label: 'Modelo del Sistema',
-    value: 'System Product Name',
-    source: 'msinfo32 / WMI',
-    provenance: 'SYSTEM_REPORTED',
-    confidence: 'HIGH',
-    timestamp: new Date().toISOString(),
+    value: '',
+    source: 'No registrado',
+    provenance: 'UNKNOWN',
+    confidence: 'DECLARED_ONLY',
+    timestamp: '',
   };
 
   const defaultBootMode: PassportFieldData = passport.bootMode || {
     fieldKey: 'bootMode',
     label: 'Modo de BIOS / Firmware',
-    value: 'UEFI (Nativo)',
-    source: 'msinfo32',
-    provenance: 'SYSTEM_REPORTED',
-    confidence: 'HIGH',
-    timestamp: new Date().toISOString(),
+    value: '',
+    source: 'No registrado',
+    provenance: 'UNKNOWN',
+    confidence: 'DECLARED_ONLY',
+    timestamp: '',
   };
 
   const defaultSecureBoot: PassportFieldData = passport.secureBoot || {
     fieldKey: 'secureBoot',
     label: 'Estado de Secure Boot',
-    value: 'Activado / Enforced',
-    source: 'msinfo32',
-    provenance: 'SYSTEM_REPORTED',
-    confidence: 'HIGH',
-    timestamp: new Date().toISOString(),
+    value: '',
+    source: 'No registrado',
+    provenance: 'UNKNOWN',
+    confidence: 'DECLARED_ONLY',
+    timestamp: '',
   };
 
   const fieldsList = [

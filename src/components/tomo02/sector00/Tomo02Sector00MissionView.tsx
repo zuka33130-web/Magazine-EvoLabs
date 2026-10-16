@@ -30,72 +30,33 @@ export const Tomo02Sector00MissionView: React.FC<Tomo02Sector00MissionViewProps>
   onBack,
 }) => {
   const [formData, setFormData] = useState({
-    edition: initialPassport.edition.value || 'Windows 11 Pro',
-    version: initialPassport.version.value || '24H2',
-    build: initialPassport.build.value || '26100.2033',
-    architecture: initialPassport.architecture.value || 'x64 (64-bit)',
-    accountType: initialPassport.accountType.value || 'Cuenta Local',
-    privilege: initialPassport.privilege.value || 'Administrador (Split Token / Medium Integrity)',
-    systemDrive: initialPassport.systemDrive.value || 'C:',
-    windowsPath: initialPassport.windowsPath.value || 'C:\\Windows',
-    userProfile: initialPassport.userProfile.value || 'C:\\Users\\Lucas',
+    edition: initialPassport.edition.value,
+    version: initialPassport.version.value,
+    build: initialPassport.build.value,
+    architecture: initialPassport.architecture.value,
+    accountType: initialPassport.accountType.value,
+    privilege: initialPassport.privilege.value,
+    systemDrive: initialPassport.systemDrive.value,
+    windowsPath: initialPassport.windowsPath.value,
+    userProfile: initialPassport.userProfile.value,
   });
+  const [provenanceMap, setProvenanceMap] = useState<Record<string, ProvenanceType>>(
+    Object.fromEntries(Object.keys(formData).map(field => [field, 'USER_DECLARED']))
+  );
+  const [showCaptureGuide, setShowCaptureGuide] = useState(false);
+  const [formError, setFormError] = useState('');
 
-  const [provenanceMap, setProvenanceMap] = useState<Record<string, ProvenanceType>>({
-    edition: initialPassport.edition.provenance || 'SYSTEM_REPORTED',
-    version: initialPassport.version.provenance || 'SYSTEM_REPORTED',
-    build: initialPassport.build.provenance || 'SYSTEM_REPORTED',
-    architecture: initialPassport.architecture.provenance || 'SYSTEM_REPORTED',
-    accountType: initialPassport.accountType.provenance || 'OBSERVED',
-    privilege: initialPassport.privilege.provenance || 'OBSERVED',
-    systemDrive: initialPassport.systemDrive.provenance || 'SYSTEM_REPORTED',
-    windowsPath: initialPassport.windowsPath.provenance || 'SYSTEM_REPORTED',
-    userProfile: initialPassport.userProfile.provenance || 'SYSTEM_REPORTED',
-  });
-
-  const [simulatedAutodetectRunning, setSimulatedAutodetectRunning] = useState(false);
-  const [autodetected, setAutodetected] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  // Auto-detect simulation from browser / client hints or real inputs
-  const handleRunAutodetect = () => {
-    setSimulatedAutodetectRunning(true);
-    setTimeout(() => {
-      // Extract what browser Navigator can truly declare vs what user inspects
-      const ua = navigator.userAgent;
-      const is64 = ua.includes('x64') || ua.includes('Win64') || navigator.maxTouchPoints === 0;
-      
-      setFormData((prev) => ({
-        ...prev,
-        edition: 'Windows 11 Pro',
-        version: '24H2 (Actual)',
-        build: '26100.2033',
-        architecture: is64 ? 'x64 (64-bit)' : 'ARM64',
-        systemDrive: 'C:',
-        windowsPath: 'C:\\Windows',
-        accountType: 'Cuenta Local',
-        privilege: 'Administrador (UAC Filtered)',
-        userProfile: 'C:\\Users\\TecnicoEVO',
-      }));
-
-      setProvenanceMap({
-        edition: 'SYSTEM_REPORTED',
-        version: 'SYSTEM_REPORTED',
-        build: 'SYSTEM_REPORTED',
-        architecture: 'SYSTEM_REPORTED',
-        accountType: 'OBSERVED',
-        privilege: 'OBSERVED',
-        systemDrive: 'SYSTEM_REPORTED',
-        windowsPath: 'SYSTEM_REPORTED',
-        userProfile: 'SYSTEM_REPORTED',
-      });
-
-      setSimulatedAutodetectRunning(false);
-      setAutodetected(true);
-    }, 1200);
-  };
+  // A browser cannot inspect Winver, WMI or the local registry without a trusted agent.
+  const handleRunAutodetect = () => setShowCaptureGuide(true);
 
   const handleSave = () => {
+    if (Object.values(formData).some(value => !value.trim())) {
+      setFormError('Completá los nueve datos de forma manual; no se generará información ficticia.');
+      return;
+    }
+    setFormError('');
     const updated: Sector00Passport = {
       ...initialPassport,
       edition: {
@@ -162,17 +123,20 @@ export const Tomo02Sector00MissionView: React.FC<Tomo02Sector00MissionViewProps>
         timestamp: new Date().toISOString(),
       },
       baseline: {
-        ...initialPassport.baseline,
-        captured: true,
-        timestamp: new Date().toISOString(),
-        ramTotalGB: 16,
-        diskFreeGB: 142,
-        processCount: 135,
-        startupAppsCount: 5,
-        bootTimeSec: 14.2,
+        captured: false, timestamp: '', ramTotalGB: null, diskFreeGB: null,
+        processCount: null, startupAppsCount: null, bootTimeSec: null,
       },
     };
 
+    // Handwritten values remain user-declared; this React view did not verify Windows.
+    for (const field of ['edition','version','build','architecture','accountType','privilege','systemDrive','windowsPath','userProfile'] as const) {
+      updated[field] = { ...updated[field],
+        provenance: provenanceMap[field] === 'SIMULATED' ? 'SIMULATED' : 'USER_DECLARED',
+        source: 'Entrada manual · sin lectura WMI/CIM',
+        confidence: 'DECLARED_ONLY',
+      };
+    }
+    updated.statusTag = 'NO DISPONIBLE';
     onSavePassport(updated);
     setSavedSuccess(true);
     setTimeout(() => {
@@ -219,17 +183,16 @@ export const Tomo02Sector00MissionView: React.FC<Tomo02Sector00MissionViewProps>
         <div className="flex items-center gap-3 pt-2">
           <button
             onClick={handleRunAutodetect}
-            disabled={simulatedAutodetectRunning}
+            
             className="px-4 py-2 rounded-xl bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/50 text-xs font-mono-tech text-cyan-300 font-bold flex items-center gap-2 transition-colors"
           >
             <Terminal className="w-4 h-4 text-cyan-400" />
-            <span>{simulatedAutodetectRunning ? 'CONSULTANDO WMI / REGISTRY...' : 'PRECARGAR DESDE AUDITORÍA EVO'}</span>
+            <span>GUÍA PARA OBTENER DATOS REALES</span>
           </button>
-          {autodetected && (
-            <span className="text-xs font-mono-tech text-emerald-400 flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Datos precargados con sellos SYSTEM_REPORTED
-            </span>
-          )}
+          {showCaptureGuide && <p className="text-xs text-amber-300">
+            El navegador no puede consultar WMI ni Winver. Abrí winver, msinfo32 y whoami /priv en tu Windows
+            y transcribí los resultados. Se conservarán como declaración manual, no como telemetría verificada.
+          </p>}
         </div>
       </div>
 
@@ -266,16 +229,16 @@ export const Tomo02Sector00MissionView: React.FC<Tomo02Sector00MissionViewProps>
                   onChange={(e) => setProvenanceMap({ ...provenanceMap, [key]: e.target.value as ProvenanceType })}
                   className="bg-black text-[9px] font-mono-tech text-cyan-300 border border-zinc-700 rounded px-1.5 py-0.5 focus:outline-none"
                 >
-                  <option value="SYSTEM_REPORTED">SYSTEM_REPORTED</option>
                   <option value="USER_DECLARED">USER_DECLARED</option>
-                  <option value="OBSERVED">OBSERVED</option>
-                  <option value="MEASURED">MEASURED</option>
+                  <option value="SIMULATED">SIMULATED (práctica)</option>
                 </select>
               </div>
             </div>
           );
         })}
       </div>
+
+      {formError && <p role="alert" className="text-xs text-red-400">{formError}</p>}
 
       {/* Action Footer */}
       <div className="p-4 rounded-2xl bg-[#090c12] border border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">

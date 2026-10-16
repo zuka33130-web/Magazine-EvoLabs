@@ -63,99 +63,26 @@ export const Tomo02Sector00View: React.FC<Tomo02Sector00ViewProps> = ({
   const [challengeSuccess, setChallengeSuccess] = useState<Record<string, boolean>>({});
   
   // Mission & Passport state
-  const [passportData, setPassportData] = useState<Sector00Passport>({
-    passportId: 'EVO-WIN-PASSPORT-001-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-    edition: {
-      fieldKey: 'edition',
-      label: 'Edición del SO',
-      value: 'Windows 11 Pro',
-      source: 'winver / registry',
-      provenance: 'SYSTEM_REPORTED',
-      confidence: 'HIGH',
-      timestamp: new Date().toISOString(),
-    },
-    version: {
-      fieldKey: 'version',
-      label: 'Versión del Sistema',
-      value: '24H2',
-      source: 'winver',
-      provenance: 'SYSTEM_REPORTED',
-      confidence: 'HIGH',
-      timestamp: new Date().toISOString(),
-    },
-    build: {
-      fieldKey: 'build',
-      label: 'Compilación del SO (Build)',
-      value: '26100.2033',
-      source: 'winver (OS Build)',
-      provenance: 'SYSTEM_REPORTED',
-      confidence: 'HIGH',
-      timestamp: new Date().toISOString(),
-    },
-    architecture: {
-      fieldKey: 'architecture',
-      label: 'Arquitectura',
-      value: 'x64 (64-bit)',
-      source: 'msinfo32',
-      provenance: 'SYSTEM_REPORTED',
-      confidence: 'HIGH',
-      timestamp: new Date().toISOString(),
-    },
-    accountType: {
-      fieldKey: 'accountType',
-      label: 'Tipo de Cuenta',
-      value: 'Cuenta Local',
-      source: 'Configuración > Cuentas',
-      provenance: 'OBSERVED',
-      confidence: 'HIGH',
-      timestamp: new Date().toISOString(),
-    },
-    privilege: {
-      fieldKey: 'privilege',
-      label: 'Contexto de Privilegio',
-      value: 'Administrador (Split Token / Medium Integrity)',
-      source: 'whoami /priv',
-      provenance: 'OBSERVED',
-      confidence: 'HIGH',
-      timestamp: new Date().toISOString(),
-    },
-    systemDrive: {
-      fieldKey: 'systemDrive',
-      label: 'Unidad del Sistema',
-      value: 'C:',
-      source: '%SYSTEMDRIVE%',
-      provenance: 'SYSTEM_REPORTED',
-      confidence: 'HIGH',
-      timestamp: new Date().toISOString(),
-    },
-    windowsPath: {
-      fieldKey: 'windowsPath',
-      label: 'Ruta de Windows',
-      value: 'C:\\Windows',
-      source: '%WINDIR%',
-      provenance: 'SYSTEM_REPORTED',
-      confidence: 'HIGH',
-      timestamp: new Date().toISOString(),
-    },
-    userProfile: {
-      fieldKey: 'userProfile',
-      label: 'Ruta de Perfil de Usuario',
-      value: 'C:\\Users\\TecnicoEVO',
-      source: '%USERPROFILE%',
-      provenance: 'SYSTEM_REPORTED',
-      confidence: 'HIGH',
-      timestamp: new Date().toISOString(),
-    },
-    baseline: {
-      captured: true,
-      timestamp: new Date().toISOString(),
-      ramTotalGB: 16,
-      diskFreeGB: 128,
-      processCount: 142,
-      startupAppsCount: 6,
-      bootTimeSec: 13.8,
-    },
+  // Never seed a technical passport with fictitious Windows/WMI measurements.
+  const unknownField = (fieldKey: string, label: string): Sector00Passport['edition'] => ({
+    fieldKey, label, value: '', source: 'Pendiente de declaración manual',
+    provenance: 'UNKNOWN', confidence: 'DECLARED_ONLY', timestamp: '',
   });
+  const [passportData, setPassportData] = useState<Sector00Passport>(() => ({
+    passportId: 'EVO-WIN-PASSPORT-001-DRAFT',
+    edition: unknownField('edition', 'Edición del SO'),
+    version: unknownField('version', 'Versión del Sistema'),
+    build: unknownField('build', 'Compilación del SO'),
+    architecture: unknownField('architecture', 'Arquitectura'),
+    accountType: unknownField('accountType', 'Tipo de cuenta'),
+    privilege: unknownField('privilege', 'Privilegios'),
+    systemDrive: unknownField('systemDrive', 'Unidad del sistema'),
+    windowsPath: unknownField('windowsPath', 'Ruta de Windows'),
+    userProfile: unknownField('userProfile', 'Perfil de usuario'),
+    statusTag: 'NO DISPONIBLE',
+    baseline: { captured: false, timestamp: '', ramTotalGB: null, diskFreeGB: null,
+      processCount: null, startupAppsCount: null, bootTimeSec: null },
+  }));
 
   const isMissionPassed = recorder.missionPassed;
   const setIsMissionPassed = recorder.setMissionPassed;
