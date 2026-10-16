@@ -363,13 +363,13 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                     </div>
                     <div className="p-2.5 rounded bg-black/50 border border-emerald-950 flex items-center justify-between">
                       <span className="text-emerald-300 font-bold">BANCO DE MESA:</span>
-                      <span className="text-zinc-400">Armado fuera del gabinete sobre caja de cartón</span>
+                      <span className="text-zinc-400">Prueba de configuración mínima sobre superficie adecuada para ESD</span>
                     </div>
                   </div>
 
                   <div className="pt-3 border-t border-emerald-950 flex items-center justify-between text-[11px] font-mono-tech text-zinc-400">
                     <span>“NO REEMPLACES A CIEGAS. MEDÍ PRIMERO.”</span>
-                    <span className="text-emerald-400 font-bold">48 PÁGINAS A4</span>
+                    <span className="text-emerald-400 font-bold">{totalPages} PÁGINAS A4</span>
                   </div>
                 </div>
               </div>
@@ -384,7 +384,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                   <div className="tracking-widest font-mono-tech text-sm text-emerald-400 font-bold">
                     |||||||| | |||| | |||||||
                   </div>
-                  <span className="text-[9px] text-zinc-500">ISBN-EVO-T03-2026</span>
+                  <span className="text-[9px] text-zinc-500">EVO-T03-2026</span>
                 </div>
               </div>
             </div>
@@ -450,7 +450,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 03: ÍNDICE DE LOS 32 MÓDULOS DE ESCRITORIO
+            PAGE 03: ÍNDICE DE LOS 35 MÓDULOS DE ESCRITORIO
         ======================================================== */}
         {(viewMode === 'continuous' || currentPage === 3) && (
           <Tomo03MasterPage
@@ -668,14 +668,14 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         })}
 
         {/* ========================================================
-            PAGE 40: CASOS GUIADOS DE TALLER DE ESCRITORIO
+            PAGE 39: CASOS GUIADOS DE TALLER DE ESCRITORIO
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 40) && (
+        {(viewMode === 'continuous' || currentPage === 39) && (
           <Tomo03MasterPage
-            pageId="t03-page-40"
-            pageNumber={40}
+            pageId="t03-page-39"
+            pageNumber={39}
             sectionTitle="EXPEDIENTES DE BANCO"
-            subSlug="CASOS REALES DE ESCRITORIO"
+            subSlug="CASOS DIDÁCTICOS SIMULADOS"
             accentColor="#10B981"
           >
             <div className="h-full flex flex-col justify-between space-y-3">
@@ -718,7 +718,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
               <div className="p-3 rounded-xl bg-black/60 border border-emerald-950 text-xs font-mono-tech text-zinc-300 flex items-center justify-between">
                 <span>PRINCIPIO EVO DE BANCO:</span>
                 <span className="text-emerald-400 font-bold">
-                  “EL 60% DE LAS FALLAS DE HARDWARE SON PROBLEMAS DE CONTACTO MECÁNICO O TÉRMICO.”
+                  “LAS CAUSAS SE DETERMINAN POR PRUEBAS, NO POR ESTADÍSTICAS INVENTADAS.”
                 </span>
               </div>
             </div>
@@ -726,12 +726,12 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 41: GLOSARIO DE TALLER Y ELECTRÓNICA BÁSICA
+            PAGE 40: GLOSARIO DE TALLER Y ELECTRÓNICA BÁSICA
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 41) && (
+        {(viewMode === 'continuous' || currentPage === 40) && (
           <Tomo03MasterPage
-            pageId="t03-page-41"
-            pageNumber={41}
+            pageId="t03-page-40"
+            pageNumber={40}
             sectionTitle="DICCIONARIO DE TALLER"
             subSlug="GLOSARIO ELECTRÓNICO & BANCO"
             accentColor="#10B981"
@@ -778,12 +778,12 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 42: PARTE DE SERVICIO DE TALLER IMPRIMIBLE
+            PAGE 41: PARTE DE SERVICIO DE TALLER IMPRIMIBLE
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 42) && (
+        {(viewMode === 'continuous' || currentPage === 41) && (
           <Tomo03MasterPage
-            pageId="t03-page-42"
-            pageNumber={42}
+            pageId="t03-page-41"
+            pageNumber={41}
             sectionTitle="PARTE DE SERVICIO"
             subSlug="PLANILLA TÉCNICA OFICIAL"
             accentColor="#10B981"
@@ -867,11 +867,11 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 43: BACK COVER / CONTRATAPA
+            PAGE 42: BACK COVER / CONTRATAPA
         ======================================================== */}
         {(viewMode === 'continuous' || currentPage === totalPages) && (
           <Tomo03MasterPage
-            pageId="t03-page-43"
+            pageId="t03-page-42"
             pageNumber={totalPages}
             isBackCover
             hideHeaderFooter
