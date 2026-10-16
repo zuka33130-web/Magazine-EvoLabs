@@ -54,7 +54,7 @@ export const Tomo02MasterExpedienteModal: React.FC<Tomo02MasterExpedienteModalPr
     '',
     'Registro de avance de la aplicación, NO certificación individual ni verificación automática de evidencia.',
     'La procedencia y el contenido de la evidencia deben revisarse en cada sector.',
-  ].join('\\n');
+  ].join('\n');
 
   const handleCopy = () => {
     void navigator.clipboard.writeText(buildReport()).then(() => {
