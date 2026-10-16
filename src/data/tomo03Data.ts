@@ -167,7 +167,7 @@ export const TOMO_03_MODULES: Tomo03ModuleItem[] = [
     bancoTool: 'Pulsera Antiestática + Fotos del cableado con smartphone antes de desconectar nada.',
     keyTakeaways: [
       'Entrevista técnica de admisión: Cuándo falló por primera vez, si hubo tormenta eléctrica, ruidos extraños o si fue abierta recientemente.',
-      'El ritual de descarga: Desconectar el cable de alimentación y presionar el botón de encendido durante 10 segundos para vaciar la carga residual de la fuente y placa madre.',
+      'Desconectar de la red y pulsar POWER puede reducir energía residual en la placa, pero NO descarga con garantía los capacitores de la fuente. Nunca abrir la carcasa ATX.',
       'El método de las cajas de tornillos: Clasificar tornillos de fuente, placas y gabinete en recipientes separados; jamás usar tornillos forzados en roscas incompatibles.',
     ],
     safetyLevel: 'AMARILLO_PRECAUCION',
@@ -188,7 +188,7 @@ export const TOMO_03_MODULES: Tomo03ModuleItem[] = [
     keyTakeaways: [
       'El axioma fundamental de EVO: Síntoma ≠ Causa. Un juego que se congela puede ser GPU, pero también puede ser fuente inestable o temperatura de CPU.',
       'La regla de una sola variable: Nunca cambies dos cosas al mismo tiempo; si tocás dos variables y el problema se resuelve, no sabés qué lo solucionó.',
-      'Aislar en banco de pruebas (Minimal Boot): Cuando el gabinete confunde el diagnóstico, sacar la placa madre afuera sobre una caja de cartón elimina un 50% de causas posibles.',
+      'Arranque mínimo: aislar periféricos y comparar con una configuración mínima compatible, sobre superficie de taller no conductora y adecuada para ESD. Evitar afirmar porcentajes de fallas sin datos.',
     ],
     safetyLevel: 'VERDE_SEGURO',
   },
@@ -201,15 +201,15 @@ export const TOMO_03_MODULES: Tomo03ModuleItem[] = [
     readTime: '12 min',
     decisionTree: {
       question: '¿El led de standby de la placa madre enciende al conectar la fuente a la pared y encender el switch I/O?',
-      yesAction: 'El riel 5VSB está vivo. La falla está en el circuito de encendido (PWR_SW, I/O o corto en riel principal).',
-      noAction: 'Falla total de suministro primario: revisar enchufe, cable interlock, fusible o puente rectificador de la fuente.',
+      yesAction: 'El indicador sugiere alimentación de espera, pero no demuestra un 5VSB estable ni descarta fuente, placa o circuito de encendido. Verificar con pruebas cruzadas seguras.',
+      noAction: 'Comprobar toma, cable, interruptor externo y otra fuente compatible conocida buena. No abrir ni inspeccionar el interior energizado o descargado de una fuente ATX.',
     },
-    bancoTool: 'Multímetro Digital en escala 20V DC (medir cable Violeta pin 9 del conector ATX de 24 pines).',
-    multimeterMode: '20V DC: Punta negra a masa (cable negro), punta roja a pin 9 (cable violeta). Debe dar exactamente +5.0V (+-5%).',
+    bancoTool: 'Fuente ATX compatible conocida buena o analizador externo profesional. Toda medición en circuitos energizados requiere técnico capacitado y puntas aisladas.',
+    multimeterMode: 'Referencia ATX de +5VSB: tolerancia nominal habitual ±5% (4,75 a 5,25 V). Solo personal formado debe medir circuitos energizados; una lectura aislada no certifica una fuente.',
     keyTakeaways: [
-      'Nunca culpar a la placa madre primero: el 40% de las PCs "muertas" son cables de alimentación flojos, zapatillas defectuosas o el interruptor I/O de la fuente en posición O.',
+      'Antes de culpar a la placa madre, verificar toma, cable y selector externo I/O de la fuente. No atribuir porcentajes de falla sin muestras representativas.',
       'El riel 5VSB (Standby): Es la línea de vida permanente que alimenta los circuitos de espera del Super I/O mientras la máquina está apagada.',
-      'Prueba de la fuente aislada (Clip Paper): Desconectar todos los cables de la PC, puentear pin verde (PS_ON) con cualquier pin negro (GND) del conector de 24 pines.',
+      'No improvisar puentes con clips: el giro de un ventilador no demuestra que la fuente soporte carga. Preferir instrumento de prueba homologado o reemplazo cruzado compatible.',
     ],
     safetyLevel: 'ROJO_PELIGRO',
   },
@@ -221,12 +221,12 @@ export const TOMO_03_MODULES: Tomo03ModuleItem[] = [
     categoryTag: 'ELECTRÓNICA DE ALIMENTACIÓN',
     readTime: '13 min',
     decisionTree: {
-      question: '¿Al puentear pin 16 (verde PS_ON) a pin 17 (negro GND) el ventilador gira y el pin 8 (gris PG) entrega +5V?',
-      yesAction: 'La fuente responde a la orden de encendido. Comprobar rieles de 12V (cables amarillos).',
-      noAction: 'La fuente está muerta o sus protecciones contra cortocircuito (SCP/OVP) están bloqueadas.',
+      question: '¿La fuente mantiene tensiones y señales correctas bajo una prueba profesional segura y carga adecuada, o la PC funciona con una fuente compatible conocida buena?',
+      yesAction: 'La prueba aporta evidencia sobre la entrega de alimentación; registrar carga, instrumento y comprobar estabilidad bajo condiciones controladas.',
+      noAction: 'No hay evidencia suficiente de alimentación correcta; aislar los demás componentes con una fuente compatible conocida buena antes de atribuir causa.',
     },
     bancoTool: 'Tester de fuente ATX o multímetro con puntas aisladas.',
-    multimeterMode: '20V DC: Pin 8 (cable gris Power Good). Debe subir a +5V entre 100 y 500 milisegundos tras el encendido.',
+    multimeterMode: 'Power Good (PWR_OK) es una señal temporal cuya transición y estabilidad requieren instrumental adecuado, como osciloscopio. Un multímetro común no verifica el tiempo de subida.',
     keyTakeaways: [
       'ADVERTENCIA CRÍTICA: Jamás abras la carcasa metálica de una fuente de poder. Los capacitores del primario retienen 400 voltios continuos mortales durante horas.',
       'Los rieles de poder: +12V (amarillo) para CPU y GPU; +5V (rojo) para controladores y USB; +3.3V (naranja) para chips lógicos y M.2; -12V (azul).',
@@ -586,9 +586,9 @@ export const TOMO_03_MODULES: Tomo03ModuleItem[] = [
     categoryTag: 'DESPLIEGUE PROFESIONAL',
     readTime: '12 min',
     decisionTree: {
-      question: '¿El disco de destino aparece como "Espacio sin asignar" en su totalidad para que Windows cree las particiones correctas automáticamente?',
-      yesAction: 'Seleccionar el espacio sin asignar y presionar "Siguiente" directamente.',
-      noAction: 'Si quedan particiones viejas de instalaciones anteriores, eliminarlas hasta consolidar el espacio limpio.',
+      question: '¿Confirmaste por modelo, capacidad e identificador que es el disco correcto y verificaste un respaldo recuperable antes de modificar particiones?',
+      yesAction: 'Con consentimiento y respaldo verificado, seleccionar el destino correcto y comprobar el esquema de particiones recomendado por el fabricante.',
+      noAction: 'Detener la instalación: no borrar particiones hasta identificar el contenido y comprobar respaldo, claves de cifrado y autorización explícita.',
     },
     bancoTool: 'Pendrive USB de instalación oficial de Windows.',
     keyTakeaways: [
@@ -602,7 +602,7 @@ export const TOMO_03_MODULES: Tomo03ModuleItem[] = [
     id: 'mod23',
     moduleNumber: '23',
     title: 'INSTALACIÓN DE CONTROLADORES EN ORDEN',
-    subtitle: 'El orden cronológico inquebrantable: Chipset -> Red -> Video -> Audio',
+    subtitle: 'Identificar hardware y dependencias: chipset, red, video y audio con controladores oficiales',
     categoryTag: 'ESTABILIDAD DEL HARDWARE',
     readTime: '11 min',
     decisionTree: {
@@ -612,7 +612,7 @@ export const TOMO_03_MODULES: Tomo03ModuleItem[] = [
     },
     bancoTool: 'Controladores descargados directamente de la página oficial del fabricante de la placa madre.',
     keyTakeaways: [
-      'Por qué el orden importa: El controlador del Chipset le enseña a Windows qué componentes físicos existen en la placa madre; sin él, los controladores posteriores pueden fallar.',
+      'Instalar controladores conforme a las dependencias y recomendaciones oficiales del fabricante. Los INF de chipset suelen describir dispositivos existentes, no garantizan que otros controladores fallen si se instalan antes.',
       'El mito de los "Drivers universales de Windows": El controlador básico de video de Microsoft no tiene aceleración 3D ni control de ventiladores; el driver oficial de NVIDIA/AMD es obligatorio.',
       'Identificación por Hardware ID: En el Administrador de Dispositivos -> Propiedades -> Detalles -> Id. de hardware para descubrir el fabricante de dispositivos desconocidos.',
     ],
@@ -783,7 +783,7 @@ export const TOMO_03_MODULES: Tomo03ModuleItem[] = [
   {
     id: 'mod32',
     moduleNumber: '32',
-    title: 'CASOS GUIADOS DE TALLER EVO',
+    title: 'CASOS DIDÁCTICOS DE TALLER EVO',
     subtitle: '5 expedientes reales de reparación resueltos con el método deductivo',
     categoryTag: 'HISTORIAL DE BANCO',
     readTime: '15 min',
