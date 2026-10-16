@@ -52,7 +52,7 @@ export const Tomo02Sector00MissionView: React.FC<Tomo02Sector00MissionViewProps>
   const handleRunAutodetect = () => setShowCaptureGuide(true);
 
   const handleSave = () => {
-    if (Object.values(formData).some(value => !value.trim())) {
+    if (Object.values(formData).some(value => typeof value !== 'string' || !value.trim())) {
       setFormError('Completá los nueve datos de forma manual; no se generará información ficticia.');
       return;
     }

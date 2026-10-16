@@ -56,7 +56,7 @@ export const Tomo02Sector01MissionView: React.FC<Tomo02Sector01MissionViewProps>
 
   const handleValidateAndGenerate = () => {
     const errors: string[] = [];
-    const missing = Object.entries(formData).filter(([, value]) => !value.trim()).map(([field]) => field);
+    const missing = Object.entries(formData).filter(([, value]) => typeof value !== 'string' || !value.trim()).map(([field]) => field);
     if (missing.length) errors.push('Completá todos los campos observados o indicá explícitamente "No verificado": ' + missing.join(', '));
 
     if (errors.length > 0) {
