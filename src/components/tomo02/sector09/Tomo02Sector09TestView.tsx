@@ -12,11 +12,13 @@ import {
 import { SECTOR_09_TEST_BANK } from '../../../data/tomo02Sector09Data';
 
 interface Tomo02Sector09TestViewProps {
+  onPassTest?: (score: number) => void;
   onBackToReader: () => void;
 }
 
 export const Tomo02Sector09TestView: React.FC<Tomo02Sector09TestViewProps> = ({
   onBackToReader,
+  onPassTest,
 }) => {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
@@ -44,6 +46,7 @@ export const Tomo02Sector09TestView: React.FC<Tomo02Sector09TestViewProps> = ({
       return;
     }
     setIsSubmitted(true);
+    onPassTest?.(results.percentage);
   };
 
   const handleReset = () => {

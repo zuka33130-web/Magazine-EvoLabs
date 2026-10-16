@@ -12,10 +12,11 @@ import {
 import { SECTOR_07_TEST_BANK, Sector07TestQuestion } from '../../../data/tomo02Sector07Data';
 
 interface Tomo02Sector07TestViewProps {
+  onPassTest?: (score: number) => void;
   onBack: () => void;
 }
 
-export const Tomo02Sector07TestView: React.FC<Tomo02Sector07TestViewProps> = ({ onBack }) => {
+export const Tomo02Sector07TestView: React.FC<Tomo02Sector07TestViewProps> = ({ onBack, onPassTest }) => {
   const [userAnswers, setUserAnswers] = useState<{ [qId: string]: string }>({});
   const [isExamSubmitted, setIsExamSubmitted] = useState<boolean>(false);
 
@@ -37,7 +38,9 @@ export const Tomo02Sector07TestView: React.FC<Tomo02Sector07TestViewProps> = ({ 
   };
 
   const handleSubmitExam = () => {
+    if (questions.some(q => !userAnswers[q.id])) return;
     setIsExamSubmitted(true);
+    onPassTest?.(score);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
