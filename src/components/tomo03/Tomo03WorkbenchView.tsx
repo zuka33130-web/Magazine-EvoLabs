@@ -4,7 +4,7 @@ import {TOMO_03_MODULES} from '../../data/tomo03Data';
 import {ATX_RAILS, assessAtxRail, TOMO03_REPAIR_LABS} from '../../data/tomo03WorkbenchData';
 import {TOMO03_PROFESSIONAL_MODULES,getProfessionalModule} from '../../data/tomo03ProfessionalContent';
 import type {ProfessionalState} from '../../data/tomo03ProfessionalTypes';
-import {parseProfessionalState,moduleAssessment} from '../../data/tomo03RepairEngine';
+import {parseProfessionalState,moduleAssessment,assessAtxUncertainty} from '../../data/tomo03RepairEngine';
 import {Tomo03ProfessionalModule} from './Tomo03ProfessionalModule';
 import {EvoRepairLab} from './EvoRepairLab';
 import {Tomo03RepairTools} from './Tomo03RepairTools';
@@ -21,19 +21,33 @@ type RecordItem = {
   result: string;
   validation: string;
   rollback: string;
+  diagnosis: string;
+  limitations: string;
   provenance: Provenance;
 };
 type Store = {schema:1;records:Record<string,RecordItem>;labs:Record<string,Record<string,string>>;professional?:Record<string,ProfessionalState>};
 const storageKey='evo_tomo03_repair_workbench_v1';
+const readAtxDraft=():Record<string,string>=>{try{const value=JSON.parse(localStorage.getItem('evo_tomo03_atx_draft_v1')||'{}');return value&&typeof value==='object'?Object.fromEntries(Object.entries(value).filter((entry):entry is [string,string]=>typeof entry[1]==='string')):{};}catch{return {};}};
 const blank=():RecordItem=>({
-  branch:'untested',symptom:'',observation:'',hypothesis:'',test:'',result:'',validation:'',rollback:'',
+  branch:'untested',symptom:'',observation:'',hypothesis:'',test:'',result:'',validation:'',rollback:'',diagnosis:'',limitations:'',
   provenance:'SIMULATED'
 });
 const readStore=():Store=>{
   try {
     const saved=JSON.parse(localStorage.getItem(storageKey)||'{}');
     if(saved.schema===1 && saved.records && typeof saved.records==='object' && saved.labs && typeof saved.labs==='object'){
-      return {schema:1,records:saved.records,labs:saved.labs,professional:saved.professional&&typeof saved.professional==='object'?saved.professional:{}};
+      const records:Store['records']={};
+      for(const [id,raw] of Object.entries(saved.records)){
+        if(!raw||typeof raw!=='object'||Array.isArray(raw))continue;
+        const item=raw as Partial<RecordItem>,record=blank();
+        for(const key of ['symptom','observation','hypothesis','test','result','validation','rollback','diagnosis','limitations'] as const)if(typeof item[key]==='string')record[key]=item[key]!;
+        if(item.branch==='yes'||item.branch==='no')record.branch=item.branch;
+        if(item.provenance==='USER_DECLARED_NOT_VERIFIED')record.provenance=item.provenance;
+        records[id]=record;
+      }
+      const labs:Store['labs']={};
+      for(const [id,raw] of Object.entries(saved.labs))if(raw&&typeof raw==='object'&&!Array.isArray(raw))labs[id]=Object.fromEntries(Object.entries(raw).filter(([,value])=>typeof value==='string'));
+      return {schema:1,records,labs,professional:saved.professional&&typeof saved.professional==='object'&&!Array.isArray(saved.professional)?saved.professional:{}};
     }
   }catch{ /* No storage in private mode or invalid old data. */ }
   return {schema:1,records:{},labs:{}};
@@ -50,8 +64,9 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
   const [moduleId,setModuleId]=useState('mod03');
   const [filter,setFilter]=useState('');
   const [labId,setLabId]=useState(TOMO03_REPAIR_LABS[0].id);
-  const [rail,setRail]=useState<string>('12');
-  const [voltage,setVoltage]=useState('');
+  const [rail,setRail]=useState<string>(()=>{const value=readAtxDraft().rail;return ATX_RAILS.some(r=>r.id===value)?value:'12';});
+  const [voltage,setVoltage]=useState(()=>readAtxDraft().voltage||'');
+  const [voltageUncertainty,setVoltageUncertainty]=useState(()=>readAtxDraft().uncertainty||'');
   const [showTheory,setShowTheory]=useState(false);
   const [professionalCase,setProfessionalCase]=useState<string|null>(null);
   const [professionalTool,setProfessionalTool]=useState('power-checklist');
@@ -72,6 +87,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
   const filtered=useMemo(()=>TOMO_03_MODULES.filter(item=>[item.moduleNumber,item.title,item.subtitle,item.categoryTag]
     .some(value=>value.toLocaleLowerCase('es').includes(filter.toLocaleLowerCase('es').trim()))),[filter]);
   useEffect(()=>{try{localStorage.setItem(storageKey,JSON.stringify(store));}catch{/* Storage optional. */}},[store]);
+  useEffect(()=>{try{localStorage.setItem('evo_tomo03_atx_draft_v1',JSON.stringify({rail,voltage,uncertainty:voltageUncertainty,provenance:'USER_INPUT_NOT_VERIFIED'}));}catch{/* Optional draft. */}},[rail,voltage,voltageUncertainty]);
   const update=(patch:Partial<RecordItem>)=>setStore(prev=>({
     ...prev,records:{...prev.records,[current.id]:{...blank(),...prev.records[current.id],...patch}}
   }));
@@ -93,7 +109,10 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
       'RESULTADO: '+(record.result||'(sin consignar)'),
       'VALIDACIÓN: '+(record.validation||'(sin consignar)'),
       'REVERSIÓN: '+(record.rollback||'(sin consignar)'),
-      'RUTA DEL ÁRBOL: '+record.branch,
+      'DIAGNÓSTICO / GRADO DE CERTEZA: '+(record.diagnosis||'(sin consignar)'),
+      'LIMITACIONES Y PRUEBAS PENDIENTES: '+(record.limitations||'(sin consignar)'),
+      'LECTURA ATX INGRESADA, NO VERIFICADA: '+(voltage?`${rail}: ${voltage} V; incertidumbre declarada ${voltageUncertainty||'desconocida'} V`:'sin lectura registrada'),
+      'RUTA DEL ÁRBOL: '+(professional?JSON.stringify(parseProfessionalState(store.professional?.[professional.number],professional).tree):record.branch),
       ...(professional?[
         'RECORRIDO PROFESIONAL: '+JSON.stringify(parseProfessionalState(store.professional?.[professional.number],professional)),
         'EVALUACIÓN EDUCATIVA: '+JSON.stringify(moduleAssessment(professional,parseProfessionalState(store.professional?.[professional.number],professional))),
@@ -121,6 +140,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
   };
   const numeric=voltage.trim()?Number(voltage.replace(',','.')):NaN;
   const evaluated=assessAtxRail(rail,numeric);
+  const interval=evaluated?assessAtxUncertainty(numeric,voltageUncertainty.trim()?Number(voltageUncertainty.replace(',','.')):NaN,evaluated.rail.min,evaluated.rail.max):null;
   return <main className="min-h-screen bg-[#050a07] text-zinc-100 px-3 sm:px-7 pb-16 font-sans">
     <div className="max-w-7xl mx-auto space-y-6">
       <header className="sticky top-0 z-30 bg-[#06100b]/95 border-b border-emerald-900/60 backdrop-blur py-4">
@@ -186,6 +206,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
               <label className="text-xs text-zinc-300">Verificación y reversión<textarea value={record.validation} onChange={e=>update({validation:e.target.value})} rows={3} placeholder="Cómo confirmaste estabilidad" className="mt-1 block w-full rounded-lg border border-zinc-700 bg-black p-3"/></label>
             </div>
             <label className="text-xs text-zinc-300 block">Plan de recuperación si algo sale mal<textarea value={record.rollback} onChange={e=>update({rollback:e.target.value})} rows={2} className="block mt-1 w-full rounded-lg border border-zinc-700 bg-black p-2"/></label>
+            <div className="grid sm:grid-cols-2 gap-3"><label className="text-xs block">Diagnóstico y grado de certeza<textarea value={record.diagnosis} onChange={e=>update({diagnosis:e.target.value})} rows={3} placeholder="Probable, sustentado o inconcluso; citar pruebas" className="block mt-1 w-full rounded-lg border border-zinc-700 bg-black p-2"/></label><label className="text-xs block">Limitaciones y pruebas pendientes<textarea value={record.limitations} onChange={e=>update({limitations:e.target.value})} rows={3} placeholder="Qué no pudo comprobarse y cuándo derivar" className="block mt-1 w-full rounded-lg border border-zinc-700 bg-black p-2"/></label></div>
             <label className="text-xs text-zinc-300 block">Procedencia del expediente
               <select value={record.provenance} onChange={e=>update({provenance:e.target.value as Provenance})} className="block mt-1 p-2 rounded-lg bg-black border border-zinc-700 w-full max-w-lg">
                 <option value="SIMULATED">Práctica simulada</option>
@@ -232,14 +253,16 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
         </div>
       </section></div>}
       {section==='herramientas'&&<><Tomo03RepairTools key={professionalTool} initialTool={professionalTool}/><div className="grid lg:grid-cols-2 gap-5">
-        <section className="rounded-2xl border border-emerald-800 bg-[#09140e] p-5 space-y-4">
+        <section id="evo-atx-interpreter" className="rounded-2xl border border-emerald-800 bg-[#09140e] p-5 space-y-4">
           <h2 className="text-xl font-black flex items-center gap-2"><Gauge size={20}/> Intérprete de tensiones ATX</h2>
           <p className="text-xs text-zinc-300">Calculadora para introducir una medición manual. No conecta con un multímetro ni verifica el estado de la fuente. Rangos nominales ±5 % por riel para interpretación orientativa.</p>
           <label className="text-xs text-emerald-300 block">Riel medido<select value={rail} onChange={e=>setRail(e.target.value)} className="block w-full p-2 mt-1 bg-black border border-zinc-700 rounded-lg">{ATX_RAILS.map(item=><option key={item.id} value={item.id}>{item.label} · nominal {item.nominal} V</option>)}</select></label>
-          <label className="text-xs text-emerald-300 block">Lectura en voltios<input inputMode="decimal" value={voltage} onChange={e=>setVoltage(e.target.value)} placeholder="Por ejemplo: 12,04" className="block w-full mt-1 bg-black border border-zinc-700 p-2 rounded-lg"/></label>
+          <label className="text-xs text-emerald-300 block">Lectura en voltios<input aria-label="Tensión ingresada (V)" inputMode="decimal" value={voltage} onChange={e=>setVoltage(e.target.value)} placeholder="Por ejemplo: 12,04" className="block w-full mt-1 bg-black border border-zinc-700 p-2 rounded-lg"/></label>
+          <label className="text-xs text-emerald-300 block">Incertidumbre absoluta declarada (± V)<input inputMode="decimal" value={voltageUncertainty} onChange={e=>setVoltageUncertainty(e.target.value)} placeholder="Según instrumento y método" className="block w-full mt-1 bg-black border border-zinc-700 p-2 rounded-lg"/></label>
           <div role="status" className="p-4 border border-zinc-700 rounded-xl text-sm space-y-2">
-            {evaluated?<><p className={evaluated.within?'text-emerald-300 font-bold':'text-amber-300 font-bold'}>{evaluated.within?'Dentro del rango de tensión nominal':'Fuera del rango de tensión nominal'}</p><p>Rango de comparación: {evaluated.rail.min} – {evaluated.rail.max} V.</p><p className="text-xs text-zinc-400">{evaluated.caveat}</p></>:<p className="text-zinc-400">Ingresá un valor numérico válido para mostrar el rango.</p>}
+            {evaluated?<><p className={evaluated.within?'text-emerald-300 font-bold':'text-amber-300 font-bold'}>{evaluated.within?'Dentro del rango de tensión nominal (valor central)':'Fuera del rango de tensión nominal (valor central)'}</p><p>Rango de comparación: {evaluated.rail.min} – {evaluated.rail.max} V.</p><p className="text-xs text-zinc-400">{evaluated.caveat}</p></>:<p className="text-zinc-400">Ingresá un valor numérico válido para mostrar el rango.</p>}
           </div>
+          <p role="status" className="text-sm text-amber-200">{interval?`Intervalo ${interval.low.toFixed(3)}–${interval.high.toFixed(3)} V. ${interval.status==='WITHIN'?'Dentro de referencia DC incluyendo incertidumbre':interval.status==='OUTSIDE'?'Fuera de referencia DC':'Indeterminado: cruza un límite'}.`:'La comparación nominal anterior no incluye incertidumbre hasta que declares su valor.'}</p>
           <p className="text-xs text-amber-300">Solo personal calificado debe medir en circuitos energizados. Nunca abrir la fuente ni introducir puntas donde puedan causar cortocircuito. Un riel dentro de rango no descarta rizado o fallas transitorias.</p>
         </section>
         <section className="rounded-2xl border border-zinc-800 p-5 bg-zinc-950/70 space-y-4">
@@ -251,7 +274,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
             <li>Contrastar la hipótesis con un componente conocido bueno si es seguro y compatible.</li>
             <li>Documentar intervención, verificación después de reparar y plan de reversión.</li>
           </ol>
-          <p className="text-xs text-zinc-500">Próximos instrumentos: lectura de SMART, línea de tiempo POST, temperaturas y pruebas de estabilidad con procedencia de datos. No se presentan aún como disponibles.</p>
+          <p className="text-xs text-zinc-500">POST, RAM, compatibilidad, perfil térmico y comparación de series están disponibles en el selector del banco. El lector guiado de SMART corresponde a la siguiente fase de almacenamiento.</p>
         </section>
       </div></>}
       {section==='expediente'&&<section className="rounded-2xl border border-emerald-800 bg-[#09140e] p-5 space-y-4 max-w-5xl">

@@ -1,5 +1,6 @@
 import React,{useState} from 'react';
 import type {ProfessionalModule,ProfessionalState} from '../../data/tomo03ProfessionalTypes';
+import {TOMO03_TOOL_LABELS} from '../../data/tomo03ProfessionalTypes';
 import {moduleAssessment} from '../../data/tomo03RepairEngine';
 interface Props {content:ProfessionalModule;state:ProfessionalState;onChange:(state:ProfessionalState)=>void;onLab:()=>void;onTool:()=>void}
 export const Tomo03ProfessionalModule:React.FC<Props>=({content,state,onChange,onLab,onTool})=>{
@@ -17,7 +18,7 @@ export const Tomo03ProfessionalModule:React.FC<Props>=({content,state,onChange,o
    <h3 className="font-bold text-emerald-300">Medí · procedimiento e interpretación</h3>
    <ol className="list-decimal pl-5 text-sm space-y-2">{content.procedure.map(s=><li key={s}>{s}</li>)}</ol>
    <dl className="text-xs space-y-2">{Object.entries({Instrumento:content.measurement.instrument,Condiciones:content.measurement.conditions,Referencia:content.measurement.reference,Incertidumbre:content.measurement.uncertainty,Interpretación:content.measurement.interpretation}).map(([label,text])=><div key={label}><dt className="font-bold text-emerald-300">{label}</dt><dd className="mt-1">{text}</dd></div>)}</dl>
-   <button type="button" onClick={onTool} className="border border-emerald-600 px-3 py-2 rounded-lg text-xs">Abrir herramientas del banco · {content.tool}</button>
+   <button type="button" onClick={onTool} className="border border-emerald-600 px-3 py-2 rounded-lg text-xs">Abrir herramientas del banco · {TOMO03_TOOL_LABELS[content.tool]}</button>
   </section>
   <section className="p-4 rounded-xl bg-black/40 border border-emerald-900 space-y-3" aria-label="Árbol profesional">
    <h3 className="font-bold text-emerald-300">Descartá · decisiones encadenadas</h3>

@@ -37,17 +37,19 @@ export function moduleAssessment(content:ProfessionalModule,state:ProfessionalSt
 export function assessAtxUncertainty(value:number,uncertainty:number,min:number,max:number) {
   if(![value,uncertainty,min,max].every(Number.isFinite)||value<0||uncertainty<0||min>=max)return null;
   const low=value-uncertainty,high=value+uncertainty;
+  if(!Number.isFinite(low)||!Number.isFinite(high))return null;
   return {low,high,status:low>=min&&high<=max?'WITHIN':high<min||low>max?'OUTSIDE':'INDETERMINATE'} as const;
 }
 export function compareRepairSamples(before:number[],after:number[]) {
-  const summarize=(values:number[])=>{if(values.length<3||values.some(n=>!Number.isFinite(n)||n<0))return null;const sorted=[...values].sort((a,b)=>a-b);const mid=Math.floor(sorted.length/2);return {count:values.length,min:sorted[0],max:sorted.at(-1)!,median:sorted.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2};};
+  const summarize=(values:number[])=>{if(values.length<3||values.some(n=>!Number.isFinite(n)||n<0))return null;const sorted=[...values].sort((a,b)=>a-b);const mid=Math.floor(sorted.length/2);return {count:values.length,min:sorted[0],max:sorted.at(-1)!,median:sorted.length%2?sorted[mid]:sorted[mid-1]/2+sorted[mid]/2};};
   const baseline=summarize(before),result=summarize(after);
   if(!baseline||!result||baseline.count!==result.count)return null;
-  return {baseline,result,delta:result.median-baseline.median,percent:baseline.median===0?null:(result.median-baseline.median)/baseline.median*100};
+  const delta=result.median-baseline.median,percent=baseline.median===0?null:delta/baseline.median*100;
+  return {baseline,result,delta,percent:percent!==null&&Number.isFinite(percent)?percent:null};
 }
 export type RamResult='pass'|'fail'|'unknown';
 export function assessRamMatrix(matrix:[RamResult,RamResult,RamResult,RamResult]) {
-  if(matrix.some(value=>!['pass','fail','unknown'].includes(value)))return 'INVALID';
+  if(matrix.length!==4||matrix.some(value=>!['pass','fail','unknown'].includes(value)))return 'INVALID';
   if(matrix.includes('unknown'))return 'INCOMPLETE';
   const [a1,a2,b1,b2]=matrix;
   if(a1==='fail'&&a2==='fail'&&b1==='pass'&&b2==='pass')return 'MODULE_A';
@@ -64,6 +66,16 @@ export function advancePost(position:number,stopAt:number|null) {
   return {position:blocked?position:Math.min(position+1,POST_STAGES.length-1),blocked};
 }
 export function assessFirmwarePlan(plan:Record<'identity'|'reason'|'official'|'recovery'|'power',boolean>) {
- const missing=(Object.keys(plan) as (keyof typeof plan)[]).filter(key=>plan[key]!==true);
+ const missing=(['identity','reason','official','recovery','power'] as const).filter(key=>plan?.[key]!==true);
  return {allowed:missing.length===0,missing};
+}
+export function assessCpuCompatibility(cpuSocket:string,boardSocket:string,support:'yes'|'no'|'unknown',firmware:boolean,power:boolean,identity:boolean) {
+ if(!cpuSocket.trim()||!boardSocket.trim()||!identity)return 'UNKNOWN';
+ if(cpuSocket.trim().toUpperCase()!==boardSocket.trim().toUpperCase()||support==='no')return 'NOT_SUPPORTED';
+ if(support!=='yes'||!firmware||!power)return 'UNKNOWN';
+ return 'DOCUMENTED_BY_USER';
+}
+export function assessThermalProfile(temperature:number,ambient:number,limit:number) {
+ if(![temperature,ambient,limit].every(Number.isFinite)||temperature< -40||temperature>200||ambient< -40||ambient>100||limit<=0||limit>200)return null;
+ return {deltaAmbient:temperature-ambient,margin:limit-temperature,atLimit:temperature>=limit};
 }

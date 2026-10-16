@@ -19,20 +19,20 @@ La edición A4 es una vista editorial. La capa operativa "Banco interactivo" es 
 ## Mapa de cobertura obligatoria: 35 módulos
 | Módulo | Núcleo técnico y diagnóstico profundo | Laboratorio práctico y herramienta asociada |
 |---|---|---|
-| 01 Seguridad de banco | ESD, energía almacenada, orden, autorización, preservación de datos | Simulador de recepción y evaluación de riesgo; checklist de seguridad |
-| 02 Método de descarte | Hipótesis, probabilidad contextual, prueba controlada, sesgos | Detective EVO: seleccionar la siguiente comprobación y descartar hipótesis |
-| 03 Sin energía | Trayecto externo, standby, PS_ON/PWR_OK conceptuales, prueba cruzada | **LAB 01 activo**: no enciende; lista de verificación |
-| 04 ATX | Rieles y tolerancias, protecciones, carga, transitorios y conectores | LAB 01/03 activos; **intérprete ATX activo**, sin conexión al hardware |
-| 05 Power/panel | Headers según placa, interruptores, continuidad sin tensión | LAB 01 activo; simulador de pines **pendiente** |
-| 06 Sin video | Display/cable/puerto, CPU con/sin iGPU, GPU, POST, RAM | **LAB 02 activo**; mapa de diagnóstico de video pendiente |
-| 07 POST | Secuencias de arranque, códigos específicos de placa/BIOS | LAB 02 activo; decodificador por fabricante pendiente |
-| 08 RAM | Topología, módulos/ranuras, entrenamiento, XMP/EXPO y prueba por aislamiento | LAB 02 activo; árbol cruzado de módulo/slot pendiente |
-| 09 CMOS/NVRAM | RTC, pila, configuración, Clear CMOS según fabricante | LAB 02 activo; bitácora de firmware pendiente |
-| 10 Firmware | compatibilidad, actualización y recuperación, modos UEFI, riesgo | LAB 02 activo; simulador de decisión de flasheo pendiente |
-| 11 CPU | pines/socket, VRM, señales de POST, temperaturas, compatibilidad | LAB 02/03 activos; checklist de compatibilidad pendiente |
-| 12 Refrigeración | transferencia térmica, ventilación, sensores, límites por fabricante | LAB 03 activo; comparador de perfiles térmicos pendiente |
-| 13 GPU | salida de video, alimentación, temperaturas, PCIe, controlador | LAB 02/03 activos; árbol de descarte GPU pendiente |
-| 14 Motherboard | inspección segura, cortos, pistas, VRM, headers sin atribución especulativa | LAB 01/02 activos; guía de inspección pendiente |
+| 01 Seguridad de banco | Tres niveles, ESD, recepción, autorización y preservación | Caso de riesgo con parada/derivación, checklist, árbol y evaluación activos |
+| 02 Método de descarte | Hipótesis rivales, control, repetición e incertidumbre | Caso de apagado con prueba aislada; comparador de series activo |
+| 03 Sin energía | Trayecto externo, standby, PS_ON/PWR_OK y carga | Caso de cable externo, árbol encadenado y checklist activos; LAB 01 conservado |
+| 04 ATX | Rieles, protecciones, carga, transitorios y límites de instrumento | Intérprete original ampliado con incertidumbre; caso bajo carga y conectores activos |
+| 05 Power/panel | Header por manual, contacto aislado, retención e intermitencia | Caso de pulsador, identificador educativo y árbol activos; sin pinout universal ficticio |
+| 06 Sin video | Ruta de pantalla, salida soportada, iGPU y POST | Caso de ruta incorrecta y mapa funcional activos; LAB 02 conservado |
+| 07 POST | Secuencia y alcance de indicadores según documentación | Simulador funcional activo; los códigos reales se consultan en manual exacto, no en tabla universal |
+| 08 RAM | Perfil base, entrenamiento, topología, módulo/slot/canal | Matriz RAM y caso de módulo defectuoso activos |
+| 09 CMOS/NVRAM | RTC, pila, retención, configuración y cifrado | Caso de retención, expediente y decisión previa a reset activos |
+| 10 Firmware | Identidad, soporte, versión, imagen y recuperación | Decisión de firmware y caso de soporte CPU activos; nunca flasheo real |
+| 11 CPU | Soporte, socket, EPS, VRM y límites de descarte | Compatibilidad declarada, árbol y caso EPS activos |
+| 12 Refrigeración | Interfaz, flujo, ambiente, potencia y sensor | Evaluador térmico por límite del modelo, comparador y caso de montaje activos |
+| 13 GPU | Alimentación, enlace, salida, controlador y artefactos | Árbol y caso de alimentación auxiliar activos; identificador de conectores compartido |
+| 14 Motherboard | PCB, VRM, fijaciones, intermitencia y derivación | Caso de contacto con separador, guía de inspección y árbol activos |
 | 15 SSD/HDD/NVMe | SMART, integridad, copia, falla física vs lógica, interfaces | **LAB 04 activo**; lector guiado de SMART pendiente |
 | 16 Apagado a segundos | protección, ventilador, corto, montaje, configuración mínima | LAB 03 activo; simulador de eventos pendiente |
 | 17 Sin inicio de SO | UEFI/BCD, volumen, cifrado, fallo físico vs corrupción lógica | LAB 04 activo; diagnóstico de arranque pendiente |
@@ -55,21 +55,24 @@ La edición A4 es una vista editorial. La capa operativa "Banco interactivo" es 
 | 34 Parte de servicio | recepción, autorización, inventario, informe, aceptación | **expediente TXT inicial activo**; formulario imprimible interactivo pendiente |
 | 35 Glosario y referencias | conceptos por disciplinas, versiones de estándares y enlaces auditados | buscador de referencias contextual pendiente |
 
-## Alcance realmente implementado en esta etapa
+## Alcance implementado y verificado en Fase 2
 - Navegación desde el Tomo 03 al banco, manteniendo el manual A4.
 - Protocolos y registro manual de evidencia para los 35 módulos; rama sí/no/no probado.
 - Cuatro simulaciones con decisiones contextualizadas y retroalimentación.
 - Intérprete numérico de rieles ATX; sin lectura de voltajes real.
 - Expediente por módulo persistido en almacenamiento local y exportación TXT; no certificado.
 - Correcciones de seguridad (fuente ATX, borrado de discos, orden de controladores) y de conteo del manual.
-- Regresión automatizada de Chromium nueva, que **requiere ejecución local** para afirmar PASS.
+- Especialización de módulos 01–14: tres niveles, mapa, procedimiento, interpretación de mediciones, atajo con contraindicaciones, tres decisiones, tres preguntas y caso con evidencia.
+- EVO Repair Lab comparte un motor con 14 escenarios; las cuatro prácticas anteriores conservan IDs, respuestas y recorrido.
+- Nueve accesos de herramientas centrales: checklist, intérprete ATX con incertidumbre, conectores, comparación, RAM, POST, firmware, CPU y térmica. Árboles y expediente están integrados en el recorrido.
+- Chromium ejecutado en escritorio y móvil; resultados y límites en `TOMO03_PHASE2_REPORT.md`.
 
 ## Definición de terminado por módulo
 Una ficha A4 de una página **no** satisface este contrato. Una función etiquetada «pendiente» **no** se anunciará disponible. Un botón sin resultado observable es FAIL. Para dar por completado un módulo deben existir: teoría especializada, diagrama o mapa verificable, práctica con respuestas, herramienta o medición interpretada, advertencias, procedimiento de reversión, expediente y prueba funcional. Mantener acceso adaptable para quien comienza y para el técnico experimentado.
 
 ## Prioridad técnica
 **Fase A**: motor de expediente y seguridad, cuatro fallas frecuentes, regresión Chromium (implementado, esperando ejecución).
-**Fase B**: especialización de 01–14 (electricidad baja tensión y arranque físico), instrumentación y árboles ramificados.
+**Fase B**: especialización de 01–14 implementada y comprobada por software; simulaciones y datos manuales, sin reparación física certificada.
 **Fase C**: 15–24 (almacenamiento, rescate, firmware y sistema), protección de datos por defecto.
 **Fase D**: 25–35 (inestabilidad, telemetría, herramientas, parte de servicio y examen final).
 **Fase E**: evaluación de contenidos por técnico, contraste con documentación de fabricantes, pruebas E2E escritorio/móvil y publicación. El cierre del tomo debe comprobar todas las rutas, no solo un contador de módulos.

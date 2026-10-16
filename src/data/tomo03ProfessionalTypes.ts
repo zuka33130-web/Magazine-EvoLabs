@@ -23,3 +23,10 @@ export interface ProfessionalState {
   log:string[];
 }
 export const emptyProfessionalState=():ProfessionalState=>({tree:{},quiz:{},observations:[],hypothesis:null,repair:null,verified:false,log:[]});
+export const TOMO03_TOOL_LABELS:Record<string,string>={
+ 'power-checklist':'Checklist de encendido','atx-uncertainty':'Intérprete ATX e incertidumbre',
+ connectors:'Identificador de conectores','before-after':'Comparador antes/después',
+ 'ram-matrix':'Matriz RAM módulo/ranura','post-sequence':'Secuencia POST didáctica',
+ 'firmware-decision':'Plan de firmware y recuperación','cpu-compatibility':'Compatibilidad CPU/motherboard',
+ 'thermal-profile':'Perfil térmico y margen al límite'
+};
