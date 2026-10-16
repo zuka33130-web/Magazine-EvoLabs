@@ -23,6 +23,7 @@ interface EvoTomo02CompletionScreenProps {
   onReviewExam?: () => void;
   onOpenA4Magazine?: () => void;
   score?: number;
+  total?: number;
 }
 
 export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps> = ({
@@ -31,7 +32,8 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
   onGoToCampusFormation,
   onReviewExam,
   onOpenA4Magazine,
-  score = 10,
+  score,
+  total,
 }) => {
   return (
     <div className="w-full max-w-4xl mx-auto py-6 sm:py-10 px-4 sm:px-6 font-sans-editorial space-y-8 animate-in fade-in duration-300">
@@ -75,7 +77,7 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
 
           <div className="text-right font-mono-tech">
             <span className="px-3 py-1 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 font-black text-xs uppercase tracking-wider inline-block">
-              CALIFICACIÓN: {score} / 10
+              CALIFICACIÓN: {typeof score === 'number' && typeof total === 'number' && total > 0 ? `${score} / ${total} (${Math.round(score / total * 100)}%)` : 'SIN NOTA VALIDADA'}
             </span>
             <span className="text-[10px] text-zinc-500 block mt-1">
               ESTADO: COMPROBACIÓN EVO SUPERADA

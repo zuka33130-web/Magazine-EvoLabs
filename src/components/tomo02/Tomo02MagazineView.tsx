@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { safeStorage } from '../../utils/safeStorage';
+import { getExamHistory } from '../exam/utils/examStorage';
 import {
   ChevronLeft,
   ChevronRight,
@@ -164,6 +165,17 @@ const getModuleEditorialVariant = (
   }
 };
 
+const TOMO_02_SECTOR_IDS = Array.from({ length: 40 }, (_, number) => `sector-${String(number).padStart(2, '0')}`);
+const verifiedTomo02Exam = () => getExamHistory('tomo-02').find(attempt =>
+  attempt.passed === true && Number.isInteger(attempt.score) && Number.isInteger(attempt.totalQuestions) &&
+  attempt.totalQuestions > 0 && attempt.score >= 0 && attempt.score <= attempt.totalQuestions &&
+  attempt.score / attempt.totalQuestions >= 0.7
+);
+const hasFinalExperimentEvidence = () => {
+  try { return JSON.parse(safeStorage.getItem('evo_tomo02_sector39_learning_v1') || '{}')?.finalExperiment === true; }
+  catch { return false; }
+};
+
 export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   onBackToApp,
   onNavigateTomo,
@@ -202,16 +214,16 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
 
   // Tomo 02 completion is strictly FALSE until all 40 sectors (Sector 00 to 39),
   // master lab and final exam are completed.
-  const [hasPassedFinalExam, setHasPassedFinalExam] = useState<boolean>(false);
+  const [hasPassedFinalExam, setHasPassedFinalExam] = useState<boolean>(() => Boolean(verifiedTomo02Exam()));
 
-  const [examScore, setExamScore] = useState<number>(() => {
-    try {
-      const saved = safeStorage.getItem('evo_tomo02_exam_score');
-      return saved ? parseInt(saved, 10) : 10;
-    } catch {
-      return 10;
-    }
-  });
+  const [examScore, setExamScore] = useState<number>(() => verifiedTomo02Exam()?.score ?? 0);
+  const [examTotal, setExamTotal] = useState<number>(() => verifiedTomo02Exam()?.totalQuestions ?? 0);
+  const sectorCompletionReady = TOMO_02_SECTOR_IDS.every(id => moduleProgress[id] === 'completed');
+  const completionEligible = hasPassedFinalExam && sectorCompletionReady && hasFinalExperimentEvidence();
+  useEffect(() => {
+    // A legacy exam-only completion flag must not grant a certificate.
+    safeStorage.setItem('evo_tomo02_completed', completionEligible ? 'true' : 'false');
+  }, [completionEligible]);
 
   const completedCount = Object.values(moduleProgress).filter((s) => s === 'completed').length;
 
@@ -247,15 +259,17 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
 
   const handleExamPassed = (score: number, total: number) => {
     setExamScore(score);
+    setExamTotal(total);
     setHasPassedFinalExam(true);
-    try {
+    // La teoría aprobada se conserva por separado de la finalización del tomo.
+    safeStorage.setItem('evo_tomo02_exam_score', String(score));
+    if (sectorCompletionReady && hasFinalExperimentEvidence()) {
       safeStorage.setItem('evo_tomo02_completed', 'true');
-      safeStorage.setItem('evo_tomo02_exam_score', String(score));
-    } catch {
-      // ignore
+      setSubView('completion');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    setSubView('completion');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Si faltan sectores o evidencia, EvoTomeExamEngine muestra el resultado,
+    // pero no se emite una constancia de tomo completo.
   };
 
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
@@ -885,7 +899,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onOpenCompletionScreen={() => {
-              setSubView('completion');
+              setSubView(completionEligible ? 'completion' : 'index');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onOpenWindowsMatrixLab={onOpenLab}
@@ -947,6 +961,13 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   }
 
   if (subView === 'completion') {
+    if (!completionEligible) {
+      return <div className="min-h-screen bg-[#060709] text-zinc-100 p-8 max-w-3xl mx-auto space-y-4">
+        <h2 className="text-xl font-bold text-amber-400">Finalización pendiente</h2>
+        <p>La constancia requiere los 40 sectores completados, evidencia válida del Sector 39 y examen general aprobado. Aprobar solo la teoría no completa el tomo.</p>
+        <button type="button" className="px-4 py-2 rounded-lg bg-sky-700" onClick={() => setSubView('index')}>Volver al índice</button>
+      </div>;
+    }
     return (
       <div className="min-h-screen bg-[#060709] text-zinc-100 flex flex-col font-sans-editorial px-4 sm:px-6">
         <EvoTomo02CompletionScreen
@@ -965,6 +986,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           score={examScore}
+          total={examTotal}
         />
       </div>
     );

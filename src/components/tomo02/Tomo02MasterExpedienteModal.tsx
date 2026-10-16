@@ -22,69 +22,54 @@ interface Tomo02MasterExpedienteModalProps {
   onClose: () => void;
   onOpenSector00?: () => void;
   onOpenSector01?: () => void;
+  moduleProgress?: Record<string, 'not_started' | 'in_progress' | 'completed'>;
 }
 
 export const Tomo02MasterExpedienteModal: React.FC<Tomo02MasterExpedienteModalProps> = ({
   onClose,
   onOpenSector00,
   onOpenSector01,
+  moduleProgress = {},
 }) => {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'tree' | 'raw'>('tree');
 
   const dossierMasterId = 'EVO-WIN-EXPEDIENTE-001-CANONICAL';
 
+  const sectorStates = TOMO_02_MASTER_SECTORS.map(sector => ({
+    sector,
+    status: moduleProgress[sector.sectorId] || 'not_started' as const,
+  }));
+  const completedSectors = sectorStates.filter(item => item.status === 'completed').length;
+  const inProgressSectors = sectorStates.filter(item => item.status === 'in_progress').length;
+  const statusText = (status: string) => status === 'completed' ? 'AVANCE COMPLETO' : status === 'in_progress' ? 'EN CURSO' : 'SIN AVANCE REGISTRADO';
+  const buildReport = () => [
+    'EVO LABS // EXPEDIENTE MAESTRO WINDOWS EVO 001',
+    'TOMO 02: LA BIBLIA NEGRA DE WINDOWS',
+    'FECHA UTC: ' + new Date().toISOString(),
+    'SECTORES CON AVANCE COMPLETO: ' + completedSectors + ' / ' + sectorStates.length,
+    'SECTORES EN CURSO: ' + inProgressSectors,
+    '',
+    ...sectorStates.map(({ sector, status }) => 'Sector ' + sector.sectorNumber + ' - ' + sector.title + ': ' + statusText(status)),
+    '',
+    'Registro de avance de la aplicación, NO certificación individual ni verificación automática de evidencia.',
+    'La procedencia y el contenido de la evidencia deben revisarse en cada sector.',
+  ].join('\\n');
+
   const handleCopy = () => {
-    const summary = `=====================================================
-EVO LABS // EXPEDIENTE MAESTRO WINDOWS EVO 001
-TOMO 02: LA BIBLIA NEGRA DE WINDOWS // MENTIRA Y VERDAD
-ID: ${dossierMasterId}
-ESTADO: 2 / 40 SECTORES CON EVIDENCIA CERTIFICADA
-=====================================================
-
-ARTEFACTOS DE EVIDENCIA CONSOLIDADOS:
-├── [ARTEFACTO 001] PASAPORTE WINDOWS EVO 001 (Sector 00: Día Cero)
-│   ├── Edición, Versión, Build, Arquitectura, Licencia, UAC, SAM
-│   └── Sello Forense de Línea Base (Baseline)
-│
-├── [ARTEFACTO 002] EXPEDIENTE FORENSE PRE-BOOT 002 (Sector 01: Antes del Logo)
-│   ├── Modo UEFI, Tabla GPT, Secure Boot, Módulo TPM 2.0
-│   ├── Partición ESP FAT32, Almacén BCD, winload.efi
-│   └── Cadena de Custodia Pre-Boot (12 Fases del Modelo EVO)
-│
-└── [SECTORES 02–39] EN PROCESO DE AUDITORÍA FORENSE
-    └── 38 Artefactos en Hoja de Ruta
-
-VEREDICTO PERICIAL:
-El expediente maestro unifica todas las pruebas de banco de la obra.
-=====================================================`;
-
-    navigator.clipboard.writeText(summary);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    void navigator.clipboard.writeText(buildReport()).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => setCopied(false));
   };
 
   const handleDownload = () => {
-    const content = `=====================================================
-EVO LABS // EXPEDIENTE MAESTRO WINDOWS EVO 001
-TOMO 02: LA BIBLIA NEGRA DE WINDOWS // MENTIRA Y VERDAD
-FECHA DE EMISIÓN: ${new Date().toISOString()}
-ID EXPEDIENTE: ${dossierMasterId}
-=====================================================
-
-CADENA DE EVIDENCIA PERICIAL:
-1. Sector 00: Pasaporte de Identidad y Modelo de Privilegios [COMPROBADO]
-2. Sector 01: Protocolo de Arranque, UEFI y Almacén BCD [COMPROBADO]
-3. Sectores 02–39: Auditorías de Kernel, Memoria, Red, Seguridad [RESERVADO]
-
-EXPEDIENTE OFICIAL DE CURSO EVO LABS.`;
-
-    const blob = new Blob([content], { type: 'text/plain' });
+    const blob = new Blob([buildReport()], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `EXPEDIENTE_MAESTRO_WINDOWS_EVO_001.txt`;
-    a.click();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'EXPEDIENTE_MAESTRO_WINDOWS_EVO_001.txt';
+    link.click();
     URL.revokeObjectURL(url);
   };
 
@@ -128,12 +113,12 @@ EXPEDIENTE OFICIAL DE CURSO EVO LABS.`;
             <div>
               <span className="text-zinc-500 block text-[10px]">SUB-ARTEFACTOS ACTIVOS</span>
               <span className="text-[#16C784] font-bold flex items-center gap-1.5 mt-0.5">
-                <CheckCircle2 className="w-3.5 h-3.5" /> 2 / 40 CERTIFICADOS
+                <CheckCircle2 className="w-3.5 h-3.5" /> {completedSectors} / {sectorStates.length} CON AVANCE COMPLETO
               </span>
             </div>
             <div>
-              <span className="text-zinc-500 block text-[10px]">COBERTURA FORENSE</span>
-              <span className="text-[#60CDFF] font-bold">SECTOR 00 & SECTOR 01</span>
+              <span className="text-zinc-500 block text-[10px]">ESTADO REGISTRADO</span>
+              <span className="text-[#60CDFF] font-bold">{inProgressSectors} EN CURSO</span>
             </div>
           </div>
 
@@ -201,7 +186,7 @@ EXPEDIENTE OFICIAL DE CURSO EVO LABS.`;
                   )}
                 </div>
                 <p className="text-xs text-zinc-300">
-                  Inspección y certificación del vector de arranque: Modo Firmware UEFI, partición ESP FAT32, Almacén BCD, Módulo TPM 2.0, Secure Boot, winload.efi y 12 fases del modelo EVO.
+                  Guía de inspección del vector de arranque: Modo Firmware UEFI, partición ESP FAT32, Almacén BCD, Módulo TPM 2.0, Secure Boot, winload.efi y 12 fases del modelo EVO.
                 </p>
               </div>
 
@@ -209,11 +194,19 @@ EXPEDIENTE OFICIAL DE CURSO EVO LABS.`;
               <div className="p-4 rounded-xl bg-[#080B10]/80 border border-sky-500/10 space-y-2 opacity-75">
                 <div className="flex items-center gap-2 font-mono text-xs text-zinc-400 font-bold">
                   <Lock className="w-3.5 h-3.5 text-zinc-500" />
-                  <span>ARTEFACTOS 003 A 040 // HOJA DE RUTA PERICIAL</span>
+                  <span>SECTORES 02–39 // ESTADO DE AVANCE</span>
                 </div>
                 <p className="text-xs text-zinc-500">
-                  A medida que se completen los Sectores 02 a 39, cada uno generará su respectivo artefacto pericial (Mapa NTFS, Árbol EPROCESS, Latencias DPC, Colmenas Registry, etc.) que se integrará automáticamente aquí.
+                  El progreso registrado no equivale a evidencia validada. Consultá cada sector para revisar misión, test y procedencia de las observaciones.
                 </p>
+                <details className="mt-3 text-xs text-zinc-300">
+                  <summary className="cursor-pointer text-sky-300">Ver estado de los 40 sectores</summary>
+                  <div className="mt-3 grid gap-1 sm:grid-cols-2">
+                    {sectorStates.map(({ sector, status }) => <div key={sector.sectorId} className="p-2 rounded border border-sky-500/10">
+                      Sector {sector.sectorNumber} · {sector.title}: <span className="text-sky-300">{statusText(status)}</span>
+                    </div>)}
+                  </div>
+                </details>
               </div>
             </div>
           </div>

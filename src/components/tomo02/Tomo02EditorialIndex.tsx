@@ -142,10 +142,10 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
     setExpandedSectorId((prev) => (prev === sectorId ? null : sectorId));
   };
 
-  // Active sectors metrics: 2 / 40
-  const activeSectorsCount = TOMO_02_MASTER_SECTORS.filter((s) => s.status === 'ACTIVE' || s.status === 'COMPLETED').length;
+  // Course progress uses recorded completions, never editorial publication flags.
   const totalSectorsCount = TOMO_02_MASTER_SECTORS.length;
-  const progressPercent = Math.round((activeSectorsCount / totalSectorsCount) * 100);
+  const completedSectorsCount = TOMO_02_MASTER_SECTORS.filter((sector) => moduleProgress[sector.sectorId] === 'completed').length;
+  const progressPercent = Math.round((completedSectorsCount / totalSectorsCount) * 100);
 
   const currentGroup = SECTOR_LEVEL_GROUPS.find((g) => g.id === selectedGroup) || SECTOR_LEVEL_GROUPS[0];
 
@@ -199,6 +199,7 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
           onClose={() => setShowMasterExpedienteModal(false)}
           onOpenSector00={onOpenSector00}
           onOpenSector01={onOpenSector01}
+          moduleProgress={moduleProgress}
         />
       )}
 
@@ -240,7 +241,7 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
           <span className="text-zinc-600 hidden sm:inline">|</span>
 
           <span className="text-[#60CDFF] font-bold hidden sm:inline">
-            {activeSectorsCount} / {totalSectorsCount} SECTORES ACTIVOS
+            {completedSectorsCount} / {totalSectorsCount} SECTORES CON AVANCE REGISTRADO
           </span>
         </div>
       </nav>
@@ -302,8 +303,8 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
         {/* Progress Bar (Windows Gradient) */}
         <div className="space-y-1.5 relative z-10 pt-3 border-t border-sky-500/15">
           <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400">
-            <span className="text-[#60CDFF]">SECTOR 00 (DÍA CERO) & SECTOR 01 (ANTES DEL LOGO)</span>
-            <span className="font-bold text-white">{progressPercent}% HABILITADO</span>
+            <span className="text-[#60CDFF]">AVANCE REGISTRADO DEL ESTUDIANTE · SECTORES 00–39</span>
+            <span className="font-bold text-white">{progressPercent}% COMPLETADO SEGÚN REGISTROS</span>
           </div>
           <div className="w-full h-2 rounded-full bg-[#151B23] border border-sky-500/20 overflow-hidden">
             <div
