@@ -55,7 +55,7 @@ export const TOMO_03_META = {
   secondaryColor: '#00FF88',
   badge: 'TALLER & BANCO DE PRUEBAS',
   edition: 'Edición Maestra de Taller 2026',
-  totalPages: 43,
+  totalPages: 42,
   manifestoPhrase: 'SÍNTOMA ≠ CAUSA. NO CAMBIES UNA PIEZA HASTA TENER EVIDENCIA DE QUE FALLA.',
   description: 'La biblia de referencia técnica para diagnosticar, medir y reparar PCs de escritorio. Desde el cable de 220V hasta el osciloscopio y la depuración del kernel.',
 };
