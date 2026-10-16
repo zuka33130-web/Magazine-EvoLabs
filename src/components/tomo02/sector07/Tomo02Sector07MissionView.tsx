@@ -15,10 +15,11 @@ import {
 } from 'lucide-react';
 
 interface Tomo02Sector07MissionViewProps {
+  onPracticeCompleted?: () => void;
   onBack: () => void;
 }
 
-export const Tomo02Sector07MissionView: React.FC<Tomo02Sector07MissionViewProps> = ({ onBack }) => {
+export const Tomo02Sector07MissionView: React.FC<Tomo02Sector07MissionViewProps> = ({ onBack, onPracticeCompleted }) => {
   const [hardwareType, setHardwareType] = useState<'SSD_NVME' | 'HDD_LEGACY'>('SSD_NVME');
   const [testApp, setTestApp] = useState<'Photoshop' | 'Chrome' | 'VSCode'>('Photoshop');
   const [isBenchmarking, setIsBenchmarking] = useState<boolean>(false);
@@ -67,6 +68,7 @@ export const Tomo02Sector07MissionView: React.FC<Tomo02Sector07MissionViewProps>
       }
       setIsBenchmarking(false);
       setBenchmarkDone(true);
+      onPracticeCompleted?.();
     }, 1800);
   };
 

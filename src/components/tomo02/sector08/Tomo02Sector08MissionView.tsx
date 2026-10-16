@@ -18,11 +18,13 @@ import {
 } from 'lucide-react';
 
 interface Tomo02Sector08MissionViewProps {
+  onPracticeCompleted?: () => void;
   onBackToReader: () => void;
 }
 
 export const Tomo02Sector08MissionView: React.FC<Tomo02Sector08MissionViewProps> = ({
   onBackToReader,
+  onPracticeCompleted,
 }) => {
   const [pagefileMode, setPagefileMode] = useState<'AUTO' | 'DISABLED' | 'FIXED_SMALL'>('AUTO');
   const [allocatedGb, setAllocatedGb] = useState<number>(12);
@@ -78,6 +80,7 @@ export const Tomo02Sector08MissionView: React.FC<Tomo02Sector08MissionViewProps>
         log,
       });
       setIsRunningSim(false);
+      onPracticeCompleted?.();
     }, 600);
   };
 

@@ -17,13 +17,16 @@ import {
 } from 'lucide-react';
 
 interface Tomo02Sector10MissionViewProps {
+  onPracticeCompleted?: () => void;
   onBackToReader: () => void;
 }
 
 export const Tomo02Sector10MissionView: React.FC<Tomo02Sector10MissionViewProps> = ({
   onBackToReader,
+  onPracticeCompleted,
 }) => {
   const [activeModule, setActiveModule] = useState<'SYSTEM' | 'PROCESS' | 'SERVICES' | 'NETWORK' | 'STORAGE' | 'EVENTS'>('SYSTEM');
+  const [exploredModules, setExploredModules] = useState<string[]>(['SYSTEM']);
   const [psCommand, setPsCommand] = useState<string>('Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, LastBootUpTime');
   const [useWhatIf, setUseWhatIf] = useState<boolean>(true);
   const [consoleOutput, setConsoleOutput] = useState<{
@@ -44,6 +47,7 @@ SystemDirectory    : C:\\Windows\\system32`,
 
   const handleSelectModule = (mod: 'SYSTEM' | 'PROCESS' | 'SERVICES' | 'NETWORK' | 'STORAGE' | 'EVENTS') => {
     setActiveModule(mod);
+    setExploredModules(prev => prev.includes(mod) ? prev : [...prev, mod]);
     let cmd = '';
     let objType = '';
     let resData = '';
@@ -109,6 +113,7 @@ Wi-Fi                     192.168.1.120   Disconnected`;
   };
 
   const executeCustomPs = () => {
+    if (exploredModules.length >= 3 && /^\s*(Get-|Measure-|Test-)/i.test(psCommand)) onPracticeCompleted?.();
     let output = `[POWERSHELL OBJECT PIPELINE EXECUTION]
 Comando: ${psCommand}
 Tipo de Objeto Retornado: System.Management.Automation.PSCustomObject

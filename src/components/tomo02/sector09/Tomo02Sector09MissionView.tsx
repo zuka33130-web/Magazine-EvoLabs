@@ -14,11 +14,13 @@ import {
 } from 'lucide-react';
 
 interface Tomo02Sector09MissionViewProps {
+  onPracticeCompleted?: () => void;
   onBackToReader: () => void;
 }
 
 export const Tomo02Sector09MissionView: React.FC<Tomo02Sector09MissionViewProps> = ({
   onBackToReader,
+  onPracticeCompleted,
 }) => {
   const [commandInput, setCommandInput] = useState<string>('evo-diag.cmd');
   const [activeMenuOption, setActiveMenuOption] = useState<string | null>(null);
@@ -131,6 +133,10 @@ No further action is required.`;
 Resultado: Comando verificado sin efectos colaterales en el sistema anfitrión.`;
     }
 
+    // Only three distinct supported sandbox queries count as a guided practice.
+    const allowed = new Set(['1', '2', '3', '4', '5', '6', 'systeminfo', 'ipconfig /all', 'tasklist', 'driverquery', 'chkdsk']);
+    const practiced = new Set([...terminalHistory.map(entry => entry.command.trim().toLowerCase()), cmdClean].filter(item => allowed.has(item)));
+    if (practiced.size >= 3) onPracticeCompleted?.();
     setTerminalHistory((prev) => [
       ...prev,
       {

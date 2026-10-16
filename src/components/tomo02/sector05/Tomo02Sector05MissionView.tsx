@@ -16,10 +16,11 @@ import {
 } from 'lucide-react';
 
 interface Tomo02Sector05MissionViewProps {
+  onPracticeCompleted?: () => void;
   onBack: () => void;
 }
 
-export const Tomo02Sector05MissionView: React.FC<Tomo02Sector05MissionViewProps> = ({ onBack }) => {
+export const Tomo02Sector05MissionView: React.FC<Tomo02Sector05MissionViewProps> = ({ onBack, onPracticeCompleted }) => {
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [simTimeSeconds, setSimTimeSeconds] = useState<number>(0);
   const [logs, setLogs] = useState<
@@ -100,6 +101,7 @@ export const Tomo02Sector05MissionView: React.FC<Tomo02Sector05MissionViewProps>
         clearInterval(interval);
         setIsSimulating(false);
         setIsReportReady(true);
+        onPracticeCompleted?.();
       }
     }, 1200);
   };

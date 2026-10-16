@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 
 interface Tomo02Sector06MissionViewProps {
+  onPracticeCompleted?: () => void;
   onBack: () => void;
 }
 
@@ -138,7 +139,7 @@ const LAB_SCENARIOS: Scenario[] = [
   },
 ];
 
-export const Tomo02Sector06MissionView: React.FC<Tomo02Sector06MissionViewProps> = ({ onBack }) => {
+export const Tomo02Sector06MissionView: React.FC<Tomo02Sector06MissionViewProps> = ({ onBack, onPracticeCompleted }) => {
   const [activeScenarioIdx, setActiveScenarioIndex] = useState<number>(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [scId: string]: string }>({});
   const [showConsequences, setShowConsequences] = useState<{ [scId: string]: boolean }>({});
@@ -154,7 +155,9 @@ export const Tomo02Sector06MissionView: React.FC<Tomo02Sector06MissionViewProps>
 
   const handleApplyVirtualAction = () => {
     if (!selectedOptId) return;
-    setShowConsequences((prev) => ({ ...prev, [currentScenario.id]: true }));
+    const newConsequences = { ...showConsequences, [currentScenario.id]: true };
+    setShowConsequences(newConsequences);
+    if (LAB_SCENARIOS.every(scenario => newConsequences[scenario.id] === true)) onPracticeCompleted?.();
   };
 
   return (
