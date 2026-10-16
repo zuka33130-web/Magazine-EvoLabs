@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTomo02LegacySectorProgress, type LegacySectorStatus } from '../shared/useTomo02LegacySectorProgress';
 import {
   BookOpen,
   CheckCircle2,
@@ -40,10 +41,12 @@ import { Tomo02Sector00MissionView } from './Tomo02Sector00MissionView';
 import { Sector00VisualDiagram } from './Sector00VisualDiagrams';
 
 interface Tomo02Sector00ViewProps {
+  onSectorProgress?: (id: string, status: LegacySectorStatus) => void;
   onBackToMagazine?: () => void;
 }
 
 export const Tomo02Sector00View: React.FC<Tomo02Sector00ViewProps> = ({
+  onSectorProgress,
   onBackToMagazine,
 }) => {
   // Navigation & Subviews
@@ -53,7 +56,9 @@ export const Tomo02Sector00View: React.FC<Tomo02Sector00ViewProps> = ({
   const [showCasesModal, setShowCasesModal] = useState(false);
 
   // Progress state
-  const [completedInvestigations, setCompletedInvestigations] = useState<Record<string, boolean>>({});
+  const recorder = useTomo02LegacySectorProgress('00', SECTOR_00_INVESTIGATIONS.map(inv => inv.id), 70, onSectorProgress);
+  const completedInvestigations = recorder.completedRecords;
+  const setCompletedInvestigations = recorder.setCompletedRecords;
   const [challengeAnswers, setChallengeAnswers] = useState<Record<string, any>>({});
   const [challengeSuccess, setChallengeSuccess] = useState<Record<string, boolean>>({});
   
@@ -152,8 +157,10 @@ export const Tomo02Sector00View: React.FC<Tomo02Sector00ViewProps> = ({
     },
   });
 
-  const [isMissionPassed, setIsMissionPassed] = useState(false);
-  const [testScore, setTestScore] = useState<number | null>(null);
+  const isMissionPassed = recorder.missionPassed;
+  const setIsMissionPassed = recorder.setMissionPassed;
+  const testScore = recorder.testScore;
+  const setTestScore = recorder.setTestScore;
   const [solvedCasesCount, setSolvedCasesCount] = useState(0);
 
   const currentInv = SECTOR_00_INVESTIGATIONS[selectedInvIndex];

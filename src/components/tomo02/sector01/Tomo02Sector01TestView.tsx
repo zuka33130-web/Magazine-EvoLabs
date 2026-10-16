@@ -15,12 +15,14 @@ import {
 import { SECTOR_01_TEST_BANK, Sector01TestQuestion } from '../../../data/tomo02Sector01CasesAndTests';
 
 interface Tomo02Sector01TestViewProps {
+  onPassTest?: (percentage: number) => void;
   onBackToReader: () => void;
   onOpenExpediente: () => void;
 }
 
 export const Tomo02Sector01TestView: React.FC<Tomo02Sector01TestViewProps> = ({
   onBackToReader,
+  onPassTest,
   onOpenExpediente,
 }) => {
   // Select 10 random questions from the 24 question bank on mount
@@ -156,7 +158,7 @@ export const Tomo02Sector01TestView: React.FC<Tomo02Sector01TestViewProps> = ({
               </button>
             ) : (
               <button
-                onClick={() => setSubmitted(true)}
+                onClick={() => { setSubmitted(true); onPassTest?.(scoreData.percentage); }}
                 disabled={!allAnswered}
                 className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-black text-xs font-bold transition-colors shadow-lg shadow-amber-500/20 flex items-center gap-2"
               >

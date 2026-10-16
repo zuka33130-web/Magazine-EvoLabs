@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTomo02LegacySectorProgress, type LegacySectorStatus } from '../shared/useTomo02LegacySectorProgress';
 import {
   BookOpen,
   CheckCircle2,
@@ -33,11 +34,13 @@ import { Tomo02Sector01TestView } from './Tomo02Sector01TestView';
 import { Tomo02Sector01MissionView } from './Tomo02Sector01MissionView';
 
 interface Tomo02Sector01ViewProps {
+  onSectorProgress?: (id: string, status: LegacySectorStatus) => void;
   onBackToMagazine?: () => void;
   onOpenSector00?: () => void;
 }
 
 export const Tomo02Sector01View: React.FC<Tomo02Sector01ViewProps> = ({
+  onSectorProgress,
   onBackToMagazine,
   onOpenSector00,
 }) => {
@@ -50,7 +53,9 @@ export const Tomo02Sector01View: React.FC<Tomo02Sector01ViewProps> = ({
   const [showMapModal, setShowMapModal] = useState(false);
 
   // Progress state
-  const [completedInvestigations, setCompletedInvestigations] = useState<Record<string, boolean>>({});
+  const recorder = useTomo02LegacySectorProgress('01', SECTOR_01_INVESTIGATIONS.map(inv => inv.id), 70, onSectorProgress);
+  const completedInvestigations = recorder.completedRecords;
+  const setCompletedInvestigations = recorder.setCompletedRecords;
   const [challengeAnswers, setChallengeAnswers] = useState<Record<string, any>>({});
 
   // Expediente state
@@ -222,11 +227,12 @@ export const Tomo02Sector01View: React.FC<Tomo02Sector01ViewProps> = ({
             onOpenExpediente={() => setShowExpedienteModal(true)}
             onSaveDossier={(dossier) => {
               setDossierData(dossier);
-              handleCompleteInvestigation('mission-01');
+              recorder.setMissionPassed(true);
             }}
           />
         ) : activeTab === 'test' ? (
           <Tomo02Sector01TestView
+            onPassTest={recorder.setTestScore}
             onBackToReader={() => setActiveTab('reader')}
             onOpenExpediente={() => setShowExpedienteModal(true)}
           />

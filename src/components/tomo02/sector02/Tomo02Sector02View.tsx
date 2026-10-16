@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTomo02LegacySectorProgress, type LegacySectorStatus } from '../shared/useTomo02LegacySectorProgress';
 import {
   BookOpen,
   CheckCircle2,
@@ -32,12 +33,14 @@ import { Tomo02Sector02MissionView } from './Tomo02Sector02MissionView';
 import { Sector02VisualDiagram } from './Sector02VisualDiagrams';
 
 interface Tomo02Sector02ViewProps {
+  onSectorProgress?: (id: string, status: LegacySectorStatus) => void;
   onBackToMagazine?: () => void;
   onOpenSector00?: () => void;
   onOpenSector01?: () => void;
 }
 
 export const Tomo02Sector02View: React.FC<Tomo02Sector02ViewProps> = ({
+  onSectorProgress,
   onBackToMagazine,
   onOpenSector00,
   onOpenSector01,
@@ -49,7 +52,9 @@ export const Tomo02Sector02View: React.FC<Tomo02Sector02ViewProps> = ({
   const [searchFilter, setSearchFilter] = useState('');
 
   // Progress state
-  const [completedInvestigations, setCompletedInvestigations] = useState<Record<string, boolean>>({});
+  const recorder = useTomo02LegacySectorProgress('02', SECTOR_02_INVESTIGATIONS.map(inv => inv.id), 80, onSectorProgress);
+  const completedInvestigations = recorder.completedRecords;
+  const setCompletedInvestigations = recorder.setCompletedRecords;
   const [challengeAnswers, setChallengeAnswers] = useState<Record<string, any>>({});
   const [challengeSuccess, setChallengeSuccess] = useState<Record<string, boolean>>({});
 
@@ -206,7 +211,8 @@ export const Tomo02Sector02View: React.FC<Tomo02Sector02ViewProps> = ({
         {activeTab === 'test' ? (
           <Tomo02Sector02TestView
             onBack={() => setActiveTab('reader')}
-            onPassTest={() => {
+            onPassTest={(score) => {
+              recorder.setTestScore(score);
               setActiveTab('reader');
             }}
           />
@@ -214,6 +220,7 @@ export const Tomo02Sector02View: React.FC<Tomo02Sector02ViewProps> = ({
           <Tomo02Sector02MissionView
             onBack={() => setActiveTab('reader')}
             onMissionComplete={() => {
+              recorder.setMissionPassed(true);
               setActiveTab('reader');
             }}
           />

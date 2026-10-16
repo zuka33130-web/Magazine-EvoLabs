@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTomo02LegacySectorProgress, type LegacySectorStatus } from '../shared/useTomo02LegacySectorProgress';
 import {
   BookOpen,
   CheckCircle2,
@@ -27,6 +28,7 @@ import { Tomo02Sector03MissionView } from './Tomo02Sector03MissionView';
 import { Sector03VisualDiagram, WindowsControlRoomMapDiagram } from './Sector03VisualDiagrams';
 
 interface Tomo02Sector03ViewProps {
+  onSectorProgress?: (id: string, status: LegacySectorStatus) => void;
   onBackToMagazine?: () => void;
   onOpenSector00?: () => void;
   onOpenSector01?: () => void;
@@ -34,6 +36,7 @@ interface Tomo02Sector03ViewProps {
 }
 
 export const Tomo02Sector03View: React.FC<Tomo02Sector03ViewProps> = ({
+  onSectorProgress,
   onBackToMagazine,
 }) => {
   // Navigation & Subviews
@@ -43,7 +46,9 @@ export const Tomo02Sector03View: React.FC<Tomo02Sector03ViewProps> = ({
   const [searchFilter, setSearchFilter] = useState('');
 
   // Progress state
-  const [completedInvestigations, setCompletedInvestigations] = useState<Record<string, boolean>>({});
+  const recorder = useTomo02LegacySectorProgress('03', SECTOR_03_INVESTIGATIONS.map(inv => inv.id), 80, onSectorProgress);
+  const completedInvestigations = recorder.completedRecords;
+  const setCompletedInvestigations = recorder.setCompletedRecords;
   const [challengeAnswers, setChallengeAnswers] = useState<Record<string, any>>({});
   const [challengeSuccess, setChallengeSuccess] = useState<Record<string, boolean>>({});
 
@@ -208,7 +213,8 @@ export const Tomo02Sector03View: React.FC<Tomo02Sector03ViewProps> = ({
         {activeTab === 'test' ? (
           <Tomo02Sector03TestView
             onBack={() => setActiveTab('reader')}
-            onPassTest={() => {
+            onPassTest={(score) => {
+              recorder.setTestScore(score);
               setActiveTab('reader');
             }}
           />
@@ -216,6 +222,7 @@ export const Tomo02Sector03View: React.FC<Tomo02Sector03ViewProps> = ({
           <Tomo02Sector03MissionView
             onBack={() => setActiveTab('reader')}
             onMissionComplete={() => {
+              recorder.setMissionPassed(true);
               setActiveTab('reader');
             }}
           />
