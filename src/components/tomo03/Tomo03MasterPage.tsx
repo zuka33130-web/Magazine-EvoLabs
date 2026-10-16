@@ -15,7 +15,7 @@ interface Tomo03MasterPageProps {
 
 export const Tomo03MasterPage: React.FC<Tomo03MasterPageProps> = ({
   pageNumber,
-  totalPages = 48,
+  totalPages = 42,
   sectionTitle = 'MANUAL DE BANCO PC',
   subSlug = 'DIAGNÓSTICO & HARDWARE DE ESCRITORIO',
   accentColor = '#10B981',
