@@ -687,7 +687,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                   CASOS DE REPARACIÓN DE ESCRITORIO RESUELTOS
                 </h2>
                 <p className="text-xs font-mono-tech text-zinc-400">
-                  Desmontaje analítico: cómo el método pericial evitó compras inútiles de hardware.
+                  Escenarios sintéticos de aprendizaje: los valores y diagnósticos son ilustrativos, no mediciones reales verificadas.
                 </p>
               </div>
 
@@ -703,13 +703,13 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                       </div>
                       <div className="text-[11px] text-zinc-300 space-y-1">
                         <p><strong className="text-zinc-400">Síntoma:</strong> {c.symptom}</p>
-                        <p><strong className="text-amber-400">Hipótesis falsa:</strong> {c.hypothesis}</p>
+                        <p><strong className="text-amber-400">Hipótesis inicial:</strong> {c.hypothesis}</p>
                         <p><strong className="text-emerald-400">Medición clave:</strong> {c.measurement}</p>
                         <p><strong className="text-zinc-400">Descartado:</strong> {c.discarded}</p>
                       </div>
                     </div>
                     <div className="pt-2 border-t border-zinc-900 text-[10px] text-emerald-400">
-                      <strong>Causa Raíz & Reparación:</strong> {c.rootCause} → {c.repairAction}
+                      <strong>Causa propuesta y reparación simulada:</strong> {c.rootCause} → {c.repairAction}
                     </div>
                   </div>
                 ))}
