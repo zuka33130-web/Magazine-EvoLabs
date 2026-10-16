@@ -1,0 +1,40 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {TOMO03_PROFESSIONAL_MODULES} from '../src/data/tomo03ProfessionalContent';
+import {emptyProfessionalState} from '../src/data/tomo03ProfessionalTypes';
+import {performRepairTest,validateRepair,parseProfessionalState,moduleAssessment,assessAtxUncertainty,compareRepairSamples} from '../src/data/tomo03RepairEngine';
+import {TOMO_03_MODULES} from '../src/data/tomo03Data';
+test('specializations have unique original module ownership and a complete technical contract',()=>{
+ const ids=new Set<string>();
+ for(const content of TOMO03_PROFESSIONAL_MODULES){
+  assert.ok(!ids.has(content.number));ids.add(content.number);assert.ok(TOMO_03_MODULES.some(m=>m.moduleNumber===content.number));
+  assert.equal(content.levels.length,3);assert.ok(content.levels.every(p=>p.length>180));assert.ok(content.diagram.length>=4);assert.ok(content.tree.length>=3);assert.ok(content.procedure.length>=4);assert.ok(content.quiz.length>=3);
+  for(const question of content.quiz){assert.ok(question.choices.some(c=>c.id===question.correct));assert.ok(question.choices.every(c=>c.feedback.length>40));}
+  assert.ok(content.references.every(ref=>ref.url.startsWith('https://')));assert.ok(content.measurement.uncertainty.length>30);
+ }
+});
+for(const content of TOMO03_PROFESSIONAL_MODULES)test(`case ${content.number}: evidence gates, incorrect repairs, validation and safe restoration`,()=>{
+ const scenario=content.scenario;
+ let state=emptyProfessionalState();assert.equal(validateRepair(scenario,state).state.verified,false);
+ const premature=scenario.tests.find(t=>t.requires?.length);if(premature){const attempt=performRepairTest(scenario,state,premature.id);assert.deepEqual(attempt.state.observations,[]);assert.match(attempt.message,/previas/);}
+ for(const unsafe of scenario.tests.filter(t=>t.unsafe)){state=performRepairTest(scenario,state,unsafe.id).state;assert.ok(!state.observations.includes(unsafe.id));}
+ assert.equal(parseProfessionalState({verified:true},content).verified,false);
+ for(const observation of scenario.tests.filter(t=>!t.unsafe))state=performRepairTest(scenario,state,observation.id).state;
+ assert.equal(state.observations.length,scenario.tests.filter(t=>!t.unsafe).length);
+ state={...state,hypothesis:scenario.cause,repair:scenario.repairs.find(r=>r.id!==scenario.repair)!.id};
+ assert.equal(validateRepair(scenario,state).state.verified,false);
+ state={...state,repair:scenario.repair};state=validateRepair(scenario,state).state;assert.equal(state.verified,true);
+ assert.equal(parseProfessionalState(JSON.parse(JSON.stringify(state)),content).verified,true);
+ assert.equal(moduleAssessment(content,state).practiceValidated,true);assert.equal(moduleAssessment(content,state).theoryPassed,false);
+ state.quiz=Object.fromEntries(content.quiz.map(q=>[q.id,q.correct]));assert.equal(moduleAssessment(content,state).theoryPassed,true);
+ const forged={...state,observations:['fake'],verified:true};assert.equal(parseProfessionalState(forged,content).verified,false);
+});
+test('measurement tools: boundary uncertainty and comparable series, including genuine zero',()=>{
+ assert.equal(assessAtxUncertainty(11.4,.05,11.4,12.6)?.status,'INDETERMINATE');
+ assert.equal(assessAtxUncertainty(12.04,.03,11.4,12.6)?.status,'WITHIN');
+ assert.equal(assessAtxUncertainty(11,.03,11.4,12.6)?.status,'OUTSIDE');
+ assert.equal(assessAtxUncertainty(NaN,0,11.4,12.6),null);assert.equal(assessAtxUncertainty(12,-1,11.4,12.6),null);
+ assert.equal(compareRepairSamples([0,0,0],[1,1,1])?.percent,null);
+ assert.equal(compareRepairSamples([1,2,3],[2,3]),null);assert.equal(compareRepairSamples([1,NaN,3],[1,2,3]),null);
+ assert.equal(compareRepairSamples([10,11,12],[8,9,10])?.delta,-2);
+});

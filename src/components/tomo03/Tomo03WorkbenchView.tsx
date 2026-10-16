@@ -2,6 +2,12 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {Activity, ArrowLeft, BookOpen, CheckCircle2, ClipboardList, Download, FlaskConical, Gauge, RotateCcw, Search, ShieldAlert, Wrench} from 'lucide-react';
 import {TOMO_03_MODULES} from '../../data/tomo03Data';
 import {ATX_RAILS, assessAtxRail, TOMO03_REPAIR_LABS} from '../../data/tomo03WorkbenchData';
+import {TOMO03_PROFESSIONAL_MODULES,getProfessionalModule} from '../../data/tomo03ProfessionalContent';
+import type {ProfessionalState} from '../../data/tomo03ProfessionalTypes';
+import {parseProfessionalState,moduleAssessment} from '../../data/tomo03RepairEngine';
+import {Tomo03ProfessionalModule} from './Tomo03ProfessionalModule';
+import {EvoRepairLab} from './EvoRepairLab';
+import {Tomo03RepairTools} from './Tomo03RepairTools';
 
 type Section = 'protocolos'|'laboratorios'|'herramientas'|'expediente';
 type Branch = 'untested'|'yes'|'no';
@@ -17,7 +23,7 @@ type RecordItem = {
   rollback: string;
   provenance: Provenance;
 };
-type Store = {schema:1;records:Record<string,RecordItem>;labs:Record<string,Record<string,string>>};
+type Store = {schema:1;records:Record<string,RecordItem>;labs:Record<string,Record<string,string>>;professional?:Record<string,ProfessionalState>};
 const storageKey='evo_tomo03_repair_workbench_v1';
 const blank=():RecordItem=>({
   branch:'untested',symptom:'',observation:'',hypothesis:'',test:'',result:'',validation:'',rollback:'',
@@ -27,7 +33,7 @@ const readStore=():Store=>{
   try {
     const saved=JSON.parse(localStorage.getItem(storageKey)||'{}');
     if(saved.schema===1 && saved.records && typeof saved.records==='object' && saved.labs && typeof saved.labs==='object'){
-      return {schema:1,records:saved.records,labs:saved.labs};
+      return {schema:1,records:saved.records,labs:saved.labs,professional:saved.professional&&typeof saved.professional==='object'?saved.professional:{}};
     }
   }catch{ /* No storage in private mode or invalid old data. */ }
   return {schema:1,records:{},labs:{}};
@@ -47,7 +53,11 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
   const [rail,setRail]=useState<string>('12');
   const [voltage,setVoltage]=useState('');
   const [showTheory,setShowTheory]=useState(false);
+  const [professionalCase,setProfessionalCase]=useState<string|null>(null);
   const current=TOMO_03_MODULES.find(item=>item.id===moduleId)||TOMO_03_MODULES[0];
+  const professional=getProfessionalModule(current.moduleNumber);
+  const caseContent=getProfessionalModule(professionalCase||'');
+  const updateProfessional=(number:string,state:ProfessionalState)=>setStore(prev=>({...prev,professional:{...prev.professional,[number]:state}}));
   const record={...blank(),...(store.records[current.id]||{})};
   const lab=TOMO03_REPAIR_LABS.find(item=>item.id===labId)!;
   const labAnswers=store.labs[lab.id]||{};
@@ -83,6 +93,12 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
       'VALIDACIÓN: '+(record.validation||'(sin consignar)'),
       'REVERSIÓN: '+(record.rollback||'(sin consignar)'),
       'RUTA DEL ÁRBOL: '+record.branch,
+      ...(professional?[
+        'RECORRIDO PROFESIONAL: '+JSON.stringify(parseProfessionalState(store.professional?.[professional.number],professional)),
+        'EVALUACIÓN EDUCATIVA: '+JSON.stringify(moduleAssessment(professional,parseProfessionalState(store.professional?.[professional.number],professional))),
+        'CAUSA Y REPARACIÓN SIMULADAS: '+(parseProfessionalState(store.professional?.[professional.number],professional).verified?professional.scenario.hypotheses.find(h=>h.id===professional.scenario.cause)?.label:'Aún sin resolución validada'),
+        'LÍMITES: '+professional.scenario.limits
+      ]:[]),
       '',
       'PRÁCTICAS DIDÁCTICAS (NO SON MEDICIONES FÍSICAS):',
       ...TOMO03_REPAIR_LABS.map(item=>{
@@ -147,7 +163,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
                 <p className="text-amber-300">Riesgo declarado: {current.safetyLevel.replaceAll('_',' ')}</p>
               </div>}
             </div>
-            <div className="bg-black/40 border border-emerald-900/70 rounded-lg p-4 space-y-3">
+            {professional?<Tomo03ProfessionalModule key={professional.number} content={professional} state={parseProfessionalState(store.professional?.[professional.number],professional)} onChange={state=>updateProfessional(professional.number,state)} onLab={()=>{setProfessionalCase(professional.number);setSection('laboratorios');}} onTool={()=>setSection('herramientas')}/>:<div className="bg-black/40 border border-emerald-900/70 rounded-lg p-4 space-y-3">
               <h3 className="font-bold text-emerald-300 text-sm">2. Árbol de decisión interactivo</h3>
               <p className="text-sm">{current.decisionTree.question}</p>
               <div className="flex flex-wrap gap-2">{([
@@ -159,7 +175,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
                 {record.branch==='yes'?current.decisionTree.yesAction:record.branch==='no'?current.decisionTree.noAction:'Elegí solo una observación realmente comprobada. Si no la mediste, dejá «No comprobado».'}
               </p>
               <p className="text-xs text-amber-300">Una rama indica la próxima comprobación sugerida; no certifica la causa de una avería.</p>
-            </div>
+            </div>}
             <div className="grid sm:grid-cols-2 gap-3">
               <label className="text-xs text-zinc-300">Síntoma reproducible<textarea value={record.symptom} onChange={e=>update({symptom:e.target.value})} rows={3} placeholder="Qué ocurre, cuándo y con qué frecuencia" className="mt-1 block w-full rounded-lg border border-zinc-700 bg-black p-3"/></label>
               <label className="text-xs text-zinc-300">Observación o medición<textarea value={record.observation} onChange={e=>update({observation:e.target.value})} rows={3} placeholder="Dato obtenido y fuente; no inventar valores" className="mt-1 block w-full rounded-lg border border-zinc-700 bg-black p-3"/></label>
@@ -185,7 +201,11 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
           </section>
         </div>
       </div>}
-      {section==='laboratorios'&&<section className="grid lg:grid-cols-[270px_minmax(0,1fr)] gap-5">
+      {section==='laboratorios'&&<div className="space-y-5">
+       <section className="p-4 rounded-xl border border-emerald-800 space-y-3"><h2 className="text-xl font-bold">EVO Repair Lab · investigación de fallas</h2><label className="text-xs block">Equipo y escenario simulado<select aria-label="Equipo y escenario simulado" className="block w-full bg-black border border-zinc-700 p-2 rounded-lg mt-1" value={professionalCase||''} onChange={e=>{setProfessionalCase(e.target.value||null);if(e.target.value)setModuleId('mod'+e.target.value);}}><option value="">Seleccionar equipo simulado</option>{TOMO03_PROFESSIONAL_MODULES.map(m=><option key={m.number} value={m.number}>[{m.number}] {m.scenario.equipment} · {m.scenario.symptom}</option>)}</select></label><p className="text-xs text-zinc-400">Elegís un equipo y un síntoma. Las pruebas revelan evidencia del caso; la resolución permanece oculta hasta sustentar y comprobar una reparación.</p></section>
+       {caseContent&&<EvoRepairLab key={caseContent.number} content={caseContent} state={parseProfessionalState(store.professional?.[caseContent.number],caseContent)} onChange={state=>updateProfessional(caseContent.number,state)} onDocument={()=>{setModuleId('mod'+caseContent.number);setSection('expediente');}}/>}
+       <h2 className="font-bold text-lg">Cuatro prácticas guiadas originales</h2>
+       <section className="grid lg:grid-cols-[270px_minmax(0,1fr)] gap-5">
         <aside className="space-y-2">{TOMO03_REPAIR_LABS.map(item=><button key={item.id} type="button" onClick={()=>setLabId(item.id)} aria-pressed={lab.id===item.id} className={'block w-full text-left p-3 rounded-xl border text-sm '+(lab.id===item.id?'bg-emerald-950/50 border-emerald-500':'bg-zinc-950 border-zinc-800')}>{item.title}<span className="block text-xs text-zinc-400 mt-1">{item.steps.length} decisiones</span></button>)}</aside>
         <div className="space-y-4 min-w-0">
           <div className="rounded-2xl border border-emerald-800 p-5 bg-[#09140e] space-y-3">
@@ -209,8 +229,8 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
             <div className="flex flex-wrap gap-2"><button type="button" onClick={()=>setStore(prev=>({...prev,labs:{...prev.labs,[lab.id]:{}}}))} className="flex items-center gap-2 text-xs border border-zinc-700 rounded-lg px-3 py-2"><RotateCcw size={14}/> Repetir práctica</button><button type="button" onClick={()=>setSection('expediente')} className="text-xs bg-emerald-500 text-black font-bold rounded-lg px-3 py-2">Ver avance en expediente</button></div>
           </div>
         </div>
-      </section>}
-      {section==='herramientas'&&<div className="grid lg:grid-cols-2 gap-5">
+      </section></div>}
+      {section==='herramientas'&&<><Tomo03RepairTools/><div className="grid lg:grid-cols-2 gap-5">
         <section className="rounded-2xl border border-emerald-800 bg-[#09140e] p-5 space-y-4">
           <h2 className="text-xl font-black flex items-center gap-2"><Gauge size={20}/> Intérprete de tensiones ATX</h2>
           <p className="text-xs text-zinc-300">Calculadora para introducir una medición manual. No conecta con un multímetro ni verifica el estado de la fuente. Rangos nominales ±5 % por riel para interpretación orientativa.</p>
@@ -232,7 +252,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
           </ol>
           <p className="text-xs text-zinc-500">Próximos instrumentos: lectura de SMART, línea de tiempo POST, temperaturas y pruebas de estabilidad con procedencia de datos. No se presentan aún como disponibles.</p>
         </section>
-      </div>}
+      </div></>}
       {section==='expediente'&&<section className="rounded-2xl border border-emerald-800 bg-[#09140e] p-5 space-y-4 max-w-5xl">
         <h2 className="text-xl font-black flex gap-2 items-center"><ClipboardList size={20}/> Expediente de reparación · {current.title}</h2>
         <p className="text-sm text-zinc-300">Los datos se guardan en este navegador para los 35 módulos. El expediente informa observaciones declaradas y prácticas simuladas; no expide certificados.</p>
@@ -244,7 +264,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
         </div>
         <p className="text-xs text-amber-300">No guardes contraseñas, datos identificatorios de clientes ni claves de cifrado. Antes de prestar un equipo, considerá exportar el informe y borrar los datos locales según la política de privacidad del taller.</p>
       </section>}
-      <footer className="text-[11px] text-zinc-600 border-t border-emerald-950 py-5 flex items-center gap-2"><Activity size={14}/> EVO LABS // BANCO EN DESARROLLO · cuatro laboratorios activos · 35 protocolos con registro por módulo</footer>
+      <footer className="text-[11px] text-zinc-500 border-t border-emerald-950 py-5 flex items-center gap-2"><Activity size={14}/> EVO LABS // {TOMO03_PROFESSIONAL_MODULES.length} módulos especializados · cuatro prácticas originales · 35 protocolos con registro. Los demás módulos continúan en desarrollo.</footer>
     </div>
   </main>;
 };
