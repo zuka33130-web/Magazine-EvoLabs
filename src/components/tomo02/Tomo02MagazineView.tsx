@@ -906,6 +906,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             moduleProgress={moduleProgress}
             completedCount={completedCount}
             hasPassedFinalExam={hasPassedFinalExam}
+            canIssueCertificate={completionEligible}
           />
         </div>
       </div>

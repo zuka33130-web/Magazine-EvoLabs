@@ -60,6 +60,7 @@ interface Tomo02EditorialIndexProps {
   moduleProgress?: ModuleProgressStatus;
   completedCount?: number;
   hasPassedFinalExam?: boolean;
+  canIssueCertificate?: boolean;
 }
 
 export interface SectorLevelGroup {
@@ -131,6 +132,10 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
   onOpenSector10,
   onOpenOriginalSector,
   onOpenAdvancedSector,
+  onStartFinalExam,
+  onOpenCompletionScreen,
+  hasPassedFinalExam = false,
+  canIssueCertificate = false,
   moduleProgress = {},
 }) => {
   const [selectedGroup, setSelectedGroup] = useState<string>('all');
@@ -314,6 +319,31 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
           </div>
         </div>
       </header>
+
+      {onStartFinalExam && (
+        <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-5 rounded-xl bg-[#101923] border border-sky-500/30" aria-label="Evaluación final del Tomo 02">
+          <div className="space-y-1">
+            <h2 className="text-sm font-bold text-white uppercase">Evaluación general del Tomo 02</h2>
+            <p className="text-xs text-zinc-300">
+              {hasPassedFinalExam
+                ? canIssueCertificate ? 'Recorrido y evaluación aprobados: constancia disponible.' : 'Teoría aprobada. La constancia requiere completar los 40 sectores y el expediente final.'
+                : 'Comprobá tus conocimientos. Aprobar la teoría no completa automáticamente el tomo.'}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 shrink-0">
+            <button type="button" onClick={onStartFinalExam}
+              className="px-4 py-2.5 rounded-lg bg-[#0078D4] hover:bg-[#0067C0] text-white text-xs font-bold uppercase">
+              {hasPassedFinalExam ? 'Revisar examen →' : 'Abrir examen final →'}
+            </button>
+            {canIssueCertificate && onOpenCompletionScreen && (
+              <button type="button" onClick={onOpenCompletionScreen}
+                className="px-4 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold uppercase">
+                Ver constancia →
+              </button>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Main Settings/Explorer-Style 2-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
