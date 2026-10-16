@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { safeStorage } from '../../../utils/safeStorage';
 import { useTomo02LegacySectorProgress, type LegacySectorStatus } from '../shared/useTomo02LegacySectorProgress';
 import {
   BookOpen,
@@ -68,7 +69,15 @@ export const Tomo02Sector00View: React.FC<Tomo02Sector00ViewProps> = ({
     fieldKey, label, value: '', source: 'Pendiente de declaración manual',
     provenance: 'UNKNOWN', confidence: 'DECLARED_ONLY', timestamp: '',
   });
-  const [passportData, setPassportData] = useState<Sector00Passport>(() => ({
+  const [passportData, setPassportData] = useState<Sector00Passport>(() => {
+    // Only restore documents explicitly saved by the user, not old hardcoded examples.
+    try {
+      const raw = JSON.parse(safeStorage.getItem('evo_tomo02_sector00_passport_v1') || 'null');
+      if (raw && typeof raw === 'object' && raw.edition?.provenance === 'USER_DECLARED' &&
+          raw.userProfile?.provenance === 'USER_DECLARED' && raw.baseline?.captured === false)
+        return raw as Sector00Passport;
+    } catch { /* Recover to a blank educational passport. */ }
+    return ({
     passportId: 'EVO-WIN-PASSPORT-001-DRAFT',
     edition: unknownField('edition', 'Edición del SO'),
     version: unknownField('version', 'Versión del Sistema'),
@@ -82,7 +91,12 @@ export const Tomo02Sector00View: React.FC<Tomo02Sector00ViewProps> = ({
     statusTag: 'NO DISPONIBLE',
     baseline: { captured: false, timestamp: '', ramTotalGB: null, diskFreeGB: null,
       processCount: null, startupAppsCount: null, bootTimeSec: null },
-  }));
+    });
+  });
+  useEffect(() => {
+    // Only persist explicitly completed documents; no invented baseline on first visit.
+    if (recorder.missionPassed) safeStorage.setItem('evo_tomo02_sector00_passport_v1', JSON.stringify(passportData));
+  }, [passportData, recorder.missionPassed]);
 
   const isMissionPassed = recorder.missionPassed;
   const setIsMissionPassed = recorder.setMissionPassed;

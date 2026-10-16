@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { safeStorage } from '../../../utils/safeStorage';
 import { useTomo02LegacySectorProgress, type LegacySectorStatus } from '../shared/useTomo02LegacySectorProgress';
 import {
   BookOpen,
@@ -59,7 +60,20 @@ export const Tomo02Sector01View: React.FC<Tomo02Sector01ViewProps> = ({
   const [challengeAnswers, setChallengeAnswers] = useState<Record<string, any>>({});
 
   // Expediente state
-  const [dossierData, setDossierData] = useState<Sector01BootDossier | undefined>(undefined);
+  const [dossierData, setDossierData] = useState<Sector01BootDossier | undefined>(() => {
+    try {
+      const raw = JSON.parse(safeStorage.getItem('evo_tomo02_sector01_dossier_v1') || 'null');
+      if (raw && typeof raw === 'object' && typeof raw.dossierId === 'string' &&
+          raw.biosMode?.provenance?.startsWith('USER_DECLARED') &&
+          raw.biosMode?.status === 'WARNING' && raw.evaluatedStages === 0)
+        return raw as Sector01BootDossier;
+    } catch { /* Blank form retains its original mission route. */ }
+    return undefined;
+  });
+  useEffect(() => {
+    if (recorder.missionPassed && dossierData)
+      safeStorage.setItem('evo_tomo02_sector01_dossier_v1', JSON.stringify(dossierData));
+  }, [recorder.missionPassed, dossierData]);
 
   // Copy helper
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
