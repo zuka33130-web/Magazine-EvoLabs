@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTomo02LegacySectorProgress, type LegacySectorStatus } from '../shared/useTomo02LegacySectorProgress';
 import {
   BookOpen,
   CheckCircle2,
@@ -29,6 +30,7 @@ import { Tomo02Sector05TestView } from './Tomo02Sector05TestView';
 import { Tomo02Sector05MissionView } from './Tomo02Sector05MissionView';
 
 interface Tomo02Sector05ViewProps {
+  onSectorProgress?: (id: string, status: LegacySectorStatus) => void;
   onBackToMagazine: () => void;
   onOpenSector00?: () => void;
   onOpenSector01?: () => void;
@@ -38,6 +40,7 @@ interface Tomo02Sector05ViewProps {
 }
 
 export const Tomo02Sector05View: React.FC<Tomo02Sector05ViewProps> = ({
+  onSectorProgress,
   onBackToMagazine,
 }) => {
   const [activeTab, setActiveTab] = useState<'reader' | 'mission' | 'test'>('reader');
@@ -45,7 +48,9 @@ export const Tomo02Sector05View: React.FC<Tomo02Sector05ViewProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
   const [isMiniCasesOpen, setIsMiniCasesOpen] = useState<boolean>(false);
-  const [completedInvs, setCompletedInvs] = useState<string[]>([]);
+  const recorder = useTomo02LegacySectorProgress('05', SECTOR_05_INVESTIGATIONS.map(inv => inv.code), 80, onSectorProgress);
+  const completedInvs = recorder.completedCodes;
+  const setCompletedInvs = recorder.setCompletedCodes;
 
   const investigations = SECTOR_05_INVESTIGATIONS;
 
@@ -72,11 +77,11 @@ export const Tomo02Sector05View: React.FC<Tomo02Sector05ViewProps> = ({
   };
 
   if (activeTab === 'mission') {
-    return <Tomo02Sector05MissionView onBack={() => setActiveTab('reader')} />;
+    return <Tomo02Sector05MissionView onBack={() => setActiveTab('reader')} onPracticeCompleted={() => recorder.setMissionPassed(true)} />;
   }
 
   if (activeTab === 'test') {
-    return <Tomo02Sector05TestView onBack={() => setActiveTab('reader')} />;
+    return <Tomo02Sector05TestView onBack={() => setActiveTab('reader')} onPassTest={recorder.setTestScore} />;
   }
 
   return (

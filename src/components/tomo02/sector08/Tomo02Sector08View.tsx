@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTomo02LegacySectorProgress, type LegacySectorStatus } from '../shared/useTomo02LegacySectorProgress';
 import {
   BookOpen,
   CheckCircle2,
@@ -28,6 +29,7 @@ import { Tomo02Sector08TestView } from './Tomo02Sector08TestView';
 import { Tomo02Sector08MissionView } from './Tomo02Sector08MissionView';
 
 interface Tomo02Sector08ViewProps {
+  onSectorProgress?: (id: string, status: LegacySectorStatus) => void;
   onBackToMagazine: () => void;
   onOpenSector00?: () => void;
   onOpenSector01?: () => void;
@@ -40,6 +42,7 @@ interface Tomo02Sector08ViewProps {
 }
 
 export const Tomo02Sector08View: React.FC<Tomo02Sector08ViewProps> = ({
+  onSectorProgress,
   onBackToMagazine,
 }) => {
   const [activeTab, setActiveTab] = useState<'reader' | 'mission' | 'test'>('reader');
@@ -47,7 +50,9 @@ export const Tomo02Sector08View: React.FC<Tomo02Sector08ViewProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
   const [isMiniCasesOpen, setIsMiniCasesOpen] = useState<boolean>(false);
-  const [completedInvs, setCompletedInvs] = useState<string[]>([]);
+  const recorder = useTomo02LegacySectorProgress('08', SECTOR_08_INVESTIGATIONS.map(inv => inv.code), 80, onSectorProgress);
+  const completedInvs = recorder.completedCodes;
+  const setCompletedInvs = recorder.setCompletedCodes;
 
   const investigations = SECTOR_08_INVESTIGATIONS;
 
@@ -74,11 +79,11 @@ export const Tomo02Sector08View: React.FC<Tomo02Sector08ViewProps> = ({
   };
 
   if (activeTab === 'mission') {
-    return <Tomo02Sector08MissionView onBackToReader={() => setActiveTab('reader')} />;
+    return <Tomo02Sector08MissionView onBackToReader={() => setActiveTab('reader')} onPracticeCompleted={() => recorder.setMissionPassed(true)} />;
   }
 
   if (activeTab === 'test') {
-    return <Tomo02Sector08TestView onBackToReader={() => setActiveTab('reader')} />;
+    return <Tomo02Sector08TestView onBackToReader={() => setActiveTab('reader')} onPassTest={recorder.setTestScore} />;
   }
 
   return (
