@@ -54,7 +54,10 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
   const answered=lab.steps.filter(step=>step.options.some(c=>c.id===labAnswers[step.id])).length;
   const correct=lab.steps.filter(step=>step.correctId===labAnswers[step.id]).length;
   const matchingLabs=TOMO03_REPAIR_LABS.filter(item=>item.moduleNumbers.includes(current.moduleNumber));
-  const recordsCount=Object.values(store.records).filter((item)=>item && (item.symptom?.trim() || item.observation?.trim())).length;
+  const recordsCount=Object.keys(store.records).filter((key) => {
+    const item: RecordItem | undefined = store.records[key];
+    return Boolean(item && (item.symptom?.trim() || item.observation?.trim()));
+  }).length;
   const filtered=useMemo(()=>TOMO_03_MODULES.filter(item=>[item.moduleNumber,item.title,item.subtitle,item.categoryTag]
     .some(value=>value.toLocaleLowerCase('es').includes(filter.toLocaleLowerCase('es').trim()))),[filter]);
   useEffect(()=>{try{localStorage.setItem(storageKey,JSON.stringify(store));}catch{/* Storage optional. */}},[store]);
