@@ -40,6 +40,10 @@ async function run(){
   assert(document.body.textContent!.includes('Finalización pendiente'),'39/40 should block certificate');
   assert(localStorage.getItem('evo_tomo02_completed')==='false','39/40 completion erroneously granted');
   report('39 of 40 sectors => certificate denied');
+  await mount(<TutorEvoProvider><Tomo02MagazineView initialSubView="index" /></TutorEvoProvider>);
+  assert(![...document.querySelectorAll('button')].some(b=>b.textContent?.includes('Ver constancia')),
+    'Incomplete course offered a certificate button');
+  report('incomplete course index hides certificate entry');
 
   localStorage.clear();
   put('evo_tomo02_progress',completeProgress());
@@ -67,6 +71,13 @@ async function run(){
   assert(document.body.textContent!.includes('8 / 10 (80%)'),'Real exam score missing from certificate');
   assert(localStorage.getItem('evo_tomo02_completed')==='true','Eligible completion not persisted');
   report('all prerequisites => internal certificate, real score 8/10');
+  await mount(<TutorEvoProvider><Tomo02MagazineView initialSubView="index" /></TutorEvoProvider>);
+  const certificateButton=[...document.querySelectorAll('button')].find(b=>b.textContent?.includes('Ver constancia'));
+  assert(certificateButton,'Completed index did not show certificate navigation');
+  flushSync(()=>certificateButton!.click());
+  await pause();
+  assert(document.body.textContent!.includes('TOMO 02 SUPERADO CON ÉXITO'),'Index certificate navigation failed');
+  report('certified course index => certificate route works');
 
   localStorage.clear();
   const partial={ 'sector-00':'completed','sector-02':'in_progress' } as Record<string,'completed'|'in_progress'|'not_started'>;
