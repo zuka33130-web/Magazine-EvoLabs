@@ -34,16 +34,10 @@ export const Tomo02Sector01MissionView: React.FC<Tomo02Sector01MissionViewProps>
   onSaveDossier,
 }) => {
   // Form fields for the 9 boot inspection parameters
+  // No default can be mistaken for a reading taken from the user's PC.
   const [formData, setFormData] = useState({
-    biosMode: 'UEFI',
-    partitionScheme: 'GPT',
-    secureBoot: 'Habilitado',
-    tpmVersion: '2.0',
-    espPartition: '100MB FAT32',
-    bcdStatus: 'Válido / Presente',
-    winloadState: 'Firmado por Microsoft',
-    postTime: '3.2 segundos',
-    fastStartup: 'Desactivado (Cold Boot)',
+    biosMode: '', partitionScheme: '', secureBoot: '', tpmVersion: '',
+    espPartition: '', bcdStatus: '', winloadState: '', postTime: '', fastStartup: '',
   });
 
   const [orderSequence, setOrderSequence] = useState([
@@ -62,9 +56,8 @@ export const Tomo02Sector01MissionView: React.FC<Tomo02Sector01MissionViewProps>
 
   const handleValidateAndGenerate = () => {
     const errors: string[] = [];
-    if (!formData.biosMode) errors.push('Seleccioná el Modo de Firmware');
-    if (!formData.partitionScheme) errors.push('Seleccioná el Esquema de Particionado');
-    if (!formData.postTime) errors.push('Ingresá el tiempo aproximado de POST / Última hora de BIOS');
+    const missing = Object.entries(formData).filter(([, value]) => !value.trim()).map(([field]) => field);
+    if (missing.length) errors.push('Completá todos los campos observados o indicá explícitamente "No verificado": ' + missing.join(', '));
 
     if (errors.length > 0) {
       setValidationErrors(errors);
@@ -73,18 +66,22 @@ export const Tomo02Sector01MissionView: React.FC<Tomo02Sector01MissionViewProps>
 
     setValidationErrors([]);
 
+    const declared = (value: string, tool: string) => ({
+      value, provenance: 'USER_DECLARED (consulta manual sugerida: ' + tool + ')',
+      status: 'WARNING' as const,
+    });
     const newDossier: Sector01BootDossier = {
       dossierId: 'EVO-BOOT-EXPEDIENTE-002-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-      biosMode: { value: formData.biosMode, provenance: 'SYSTEM_REPORTED (msinfo32)', status: 'VALID' },
-      partitionScheme: { value: formData.partitionScheme, provenance: 'SYSTEM_REPORTED (diskpart)', status: 'VALID' },
-      secureBootStatus: { value: formData.secureBoot, provenance: 'SYSTEM_REPORTED (PowerShell)', status: 'VALID' },
-      tpmVersion: { value: `TPM ${formData.tpmVersion}`, provenance: 'SYSTEM_REPORTED (tpm.msc)', status: 'VALID' },
-      espPartitionState: { value: formData.espPartition, provenance: 'OBSERVED (diskmgmt.msc)', status: 'VALID' },
-      bcdStatus: { value: formData.bcdStatus, provenance: 'DERIVED (bcdedit)', status: 'VALID' },
-      winloadState: { value: formData.winloadState, provenance: 'SYSTEM_REPORTED (sigcheck)', status: 'VALID' },
-      lastPostTime: { value: formData.postTime, provenance: 'MEASURED (Taskmgr)', status: 'VALID' },
-      fastStartupMode: { value: formData.fastStartup, provenance: 'USER_DECLARED', status: 'VALID' },
-      evaluatedStages: 12,
+      biosMode: declared(formData.biosMode, 'msinfo32'),
+      partitionScheme: declared(formData.partitionScheme, 'diskpart'),
+      secureBootStatus: declared(formData.secureBoot, 'Confirm-SecureBootUEFI'),
+      tpmVersion: declared(formData.tpmVersion, 'tpm.msc'),
+      espPartitionState: declared(formData.espPartition, 'diskmgmt.msc'),
+      bcdStatus: declared(formData.bcdStatus, 'bcdedit'),
+      winloadState: declared(formData.winloadState, 'sigcheck'),
+      lastPostTime: declared(formData.postTime, 'Administrador de tareas'),
+      fastStartupMode: declared(formData.fastStartup, 'Opciones de energía'),
+      evaluatedStages: 0, // Sequence not autonomously verified.
     };
 
     onSaveDossier(newDossier);
@@ -136,7 +133,7 @@ export const Tomo02Sector01MissionView: React.FC<Tomo02Sector01MissionViewProps>
           OBJETIVO FORENSE DE LA MISIÓN
         </div>
         <h3 className="text-base md:text-lg font-bold text-white">
-          Inspeccionar y Certificar los 9 Vectores Pre-Boot de tu Equipo Real
+          Documentar los 9 vectores Pre-Boot con procedencia declarada
         </h3>
         <p className="text-xs md:text-sm text-zinc-300 leading-relaxed">
           Abrí las herramientas de diagnóstico en tu máquina física (<code>msinfo32</code>, <code>diskmgmt.msc</code>,{' '}
@@ -161,6 +158,7 @@ export const Tomo02Sector01MissionView: React.FC<Tomo02Sector01MissionViewProps>
               onChange={(e) => setFormData({ ...formData, biosMode: e.target.value })}
               className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-white focus:border-amber-500 outline-none"
             >
+              <option value="">Elegí según la inspección</option>
               <option value="UEFI Nativo">UEFI Nativo (Recomendado)</option>
               <option value="Heredado / CSM BIOS">Heredado / BIOS Clásica (Legacy)</option>
             </select>
@@ -175,6 +173,7 @@ export const Tomo02Sector01MissionView: React.FC<Tomo02Sector01MissionViewProps>
               onChange={(e) => setFormData({ ...formData, partitionScheme: e.target.value })}
               className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-white focus:border-amber-500 outline-none"
             >
+              <option value="">Elegí según la inspección</option>
               <option value="GPT (GUID Partition Table)">GPT (Requerido para UEFI/Win11)</option>
               <option value="MBR (Master Boot Record)">MBR (Antiguo / Legacy)</option>
             </select>
@@ -189,6 +188,7 @@ export const Tomo02Sector01MissionView: React.FC<Tomo02Sector01MissionViewProps>
               onChange={(e) => setFormData({ ...formData, secureBoot: e.target.value })}
               className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-white focus:border-amber-500 outline-none"
             >
+              <option value="">Elegí según la inspección</option>
               <option value="Habilitado / Activo">Habilitado (Secure Boot ON)</option>
               <option value="Deshabilitado">Deshabilitado (Secure Boot OFF)</option>
               <option value="No Soportado">No soportado por hardware</option>
@@ -204,6 +204,7 @@ export const Tomo02Sector01MissionView: React.FC<Tomo02Sector01MissionViewProps>
               onChange={(e) => setFormData({ ...formData, tpmVersion: e.target.value })}
               className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-white focus:border-amber-500 outline-none"
             >
+              <option value="">Elegí según la inspección</option>
               <option value="2.0">TPM 2.0 (Listo para usar)</option>
               <option value="1.2">TPM 1.2 (Generación anterior)</option>
               <option value="Ausente">Sin módulo TPM detectado</option>
@@ -236,6 +237,20 @@ export const Tomo02Sector01MissionView: React.FC<Tomo02Sector01MissionViewProps>
             />
             <span className="text-[10px] font-mono text-zinc-500 block">Taskmgr &gt; Inicio</span>
           </div>
+          {([
+            ['bcdStatus', 'Estado del almacén BCD', 'bcdedit /enum'],
+            ['winloadState', 'Estado de winload.efi', 'Consulta de firma o ruta de arranque'],
+            ['fastStartup', 'Inicio rápido', 'Opciones de energía'],
+          ] as const).map(([field, label, tool]) => (
+            <div key={field} className="space-y-1.5">
+              <label className="text-xs font-semibold text-zinc-300">{label}</label>
+              <input type="text" value={formData[field]}
+                onChange={event => setFormData(prev => ({ ...prev, [field]: event.target.value }))}
+                placeholder='Dato observado o "No verificado"'
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-xs text-white" />
+              <span className="text-[10px] font-mono text-zinc-500 block">{tool}</span>
+            </div>
+          ))}
         </div>
 
         {/* Validation error message */}
@@ -255,10 +270,10 @@ export const Tomo02Sector01MissionView: React.FC<Tomo02Sector01MissionViewProps>
           <div className="text-xs text-zinc-400">
             {missionComplete ? (
               <span className="text-emerald-400 font-bold flex items-center gap-1">
-                <CheckCircle2 className="w-4 h-4" /> Expediente emitido y archivado correctamente
+                <CheckCircle2 className="w-4 h-4" /> Registro didáctico emitido: valores declarados, sin validación automática
               </span>
             ) : (
-              'Completá los campos y generá el expediente técnico pericial.'
+              'Completá los campos según tus observaciones o indicá No verificado.'
             )}
           </div>
 

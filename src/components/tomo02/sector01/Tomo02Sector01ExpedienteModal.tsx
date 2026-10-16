@@ -44,18 +44,13 @@ export const Tomo02Sector01ExpedienteModal: React.FC<Tomo02Sector01ExpedienteMod
 }) => {
   const [copied, setCopied] = useState(false);
 
+  const unknown = { value: 'No registrado', provenance: 'UNKNOWN', status: 'WARNING' as const };
   const defaultDossier: Sector01BootDossier = dossierData || {
-    dossierId: 'EVO-BOOT-EXPEDIENTE-002-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-    biosMode: { value: 'UEFI Nativo (x64)', provenance: 'USER_DECLARED (msinfo32)', status: 'VALID' },
-    partitionScheme: { value: 'GPT (GUID Partition Table)', provenance: 'USER_DECLARED (diskpart)', status: 'VALID' },
-    secureBootStatus: { value: 'Habilitado / Activo', provenance: 'USER_DECLARED (PowerShell)', status: 'VALID' },
-    tpmVersion: { value: 'TPM 2.0 (Especificación 1.38)', provenance: 'USER_DECLARED (tpm.msc)', status: 'VALID' },
-    espPartitionState: { value: 'Partición EFI 100MB FAT32 (Integra)', provenance: 'USER_DECLARED (diskmgmt.msc)', status: 'VALID' },
-    bcdStatus: { value: 'BCD Store Válido (\\EFI\\Microsoft\\Boot\\BCD)', provenance: 'DERIVED (bcdedit)', status: 'VALID' },
-    winloadState: { value: 'winload.efi Certificado por Microsoft', provenance: 'USER_DECLARED (sigcheck)', status: 'VALID' },
-    lastPostTime: { value: '3.4 segundos (POST Normal)', provenance: 'USER_DECLARED (Taskmgr)', status: 'VALID' },
-    fastStartupMode: { value: 'Desactivado para Mantenimiento Forense (Cold Boot)', provenance: 'USER_DECLARED', status: 'VALID' },
-    evaluatedStages: 12,
+    dossierId: 'EVO-BOOT-EXPEDIENTE-002-DRAFT',
+    biosMode: { ...unknown }, partitionScheme: { ...unknown }, secureBootStatus: { ...unknown },
+    tpmVersion: { ...unknown }, espPartitionState: { ...unknown }, bcdStatus: { ...unknown },
+    winloadState: { ...unknown }, lastPostTime: { ...unknown }, fastStartupMode: { ...unknown },
+    evaluatedStages: 0,
   };
 
   const handleCopy = () => {
@@ -85,11 +80,11 @@ PARÁMETROS FORENSES DE INICIALIZACIÓN:
 8. TIEMPO DE POST: ${defaultDossier.lastPostTime.value} [${defaultDossier.lastPostTime.provenance}]
 9. MODO FAST STARTUP: ${defaultDossier.fastStartupMode.value} [${defaultDossier.fastStartupMode.provenance}]
 
-ETAPAS DEL MODELO DIDÁCTICO EVO COMPROBADAS:
+ETAPAS DE REFERENCIA DEL MODELO DIDÁCTICO EVO (NO VERIFICADAS AUTOMÁTICAMENTE):
 ${CANONICAL_BOOT_STAGES.map((s) => `[ETAPA 0${s.stageNumber}] ${s.name} -> Actor: ${s.actor}`).join('\n')}
 
 VEREDICTO FORENSE:
-Cadena de confianza pre-boot verificada. Arranque UEFI con GPT y validación Secure Boot nominal.
+Registro de observaciones declarado por el usuario; sin lectura automática del firmware, Secure Boot ni TPM.
 Integrado en EXPEDIENTE MAESTRO WINDOWS EVO 001.
 =====================================================`;
 
