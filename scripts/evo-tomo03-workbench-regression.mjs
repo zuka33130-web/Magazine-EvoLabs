@@ -20,7 +20,7 @@ try{
  plugins:[{name:'vite-alias',setup(b){b.onResolve({filter:/^\/components\//},a=>({path:path.join(root,'src',a.path.slice(1))}));}}],
  alias:{components:path.join(root,'src/components')}});
  const css=await compile(fs.readFileSync(path.join(root,'src/index.css'),'utf8'),{base:path.join(root,'src'),onDependency:()=>{}});
- const source=['src/components/tomo03/Tomo03WorkbenchView.tsx','src/components/tomo03/Tomo03MagazineView.tsx'];
+ const source=fs.readdirSync(path.join(root,'src/components/tomo03')).filter(name=>name.endsWith('.tsx')).map(name=>'src/components/tomo03/'+name);
  const tokens=[...new Set(source.flatMap(p=>fs.readFileSync(path.join(root,p),'utf8').split(/[\s'"\x60{}<>]+/)))];
  fs.writeFileSync(path.join(output,'styles.css'),css.build(tokens));
  const html='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/styles.css"></head><body><div id="root"></div><pre id="result"></pre><script src="/app.js"></script></body></html>';

@@ -54,6 +54,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
   const [voltage,setVoltage]=useState('');
   const [showTheory,setShowTheory]=useState(false);
   const [professionalCase,setProfessionalCase]=useState<string|null>(null);
+  const [professionalTool,setProfessionalTool]=useState('power-checklist');
   const current=TOMO_03_MODULES.find(item=>item.id===moduleId)||TOMO_03_MODULES[0];
   const professional=getProfessionalModule(current.moduleNumber);
   const caseContent=getProfessionalModule(professionalCase||'');
@@ -163,7 +164,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
                 <p className="text-amber-300">Riesgo declarado: {current.safetyLevel.replaceAll('_',' ')}</p>
               </div>}
             </div>
-            {professional?<Tomo03ProfessionalModule key={professional.number} content={professional} state={parseProfessionalState(store.professional?.[professional.number],professional)} onChange={state=>updateProfessional(professional.number,state)} onLab={()=>{setProfessionalCase(professional.number);setSection('laboratorios');}} onTool={()=>setSection('herramientas')}/>:<div className="bg-black/40 border border-emerald-900/70 rounded-lg p-4 space-y-3">
+            {professional?<Tomo03ProfessionalModule key={professional.number} content={professional} state={parseProfessionalState(store.professional?.[professional.number],professional)} onChange={state=>updateProfessional(professional.number,state)} onLab={()=>{setProfessionalCase(professional.number);setSection('laboratorios');}} onTool={()=>{setProfessionalTool(professional.tool);setSection('herramientas');}}/>:<div className="bg-black/40 border border-emerald-900/70 rounded-lg p-4 space-y-3">
               <h3 className="font-bold text-emerald-300 text-sm">2. Árbol de decisión interactivo</h3>
               <p className="text-sm">{current.decisionTree.question}</p>
               <div className="flex flex-wrap gap-2">{([
@@ -230,7 +231,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
           </div>
         </div>
       </section></div>}
-      {section==='herramientas'&&<><Tomo03RepairTools/><div className="grid lg:grid-cols-2 gap-5">
+      {section==='herramientas'&&<><Tomo03RepairTools key={professionalTool} initialTool={professionalTool}/><div className="grid lg:grid-cols-2 gap-5">
         <section className="rounded-2xl border border-emerald-800 bg-[#09140e] p-5 space-y-4">
           <h2 className="text-xl font-black flex items-center gap-2"><Gauge size={20}/> Intérprete de tensiones ATX</h2>
           <p className="text-xs text-zinc-300">Calculadora para introducir una medición manual. No conecta con un multímetro ni verifica el estado de la fuente. Rangos nominales ±5 % por riel para interpretación orientativa.</p>

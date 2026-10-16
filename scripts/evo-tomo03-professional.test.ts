@@ -4,6 +4,7 @@ import {TOMO03_PROFESSIONAL_MODULES} from '../src/data/tomo03ProfessionalContent
 import {emptyProfessionalState} from '../src/data/tomo03ProfessionalTypes';
 import {performRepairTest,validateRepair,parseProfessionalState,moduleAssessment,assessAtxUncertainty,compareRepairSamples} from '../src/data/tomo03RepairEngine';
 import {TOMO_03_MODULES} from '../src/data/tomo03Data';
+import {assessRamMatrix,advancePost,assessFirmwarePlan} from '../src/data/tomo03RepairEngine';
 test('specializations have unique original module ownership and a complete technical contract',()=>{
  const ids=new Set<string>();
  for(const content of TOMO03_PROFESSIONAL_MODULES){
@@ -37,4 +38,14 @@ test('measurement tools: boundary uncertainty and comparable series, including g
  assert.equal(compareRepairSamples([0,0,0],[1,1,1])?.percent,null);
  assert.equal(compareRepairSamples([1,2,3],[2,3]),null);assert.equal(compareRepairSamples([1,NaN,3],[1,2,3]),null);
  assert.equal(compareRepairSamples([10,11,12],[8,9,10])?.delta,-2);
+});
+test('RAM matrix, POST progression and firmware prerequisites never manufacture evidence',()=>{
+ assert.equal(assessRamMatrix(['fail','fail','pass','pass']),'MODULE_A');
+ assert.equal(assessRamMatrix(['fail','pass','fail','pass']),'PATH_1');
+ assert.equal(assessRamMatrix(['unknown','pass','pass','pass']),'INCOMPLETE');
+ assert.equal(assessRamMatrix(['pass','pass','pass','pass']),'NO_ERROR_OBSERVED');
+ assert.deepEqual(advancePost(1,2),{position:2,blocked:false});assert.deepEqual(advancePost(2,2),{position:2,blocked:true});
+ assert.deepEqual(advancePost(5,null),{position:5,blocked:false});assert.equal(advancePost(-1,null),null);
+ assert.equal(assessFirmwarePlan({identity:true,reason:true,official:true,recovery:false,power:true}).allowed,false);
+ assert.equal(assessFirmwarePlan({identity:true,reason:true,official:true,recovery:true,power:true}).allowed,true);
 });

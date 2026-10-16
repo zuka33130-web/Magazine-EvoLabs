@@ -15,6 +15,7 @@ let browser;
 try{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
  const page=await browser.newPage({viewport:{width:1440,height:1000}});page.setDefaultTimeout(15000);const errors=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.addInitScript(()=>{if(!localStorage.getItem('evo_tomo03_repair_workbench_v1'))localStorage.setItem('evo_tomo03_repair_workbench_v1',JSON.stringify({schema:1,records:{mod35:{symptom:'EVIDENCIA LEGACY CONSERVADA',observation:'Nota previa del glosario'}},labs:{'power-zero':{p1:'a'}}}));});
  await page.goto(`http://127.0.0.1:${server.address().port}`);await page.getByRole('heading',{name:'BANCO DE REPARACIÓN INTERACTIVO'}).waitFor();
  assert.equal(await page.locator('aside button[aria-pressed]').count(),35);
  const numbers=await page.evaluate(()=>window.modules.map(m=>m.number));
@@ -45,8 +46,20 @@ try{
  await page.reload();await page.getByRole('button',{name:'Protocolos y síntomas',exact:true}).waitFor();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('evo_tomo03_repair_workbench_v1')));
  assert.equal(Object.values(saved.professional).filter(state=>state.verified).length,numbers.length);
+ assert.equal(saved.records.mod35.symptom,'EVIDENCIA LEGACY CONSERVADA');assert.equal(saved.labs['power-zero'].p1,'a');
  await page.getByRole('button',{name:'Herramientas',exact:true}).click();await page.getByLabel('Herramienta profesional',{exact:true}).selectOption('atx-uncertainty');await page.getByLabel('Tensión ingresada (V)',{exact:true}).fill('11,40');await page.getByLabel('Incertidumbre absoluta declarada (± V)',{exact:true}).fill('0,05');await page.getByText(/Indeterminado: cruza un límite/).waitFor();
  await page.getByLabel('Herramienta profesional',{exact:true}).selectOption('before-after');await page.getByLabel('Muestras antes',{exact:true}).fill('10; 11; 12');await page.getByLabel('Muestras después',{exact:true}).fill('8; 9; 10');await page.getByText(/Medianas 11 → 9/).waitFor();
+ if(numbers.includes('08')){
+  await page.getByLabel('Herramienta profesional',{exact:true}).selectOption('ram-matrix');
+  for(const label of ['Módulo A / S1','Módulo A / S2'])await page.getByLabel(label,{exact:true}).selectOption('fail');
+  for(const label of ['Módulo B / S1','Módulo B / S2'])await page.getByLabel(label,{exact:true}).selectOption('pass');
+  await page.getByText(/Patrón que sigue al módulo A/).waitFor();
+  await page.getByLabel('Herramienta profesional',{exact:true}).selectOption('post-sequence');await page.getByLabel('Detención del escenario',{exact:true}).selectOption('2');
+  for(let i=0;i<3;i++)await page.getByRole('button',{name:'Avanzar etapa POST',exact:true}).click();await page.getByText(/Detenido en esta fase del modelo/).waitFor();
+  await page.getByLabel('Herramienta profesional',{exact:true}).selectOption('firmware-decision');await page.getByText(/No iniciar:/).waitFor();
+  for(const label of ['Modelo, revisión y versión comprobados','Motivo documentado en soporte oficial','Imagen y método oficiales compatibles','Ajustes y recuperación de cifrado previstos','Energía estable y procedimiento autorizado'])await page.getByLabel(label,{exact:true}).check();
+  await page.getByText(/Plan declarado completo/).waitFor();
+ }
  assert.deepEqual(errors,[]);await page.getByRole('button',{name:'Volver al manual',exact:true}).click();assert.equal(await page.evaluate(()=>window.wentBack),true);
  console.log('PASS: persistence after reload, functional tools, export, back callback and no browser exceptions');console.log('Artifacts:',output);
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

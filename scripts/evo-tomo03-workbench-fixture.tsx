@@ -42,8 +42,8 @@ async function run(){
  assert(document.querySelectorAll('aside button[aria-pressed]').length===35,'Not all 35 modules navigable');
  click('[08] DIAGNÓSTICO PERICIAL DE RAM');
  assert(document.body.textContent!.includes('MÓDULO 08/35'),'Module context did not switch');
- click('NO, observado');
- assert(document.body.textContent!.includes('NO, observado'),'Branch selection not rendered');
+ click('No, comprobado');
+ assert(document.querySelector('[data-diagnostic-node] button[aria-pressed="true"]'),'Professional diagnostic branch selection not rendered');
  const symptom=[...document.querySelectorAll('textarea')][0] as HTMLTextAreaElement;
  setInput(symptom,'Equipo de prueba sin video con LED DRAM persistente.');
  await pause();

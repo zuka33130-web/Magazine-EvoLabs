@@ -45,3 +45,25 @@ export function compareRepairSamples(before:number[],after:number[]) {
   if(!baseline||!result||baseline.count!==result.count)return null;
   return {baseline,result,delta:result.median-baseline.median,percent:baseline.median===0?null:(result.median-baseline.median)/baseline.median*100};
 }
+export type RamResult='pass'|'fail'|'unknown';
+export function assessRamMatrix(matrix:[RamResult,RamResult,RamResult,RamResult]) {
+  if(matrix.some(value=>!['pass','fail','unknown'].includes(value)))return 'INVALID';
+  if(matrix.includes('unknown'))return 'INCOMPLETE';
+  const [a1,a2,b1,b2]=matrix;
+  if(a1==='fail'&&a2==='fail'&&b1==='pass'&&b2==='pass')return 'MODULE_A';
+  if(b1==='fail'&&b2==='fail'&&a1==='pass'&&a2==='pass')return 'MODULE_B';
+  if(a1==='fail'&&b1==='fail'&&a2==='pass'&&b2==='pass')return 'PATH_1';
+  if(a2==='fail'&&b2==='fail'&&a1==='pass'&&b1==='pass')return 'PATH_2';
+  if(matrix.every(value=>value==='pass'))return 'NO_ERROR_OBSERVED';
+  return 'INCONCLUSIVE';
+}
+export const POST_STAGES=['Alimentación disponible','Inicialización de CPU','Entrenamiento de memoria','Inicialización de video','Selección de destino de arranque','Modelo completado'] as const;
+export function advancePost(position:number,stopAt:number|null) {
+  if(!Number.isInteger(position)||position<0||position>=POST_STAGES.length||stopAt!==null&&(!Number.isInteger(stopAt)||stopAt<0||stopAt>=POST_STAGES.length-1))return null;
+  const blocked=stopAt!==null&&position>=stopAt;
+  return {position:blocked?position:Math.min(position+1,POST_STAGES.length-1),blocked};
+}
+export function assessFirmwarePlan(plan:Record<'identity'|'reason'|'official'|'recovery'|'power',boolean>) {
+ const missing=(Object.keys(plan) as (keyof typeof plan)[]).filter(key=>plan[key]!==true);
+ return {allowed:missing.length===0,missing};
+}
