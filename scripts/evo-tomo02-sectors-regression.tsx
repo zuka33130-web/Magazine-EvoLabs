@@ -107,12 +107,14 @@ const advancedViewSource = fs.readFileSync('src/components/tomo02/advanced/Tomo0
 assert.match(advancedViewSource, /<XRayLab\s+initialScenario="crash-repair"\s*\/>/);
 const baselineDir = process.env.EVO_TOMO02_BASELINE_DIR;
 const baselineText = (file:string) => baselineDir ? fs.readFileSync(`${baselineDir}/${file}`, 'utf8') : execFileSync('git',['show',`HEAD:${file}`],{encoding:'utf8'});
+// Git for Windows may materialize CRLF while git show HEAD:path returns LF.
+const normalizeEol = (value: string) => value.replace(/\r\n?/g, '\n');
 const originalMaster = baselineText('src/data/tomo02MasterSectors.ts');
-assert.equal(fs.readFileSync('src/data/tomo02MasterSectors.ts', 'utf8').split("    sectorId: 'sector-11',")[0], originalMaster.split("    sectorId: 'sector-11',")[0]);
+assert.equal(normalizeEol(fs.readFileSync('src/data/tomo02MasterSectors.ts', 'utf8')).split("    sectorId: 'sector-11',")[0], normalizeEol(originalMaster).split("    sectorId: 'sector-11',")[0]);
 // Preserve every original file of sectors 00–10 and their data exactly.
 const baselineFiles = baselineDir ? ['src/components/tomo02','src/data'].flatMap(root=>fs.readdirSync(`${baselineDir}/${root}`,{recursive:true,withFileTypes:true}).filter(item=>item.isFile()).map(item=>`${item.parentPath}/${item.name}`.slice(baselineDir.length+1))) : execFileSync('git', ['ls-tree','-r','--name-only','HEAD','src/components/tomo02','src/data'], {encoding:'utf8'}).trim().split('\n');
 const protectedFiles = baselineFiles.filter((file) => /\/sector(?:0\d|10)\//.test(file) || /tomo02Sector(?:0\d|10)/.test(file));
-for (const file of protectedFiles) assert.equal(fs.readFileSync(file,'utf8'), baselineText(file), `Changed original sector: ${file}`);
+for (const file of protectedFiles) assert.equal(normalizeEol(fs.readFileSync(file,'utf8')), normalizeEol(baselineText(file)), `Changed original sector: ${file}`);
 console.log(`PASS: 29 unified readers; 501 canonical investigations, 112 preserved cases, 9 protocol stages (622 individually rendered); 18 tool modules; ${TOMO_02_ADVANCED_CONTENT.reduce((count, sector) => count + sector.commands.length, 0)} command examples; 58 checks; ${TOMO_02_CASE_LIBRARY.length} didactic cases across 22 categories; ${protectedFiles.length} original files unchanged. Experiment math, provenance and progress gates verified.`);
 
 // Every distinct original explanation remains reachable from the single reader or its mission.
