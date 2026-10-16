@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { safeStorage } from '../../utils/safeStorage';
+import type { LegacySectorStatus } from './shared/useTomo02LegacySectorProgress';
 import { getExamHistory } from '../exam/utils/examStorage';
 import {
   ChevronLeft,
@@ -245,8 +246,19 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
   };
 
+  const handleSectorProgress = useCallback((moduleId: string, status: LegacySectorStatus) => {
+    setModuleProgress(prev => {
+      if ((prev[moduleId] || 'not_started') === status) return prev;
+      const updated: ModuleProgressStatus = { ...prev, [moduleId]: status };
+      try { safeStorage.setItem('evo_tomo02_progress', JSON.stringify(updated)); }
+      catch { /* localStorage can be unavailable */ }
+      return updated;
+    });
+  }, []);
+
   const handleMarkCompleted = (moduleId: string) => {
     setModuleProgress((prev) => {
+      if (prev[moduleId] === 'completed') return prev;
       const updated: ModuleProgressStatus = { ...prev, [moduleId]: 'completed' };
       try {
         safeStorage.setItem('evo_tomo02_progress', JSON.stringify(updated));
@@ -474,6 +486,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   if (subView === 'sector_00') {
     return (
       <Tomo02Sector00View
+        onSectorProgress={handleSectorProgress}
         onBackToMagazine={() => {
           setSubView('index');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -485,6 +498,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   if (subView === 'sector_01') {
     return (
       <Tomo02Sector01View
+        onSectorProgress={handleSectorProgress}
         onBackToMagazine={() => {
           setSubView('index');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -500,6 +514,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   if (subView === 'sector_02') {
     return (
       <Tomo02Sector02View
+        onSectorProgress={handleSectorProgress}
         onBackToMagazine={() => {
           setSubView('index');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -519,6 +534,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   if (subView === 'sector_03') {
     return (
       <Tomo02Sector03View
+        onSectorProgress={handleSectorProgress}
         onBackToMagazine={() => {
           setSubView('index');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -546,6 +562,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   if (subView === 'sector_04') {
     return (
       <Tomo02Sector04View
+        onSectorProgress={handleSectorProgress}
         onBackToMagazine={() => {
           setSubView('index');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -573,6 +590,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   if (subView === 'sector_05') {
     return (
       <Tomo02Sector05View
+        onSectorProgress={handleSectorProgress}
         onBackToMagazine={() => {
           setSubView('index');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -596,6 +614,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   if (subView === 'sector_06') {
     return (
       <Tomo02Sector06View
+        onSectorProgress={handleSectorProgress}
         onBackToMagazine={() => {
           setSubView('index');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -623,6 +642,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   if (subView === 'sector_07') {
     return (
       <Tomo02Sector07View
+        onSectorProgress={handleSectorProgress}
         onBackToMagazine={() => {
           setSubView('index');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -654,6 +674,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   if (subView === 'sector_08') {
     return (
       <Tomo02Sector08View
+        onSectorProgress={handleSectorProgress}
         onBackToMagazine={() => {
           setSubView('index');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -689,6 +710,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   if (subView === 'sector_09') {
     return (
       <Tomo02Sector09View
+        onSectorProgress={handleSectorProgress}
         onBackToMagazine={() => {
           setSubView('index');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -728,6 +750,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   if (subView === 'sector_10') {
     return (
       <Tomo02Sector10View
+        onSectorProgress={handleSectorProgress}
         onBackToMagazine={() => {
           setSubView('index');
           window.scrollTo({ top: 0, behavior: 'smooth' });
