@@ -908,7 +908,7 @@ export const EvoLabCoreTestView: React.FC<EvoLabCoreTestViewProps> = ({
               </span>
               <div>
                 <div className="font-black text-xs text-white uppercase tracking-wider flex items-center gap-2">
-                  <span>TELEMETRÍA EN TIEMPO REAL // GRÁFICOS CONTINUOS</span>
+                  <span>SIMULACIÓN EDUCATIVA (SIMULATED) // GRÁFICOS CONTINUOS</span>
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                 </div>
                 <div className="text-[10px] text-zinc-400">

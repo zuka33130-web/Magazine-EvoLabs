@@ -116,13 +116,14 @@ export class WindowsDetectionService {
    * directly without requiring administrative permissions and puts the clean JSON into clipboard.
    */
   static readonly POWERSHELL_COMMAND: string =
-    `powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='SilentlyContinue'; $c=Get-CimInstance Win32_Processor | Select-Object -First 1; $b=Get-CimInstance Win32_BaseBoard | Select-Object -First 1; $bios=Get-CimInstance Win32_BIOS | Select-Object -First 1; $m=Get-CimInstance Win32_PhysicalMemory; $g=Get-CimInstance Win32_VideoController; $d=Get-CimInstance Win32_DiskDrive; $n=Get-CimInstance Win32_NetworkAdapter -Filter 'PhysicalAdapter=True'; $o=Get-CimInstance Win32_OperatingSystem | Select-Object -First 1; [PSCustomObject]@{ Protocol='EVO_WINDOWS_TELEMETRY_V2'; Provenance='SYSTEM_REPORTED'; Timestamp=(Get-Date -Format 'o'); CPU=@{ Model=$c.Name; Cores=$c.NumberOfCores; LogicalProcessors=$c.NumberOfLogicalProcessors; MaxClockMhz=$c.MaxClockSpeed; CurrentClockMhz=$c.CurrentClockSpeed }; Motherboard=@{ Manufacturer=$b.Manufacturer; Model=$b.Product; Version=$b.Version }; BIOS=@{ Vendor=$bios.Manufacturer; Version=$bios.SMBIOSBIOSVersion; ReleaseDate=$bios.ReleaseDate }; RAM=@{ ModulesCount=($m | Measure-Object).Count; TotalGB=[math]::Round(($m | Measure-Object Capacity -Sum).Sum/1GB, 2); Modules=($m | ForEach-Object { [PSCustomObject]@{ CapacityGB=[math]::Round($_.Capacity/1GB, 2); Manufacturer=$_.Manufacturer; PartNumber=if($_.PartNumber){$_.PartNumber.Trim()}else{$null}; ConfiguredClockMhz=$_.ConfiguredClockSpeed; SpeedMhz=$_.Speed; DeviceLocator=$_.DeviceLocator; BankLabel=$_.BankLabel } }) }; GPU=($g | ForEach-Object { [PSCustomObject]@{ Model=$_.Name; DriverVersion=$_.DriverVersion; AdapterRAM_GB=if($_.AdapterRAM -and $_.AdapterRAM -gt 0 -and $_.AdapterRAM -lt 68719476736){[math]::Round($_.AdapterRAM/1GB, 2)}else{$null}; Resolution=if($_.CurrentHorizontalResolution){ \"$($_.CurrentHorizontalResolution)x$($_.CurrentVerticalResolution)\" }else{$null}; RefreshRate=$_.CurrentRefreshRate } }); Storage=($d | ForEach-Object { [PSCustomObject]@{ Model=$_.Model; Interface=$_.InterfaceType; MediaType=$_.MediaType; SizeGB=if($_.Size){[math]::Round($_.Size/1GB, 2)}else{$null} } }); Network=($n | ForEach-Object { [PSCustomObject]@{ Name=$_.Name; AdapterType=$_.AdapterType; ConnectionID=$_.NetConnectionID } }); OS=@{ Edition=$o.Caption; Version=$o.Version; Build=$o.BuildNumber; Architecture=$o.OSArchitecture } } | ConvertTo-Json -Depth 5 -Compress | Set-Clipboard"`;
+    `powershell -NoProfile -ExecutionPolicy Bypass -Command '$ErrorActionPreference="Stop"; try { $c=Get-CimInstance Win32_Processor -ErrorAction Stop | Select-Object -First 1; $b=Get-CimInstance Win32_BaseBoard -ErrorAction Stop | Select-Object -First 1; $bios=Get-CimInstance Win32_BIOS -ErrorAction Stop | Select-Object -First 1; $m=Get-CimInstance Win32_PhysicalMemory -ErrorAction Stop; $g=Get-CimInstance Win32_VideoController -ErrorAction Stop; $d=Get-CimInstance Win32_DiskDrive -ErrorAction Stop; $n=Get-CimInstance Win32_NetworkAdapter -Filter "PhysicalAdapter=True" -ErrorAction SilentlyContinue; $o=Get-CimInstance Win32_OperatingSystem -ErrorAction Stop | Select-Object -First 1; $res=[PSCustomObject]@{ Protocol="EVO_WINDOWS_TELEMETRY_V2"; Provenance="SYSTEM_REPORTED"; Timestamp=(Get-Date -Format "o"); CPU=@{ Model=$c.Name; Cores=$c.NumberOfCores; LogicalProcessors=$c.NumberOfLogicalProcessors; MaxClockMhz=$c.MaxClockSpeed; CurrentClockMhz=$c.CurrentClockSpeed }; Motherboard=@{ Manufacturer=$b.Manufacturer; Model=$b.Product; Version=$b.Version }; BIOS=@{ Vendor=$bios.Manufacturer; Version=$bios.SMBIOSBIOSVersion; ReleaseDate=$bios.ReleaseDate }; RAM=@{ ModulesCount=($m | Measure-Object).Count; TotalGB=[math]::Round(($m | Measure-Object Capacity -Sum).Sum/1GB, 2); Modules=@($m | ForEach-Object { [PSCustomObject]@{ CapacityGB=[math]::Round($_.Capacity/1GB, 2); Manufacturer=$_.Manufacturer; PartNumber=if($_.PartNumber){$_.PartNumber.Trim()}else{$null}; ConfiguredClockMhz=$_.ConfiguredClockSpeed; SpeedMhz=$_.Speed; DeviceLocator=$_.DeviceLocator; BankLabel=$_.BankLabel } }) }; GPU=@($g | ForEach-Object { [PSCustomObject]@{ Model=$_.Name; DriverVersion=$_.DriverVersion; AdapterRAM_GB=if($_.AdapterRAM -and $_.AdapterRAM -gt 0 -and $_.AdapterRAM -lt 68719476736){[math]::Round($_.AdapterRAM/1GB, 2)}else{$null}; Resolution=if($_.CurrentHorizontalResolution){ "$($_.CurrentHorizontalResolution)x$($_.CurrentVerticalResolution)" }else{$null}; RefreshRate=$_.CurrentRefreshRate } }); Storage=@($d | ForEach-Object { [PSCustomObject]@{ Model=$_.Model; Interface=$_.InterfaceType; MediaType=$_.MediaType; SizeGB=if($_.Size){[math]::Round($_.Size/1GB, 2)}else{$null} } }); Network=@($n | ForEach-Object { [PSCustomObject]@{ Name=$_.Name; AdapterType=$_.AdapterType; ConnectionID=$_.NetConnectionID } }); OS=@{ Edition=$o.Caption; Version=$o.Version; Build=$o.BuildNumber; Architecture=$o.OSArchitecture } }; $json=$res | ConvertTo-Json -Depth 5 -Compress; $testParse=$json | ConvertFrom-Json; if($testParse.Protocol -ne "EVO_WINDOWS_TELEMETRY_V2"){ throw "Protocolo EVO_WINDOWS_TELEMETRY_V2 no confirmado." }; $json | Set-Clipboard } catch { Write-Error "ERROR TELEMETRIA EVO: $_"; exit 1 }'`;
 
   /**
    * Generates a downloadable standalone .cmd script for one-click Windows execution
    */
   static generateBatchScript(): string {
     return `@echo off
+setlocal
 title EVO LABS // TELEMETRIA NATIVA DE WINDOWS (CIM / WMI)
 echo ==============================================================================
 echo [EVO LABS] LEYENDO TELEMETRIA REAL DEL SILICIO (CIM / WMI)...
@@ -130,12 +131,23 @@ echo ===========================================================================
 echo Extrayendo CPU, Motherboard, BIOS, Modulos RAM, GPU, Discos, Red y Windows...
 echo.
 ${this.POWERSHELL_COMMAND}
+if %errorlevel% neq 0 (
+    echo.
+    echo ==============================================================================
+    echo [ERROR] La extraccion de telemetria fallo o fue interrumpida.
+    echo No se copio ningun dato al portapapeles.
+    echo ==============================================================================
+    pause
+    endlocal
+    exit /b 1
+)
 echo.
 echo ==============================================================================
 echo [OK] Telemetria pericial copiada al portapapeles con exito.
 echo Volve a la ventana de EVO LABS y presiona "Pegar Telemetria" o Ctrl+V.
 echo ==============================================================================
 timeout /t 5 >nul
+endlocal
 exit /b 0
 `;
   }
@@ -145,7 +157,11 @@ exit /b 0
    */
   static parsePayload(input: string | object): WindowsTelemetryPayload {
     if (typeof input === 'object' && input !== null) {
-      return input as WindowsTelemetryPayload;
+      const obj = input as WindowsTelemetryPayload;
+      if (obj.Protocol && obj.Protocol !== 'EVO_WINDOWS_TELEMETRY_V2') {
+        throw new Error('AUTODETECTION_FAILED: Protocolo de telemetría desconocido o incompatible.');
+      }
+      return obj;
     }
 
     if (typeof input !== 'string') {
@@ -159,12 +175,22 @@ exit /b 0
 
     try {
       const parsed = JSON.parse(trimmed);
+      if (parsed && typeof parsed === 'object' && parsed.Protocol && parsed.Protocol !== 'EVO_WINDOWS_TELEMETRY_V2') {
+        throw new Error('AUTODETECTION_FAILED: Protocolo de telemetría desconocido o incompatible.');
+      }
       return parsed;
-    } catch {
+    } catch (e: any) {
+      if (e.message && e.message.includes('AUTODETECTION_FAILED')) {
+        throw e;
+      }
       // Attempt to extract JSON from surrounding console logs if user copied cmd output
       const jsonMatch = trimmed.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+        const parsedMatch = JSON.parse(jsonMatch[0]);
+        if (parsedMatch && typeof parsedMatch === 'object' && parsedMatch.Protocol && parsedMatch.Protocol !== 'EVO_WINDOWS_TELEMETRY_V2') {
+          throw new Error('AUTODETECTION_FAILED: Protocolo de telemetría desconocido o incompatible.');
+        }
+        return parsedMatch;
       }
       throw new Error('AUTODETECTION_FAILED: La telemetría no tiene formato JSON válido.');
     }

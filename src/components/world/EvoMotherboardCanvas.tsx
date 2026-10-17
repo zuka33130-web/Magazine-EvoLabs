@@ -536,7 +536,7 @@ export const EvoMotherboardCanvas: React.FC<EvoMotherboardCanvasProps> = ({
   const currentDossier = MOTHERBOARD_DATA_DICTIONARY[activeComponent] || MOTHERBOARD_DATA_DICTIONARY.cpu;
 
   // Datos reales inyectados desde el hardware passport si existen
-  const cpuDisplayName = passport?.cpuModel || 'Intel Core i3-1220P / AM5 Socket';
+  const cpuDisplayName = passport?.cpuModel || 'Intel Core i3-1220P (FCBGA1744)';
   const ramDisplayName = passport?.ramCapacityGb
     ? `${passport.ramCapacityGb} GB DDR5 @ ${passport.ramSpeedMhz || 5600} MT/s`
     : '16 GB DDR5 5600 MT/s Dual-Channel';
@@ -728,532 +728,771 @@ export const EvoMotherboardCanvas: React.FC<EvoMotherboardCanvasProps> = ({
         <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-tr from-yellow-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
 
-        <svg viewBox="0 0 1000 620" className="w-full h-full max-h-[540px] drop-shadow-2xl z-10">
+        <svg viewBox="0 0 1000 620" className="w-full h-full max-h-[560px] drop-shadow-2xl z-10 select-none overflow-visible">
           <defs>
-            {/* Gradientes Industriales para componentes */}
+            {/* Copper ground plane pattern */}
+            <pattern id="pcb-copper-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="0.8" fill="#1e293b" opacity="0.65" />
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#0f172a" strokeWidth="0.5" />
+            </pattern>
+
+            {/* Industrial Heatsink & Metal Gradients */}
+            <linearGradient id="heatsink-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#1e293b" />
+              <stop offset="50%" stopColor="#0f172a" />
+              <stop offset="100%" stopColor="#1e293b" />
+            </linearGradient>
             <linearGradient id="vrmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#1e2230" />
-              <stop offset="100%" stopColor="#111420" />
+              <stop offset="0%" stopColor="#222738" />
+              <stop offset="50%" stopColor="#151926" />
+              <stop offset="100%" stopColor="#0c0f18" />
             </linearGradient>
-            <linearGradient id="cpuGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="cpu-silicon-grad" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="#252a38" />
-              <stop offset="100%" stopColor="#141724" />
+              <stop offset="100%" stopColor="#10131d" />
             </linearGradient>
-            <linearGradient id="goldTraceGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#eab308" stopOpacity="0.4" />
-              <stop offset="50%" stopColor="#fef08a" stopOpacity="1" />
-              <stop offset="100%" stopColor="#eab308" stopOpacity="0.4" />
-            </linearGradient>
-            <linearGradient id="cyanTraceGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.4" />
-              <stop offset="50%" stopColor="#a5f3fc" stopOpacity="1" />
-              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.4" />
+            <linearGradient id="io-shield-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#1e293b" />
+              <stop offset="30%" stopColor="#0f172a" />
+              <stop offset="70%" stopColor="#1e293b" />
+              <stop offset="100%" stopColor="#090d16" />
             </linearGradient>
 
-            {/* Filtros de Resplandor (Glow) */}
-            <filter id="glowGold" x="-20%" y="-20%" width="140%" height="140%">
+            {/* Signal Bus Glow Filters */}
+            <filter id="glowGold" x="-30%" y="-30%" width="160%" height="160%">
               <feGaussianBlur stdDeviation="3.5" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
-            <filter id="glowCyan" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
+            <filter id="glowCyan" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3.5" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
+            <filter id="glowRose" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            {/* Radial Thermal Dissipation Gradients */}
+            <radialGradient id="thermal-field-crit" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#ef4444" stopOpacity="0.55" />
+              <stop offset="35%" stopColor="#f97316" stopOpacity="0.3" />
+              <stop offset="70%" stopColor="#fb923c" stopOpacity="0.12" />
+              <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
+            </radialGradient>
+            <radialGradient id="thermal-field-warn" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#f97316" stopOpacity="0.45" />
+              <stop offset="40%" stopColor="#fb923c" stopOpacity="0.25" />
+              <stop offset="75%" stopColor="#fbbf24" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+            </radialGradient>
           </defs>
 
-          {/* Plano de Circuito Impreso Base (PCB) */}
+          {/* 1. MOTHERBOARD ATX PCB BASE PLATE */}
           <rect
-            x="40"
-            y="20"
-            width="920"
-            height="580"
+            x="20"
+            y="15"
+            width="960"
+            height="590"
             rx="16"
-            fill="#090c14"
-            stroke={hoveredPart ? '#334155' : '#1f293d'}
+            fill="#060911"
+            stroke={hoveredPart ? '#3b82f6' : '#1e3a8a'}
             strokeWidth="2.5"
             className="transition-colors duration-300"
           />
+          <rect
+            x="25"
+            y="20"
+            width="950"
+            height="580"
+            rx="12"
+            fill="url(#pcb-copper-grid)"
+            opacity="0.8"
+          />
 
-          {/* Tornillos de montaje y masa de chasis */}
+          {/* ATX Mounting Standoff Screws (High-detail zinc crosshead) */}
           {[
-            [65, 45],
-            [935, 45],
-            [65, 575],
-            [935, 575],
-            [500, 45],
-            [500, 575],
-          ].map(([cx, cy], idx) => (
-            <g key={idx}>
-              <circle cx={cx} cy={cy} r="8" fill="#1e293b" stroke="#475569" strokeWidth="1.5" />
-              <circle cx={cx} cy={cy} r="3" fill="#090c14" />
-              <line x1={cx - 4} y1={cy} x2={cx + 4} y2={cy} stroke="#64748b" strokeWidth="1.2" />
-              <line x1={cx} y1={cy - 4} x2={cx} y2={cy + 4} stroke="#64748b" strokeWidth="1.2" />
+            [45, 35], [500, 35], [955, 35],
+            [45, 310], [500, 310], [955, 310],
+            [45, 585], [500, 585], [955, 585],
+          ].map(([sx, sy], i) => (
+            <g key={`screw-${i}`}>
+              <circle cx={sx} cy={sy} r="9" fill="#18181b" stroke="#94a3b8" strokeWidth="1.5" />
+              <circle cx={sx} cy={sy} r="4.5" fill="#3f3f46" />
+              <line x1={sx - 3} y1={sy} x2={sx + 3} y2={sy} stroke="#e4e4e7" strokeWidth="1.5" />
+              <line x1={sx} y1={sy - 3} x2={sx} y2={sy + 3} stroke="#e4e4e7" strokeWidth="1.5" />
             </g>
           ))}
 
+          {/* PCB Technical Silkscreen Markings */}
+          <text x="35" y="600" fill="#334155" fontSize="8" fontWeight="bold" fontFamily="monospace">
+            EVO LABS // TOPOLOGY & SIGNAL INTEGRITY // 8-LAYER HIGH-SPEED DIELECTRIC (2oz COPPER GROUND)
+          </text>
+          <text x="700" y="600" fill="#38bdf8" fontSize="8" fontWeight="bold" fontFamily="monospace">
+            SOCKET: LGA1700 • CHIPSET: DMI 4.0 x8 • PCIe 5.0 PEG
+          </text>
+
           {/* ======================================================================= */}
-          {/* TRAZAS DE BUS INTERACTIVAS CON RESPLANDOR Y SIMULACIÓN DE FLUJO        */}
+          {/* RADIAL THERMAL RIPPLE DISSIPATION LAYER (Active in Thermal Mode/Torture) */}
+          {/* ======================================================================= */}
+          {(activeOverlay === 'thermal' || activeLoad === 'torture' || activeLoad === 'gaming') && (
+            <g id="pcb-thermal-dissipation-field">
+              {/* CPU Die Hotspot Dissipation */}
+              <circle
+                cx="375"
+                cy="195"
+                r={activeLoad === 'torture' ? 140 : 100}
+                fill={activeLoad === 'torture' ? 'url(#thermal-field-crit)' : 'url(#thermal-field-warn)'}
+                className="pointer-events-none"
+              />
+              <circle cx="375" cy="195" r="28" fill="none" stroke={thermalProfile.dieGlow} strokeWidth="2.5" opacity="0.8" className="pointer-events-none">
+                <animate attributeName="r" from="28" to={activeLoad === 'torture' ? "140" : "100"} dur="2.2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" from="0.9" to="0" dur="2.2s" repeatCount="indefinite" />
+                <animate attributeName="stroke-width" from="3" to="0.5" dur="2.2s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="375" cy="195" r="28" fill="none" stroke={thermalProfile.dieGlow} strokeWidth="2" opacity="0.7" className="pointer-events-none">
+                <animate attributeName="r" from="28" to={activeLoad === 'torture' ? "140" : "100"} dur="2.2s" begin="0.8s" repeatCount="indefinite" />
+                <animate attributeName="opacity" from="0.8" to="0" dur="2.2s" begin="0.8s" repeatCount="indefinite" />
+              </circle>
+
+              {/* VRM Hotspot Dissipation */}
+              <circle
+                cx="210"
+                cy="165"
+                r={activeLoad === 'torture' ? 110 : 75}
+                fill={activeLoad === 'torture' ? 'url(#thermal-field-crit)' : 'url(#thermal-field-warn)'}
+                className="pointer-events-none"
+              />
+              <circle cx="210" cy="165" r="20" fill="none" stroke={thermalProfile.vrmColor} strokeWidth="2" opacity="0.7" className="pointer-events-none">
+                <animate attributeName="r" from="20" to={activeLoad === 'torture' ? "110" : "75"} dur="2.5s" repeatCount="indefinite" />
+                <animate attributeName="opacity" from="0.8" to="0" dur="2.5s" repeatCount="indefinite" />
+              </circle>
+            </g>
+          )}
+
+          {/* ======================================================================= */}
+          {/* DYNAMIC BUS TRACES WITH COPPER SUBSTRATE & ANIMATED PACKET PULSES       */}
           {/* ======================================================================= */}
 
-          {/* 1. FRONT SIDE BUS / BUS DE MEMORIA: CPU ↔ RAM (Canales A y B) */}
-          <g className={`transition-opacity duration-300 ${activeComponent === 'ram' || activeComponent === 'cpu' ? 'opacity-100' : 'opacity-60'}`}>
-            {/* Traza 1 */}
+          {/* 1. CPU ↔ RAM: 128-BIT DDR5 DUAL-CHANNEL HIGH-SPEED MEMORY BUS */}
+          <g
+            className={`cursor-pointer transition-opacity duration-300 ${activeComponent === 'ram' || activeComponent === 'cpu' ? 'opacity-100' : 'opacity-65'}`}
+            onClick={() => handleSelectComponent('ram')}
+          >
+            {/* Ground copper tracks */}
+            <path d="M 465 140 L 575 140 M 465 165 L 575 165 M 465 190 L 575 190 M 465 215 L 575 215" stroke="#1e293b" strokeWidth="4" />
+            {/* Active signal traces */}
             <path
-              d="M 450 170 L 590 170 L 590 110 L 610 110"
-              fill="none"
+              d="M 465 140 L 575 140 M 465 165 L 575 165 M 465 190 L 575 190 M 465 215 L 575 215"
               stroke={activeComponent === 'ram' ? '#eab308' : '#06b6d4'}
-              strokeWidth={activeComponent === 'ram' ? '3.5' : '2'}
+              strokeWidth={activeComponent === 'ram' ? '3' : '2'}
               strokeDasharray={busSimulationActive ? '6,4' : 'none'}
               className={busSimulationActive ? 'evo-trace-animated' : undefined}
               filter={activeComponent === 'ram' ? 'url(#glowGold)' : undefined}
             />
-            {/* Traza 2 */}
-            <path
-              d="M 450 200 L 590 200 L 590 190 L 610 190"
-              fill="none"
-              stroke={activeComponent === 'ram' ? '#eab308' : '#06b6d4'}
-              strokeWidth={activeComponent === 'ram' ? '3.5' : '2'}
-              strokeDasharray={busSimulationActive ? '6,4' : 'none'}
-              className={busSimulationActive ? 'evo-trace-animated' : undefined}
-              filter={activeComponent === 'ram' ? 'url(#glowGold)' : undefined}
-            />
-            {/* Traza 3 */}
-            <path
-              d="M 450 230 L 590 230 L 590 270 L 610 270"
-              fill="none"
-              stroke={activeComponent === 'ram' ? '#eab308' : '#06b6d4'}
-              strokeWidth={activeComponent === 'ram' ? '3.5' : '2'}
-              strokeDasharray={busSimulationActive ? '6,4' : 'none'}
-              className={busSimulationActive ? 'evo-trace-animated' : undefined}
-              filter={activeComponent === 'ram' ? 'url(#glowGold)' : undefined}
-            />
-            {/* Indicador de bus de datos DDR */}
-            <text x="490" y="160" fill={activeComponent === 'ram' ? '#fde047' : '#06b6d4'} fontSize="8" fontWeight="bold">
+            {/* SVG moving packet pulses */}
+            {busSimulationActive && (
+              <>
+                <circle r="3.2" fill="#ffffff" stroke="#eab308" strokeWidth="1.5">
+                  <animateMotion path="M 465 140 L 575 140" dur="1.2s" repeatCount="indefinite" />
+                </circle>
+                <circle r="3" fill="#ffffff" stroke="#06b6d4" strokeWidth="1.2">
+                  <animateMotion path="M 575 165 L 465 165" dur="1.2s" begin="0.3s" repeatCount="indefinite" />
+                </circle>
+                <circle r="2.8" fill="#eab308">
+                  <animateMotion path="M 465 190 L 575 190" dur="1.2s" begin="0.15s" repeatCount="indefinite" />
+                </circle>
+                <circle r="3" fill="#ffffff" stroke="#06b6d4" strokeWidth="1.2">
+                  <animateMotion path="M 575 215 L 465 215" dur="1.2s" begin="0.45s" repeatCount="indefinite" />
+                </circle>
+              </>
+            )}
+            <text x="475" y="132" fill={activeComponent === 'ram' ? '#fde047' : '#06b6d4'} fontSize="7.5" fontWeight="bold">
               128-BIT DDR5 BUS (IMC)
             </text>
           </g>
 
-          {/* 2. DMI LINK: CPU ↔ CHIPSET PCH (Direct Media Interface 4.0 x8) */}
-          <g className={`transition-opacity duration-300 ${activeComponent === 'pch' || activeComponent === 'cpu' ? 'opacity-100' : 'opacity-65'}`}>
+          {/* 2. CPU ↔ CHIPSET PCH: DMI 4.0 x8 LINK (15.75 GB/s) */}
+          <g
+            className={`cursor-pointer transition-opacity duration-300 ${activeComponent === 'pch' || activeComponent === 'cpu' ? 'opacity-100' : 'opacity-70'}`}
+            onClick={() => handleSelectComponent('pch')}
+          >
+            {/* Ground copper tracks */}
+            <path d="M 430 295 L 430 355 L 670 355 L 670 375 M 445 295 L 445 365 L 685 365 L 685 375" fill="none" stroke="#1e293b" strokeWidth="4" />
             <path
-              d="M 420 320 L 420 460 L 680 460 L 680 470"
+              d="M 430 295 L 430 355 L 670 355 L 670 375 M 445 295 L 445 365 L 685 365 L 685 375"
               fill="none"
               stroke={activeComponent === 'pch' ? '#facc15' : '#a855f7'}
-              strokeWidth={activeComponent === 'pch' ? '4.5' : '3'}
+              strokeWidth={activeComponent === 'pch' ? '3.5' : '2.5'}
               strokeDasharray={busSimulationActive ? '8,4' : 'none'}
               className={busSimulationActive ? 'evo-trace-fast evo-dmi-active' : undefined}
               filter={activeComponent === 'pch' ? 'url(#glowGold)' : undefined}
             />
-            <text x="480" y="452" fill={activeComponent === 'pch' ? '#fde047' : '#c084fc'} fontSize="8" fontWeight="bold">
+            {busSimulationActive && (
+              <>
+                <circle r="3.2" fill="#ffffff" stroke="#a855f7" strokeWidth="1.5">
+                  <animateMotion path="M 430 295 L 430 355 L 670 355 L 670 375" dur="1.8s" repeatCount="indefinite" />
+                </circle>
+                <circle r="3" fill="#ffffff" stroke="#facc15" strokeWidth="1.2">
+                  <animateMotion path="M 685 375 L 685 365 L 445 365 L 445 295" dur="1.8s" begin="0.4s" repeatCount="indefinite" />
+                </circle>
+              </>
+            )}
+            <text x="495" y="348" fill={activeComponent === 'pch' ? '#fde047' : '#c084fc'} fontSize="7.5" fontWeight="bold">
               DMI 4.0 x8 LINK (15.75 GB/s)
             </text>
           </g>
 
-          {/* 3. LÍNEAS DIRECTAS PCIE: CPU ↔ RANURA GRÁFICA PEG */}
-          <g className={`transition-opacity duration-300 ${activeComponent === 'pcie' || activeComponent === 'cpu' ? 'opacity-100' : 'opacity-70'}`}>
+          {/* 3. CPU ↔ PCIE X16 PEG: DIRECT HIGH-SPEED DIFFERENTIAL PAIRS */}
+          <g
+            className={`cursor-pointer transition-opacity duration-300 ${activeComponent === 'pcie' || activeComponent === 'cpu' ? 'opacity-100' : 'opacity-70'}`}
+            onClick={() => handleSelectComponent('pcie')}
+          >
+            {/* Ground copper tracks */}
+            <path d="M 330 295 L 330 380 M 350 295 L 350 380 M 370 295 L 370 380 M 390 295 L 390 380" stroke="#18181b" strokeWidth="4" />
             <path
-              d="M 330 320 L 330 390 L 220 390 L 220 420"
-              fill="none"
-              stroke={isPcieSaturated ? '#ef4444' : activeComponent === 'pcie' ? '#facc15' : '#06b6d4'}
-              strokeWidth={activeComponent === 'pcie' || isPcieSaturated ? '4' : '2.5'}
-              strokeDasharray={isPcieSaturated ? '4,2' : busSimulationActive ? '7,4' : 'none'}
-              className={busSimulationActive ? 'evo-trace-animated' : undefined}
-              filter={activeComponent === 'pcie' ? 'url(#glowGold)' : undefined}
-            />
-            <path
-              d="M 350 320 L 350 395 L 240 395 L 240 420"
-              fill="none"
+              d="M 330 295 L 330 380 M 350 295 L 350 380 M 370 295 L 370 380 M 390 295 L 390 380"
               stroke={isPcieSaturated ? '#ef4444' : activeComponent === 'pcie' ? '#facc15' : '#06b6d4'}
               strokeWidth={activeComponent === 'pcie' || isPcieSaturated ? '3.5' : '2'}
               strokeDasharray={isPcieSaturated ? '4,2' : busSimulationActive ? '7,4' : 'none'}
               className={busSimulationActive ? 'evo-trace-animated' : undefined}
               filter={activeComponent === 'pcie' ? 'url(#glowGold)' : undefined}
             />
-            {pcieLanes === 'x16' && !isBifurcated && (
-              <path
-                d="M 370 320 L 370 400 L 260 400 L 260 420"
-                fill="none"
-                stroke={activeComponent === 'pcie' ? '#facc15' : '#06b6d4'}
-                strokeWidth={activeComponent === 'pcie' ? '3.5' : '2'}
-                strokeDasharray={busSimulationActive ? '7,4' : 'none'}
-                className={busSimulationActive ? 'evo-trace-animated' : undefined}
-                filter={activeComponent === 'pcie' ? 'url(#glowGold)' : undefined}
-              />
+            {busSimulationActive && (
+              <>
+                <circle r="3.2" fill="#ffffff" stroke={isPcieSaturated ? '#ef4444' : '#06b6d4'} strokeWidth="1.5">
+                  <animateMotion path="M 330 295 L 330 380" dur="1.1s" repeatCount="indefinite" />
+                </circle>
+                <circle r="3" fill="#ffffff" stroke={isPcieSaturated ? '#ef4444' : '#facc15'} strokeWidth="1.2">
+                  <animateMotion path="M 370 380 L 370 295" dur="1.1s" begin="0.3s" repeatCount="indefinite" />
+                </circle>
+              </>
             )}
-            {isBifurcated && (
-              <path
-                d="M 370 320 L 370 345 L 340 345 L 340 355"
-                fill="none"
-                stroke="#ef4444"
-                strokeWidth="3.5"
-                strokeDasharray="3,3"
-                className="animate-pulse"
-              />
-            )}
-          </g>
-
-          {/* 4. RIELES DE POTENCIA VRM → SOCKET CPU */}
-          <g className={`transition-opacity duration-300 ${activeComponent === 'vrm' || activeOverlay === 'power' ? 'opacity-100' : 'opacity-50'}`}>
-            <path d="M 230 140 L 290 140" fill="none" stroke={activeComponent === 'vrm' ? '#eab308' : '#10b981'} strokeWidth="5" strokeLinecap="round" className={busSimulationActive ? 'evo-vrm-active' : undefined} />
-            <path d="M 230 200 L 290 200" fill="none" stroke={activeComponent === 'vrm' ? '#eab308' : '#10b981'} strokeWidth="5" strokeLinecap="round" className={busSimulationActive ? 'evo-vrm-active' : undefined} />
-            <path d="M 230 260 L 290 260" fill="none" stroke={activeComponent === 'vrm' ? '#eab308' : '#10b981'} strokeWidth="5" strokeLinecap="round" className={busSimulationActive ? 'evo-vrm-active' : undefined} />
-            <path d="M 350 80 L 350 140" fill="none" stroke={activeComponent === 'vrm' ? '#eab308' : '#10b981'} strokeWidth="5" strokeLinecap="round" className={busSimulationActive ? 'evo-vrm-active' : undefined} />
-            <text x="210" y="95" fill={activeComponent === 'vrm' ? '#fde047' : '#34d399'} fontSize="8" fontWeight="bold">
-              VCORE POWER PLANES
+            <text x="325" y="375" fill={isPcieSaturated ? '#f87171' : activeComponent === 'pcie' ? '#fde047' : '#38bdf8'} fontSize="7" fontWeight="bold">
+              PCIe PEG DIRECT LANES
             </text>
           </g>
 
-          {/* 5. CPU A SLOT M.2 NVME PRIMARIO */}
-          <path
-            d="M 350 320 L 350 350 L 500 350 L 500 370"
-            fill="none"
-            stroke={activeComponent === 'm2' ? '#facc15' : '#38bdf8'}
-            strokeWidth={activeComponent === 'm2' ? '3.5' : '2'}
-            strokeDasharray={busSimulationActive ? '5,3' : 'none'}
-            className={busSimulationActive ? 'evo-trace-animated' : undefined}
-          />
-
-          {/* ======================================================================= */}
-          {/* COMPONENTE INTERACTIVO 1: CPU (SOCKET & RING BUS)                       */}
-          {/* ======================================================================= */}
+          {/* 4. CPU ↔ M.2 NVME PRIMARY DIRECT LINK (Gen4/Gen5 x4) */}
           <g
-            onClick={() => handleSelectComponent('cpu')}
-            onMouseEnter={() => setHoveredPart('cpu')}
-            onMouseLeave={() => setHoveredPart(null)}
-            className="cursor-pointer group"
+            className={`cursor-pointer transition-opacity duration-300 ${activeComponent === 'm2' || activeComponent === 'cpu' ? 'opacity-100' : 'opacity-65'}`}
+            onClick={() => handleSelectComponent('m2')}
           >
-            {/* Soporte de retención exterior */}
-            <rect
-              x="280"
-              y="130"
-              width="170"
-              height="170"
-              rx="8"
-              fill="url(#cpuGrad)"
-              stroke={activeComponent === 'cpu' ? '#facc15' : hoveredPart === 'cpu' ? '#eab308' : '#4b5563'}
-              strokeWidth={activeComponent === 'cpu' ? '3.5' : '2'}
-              filter={activeComponent === 'cpu' ? 'url(#glowGold)' : undefined}
-              className="transition-all duration-200"
-            />
-
-            {/* Die de Silicio Central */}
-            <rect
-              x="315"
-              y="165"
-              width="100"
-              height="100"
-              rx="4"
-              fill={activeOverlay === 'thermal' ? thermalProfile.dieColor : '#0c0f17'}
-              stroke={activeComponent === 'cpu' ? '#fde047' : activeOverlay === 'thermal' ? thermalProfile.dieGlow : '#eab308'}
-              strokeWidth={activeComponent === 'cpu' ? '2.5' : '1.5'}
-            />
-
-            {/* Simulación visual de Ring Bus concéntrico en el interior del Die */}
-            <circle
-              cx="365"
-              cy="215"
-              r="34"
-              fill="none"
-              stroke={activeComponent === 'cpu' ? '#facc15' : '#eab308'}
-              strokeWidth="2"
+            <path d="M 405 295 L 405 320" stroke="#1e293b" strokeWidth="4" />
+            <path
+              d="M 405 295 L 405 320"
+              stroke={activeComponent === 'm2' ? '#facc15' : '#38bdf8'}
+              strokeWidth={activeComponent === 'm2' ? '3.5' : '2'}
               strokeDasharray={busSimulationActive ? '5,3' : 'none'}
-              className={busSimulationActive ? 'evo-ring-active' : undefined}
+              className={busSimulationActive ? 'evo-trace-animated' : undefined}
             />
-            <circle cx="365" cy="215" r="18" fill="none" stroke="#64748b" strokeWidth="1" strokeDasharray="3,3" />
-
-            {/* Microcondensadores de desacoplo */}
-            <circle cx="330" cy="180" r="3.5" fill="#94a3b8" />
-            <circle cx="400" cy="180" r="3.5" fill="#94a3b8" />
-            <circle cx="330" cy="250" r="3.5" fill="#94a3b8" />
-            <circle cx="400" cy="250" r="3.5" fill="#94a3b8" />
-
-            <text x="338" y="212" fill="#fef08a" fontSize="10" fontWeight="bold">
-              SOCKET
-            </text>
-            <text x="330" y="226" fill="#ffffff" fontSize="9" fontWeight="bold">
-              RING BUS
-            </text>
-            <text x="325" y="292" fill={activeComponent === 'cpu' ? '#facc15' : '#94a3b8'} fontSize="8" fontWeight="bold">
-              {activeOverlay === 'thermal' ? `DIE: ${thermalProfile.cpuTemp}°C` : 'CPU & DIE L3'}
-            </text>
-
-            {/* Baliza indicadora de selección */}
-            {activeComponent === 'cpu' && (
-              <circle cx="435" cy="145" r="4.5" fill="#facc15" className="animate-ping" />
+            {busSimulationActive && (
+              <circle r="3" fill="#ffffff" stroke="#38bdf8" strokeWidth="1.2">
+                <animateMotion path="M 405 295 L 405 320" dur="0.9s" repeatCount="indefinite" />
+              </circle>
             )}
           </g>
 
-          {/* ======================================================================= */}
-          {/* COMPONENTE INTERACTIVO 2: MEMORIA RAM (SUB-SISTEMA DDR & IMC)           */}
-          {/* ======================================================================= */}
+          {/* 5. VRM POWER DELIVERY PLANES TO CPU SOCKET */}
           <g
-            onClick={() => handleSelectComponent('ram')}
-            onMouseEnter={() => setHoveredPart('ram')}
+            className={`cursor-pointer transition-opacity duration-300 ${activeComponent === 'vrm' || activeOverlay === 'power' ? 'opacity-100' : 'opacity-55'}`}
+            onClick={() => handleSelectComponent('vrm')}
+          >
+            <path d="M 220 130 L 285 130 M 220 170 L 285 170 M 220 210 L 285 210 M 220 250 L 285 250" fill="none" stroke={activeComponent === 'vrm' ? '#eab308' : '#10b981'} strokeWidth="4" strokeLinecap="round" className={busSimulationActive ? 'evo-vrm-active' : undefined} />
+            <path d="M 330 74 L 330 100 M 375 74 L 375 100 M 420 74 L 420 100" fill="none" stroke={activeComponent === 'vrm' ? '#eab308' : '#10b981'} strokeWidth="4" strokeLinecap="round" className={busSimulationActive ? 'evo-vrm-active' : undefined} />
+            <text x="210" y="70" fill={activeComponent === 'vrm' ? '#fde047' : '#34d399'} fontSize="7" fontWeight="bold">
+              VCORE POWER PLANES (16+2 PHASES)
+            </text>
+          </g>
+
+          {/* ======================================================================= */}
+          {/* COMPONENTES FÍSICOS DE PLACA BASE (REALISMO ATX PROFESIONAL)           */}
+          {/* ======================================================================= */}
+
+          {/* 1. REAR I/O SHIELD & AUDIO ISOLATION SECTION (Left Edge) */}
+          <g
+            id="comp-io"
+            onClick={() => handleSelectComponent('io')}
+            onMouseEnter={() => setHoveredPart('io')}
             onMouseLeave={() => setHoveredPart(null)}
             className="cursor-pointer group"
           >
-            {[
-              { id: 'A1', x: 610, active: false, label: 'SLOT 1 (A1)' },
-              { id: 'A2', x: 635, active: true, label: 'SLOT 2 (A2) ✓' },
-              { id: 'B1', x: 660, active: false, label: 'SLOT 3 (B1)' },
-              { id: 'B2', x: 685, active: true, label: 'SLOT 4 (B2) ✓' },
-            ].map((slot) => (
-              <g key={slot.id}>
-                <rect
-                  x={slot.x}
-                  y="70"
-                  width="16"
-                  height="250"
-                  rx="3"
-                  fill={slot.active ? (activeOverlay === 'thermal' ? '#ea580c' : '#1e2538') : '#0f121a'}
-                  stroke={
-                    activeComponent === 'ram'
-                      ? '#facc15'
-                      : hoveredPart === 'ram'
-                      ? '#eab308'
-                      : slot.active
-                      ? '#3b82f6'
-                      : '#27272a'
-                  }
-                  strokeWidth={activeComponent === 'ram' && slot.active ? '2.5' : '1.5'}
-                  filter={activeComponent === 'ram' && slot.active ? 'url(#glowGold)' : undefined}
-                />
-                <text
-                  x={slot.x + 11}
-                  y="180"
-                  fill={slot.active ? '#93c5fd' : '#52525b'}
-                  fontSize="8"
-                  fontWeight="bold"
-                  transform={`rotate(90, ${slot.x + 11}, 180)`}
-                >
-                  {slot.label}
-                </text>
+            {/* Metallic Rear I/O Backplate */}
+            <rect
+              x="22"
+              y="40"
+              width="45"
+              height="340"
+              rx="4"
+              fill="url(#io-shield-grad)"
+              stroke={activeComponent === 'io' ? '#facc15' : hoveredPart === 'io' ? '#eab308' : '#334155'}
+              strokeWidth={activeComponent === 'io' ? '2.5' : '1.5'}
+              filter={activeComponent === 'io' ? 'url(#glowGold)' : undefined}
+            />
+
+            {/* Individual Rear Ports */}
+            {/* DisplayPort & HDMI */}
+            <rect x="28" y="55" width="33" height="18" rx="2" fill="#090d16" stroke="#475569" strokeWidth="1" />
+            <rect x="28" y="80" width="33" height="16" rx="2" fill="#090d16" stroke="#475569" strokeWidth="1" />
+            <text x="32" y="67" fill="#94a3b8" fontSize="6" fontWeight="bold">DP 1.4</text>
+            <text x="32" y="91" fill="#94a3b8" fontSize="6" fontWeight="bold">HDMI</text>
+
+            {/* USB 3.2 Ports (Blue Inserts) */}
+            <rect x="28" y="105" width="33" height="24" rx="2" fill="#090d16" stroke="#2563eb" strokeWidth="1" />
+            <rect x="30" y="110" width="29" height="5" fill="#3b82f6" />
+            <rect x="30" y="120" width="29" height="5" fill="#3b82f6" />
+
+            {/* USB Type-C & Type-A */}
+            <rect x="32" y="140" width="25" height="10" rx="4" fill="#090d16" stroke="#60a5fa" strokeWidth="1" />
+            <rect x="28" y="160" width="33" height="24" rx="2" fill="#090d16" stroke="#2563eb" strokeWidth="1" />
+            <rect x="30" y="165" width="29" height="5" fill="#3b82f6" />
+            <rect x="30" y="175" width="29" height="5" fill="#3b82f6" />
+
+            {/* 2.5G LAN RJ45 Port */}
+            <rect x="28" y="195" width="33" height="32" rx="2" fill="#022c22" stroke="#10b981" strokeWidth="1" />
+            <circle cx="34" cy="202" r="1.5" fill="#22c55e" className="animate-pulse" />
+            <circle cx="55" cy="202" r="1.5" fill="#eab308" />
+            <text x="32" y="220" fill="#6ee7b7" fontSize="6" fontWeight="bold">2.5G LAN</text>
+
+            {/* Wi-Fi Antenna SMA Connectors */}
+            <circle cx="36" cy="245" r="4.5" fill="#ca8a04" stroke="#eab308" />
+            <circle cx="52" cy="245" r="4.5" fill="#ca8a04" stroke="#eab308" />
+
+            {/* Audio Jack Cluster */}
+            <rect x="28" y="265" width="33" height="90" rx="3" fill="#090d16" stroke="#475569" strokeWidth="1" />
+            {[280, 305, 330].map((jy, idx) => (
+              <g key={`audio-jack-${idx}`}>
+                <circle cx="44" cy={jy} r="7" fill="#18181b" stroke="#ca8a04" strokeWidth="1" />
+                <circle cx="44" cy={jy} r="3" fill="#090d16" />
               </g>
             ))}
-            <text x="610" y="55" fill={activeComponent === 'ram' ? '#fde047' : '#facc15'} fontSize="10" fontWeight="bold">
-              DDR5 CHANNELS (IMC)
+
+            <text x="30" y="370" fill="#94a3b8" fontSize="6.5" fontWeight="bold" transform="rotate(-90 30 370)">
+              REAR I/O & USB HOST
             </text>
-            {activeComponent === 'ram' && (
-              <circle cx="705" cy="65" r="4.5" fill="#facc15" className="animate-ping" />
+
+            {/* Audio Section with Dedicated Isolation Trench */}
+            <path
+              d="M 22 395 L 115 395 L 115 580 L 22 580"
+              fill="#090e17"
+              stroke={activeComponent === 'io' ? '#facc15' : '#f59e0b'}
+              strokeWidth={activeComponent === 'io' ? '2.5' : '1.5'}
+              strokeDasharray="4 2"
+              className={activeComponent === 'io' ? 'animate-pulse' : undefined}
+            />
+            {/* Nichicon Gold Audio Capacitors */}
+            {[415, 435, 455, 475].map((cy, idx) => (
+              <g key={`audiocap-${idx}`}>
+                <circle cx="45" cy={cy} r="6" fill="#1c1917" stroke="#ca8a04" strokeWidth="1.5" />
+                <circle cx="45" cy={cy} r="2" fill="#ca8a04" />
+              </g>
+            ))}
+            {/* Audio Codec Chip */}
+            <rect x="65" y="420" width="38" height="38" rx="2" fill="#18181b" stroke="#71717a" strokeWidth="1" />
+            <text x="70" y="438" fill="#e2e8f0" fontSize="6" fontWeight="bold">ALC4080</text>
+            <text x="70" y="448" fill="#ca8a04" fontSize="5.5">DPC SHIELD</text>
+
+            <text x="30" y="520" fill={activeComponent === 'io' ? '#fde047' : '#f59e0b'} fontSize="7.5" fontWeight="bold">
+              AUDIO DPC ISOLATION
+            </text>
+            {activeComponent === 'io' && (
+              <circle cx="60" cy="50" r="4.5" fill="#facc15" className="animate-ping" />
             )}
           </g>
 
-          {/* ======================================================================= */}
-          {/* COMPONENTE INTERACTIVO 3: VRM (MÓDULO DE REGULACIÓN DE VOLTAJE)         */}
-          {/* ======================================================================= */}
+          {/* 2. VRM POWER DELIVERY SYSTEM & 8-PIN EPS 12V (Top Left) */}
           <g
+            id="comp-vrm"
             onClick={() => handleSelectComponent('vrm')}
             onMouseEnter={() => setHoveredPart('vrm')}
             onMouseLeave={() => setHoveredPart(null)}
             className="cursor-pointer group"
           >
-            {/* Disipador Superior */}
+            {/* 8-Pin EPS CPU 12V Connector */}
+            <rect x="155" y="30" width="60" height="36" rx="3" fill="#18181b" stroke="#eab308" strokeWidth="1.5" />
+            <text x="160" y="43" fill="#facc15" fontSize="7" fontWeight="black">EPS 12V</text>
+            <text x="160" y="54" fill="#a1a1aa" fontSize="6">8-PIN CPU</text>
+            {/* 8 Pin gold squares */}
+            {[0, 1, 2, 3].map((col) => (
+              <g key={`epspin-${col}`}>
+                <rect x={188 + col * 6} y="34" width="4.5" height="4.5" fill="#ca8a04" />
+                <rect x={188 + col * 6} y="41" width="4.5" height="4.5" fill="#ca8a04" />
+              </g>
+            ))}
+
+            {/* Top VRM Aluminum Heatsink */}
             <rect
-              x="280"
-              y="45"
-              width="180"
-              height="45"
+              x="235"
+              y="28"
+              width="230"
+              height="46"
               rx="4"
               fill={activeOverlay === 'thermal' ? thermalProfile.vrmColor : 'url(#vrmGrad)'}
               stroke={activeComponent === 'vrm' ? '#facc15' : hoveredPart === 'vrm' ? '#eab308' : '#3b4252'}
-              strokeWidth={activeComponent === 'vrm' ? '3' : '2'}
+              strokeWidth={activeComponent === 'vrm' ? '3' : '1.8'}
               filter={activeComponent === 'vrm' ? 'url(#glowGold)' : undefined}
             />
-            {/* Disipador Lateral */}
+            {/* Milled Heatsink cooling fins */}
+            {[38, 48, 58].map((fy, i) => (
+              <line key={`vrm-top-fin-${i}`} x1="245" y1={fy} x2="455" y2={fy} stroke="#334155" strokeWidth="1.5" />
+            ))}
+
+            {/* Left VRM Aluminum Heatsink */}
             <rect
-              x="160"
-              y="100"
-              width="65"
-              height="200"
+              x="145"
+              y="80"
+              width="70"
+              height="205"
               rx="4"
               fill={activeOverlay === 'thermal' ? thermalProfile.vrmColor : 'url(#vrmGrad)'}
               stroke={activeComponent === 'vrm' ? '#facc15' : hoveredPart === 'vrm' ? '#eab308' : '#3b4252'}
-              strokeWidth={activeComponent === 'vrm' ? '3' : '2'}
+              strokeWidth={activeComponent === 'vrm' ? '3' : '1.8'}
               filter={activeComponent === 'vrm' ? 'url(#glowGold)' : undefined}
             />
-            <text x="175" y="190" fill="#e2e8f0" fontSize="10" fontWeight="bold" transform="rotate(90, 175, 190)">
-              {activeOverlay === 'thermal' ? `VRM: ${thermalProfile.vrmTemp}°C` : 'VRM POWER STAGES'}
+            {[105, 130, 155, 180, 205, 230, 255].map((fy, i) => (
+              <line key={`vrm-left-fin-${i}`} x1="155" y1={fy} x2="205" y2={fy} stroke="#334155" strokeWidth="1.5" />
+            ))}
+
+            {/* Connecting Heatpipe between heatsinks */}
+            <path d="M 175 90 L 175 52 Q 175 42 190 42 L 235 42" fill="none" stroke="#94a3b8" strokeWidth="3" strokeLinecap="round" />
+
+            {/* Ferrite Chokes (R15 / R22) & Polymer Capacitors */}
+            {[245, 272, 299, 326, 353, 380, 407, 434].map((vx, i) => (
+              <rect key={`choke-top-${i}`} x={vx} y="76" width="18" height="16" rx="2" fill="#27272a" stroke="#71717a" strokeWidth="1" />
+            ))}
+            {[90, 115, 140, 165, 190, 215, 240, 265].map((vy, i) => (
+              <g key={`choke-left-${i}`}>
+                <rect x="218" y={vy} width="16" height="18" rx="2" fill="#27272a" stroke="#71717a" strokeWidth="1" />
+                <circle cx="210" cy={vy + 9} r="4.5" fill="#09090b" stroke="#71717a" strokeWidth="1" />
+              </g>
+            ))}
+
+            <text x="250" y="45" fill="#e2e8f0" fontSize="9" fontWeight="bold">
+              {activeOverlay === 'thermal' ? `VRM: ${thermalProfile.vrmTemp}°C` : '16+2+1 DIGITAL VRM POWER STAGES'}
             </text>
-            <text x="310" y="72" fill="#cbd5e1" fontSize="10" fontWeight="bold">
-              {activeOverlay === 'thermal' ? `16+2+1 PHASES (${thermalProfile.vrmTemp}°C)` : '16+2+1 DIGITAL PHASES'}
+            <text x="150" y="275" fill="#94a3b8" fontSize="7.5" fontWeight="bold" transform="rotate(-90 150 275)">
+              SPS 90A POWER STAGES
             </text>
             {activeComponent === 'vrm' && (
-              <circle cx="450" cy="50" r="4.5" fill="#facc15" className="animate-ping" />
+              <circle cx="455" cy="40" r="4.5" fill="#facc15" className="animate-ping" />
             )}
           </g>
 
-          {/* ======================================================================= */}
-          {/* COMPONENTE INTERACTIVO 4: PCH (PLATFORM CONTROLLER HUB / CHIPSET)       */}
-          {/* ======================================================================= */}
+          {/* 3. CPU SOCKET LGA1700 & SILICON DIE (Center-Top) */}
           <g
-            onClick={() => handleSelectComponent('pch')}
-            onMouseEnter={() => setHoveredPart('pch')}
+            id="comp-cpu"
+            onClick={() => handleSelectComponent('cpu')}
+            onMouseEnter={() => setHoveredPart('cpu')}
             onMouseLeave={() => setHoveredPart(null)}
             className="cursor-pointer group"
           >
+            {/* Outer Metal Retention Frame */}
             <rect
-              x="620"
-              y="430"
-              width="140"
-              height="120"
-              rx="8"
-              fill={activeOverlay === 'thermal' ? '#b45309' : '#1a202c'}
-              stroke={activeComponent === 'pch' ? '#facc15' : hoveredPart === 'pch' ? '#eab308' : '#475569'}
-              strokeWidth={activeComponent === 'pch' ? '3.5' : '2'}
-              filter={activeComponent === 'pch' ? 'url(#glowGold)' : undefined}
-              className="transition-all duration-200"
+              x="285"
+              y="100"
+              width="180"
+              height="195"
+              rx="10"
+              fill="#18181b"
+              stroke={activeComponent === 'cpu' ? '#facc15' : hoveredPart === 'cpu' ? '#eab308' : '#52525b'}
+              strokeWidth={activeComponent === 'cpu' ? '3.5' : '1.8'}
+              filter={activeComponent === 'cpu' ? 'url(#glowGold)' : undefined}
             />
-            <text x="645" y="480" fill={activeComponent === 'pch' ? '#fde047' : '#f8fafc'} fontSize="11" fontWeight="bold">
-              CHIPSET PCH
+
+            {/* Metal Retention Lever */}
+            <line x1="472" y1="110" x2="472" y2="280" stroke="#d4d4d8" strokeWidth="4.5" strokeLinecap="round" />
+            <circle cx="472" cy="285" r="5" fill="#f59e0b" />
+
+            {/* Socket Bevel & Pin Array (LGA Pins Bed) */}
+            <rect x="300" y="115" width="150" height="165" rx="6" fill="#09090b" stroke="#3f3f46" strokeWidth="1" />
+            {/* Gold Pin 1 alignment triangle */}
+            <polygon points="305,120 315,120 305,130" fill="#facc15" />
+
+            {/* Central CPU Die / Integrated Heat Spreader (IHS) */}
+            <rect
+              x="320"
+              y="135"
+              width="110"
+              height="125"
+              rx="5"
+              fill={activeOverlay === 'thermal' ? thermalProfile.dieColor : 'url(#cpu-silicon-grad)'}
+              stroke={activeComponent === 'cpu' ? '#fde047' : activeOverlay === 'thermal' ? thermalProfile.dieGlow : '#eab308'}
+              strokeWidth={activeComponent === 'cpu' ? '2.5' : '1.5'}
+            />
+
+            {/* Ring Bus Concentric Simulation inside Die */}
+            <circle
+              cx="375"
+              cy="197"
+              r="36"
+              fill="none"
+              stroke={activeComponent === 'cpu' ? '#facc15' : '#eab308'}
+              strokeWidth="2"
+              strokeDasharray={busSimulationActive ? '6,3' : 'none'}
+              className={busSimulationActive ? 'evo-ring-active' : undefined}
+            />
+            <circle cx="375" cy="197" r="20" fill="none" stroke="#64748b" strokeWidth="1" strokeDasharray="3,3" />
+
+            {/* Silicon Cores Matrix */}
+            <text x="340" y="172" fill="#fef08a" fontSize="10" fontWeight="bold">
+              SOCKET
             </text>
-            <text x="645" y="500" fill="#94a3b8" fontSize="9">
-              DMI 4.0 x8 LINK
+            <text x="335" y="186" fill="#ffffff" fontSize="9" fontWeight="bold">
+              RING BUS
             </text>
-            <text x="645" y="520" fill="#64748b" fontSize="8">
-              I/O, SATA & USB HOST
+            <text x="330" y="245" fill={activeComponent === 'cpu' ? '#facc15' : '#94a3b8'} fontSize="8" fontWeight="bold">
+              {activeOverlay === 'thermal' ? `DIE: ${thermalProfile.cpuTemp}°C` : 'LGA1700 / DIE L3'}
             </text>
-            <circle cx="730" cy="455" r="4" fill="#eab308" />
-            {activeComponent === 'pch' && (
-              <circle cx="745" cy="445" r="4.5" fill="#facc15" className="animate-ping" />
+            {activeComponent === 'cpu' && (
+              <circle cx="450" cy="115" r="4.5" fill="#facc15" className="animate-ping" />
             )}
           </g>
 
-          {/* ======================================================================= */}
-          {/* COMPONENTE INTERACTIVO 5: BUS PCIE (LÍNEAS DIRECTAS)                    */}
-          {/* ======================================================================= */}
+          {/* 4. RAM / DDR5 DIMM SLOTS (A1, A2, B1, B2) (Top Right) */}
           <g
-            onClick={() => handleSelectComponent('pcie')}
-            onMouseEnter={() => setHoveredPart('pcie')}
+            id="comp-ram"
+            onClick={() => handleSelectComponent('ram')}
+            onMouseEnter={() => setHoveredPart('ram')}
             onMouseLeave={() => setHoveredPart(null)}
             className="cursor-pointer group"
           >
+            {/* DIMM Bank Background Plate */}
             <rect
-              x="180"
-              y="410"
-              width="340"
-              height="30"
-              rx="4"
-              fill={
-                isPcieSaturated
-                  ? '#dc2626'
-                  : activeOverlay === 'thermal'
-                  ? '#b45309'
-                  : '#182030'
-              }
-              stroke={
-                activeComponent === 'pcie'
-                  ? '#facc15'
-                  : isPcieSaturated
-                  ? '#f87171'
-                  : hoveredPart === 'pcie'
-                  ? '#eab308'
-                  : '#eab308'
-              }
-              strokeWidth={activeComponent === 'pcie' ? '3.5' : isPcieSaturated ? '3' : '2'}
-              filter={activeComponent === 'pcie' ? 'url(#glowGold)' : undefined}
+              x="565"
+              y="65"
+              width="185"
+              height="245"
+              rx="6"
+              fill="#0c1322"
+              stroke={activeComponent === 'ram' ? '#facc15' : hoveredPart === 'ram' ? '#eab308' : '#334155'}
+              strokeWidth={activeComponent === 'ram' ? '2.8' : '1.5'}
+              filter={activeComponent === 'ram' ? 'url(#glowGold)' : undefined}
             />
-            <text x="200" y="430" fill={isPcieSaturated ? '#ffffff' : activeComponent === 'pcie' ? '#fde047' : '#facc15'} fontSize="10" fontWeight="bold">
-              {isPcieSaturated
-                ? `⚠️ PCIe ${pcieGen.replace('Gen ', '')}.0 ${pcieLanes} // ¡SATURADO POR BIFURCACIÓN M.2!`
-                : `PCIe ${pcieGen.replace('Gen ', '')}.0 ${pcieLanes} SAFE-SLOT DIRECTO (REBAR ACTIVO)`}
+            <text x="575" y="80" fill="#38bdf8" fontSize="8" fontWeight="black">
+              128-BIT DDR5 DUAL-CHANNEL (IMC)
             </text>
 
-            {/* Baliza de saturación o selección */}
-            {isPcieSaturated ? (
-              <circle cx="505" cy="425" r="6" fill="#ef4444" className="animate-ping" />
-            ) : activeComponent === 'pcie' ? (
-              <circle cx="505" cy="425" r="4.5" fill="#facc15" className="animate-ping" />
-            ) : null}
+            {/* 4 Physical Slots */}
+            {[
+              { id: 'A1', x: 578, pop: false, name: 'A1' },
+              { id: 'A2', x: 622, pop: true, name: 'A2 (CH-A) ✓' },
+              { id: 'B1', x: 666, pop: false, name: 'B1' },
+              { id: 'B2', x: 710, pop: true, name: 'B2 (CH-B) ✓' },
+            ].map((slot) => (
+              <g key={`dimm-${slot.id}`}>
+                {/* Slot casing with center key notch */}
+                <rect x={slot.x} y="90" width="26" height="190" rx="2" fill="#18181b" stroke="#3f3f46" strokeWidth="1" />
+                {/* Top & Bottom white retention latches */}
+                <rect x={slot.x - 1} y="86" width="28" height="6" fill="#e4e4e7" rx="1" />
+                <rect x={slot.x - 1} y="278" width="28" height="6" fill="#e4e4e7" rx="1" />
+
+                {/* Populated RAM Stick (Green/Dark PCB with chips) */}
+                {slot.pop ? (
+                  <g>
+                    <rect x={slot.x + 3} y="94" width="20" height="182" rx="2" fill="#042f2e" stroke="#10b981" strokeWidth="1" />
+                    {/* SMD memory chips on stick */}
+                    {[105, 125, 145, 165, 195, 215, 235, 255].map((my, idx) => (
+                      <rect key={`dram-chip-${idx}`} x={slot.x + 5} y={my} width="16" height="14" rx="1" fill="#021f1d" stroke="#059669" strokeWidth="0.8" />
+                    ))}
+                    {/* PMIC chip in center */}
+                    <rect x={slot.x + 8} y="182" width="10" height="8" rx="1" fill="#09090b" stroke="#ca8a04" strokeWidth="0.8" />
+                    <text x={slot.x + 4} y="200" fill="#6ee7b7" fontSize="7" fontWeight="black" transform={`rotate(-90 ${slot.x + 4} 200)`}>
+                      DDR5 5600 MT/s
+                    </text>
+                  </g>
+                ) : (
+                  <text x={slot.x + 7} y="195" fill="#52525b" fontSize="6.5" transform={`rotate(-90 ${slot.x + 7} 195)`}>
+                    VACÍO
+                  </text>
+                )}
+                <text x={slot.x + 3} y="295" fill="#94a3b8" fontSize="7" fontWeight="bold">
+                  {slot.name}
+                </text>
+              </g>
+            ))}
+            {activeComponent === 'ram' && (
+              <circle cx="735" cy="75" r="4.5" fill="#facc15" className="animate-ping" />
+            )}
           </g>
 
-          {/* Ranura Secundaria PCIe (vía Chipset PCH) */}
-          <g className="opacity-60">
-            <rect x="180" y="500" width="340" height="24" rx="4" fill="#10141d" stroke="#334155" strokeWidth="1.5" />
-            <text x="200" y="516" fill="#64748b" fontSize="9">
-              PCIe 4.0 x4 (VÍA CHIPSET PCH / LATENCIA INDIRECTA)
-            </text>
+          {/* 5. 24-PIN ATX MAIN POWER & SATA 6Gb/s CONNECTORS (Right Edge) */}
+          <g id="comp-atx-sata" className="opacity-90">
+            {/* 24-Pin ATX Main Power Connector */}
+            <rect x="780" y="80" width="46" height="175" rx="4" fill="#18181b" stroke="#eab308" strokeWidth="1.8" />
+            <text x="785" y="94" fill="#facc15" fontSize="7.5" fontWeight="black">ATX 24P</text>
+            {/* 2x12 Gold Pin Grid with square contact sockets */}
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((p) => (
+              <g key={`atx24pin-${p}`}>
+                <circle cx="793" cy={105 + p * 12} r="2.8" fill="#fef08a" stroke="#ca8a04" strokeWidth="0.8" />
+                <circle cx="811" cy={105 + p * 12} r="2.8" fill="#fef08a" stroke="#ca8a04" strokeWidth="0.8" />
+              </g>
+            ))}
+
+            {/* Dual Stacked SATA 6Gb/s Ports */}
+            <g>
+              <rect x="775" y="365" width="52" height="55" rx="3" fill="#18181b" stroke="#475569" strokeWidth="1.2" />
+              <rect x="782" y="375" width="38" height="15" fill="#090d16" stroke="#ca8a04" strokeWidth="1" />
+              <rect x="782" y="395" width="38" height="15" fill="#090d16" stroke="#ca8a04" strokeWidth="1" />
+              <text x="785" y="372" fill="#94a3b8" fontSize="6.5" fontWeight="bold">SATA 1 & 2</text>
+
+              <rect x="775" y="435" width="52" height="55" rx="3" fill="#18181b" stroke="#475569" strokeWidth="1.2" />
+              <rect x="782" y="445" width="38" height="15" fill="#090d16" stroke="#ca8a04" strokeWidth="1" />
+              <rect x="782" y="465" width="38" height="15" fill="#090d16" stroke="#ca8a04" strokeWidth="1" />
+              <text x="785" y="442" fill="#94a3b8" fontSize="6.5" fontWeight="bold">SATA 3 & 4</text>
+              <text x="780" y="505" fill="#64748b" fontSize="7" fontWeight="bold">4x 6Gbps SATA</text>
+            </g>
           </g>
 
-          {/* Ranura M.2 NVMe Primaria con Heatsink */}
+          {/* 6. M.2 NVME PRIMARY SLOT (Direct CPU Gen4/5 x4 with Heatsink) */}
           <g
+            id="comp-m2"
             onClick={() => handleSelectComponent('m2')}
             onMouseEnter={() => setHoveredPart('m2')}
             onMouseLeave={() => setHoveredPart(null)}
             className="cursor-pointer group"
           >
             <rect
-              x="260"
-              y="340"
-              width="240"
-              height="35"
+              x="275"
+              y="315"
+              width="245"
+              height="42"
               rx="4"
-              fill={activeOverlay === 'thermal' ? '#c2410c' : '#181e2b'}
-              stroke={activeComponent === 'm2' ? '#facc15' : hoveredPart === 'm2' ? '#eab308' : '#334155'}
-              strokeWidth={activeComponent === 'm2' ? '3' : '2'}
+              fill={activeOverlay === 'thermal' ? '#c2410c' : '#111827'}
+              stroke={activeComponent === 'm2' ? '#facc15' : hoveredPart === 'm2' ? '#eab308' : '#475569'}
+              strokeWidth={activeComponent === 'm2' ? '3' : '1.8'}
               filter={activeComponent === 'm2' ? 'url(#glowGold)' : undefined}
             />
-            <text x="280" y="362" fill={activeComponent === 'm2' ? '#fde047' : '#38bdf8'} fontSize="10" fontWeight="bold">
-              M.2 NVMe Gen4/5 DEDICADO (HEATSINK 42°C)
+            {/* Gold connector contact fingers on left */}
+            <rect x="278" y="320" width="10" height="32" rx="1" fill="#ca8a04" />
+            {/* Standoff screw with spring clip on right */}
+            <circle cx="505" cy="336" r="5.5" fill="#94a3b8" stroke="#475569" strokeWidth="1" />
+            <line x1="503" y1="336" x2="507" y2="336" stroke="#1e293b" />
+
+            <text x="295" y="335" fill={activeComponent === 'm2' ? '#fde047' : '#38bdf8'} fontSize="9" fontWeight="bold">
+              M.2 NVMe PCIe 5.0/4.0 x4 (DIRECT CPU BUS)
+            </text>
+            <text x="295" y="348" fill="#94a3b8" fontSize="7.5">
+              HEATSINK ARMOR // DISIPACIÓN ACTIVA
             </text>
             {activeComponent === 'm2' && (
-              <circle cx="485" cy="358" r="4" fill="#facc15" className="animate-ping" />
+              <circle cx="490" cy="325" r="4.5" fill="#facc15" className="animate-ping" />
             )}
           </g>
 
-          {/* Panel Trasero I/O & Aislamiento de Audio */}
+          {/* 7. PCIE EXPANSION SLOTS: PRIMARY PCIE X16 & SECONDARY PCIE X4 */}
           <g
-            onClick={() => handleSelectComponent('io')}
-            onMouseEnter={() => setHoveredPart('io')}
+            id="comp-pcie"
+            onClick={() => handleSelectComponent('pcie')}
+            onMouseEnter={() => setHoveredPart('pcie')}
             onMouseLeave={() => setHoveredPart(null)}
             className="cursor-pointer group"
           >
+            {/* Primary PCIe 5.0 x16 Slot (Metal armored SafeSlot) */}
             <rect
-              x="60"
-              y="40"
-              width="80"
-              height="300"
-              rx="8"
-              fill="#131722"
-              stroke={activeComponent === 'io' ? '#facc15' : hoveredPart === 'io' ? '#eab308' : '#2d3748'}
-              strokeWidth={activeComponent === 'io' ? '3' : '2'}
-              filter={activeComponent === 'io' ? 'url(#glowGold)' : undefined}
+              x="145"
+              y="380"
+              width="455"
+              height="34"
+              rx="4"
+              fill={
+                isPcieSaturated
+                  ? '#450a0a'
+                  : activeOverlay === 'thermal'
+                  ? '#b45309'
+                  : '#131b2b'
+              }
+              stroke={
+                activeComponent === 'pcie'
+                  ? '#facc15'
+                  : isPcieSaturated
+                  ? '#ef4444'
+                  : hoveredPart === 'pcie'
+                  ? '#eab308'
+                  : '#3b82f6'
+              }
+              strokeWidth={activeComponent === 'pcie' || isPcieSaturated ? '3.5' : '2'}
+              filter={activeComponent === 'pcie' ? 'url(#glowGold)' : undefined}
             />
-            <text x="75" y="70" fill="#94a3b8" fontSize="10" fontWeight="bold" transform="rotate(90, 75, 70)">
-              REAR I/O & USB HOST CONTROLLER
+
+            {/* PCIe Pins and Key divider */}
+            <rect x="150" y="388" width="60" height="18" fill="#09090b" />
+            <rect x="220" y="388" width="370" height="18" fill="#09090b" />
+            {/* Q-Release retention lock latch */}
+            <rect x="596" y="374" width="18" height="46" rx="2" fill="#3b82f6" stroke="#60a5fa" strokeWidth="1" />
+
+            <text x="160" y="401" fill={isPcieSaturated ? '#ffffff' : activeComponent === 'pcie' ? '#fde047' : '#facc15'} fontSize="9.5" fontWeight="bold">
+              {isPcieSaturated
+                ? `⚠️ PCIe ${pcieGen.replace('Gen ', '')}.0 ${pcieLanes} // ¡SATURADO POR BIFURCACIÓN M.2!`
+                : `PCIe ${pcieGen.replace('Gen ', '')}.0 ${pcieLanes} SAFESLOT DEDICADO (REBAR ACTIVO)`}
             </text>
-            {/* Línea de aislamiento de audio */}
-            <path
-              d="M 60 360 L 140 360 L 140 540 L 60 540"
-              fill="#0d111a"
-              stroke={activeComponent === 'io' ? '#facc15' : '#f59e0b'}
-              strokeWidth={activeComponent === 'io' ? '2.5' : '1.5'}
-              strokeDasharray="4,2"
-            />
-            <text x="70" y="450" fill={activeComponent === 'io' ? '#fde047' : '#f59e0b'} fontSize="9" fontWeight="bold">
-              AUDIO DPC ISOLATION
-            </text>
-            {activeComponent === 'io' && (
-              <circle cx="125" cy="55" r="4" fill="#facc15" className="animate-ping" />
-            )}
+
+            {/* Baliza de saturación o selección */}
+            {isPcieSaturated ? (
+              <circle cx="585" cy="397" r="6" fill="#ef4444" className="animate-ping" />
+            ) : activeComponent === 'pcie' ? (
+              <circle cx="585" cy="397" r="4.5" fill="#facc15" className="animate-ping" />
+            ) : null}
+
+            {/* Secondary PCIe 4.0 x4 Slot (via Chipset PCH) */}
+            <g className="opacity-70">
+              <rect x="145" y="470" width="320" height="26" rx="3" fill="#10141d" stroke="#334155" strokeWidth="1.5" />
+              <rect x="150" y="476" width="45" height="14" fill="#09090b" />
+              <rect x="202" y="476" width="255" height="14" fill="#09090b" />
+              <text x="160" y="487" fill="#64748b" fontSize="8" fontWeight="bold">
+                PCIe 4.0 x4 (VÍA CHIPSET PCH / EXTENSIÓN)
+              </text>
+            </g>
           </g>
 
-          {/* Conector ATX 24 Pines & Puertos SATA */}
-          <g className="opacity-75">
-            <rect x="775" y="110" width="35" height="180" rx="4" fill="#141824" stroke="#334155" strokeWidth="2" />
-            <text x="798" y="210" fill="#10b981" fontSize="9" fontWeight="bold" transform="rotate(90, 798, 210)">
-              24-PIN ATX MAIN POWER
+          {/* 8. CHIPSET PCH PLATFORM CONTROLLER HUB (Bottom Right) */}
+          <g
+            id="comp-pch"
+            onClick={() => handleSelectComponent('pch')}
+            onMouseEnter={() => setHoveredPart('pch')}
+            onMouseLeave={() => setHoveredPart(null)}
+            className="cursor-pointer group"
+          >
+            {/* Aluminum Finned Heatsink */}
+            <rect
+              x="595"
+              y="355"
+              width="170"
+              height="165"
+              rx="8"
+              fill={activeOverlay === 'thermal' ? '#b45309' : 'url(#heatsink-grad)'}
+              stroke={activeComponent === 'pch' ? '#facc15' : hoveredPart === 'pch' ? '#eab308' : '#475569'}
+              strokeWidth={activeComponent === 'pch' ? '3.5' : '2'}
+              filter={activeComponent === 'pch' ? 'url(#glowGold)' : undefined}
+            />
+            {/* Heatsink Milled Cooling Fin Slats */}
+            {[375, 395, 415, 435, 455, 475, 495].map((fy, i) => (
+              <line key={`pch-fin-${i}`} x1="605" y1={fy} x2="755" y2={fy} stroke="#334155" strokeWidth="2" />
+            ))}
+
+            {/* Centered Chipset Badge Plate */}
+            <rect x="610" y="405" width="140" height="65" rx="5" fill="#0f172a" stroke="#3b82f6" strokeWidth="1.5" />
+            <text x="620" y="425" fill={activeComponent === 'pch' ? '#fde047' : '#60a5fa'} fontSize="10" fontWeight="black">
+              CHIPSET PCH HUB
             </text>
-            <rect x="800" y="440" width="30" height="50" rx="3" fill="#111520" stroke="#334155" />
-            <rect x="800" y="500" width="30" height="50" rx="3" fill="#111520" stroke="#334155" />
-            <text x="840" y="475" fill="#64748b" fontSize="8">
-              4x SATA 6Gb/s
+            <text x="620" y="442" fill="#ffffff" fontSize="8.5" fontWeight="bold">
+              DMI 4.0 x8 LINK (15.75 GB/s)
             </text>
+            <text x="620" y="458" fill="#94a3b8" fontSize="7.5">
+              USB 3.2 • SATA • AUDIO HOST
+            </text>
+
+            <circle cx="735" cy="375" r="4.5" fill="#eab308" />
+            {activeComponent === 'pch' && (
+              <circle cx="745" cy="365" r="4.5" fill="#facc15" className="animate-ping" />
+            )}
           </g>
         </svg>
 
@@ -1352,6 +1591,23 @@ export const EvoMotherboardCanvas: React.FC<EvoMotherboardCanvasProps> = ({
           </div>
         </div>
 
+        {/* EXPLICACIÓN SIMPLE PARA PRINCIPIANTES */}
+        <div className="p-4 rounded-xl bg-gradient-to-r from-[#14120a] to-[#0c0d12] border border-amber-400/20 space-y-1">
+          <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider font-mono-tech flex items-center gap-1.5">
+            <Info className="w-3.5 h-3.5 text-amber-400" />
+            <span>EXPLICACIÓN SIMPLE PARA PRINCIPIANTES: ¿QUÉ SIGNIFICA {activeComponent.toUpperCase()}?</span>
+          </div>
+          <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
+            {activeComponent === 'vrm' && 'Regula y entrega energía estable al procesador para que funcione sin apagarse ni recalentar.'}
+            {activeComponent === 'cpu' && 'El microprocesador central, el cerebro de la PC que procesa toda la lógica e instrucciones.'}
+            {activeComponent === 'ram' && 'Memoria de acceso rápido temporal donde se guardan los datos activos de tus juegos o programas.'}
+            {activeComponent === 'pch' && 'Chipset de la placa madre que intercomunica puertos USB, discos SSD y periféricos con el CPU.'}
+            {activeComponent === 'pcie' && 'Bus de expansión ultra rápido donde se conecta la placa de video para procesar gráficos 3D.'}
+            {activeComponent === 'm2' && 'Zócalo de alta velocidad para discos de almacenamiento sólido SSD NVMe ultrarrápidos.'}
+            {activeComponent === 'io' && 'Panel de entrada/salida trasero donde se conectan pantallas, auriculares y redes externas.'}
+          </p>
+        </div>
+
         {/* ======================================================================= */}
         {/* GRILLA 1: MÉTRICAS DE TELEMETRÍA (PREPARADAS PARA ESTADO EN TIEMPO REAL)*/}
         {/* ======================================================================= */}
@@ -1364,7 +1620,7 @@ export const EvoMotherboardCanvas: React.FC<EvoMotherboardCanvasProps> = ({
                 <Thermometer className="w-3.5 h-3.5 text-yellow-500" />
                 {currentDossier.metrics.temperature.label}
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold whitespace-nowrap shrink-0">
                 NOMINAL
               </span>
             </div>
@@ -1388,7 +1644,7 @@ export const EvoMotherboardCanvas: React.FC<EvoMotherboardCanvasProps> = ({
                 <Zap className="w-3.5 h-3.5 text-yellow-500" />
                 {currentDossier.metrics.voltage.label}
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-500 border border-yellow-500/40 font-bold">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-500 border border-yellow-500/40 font-bold whitespace-nowrap shrink-0">
                 ESTABLE
               </span>
             </div>
@@ -1444,7 +1700,7 @@ export const EvoMotherboardCanvas: React.FC<EvoMotherboardCanvasProps> = ({
                 {currentDossier.metrics.latency.label}
               </span>
               <span
-                className={`text-[10px] px-1.5 py-0.5 rounded font-bold border ${
+                className={`text-[10px] px-1.5 py-0.5 rounded font-bold border whitespace-nowrap shrink-0 ${
                   currentDossier.metrics.latency.dpcSpikeRisk === 'optimal'
                     ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                     : 'bg-amber-500/20 text-amber-300 border-amber-500/40'

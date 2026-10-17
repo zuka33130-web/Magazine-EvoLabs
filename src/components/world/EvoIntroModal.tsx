@@ -1,3 +1,7 @@
+/**
+ * LEGACY / INACTIVO: Modal de perfil narrativo conservado como referencia histórica.
+ * La única intro operativa activa del sistema es EvoIntroExperience.tsx.
+ */
 import React, { useState } from 'react';
 import {
   EVO_IDENTITY,
@@ -74,7 +78,7 @@ export const EvoIntroModal: React.FC<EvoIntroModalProps> = ({
             </span>
             <span className="text-zinc-600 text-xs font-mono-tech">•</span>
             <span className="text-yellow-400 font-mono-tech text-xs tracking-wider uppercase font-semibold">
-              MUNDO EVO V1 // INGRESO
+              EVO LABS // INGRESO
             </span>
           </div>
 

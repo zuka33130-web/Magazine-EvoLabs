@@ -32,6 +32,7 @@ interface Tome01DossierViewProps {
   labReport?: AbLaboratoryReport | null;
   onBackToIndex: () => void;
   onReopenLabReport?: () => void;
+  onGoToFinalExam?: () => void;
 }
 
 export const Tome01DossierView: React.FC<Tome01DossierViewProps> = ({
@@ -40,6 +41,7 @@ export const Tome01DossierView: React.FC<Tome01DossierViewProps> = ({
   labReport,
   onBackToIndex,
   onReopenLabReport,
+  onGoToFinalExam,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -331,7 +333,7 @@ export const Tome01DossierView: React.FC<Tome01DossierViewProps> = ({
             </div>
 
             <h3 className="font-display font-black text-xl text-white uppercase tracking-tight">
-              MUNDO EVO LABS // TALLERES AVANZADOS
+              EVO LABS // TALLERES AVANZADOS
             </h3>
 
             <p className="font-sans-editorial text-xs text-zinc-400 leading-relaxed">
@@ -345,20 +347,33 @@ export const Tome01DossierView: React.FC<Tome01DossierViewProps> = ({
         </div>
       </section>
 
-      {/* Bottom CTA to return to index */}
+      {/* Bottom CTA to return to index or take final exam */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-zinc-800">
         <span className="font-mono-tech text-xs text-zinc-400">
           Tomo 01 completado formalmente. Tu progreso está guardado en este equipo.
         </span>
 
-        <button
-          type="button"
-          onClick={onBackToIndex}
-          className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-black font-mono-tech font-bold text-xs uppercase flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:shadow-yellow-400/20"
-        >
-          <span>VOLVER AL ÍNDICE DEL TOMO 01</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
+          <button
+            type="button"
+            onClick={onBackToIndex}
+            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white font-mono-tech font-bold text-xs uppercase flex items-center justify-center gap-2 cursor-pointer transition-colors"
+          >
+            <BookOpen className="w-4 h-4 text-zinc-400" />
+            <span>ÍNDICE DEL TOMO 01</span>
+          </button>
+
+          {onGoToFinalExam && (
+            <button
+              type="button"
+              onClick={onGoToFinalExam}
+              className="w-full sm:w-auto px-7 py-3 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-black font-mono-tech font-black text-xs uppercase flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:shadow-yellow-400/20"
+            >
+              <span>RENDIR PRUEBA FINAL EVO (70%) →</span>
+              <ArrowRight className="w-4 h-4 text-black" />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

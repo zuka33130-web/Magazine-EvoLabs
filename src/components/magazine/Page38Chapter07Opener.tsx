@@ -30,3 +30,5 @@ export const Page38Chapter07Opener: React.FC = () => {
     </MagazineMasterPage>
   );
 };
+
+export default Page38Chapter07Opener;

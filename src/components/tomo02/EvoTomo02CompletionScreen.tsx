@@ -23,6 +23,7 @@ interface EvoTomo02CompletionScreenProps {
   onReviewExam?: () => void;
   onOpenA4Magazine?: () => void;
   score?: number;
+  total?: number;
 }
 
 export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps> = ({
@@ -31,7 +32,8 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
   onGoToCampusFormation,
   onReviewExam,
   onOpenA4Magazine,
-  score = 10,
+  score,
+  total,
 }) => {
   return (
     <div className="w-full max-w-4xl mx-auto py-6 sm:py-10 px-4 sm:px-6 font-sans-editorial space-y-8 animate-in fade-in duration-300">
@@ -65,7 +67,7 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
             </div>
             <div>
               <span className="font-mono-tech text-[10px] text-cyan-400 uppercase tracking-widest font-bold block">
-                ACADEMIA EVO LABS // CERTIFICADO EVO
+                EVO LABS // CERTIFICADO EVO
               </span>
               <h1 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight">
                 TOMO 02 SUPERADO CON ÉXITO
@@ -75,7 +77,7 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
 
           <div className="text-right font-mono-tech">
             <span className="px-3 py-1 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 font-black text-xs uppercase tracking-wider inline-block">
-              CALIFICACIÓN: {score} / 10
+              CALIFICACIÓN: {typeof score === 'number' && typeof total === 'number' && total > 0 ? `${score} / ${total} (${Math.round(score / total * 100)}%)` : 'SIN NOTA VALIDADA'}
             </span>
             <span className="text-[10px] text-zinc-500 block mt-1">
               ESTADO: COMPROBACIÓN EVO SUPERADA
@@ -184,7 +186,7 @@ export const EvoTomo02CompletionScreen: React.FC<EvoTomo02CompletionScreenProps>
             onClick={onGoToCampusFormation}
             className="p-4 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-cyan-950 hover:border-cyan-500/60 text-zinc-300 hover:text-white transition-all text-center cursor-pointer"
           >
-            <span className="font-bold block mb-1">ESCUELA EVO // CAMPUS</span>
+            <span className="font-bold block mb-1">APRENDER // FORMACIÓN</span>
             <span className="text-[11px] text-zinc-500">Continuar formación en el mapa</span>
           </button>
         )}

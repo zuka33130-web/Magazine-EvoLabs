@@ -37,6 +37,7 @@ interface EvoLabConsoleProps {
   onEnterTomo02: () => void;
   onEnterTomo03: () => void;
   onEnterTomo04: () => void;
+  onOpenTomo?: (tomoNumber: string) => void;
 }
 
 export const EvoLabConsole: React.FC<EvoLabConsoleProps> = ({
@@ -48,8 +49,15 @@ export const EvoLabConsole: React.FC<EvoLabConsoleProps> = ({
   onEnterTomo02,
   onEnterTomo03,
   onEnterTomo04,
+  onOpenTomo,
 }) => {
   const [activeZoneId, setActiveZoneId] = useState<string>(initialZoneId || 'zona-1');
+
+  React.useEffect(() => {
+    if (initialZoneId) {
+      setActiveZoneId(initialZoneId);
+    }
+  }, [initialZoneId]);
 
   const zoneIcons: Record<string, any> = {
     'zona-1': ShieldAlert,
@@ -131,6 +139,7 @@ export const EvoLabConsole: React.FC<EvoLabConsoleProps> = ({
             onEnterTomo02={onEnterTomo02}
             onEnterTomo03={onEnterTomo03}
             onEnterTomo04={onEnterTomo04}
+            onOpenTomo={onOpenTomo}
           />
         )}
         {activeZoneId === 'zona-4' && <Lab04CamaraExperimentos />}

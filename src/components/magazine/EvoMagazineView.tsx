@@ -56,7 +56,7 @@ import { DossierP12FinalCheckpoint } from './DossierP12FinalCheckpoint';
 import { Page35Chapter06Opener } from './Page35Chapter06Opener';
 import { Page36Chapter06ArbolForense } from './Page36Chapter06ArbolForense';
 import { Page37Chapter06Mito07 } from './Page37Chapter06Mito07';
-import { Page38Chapter07Opener } from './Page38Chapter07Opener';
+import { Page38Chapter07Opener } from './Page38Chapter07Opener.tsx';
 import { Page39Chapter07MatrizAB } from './Page39Chapter07MatrizAB';
 import { Page40Chapter07Mito08 } from './Page40Chapter07Mito08';
 import { Page45FuentesTecnicas } from './Page45FuentesTecnicas';

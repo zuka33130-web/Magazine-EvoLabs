@@ -2,6 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   BOOT_SEQUENCE_STEPS,
   BootStep,
+  BOOT_PHASES,
+  BootPhase,
+  SIMPLE_STEP_TITLES,
+  getPhaseForStep,
+  getStepTransitionInfo,
   EVO_CASES,
   EvoCase,
   CaseHypothesis,
@@ -16,6 +21,8 @@ import {
 import { EvoBootMachineVisual } from './EvoBootMachineVisual';
 import {
   Power,
+  Zap,
+  Cpu,
   ChevronLeft,
   ChevronRight,
   RotateCcw,
@@ -137,6 +144,9 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({
   const currentStep: BootStep =
     BOOT_SEQUENCE_STEPS[activeVisualStepIndex] || BOOT_SEQUENCE_STEPS[0];
   const forensicDetails = getStepForensicDetails(currentStep.stepNumber);
+  const currentPhase: BootPhase = getPhaseForStep(currentStep.stepNumber);
+  const transitionInfo = getStepTransitionInfo(currentStep.stepNumber);
+  const simpleTitle = SIMPLE_STEP_TITLES[currentStep.stepNumber] || currentStep.name;
   const totalSteps = BOOT_SEQUENCE_STEPS.length - 1; // 0 to 34
 
   // =========================================================================
@@ -571,14 +581,93 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({
       {/* ======================================================================= */}
       {(activeMode === 'APRENDER' || activeMode === 'FALLA_SIMULADA') && (
         <div className="space-y-4">
-          {/* Top Controls Bar */}
-          <div className="bg-[#0b0e14] border border-zinc-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-lg">
+          
+          {/* 1. BARRA HORIZONTAL COMPACTA DE 7 GRANDES FASES */}
+          <div className="bg-[#080b12] border border-zinc-800/90 rounded-2xl p-3 shadow-xl space-y-2">
+            <div className="flex items-center justify-between text-[11px] font-mono-tech px-1 flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                <span className="font-bold text-zinc-300 uppercase tracking-wider text-[10.5px]">
+                  SECUENCIA DIDÁCTICA DE ARRANQUE EN 7 FASES
+                </span>
+                <span className="text-zinc-600">•</span>
+                <span className="text-cyan-400 font-bold uppercase text-[10.5px]">
+                  FASE ACTIVA: 0{currentPhase.phaseNumber} // {currentPhase.title}
+                </span>
+              </div>
+              <div className="text-zinc-400 text-[10.5px] font-mono font-bold">
+                PASO {String(currentStep.stepNumber).padStart(2, '0')} DE {totalSteps}
+              </div>
+            </div>
+
+            {/* Grilla compacta de 7 Fases */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5 pt-0.5">
+              {BOOT_PHASES.map((phase) => {
+                const isCurrentPhase = currentPhase.id === phase.id;
+                const isPassedPhase = activeVisualStepIndex > phase.endStep;
+
+                return (
+                  <button
+                    key={phase.id}
+                    type="button"
+                    onClick={() => handleJumpToStep(phase.startStep)}
+                    className={`p-2 rounded-xl text-left transition-all border cursor-pointer relative overflow-hidden flex flex-col justify-between select-none ${
+                      isCurrentPhase
+                        ? 'bg-zinc-900 border-amber-400/90 shadow-[0_0_15px_rgba(245,158,11,0.3)] ring-1 ring-amber-400/50'
+                        : isPassedPhase
+                        ? 'bg-zinc-950/90 border-emerald-500/35 hover:border-emerald-500/70 text-zinc-300'
+                        : 'bg-zinc-950/40 border-zinc-850 hover:border-zinc-700 text-zinc-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span
+                        className="text-[9px] font-black px-1.5 py-0.2 rounded uppercase tracking-wider"
+                        style={{
+                          backgroundColor: isCurrentPhase ? phase.color : isPassedPhase ? '#10b98125' : '#27272a',
+                          color: isCurrentPhase ? '#000000' : isPassedPhase ? '#34d399' : '#71717a',
+                        }}
+                      >
+                        0{phase.phaseNumber}
+                      </span>
+                      <span className="text-[8.5px] font-mono text-zinc-500 font-bold">
+                        {String(phase.startStep).padStart(2, '0')}–{String(phase.endStep).padStart(2, '0')}
+                      </span>
+                    </div>
+
+                    <div className="mt-1">
+                      <div
+                        className={`text-[10.5px] font-black uppercase tracking-tight truncate ${
+                          isCurrentPhase ? 'text-white' : isPassedPhase ? 'text-emerald-300' : 'text-zinc-400'
+                        }`}
+                      >
+                        {phase.title}
+                      </div>
+                      <div className="text-[8.5px] text-zinc-400 truncate leading-tight">
+                        {phase.subtitle}
+                      </div>
+                    </div>
+
+                    {/* Resaltado inferior de fase activa */}
+                    {isCurrentPhase && (
+                      <div
+                        className="absolute bottom-0 left-0 right-0 h-1"
+                        style={{ backgroundColor: phase.color }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 2. BARRA STICKY DE NAVEGACIÓN Y CONTROLES (ANTERIOR & SIGUIENTE SIEMPRE VISIBLES) */}
+          <div className="sticky top-2 z-30 bg-[#090d16]/95 backdrop-blur-md border border-zinc-800/90 rounded-2xl p-3 shadow-2xl flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2 sm:gap-3">
               {!isPoweredOn ? (
                 <button
                   type="button"
                   onClick={activeMode === 'FALLA_SIMULADA' ? handleStartSimulatedFailureRun : handlePowerOn}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-black font-bold text-xs flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:brightness-110 active:scale-95 transition-all"
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-black font-black text-xs flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.35)] hover:brightness-110 active:scale-95 transition-all cursor-pointer"
                 >
                   <Power className="w-4 h-4" />
                   <span>ENCENDER PC</span>
@@ -588,9 +677,9 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({
                   <button
                     type="button"
                     onClick={handlePowerOff}
-                    className="px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-rose-500/60 text-zinc-300 hover:text-rose-400 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    className="px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-rose-500/60 text-zinc-300 hover:text-rose-400 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
                   >
-                    <Power className="w-3.5 h-3.5" />
+                    <Power className="w-3.5 h-3.5 text-rose-400" />
                     <span>APAGAR</span>
                   </button>
 
@@ -600,20 +689,20 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({
                         type="button"
                         onClick={handlePrevStep}
                         disabled={currentStepIndex <= 0}
-                        className="px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-zinc-500 disabled:opacity-40 disabled:pointer-events-none text-zinc-200 text-xs font-bold flex items-center gap-1 transition-all"
+                        className="px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-zinc-500 disabled:opacity-30 disabled:pointer-events-none text-zinc-100 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
                       >
-                        <ChevronLeft className="w-4 h-4" />
-                        <span className="hidden sm:inline">ANTERIOR</span>
+                        <ChevronLeft className="w-4 h-4 text-cyan-400" />
+                        <span>ANTERIOR</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={handleNextStep}
                         disabled={currentStepIndex >= totalSteps}
-                        className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs flex items-center gap-1 shadow-[0_0_15px_rgba(6,182,212,0.3)] disabled:opacity-40 disabled:pointer-events-none transition-all"
+                        className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.35)] disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
                       >
                         <span>SIGUIENTE PASO</span>
-                        <ChevronRight className="w-4 h-4" />
+                        <ChevronRight className="w-4 h-4 text-black" />
                       </button>
                     </>
                   )}
@@ -621,7 +710,7 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({
               )}
             </div>
 
-            {/* In Falla Simulada: Selector of failure step */}
+            {/* En Falla Simulada: Selector de punto de falla */}
             {activeMode === 'FALLA_SIMULADA' && (
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-zinc-400 font-bold text-[11px]">PUNTO DE FALLA:</span>
@@ -645,11 +734,117 @@ export const EvoBootLab: React.FC<EvoBootLabProps> = ({
               </div>
             )}
 
-            {/* Current Step Counter */}
-            <div className="text-right">
-              <div className="text-[10px] text-zinc-500 font-bold uppercase">ETAPA ACTUAL</div>
-              <div className="text-sm font-bold text-white">
-                PASO {String(currentStep.stepNumber).padStart(2, '0')} / {totalSteps}
+            {/* Selector directo de paso y contador */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 bg-zinc-950 px-3 py-1.5 rounded-xl border border-zinc-800 text-xs">
+                <span className="text-[10px] text-zinc-400 font-bold uppercase">PASO:</span>
+                <select
+                  aria-label="Seleccionar paso directo del arranque"
+                  value={currentStepIndex}
+                  onChange={(e) => handleJumpToStep(Number(e.target.value))}
+                  className="bg-transparent text-amber-300 font-bold outline-none cursor-pointer text-xs"
+                >
+                  {BOOT_SEQUENCE_STEPS.map((s) => (
+                    <option key={s.stepNumber} value={s.stepNumber} className="bg-zinc-900 text-zinc-200">
+                      Paso {String(s.stepNumber).padStart(2, '0')}: {SIMPLE_STEP_TITLES[s.stepNumber] || s.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="text-right hidden sm:block">
+                <div className="text-[9px] text-zinc-500 font-bold uppercase">ETAPA</div>
+                <div className="text-xs font-bold text-amber-400 font-mono">
+                  PASO {String(currentStep.stepNumber).padStart(2, '0')} / {totalSteps}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. TARJETA DIDÁCTICA CON TÍTULO SIMPLE, SUBTÍTULO TÉCNICO Y TRANSICIÓN DE ESTADO */}
+          <div className="bg-[#0b0e16] border border-zinc-800/90 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+            {/* Header de Metadatos del Paso */}
+            <div className="flex items-center justify-between gap-3 border-b border-zinc-800/80 pb-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <span
+                  className="text-[10px] px-2.5 py-0.5 rounded font-black uppercase tracking-wider"
+                  style={{
+                    backgroundColor: `${currentPhase.color}20`,
+                    color: currentPhase.color,
+                    border: `1px solid ${currentPhase.color}50`,
+                  }}
+                >
+                  FASE 0{currentPhase.phaseNumber} // {currentPhase.title}
+                </span>
+                <span className="text-zinc-600">•</span>
+                <span
+                  className="text-[10px] px-2 py-0.5 rounded font-bold uppercase"
+                  style={{
+                    backgroundColor: `${currentStep.layerColor}20`,
+                    color: currentStep.layerColor,
+                    border: `1px solid ${currentStep.layerColor}50`,
+                  }}
+                >
+                  CAPA {currentStep.layer}
+                </span>
+              </div>
+
+              <div className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>PASO {String(currentStep.stepNumber).padStart(2, '0')} DE {totalSteps}</span>
+              </div>
+            </div>
+
+            {/* Título Simple Prominente y Subtítulo Técnico Original */}
+            <div className="space-y-1">
+              <div className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">
+                DESCRIPCIÓN DIDÁCTICA DE LA ETAPA
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight font-display leading-snug">
+                «{simpleTitle}»
+              </h2>
+              <div className="text-xs text-amber-300/90 font-mono flex items-center gap-1.5 pt-0.5 flex-wrap">
+                <span className="text-zinc-500 font-bold uppercase">NOMBRE TÉCNICO ORIGINAL:</span>
+                <strong className="text-zinc-200">{currentStep.name}</strong>
+              </div>
+            </div>
+
+            {/* EXPLICACIÓN DE TRANSICIÓN EN TRES PILARES */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+              {/* Pilar 1: ¿Qué cambió? */}
+              <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-1">
+                <div className="text-[10px] font-bold text-amber-400 uppercase flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>1. ¿QUÉ CAMBIÓ EN ESTE PASO?</span>
+                </div>
+                <p className="text-xs text-zinc-200 font-sans-editorial leading-relaxed pt-0.5">
+                  {transitionInfo.whatChanged}
+                </p>
+              </div>
+
+              {/* Pilar 2: Componentes en acción */}
+              <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-1">
+                <div className="text-[10px] font-bold text-cyan-400 uppercase flex items-center gap-1.5">
+                  <Cpu className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <span>2. COMPONENTES EN ACCIÓN</span>
+                </div>
+                <p className="text-xs text-zinc-200 font-sans-editorial leading-relaxed pt-0.5">
+                  {transitionInfo.interveningComponents}
+                </p>
+                <div className="text-[10px] text-zinc-400 font-mono pt-1">
+                  Circuitos: {currentStep.activeComponents.join(', ') || 'Ninguno (Standby/Off)'}
+                </div>
+              </div>
+
+              {/* Pilar 3: ¿Qué debería ocurrir después? */}
+              <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-1">
+                <div className="text-[10px] font-bold text-emerald-400 uppercase flex items-center gap-1.5">
+                  <ArrowRight className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>3. ¿QUÉ DEBERÍA OCURRIR DESPUÉS?</span>
+                </div>
+                <p className="text-xs text-emerald-200 font-sans-editorial leading-relaxed pt-0.5">
+                  {transitionInfo.whatShouldHappenNext}
+                </p>
               </div>
             </div>
           </div>

@@ -11,11 +11,11 @@ const STORAGE_KEY_LAST_LOCATION = 'evo_tutor_last_location_v1';
 
 const DEFAULT_LOCATION: TutorLocation = {
   academySection: 'MUNDO EVO',
-  tomoTitle: 'Academia EVO LABS',
+  tomoTitle: 'EVO LABS',
   whatIs: 'Centro principal de navegación y exploración de EVO LABS.',
   whatFor: 'Permite visualizar todos los Tomos, acceder al recorrido guiado y retomar tu progreso.',
   currentAction: 'Seleccioná un Tomo de la colección o hacé clic en "Continuar mi recorrido".',
-  whyItMatters: 'Comprender el mapa global de la Academia te ayuda a trazar tu plan de estudio sin perderte.',
+  whyItMatters: 'Comprender el mapa global de EVO LABS te ayuda a trazar tu plan de estudio sin perderte.',
   nextStep: 'Ingresá al Tomo 01 (Conocé tu PC) para aprender la base del silicio y componentes.',
   activityType: 'mundo',
 };
@@ -48,6 +48,10 @@ export const TutorEvoProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         url.searchParams.get('pdf') ||
         url.searchParams.get('print') === 'true'
       ) {
+        return false;
+      }
+      // Do not compete with primary EvoIntroExperience
+      if (localStorage.getItem('evo_academia_intro_dismissed') !== 'true') {
         return false;
       }
       return localStorage.getItem(STORAGE_KEY_ONBOARDING_DISMISSED) !== 'true';

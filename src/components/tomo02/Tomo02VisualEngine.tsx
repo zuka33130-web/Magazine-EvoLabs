@@ -2603,7 +2603,7 @@ const InvestigatorPassportVisual: React.FC<{ compact?: boolean }> = ({ compact =
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-cyan-950 pb-4">
           <div className="space-y-1">
             <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold block">
-              ACADEMIA FORENSE EVO LABS // COMPROBACIÓN EVO
+              EVO LABS // COMPROBACIÓN EVO
             </span>
             <h3 className="text-white text-lg sm:text-xl font-bold uppercase tracking-tight">
               PASAPORTE DE INVESTIGADOR DE KERNEL NT
@@ -2894,7 +2894,7 @@ const InvestigatorPassportVisual: React.FC<{ compact?: boolean }> = ({ compact =
           <div className="flex items-center gap-2 text-zinc-400">
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
             <span className="text-[11px] font-sans-editorial">
-              Certificado EVO emitido por la Academia Forense EVO LABS. Competencias verificadas en laboratorio.
+              Certificado EVO emitido por EVO LABS. Competencias verificadas en laboratorio.
             </span>
           </div>
           <span className="text-cyan-400 font-bold text-[10px] uppercase tracking-wider">
@@ -2991,7 +2991,7 @@ export function getVisualPedagogicalMeta(moduleId: string, module: TomoModuleIte
         badge: 'RECREACIÓN DIDÁCTICA EVO // PROTOCOLO',
         title: 'MÉTODO DE 7 PASOS & SEMÁFORO DE LAS 15 CARPETAS MAESTRAS',
         whatYouAreSeeing:
-          'El flujo metodológico de 7 pasos de la Academia EVO Labs y el mapa de seguridad por colores (Verde, Amarillo, Rojo) de las 15 carpetas críticas del sistema operativo Windows.',
+          'El flujo metodológico de 7 pasos de EVO LABS y el mapa de seguridad por colores (Verde, Amarillo, Rojo) de las 15 carpetas críticas del sistema operativo Windows.',
         focalPoints: [
           {
             label: 'La Cadena de 7 Pasos',

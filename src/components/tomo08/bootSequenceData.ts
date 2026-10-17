@@ -2351,6 +2351,231 @@ export const STEP_FORENSIC_DETAILS: Record<number, StepForensicDetail> = {
   },
 };
 
+export interface BootPhase {
+  id: string;
+  phaseNumber: number; // 1 to 7
+  title: string; // "APAGADA", "STANDBY", "POWER", "POST", "VIDEO", "BOOT", "WINDOWS"
+  subtitle: string;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+  startStep: number;
+  endStep: number;
+}
+
+export const BOOT_PHASES: BootPhase[] = [
+  {
+    id: 'phase-01',
+    phaseNumber: 1,
+    title: 'APAGADA',
+    subtitle: 'Sin energía (0V)',
+    color: '#9ca3af',
+    bgColor: 'bg-zinc-800/80',
+    borderColor: 'border-zinc-600',
+    startStep: 0,
+    endStep: 0,
+  },
+  {
+    id: 'phase-02',
+    phaseNumber: 2,
+    title: 'STANDBY',
+    subtitle: 'Riel +5VSB activo',
+    color: '#eab308',
+    bgColor: 'bg-yellow-950/60',
+    borderColor: 'border-yellow-500/40',
+    startStep: 1,
+    endStep: 3,
+  },
+  {
+    id: 'phase-03',
+    phaseNumber: 3,
+    title: 'POWER',
+    subtitle: 'Rieles nominales & PWR_OK',
+    color: '#f97316',
+    bgColor: 'bg-orange-950/60',
+    borderColor: 'border-orange-500/40',
+    startStep: 4,
+    endStep: 6,
+  },
+  {
+    id: 'phase-04',
+    phaseNumber: 4,
+    title: 'POST',
+    subtitle: 'Test de silicio & RAM',
+    color: '#a855f7',
+    bgColor: 'bg-purple-950/60',
+    borderColor: 'border-purple-500/40',
+    startStep: 7,
+    endStep: 14,
+  },
+  {
+    id: 'phase-05',
+    phaseNumber: 5,
+    title: 'VIDEO',
+    subtitle: 'GOP, discos & I/O',
+    color: '#06b6d4',
+    bgColor: 'bg-cyan-950/60',
+    borderColor: 'border-cyan-500/40',
+    startStep: 15,
+    endStep: 19,
+  },
+  {
+    id: 'phase-06',
+    phaseNumber: 6,
+    title: 'BOOT',
+    subtitle: 'ESP, BCD & winload.efi',
+    color: '#3b82f6',
+    bgColor: 'bg-blue-950/60',
+    borderColor: 'border-blue-500/40',
+    startStep: 20,
+    endStep: 26,
+  },
+  {
+    id: 'phase-07',
+    phaseNumber: 7,
+    title: 'WINDOWS',
+    subtitle: 'Kernel, servicios & Shell',
+    color: '#10b981',
+    bgColor: 'bg-emerald-950/60',
+    borderColor: 'border-emerald-500/40',
+    startStep: 27,
+    endStep: 34,
+  },
+];
+
+export const SIMPLE_STEP_TITLES: Record<number, string> = {
+  0: 'La PC está apagada y sin energía',
+  1: 'La fuente recibe energía y habilita standby (+5VSB)',
+  2: 'Se presiona el botón de encendido',
+  3: 'La placa solicita encender la fuente (PS_ON#)',
+  4: 'La fuente entrega energía a todos los componentes',
+  5: 'El voltaje se estabiliza (Power Good / PWR_OK)',
+  6: 'El procesador despierta y sale de congelamiento',
+  7: 'El procesador busca el programa de la BIOS (Reset Vector)',
+  8: 'La BIOS verifica la seguridad básica y crea memoria temporal',
+  9: 'Se configuran los núcleos y parches del procesador',
+  10: 'Se activa el controlador interno de memoria (IMC)',
+  11: 'La placa lee los datos de los módulos RAM (SPD)',
+  12: 'La memoria se comprueba y ajusta (Memory Training)',
+  13: 'Se comunican los chips y buses de la placa madre',
+  14: 'Se escanean las tarjetas y ranuras PCIe',
+  15: 'La placa de video se activa y da señal en pantalla (GOP)',
+  16: 'Se activan las controladoras de almacenamiento (NVMe/AHCI)',
+  17: 'Se detectan los discos de almacenamiento e identifican',
+  18: 'Se inicializan teclado, mouse, puertos USB y chip TPM',
+  19: 'El chequeo de componentes (POST) se completa con éxito',
+  20: 'La BIOS consulta el orden de arranque de discos (NVRAM)',
+  21: 'Se localiza la partición de arranque UEFI (ESP FAT32)',
+  22: 'Windows Boot Manager toma el control del arranque (BCD)',
+  23: 'El cargador de Windows (winload.efi) lee el sistema',
+  24: 'Se carga el núcleo de Windows (ntoskrnl.exe) en la RAM',
+  25: 'La capa de abstracción (HAL) toma el control del hardware',
+  26: 'Se cargan los controladores esenciales de arranque',
+  27: 'El núcleo de Windows se inicia oficialmente',
+  28: 'Windows prepara el gestor de sesiones (smss.exe)',
+  29: 'Se inician los procesos esenciales de seguridad y sistema',
+  30: 'Se activan los servicios en segundo plano',
+  31: 'Muestra la pantalla de inicio de sesión (LogonUI)',
+  32: 'Se autentica el usuario y se carga su perfil',
+  33: 'Se abre el escritorio interactivo y sus íconos',
+  34: 'Windows está 100% listo para trabajar',
+};
+
+export function getPhaseForStep(stepNumber: number): BootPhase {
+  const phase = BOOT_PHASES.find(p => stepNumber >= p.startStep && stepNumber <= p.endStep);
+  return phase || BOOT_PHASES[0];
+}
+
+export function getStepTransitionInfo(stepNumber: number) {
+  const step = BOOT_SEQUENCE_STEPS[stepNumber] || BOOT_SEQUENCE_STEPS[0];
+  const nextStep = BOOT_SEQUENCE_STEPS[stepNumber + 1];
+
+  let whatChanged = step.whatIsHappening;
+  if (stepNumber === 0) {
+    whatChanged = 'La computadora no tiene suministro de electricidad o la llave trasera de la fuente está apagada.';
+  } else if (stepNumber === 1) {
+    whatChanged = 'El transformador auxiliar de la fuente generó +5V permanentes en el cable violeta (+5VSB).';
+  } else if (stepNumber === 2) {
+    whatChanged = 'El pulsador frontal unió brevemente los pines PWR_SW y envió un pulso de 0V a la placa madre.';
+  } else if (stepNumber === 3) {
+    whatChanged = 'El chip Super I/O derivó el cable verde (PS_ON#) a masa, ordenando encender la fuente.';
+  } else if (stepNumber === 4) {
+    whatChanged = 'La fuente entregó voltajes estables de +12V, +5V y +3.3V a todos los circuitos del equipo.';
+  } else if (stepNumber === 5) {
+    whatChanged = 'La fuente confirmó que sus voltajes son seguros enviando +5V por el cable gris (PWR_OK).';
+  } else if (stepNumber === 6) {
+    whatChanged = 'El generador de reloj y VRM liberaron la señal RESET#; el procesador salió de reposo.';
+  } else if (stepNumber === 7) {
+    whatChanged = 'La CPU ejecutó un salto a la dirección física de la BIOS en la memoria Flash SPI.';
+  } else if (stepNumber === 8) {
+    whatChanged = 'La BIOS validó su firma digital y configuró la caché del procesador como RAM temporal.';
+  } else if (stepNumber === 9) {
+    whatChanged = 'Se aplicaron parches de microcódigo y se sincronizaron todos los núcleos de la CPU.';
+  } else if (stepNumber === 10) {
+    whatChanged = 'Se activaron las líneas de comunicación entre la CPU y los zócalos de memoria RAM.';
+  } else if (stepNumber === 11) {
+    whatChanged = 'La placa leyó el chip SPD de cada memoria RAM para conocer su velocidad y latencias.';
+  } else if (stepNumber === 12) {
+    whatChanged = 'Se emitieron impulsos de prueba en los canales RAM para calibrar el tiempo exacto de lectura.';
+  } else if (stepNumber === 13) {
+    whatChanged = 'Se abrieron los canales de datos entre el procesador, el chipset y la placa base.';
+  } else if (stepNumber === 14) {
+    whatChanged = 'Se detectaron las tarjetas de expansión insertadas en los puertos PCI Express.';
+  } else if (stepNumber === 15) {
+    whatChanged = 'La placa de video se inicializó e iluminó la pantalla con el protocolo UEFI GOP.';
+  } else if (stepNumber === 16) {
+    whatChanged = 'Se encendieron las controladoras NVMe y SATA para acceder a los discos instalados.';
+  } else if (stepNumber === 17) {
+    whatChanged = 'Se leyeron las identidades, modelos y capacidades de los discos conectados.';
+  } else if (stepNumber === 18) {
+    whatChanged = 'Se reconocieron el teclado, el mouse, los puertos USB y el chip de seguridad TPM.';
+  } else if (stepNumber === 19) {
+    whatChanged = 'Todos los componentes físicos superaron la verificación inicial (POST exitoso).';
+  } else if (stepNumber === 20) {
+    whatChanged = 'La BIOS consultó en su memoria NVRAM qué disco tiene la prioridad de arranque.';
+  } else if (stepNumber === 21) {
+    whatChanged = 'Se montó la partición EFI FAT32 y se encontró el archivo de arranque de Windows.';
+  } else if (stepNumber === 22) {
+    whatChanged = 'El administrador de arranque de Windows leyó las opciones de inicio en el archivo BCD.';
+  } else if (stepNumber === 23) {
+    whatChanged = 'El cargador winload.efi se ejecutó y comenzó a preparar la estructura de Windows.';
+  } else if (stepNumber === 24) {
+    whatChanged = 'Se copiaron los archivos principales del núcleo (ntoskrnl.exe) a la memoria RAM.';
+  } else if (stepNumber === 25) {
+    whatChanged = 'La capa HAL asumió el control para adaptar Windows a la marca y modelo del hardware.';
+  } else if (stepNumber === 26) {
+    whatChanged = 'Se cargaron los controladores críticos para que Windows pueda leer el disco duro.';
+  } else if (stepNumber === 27) {
+    whatChanged = 'El núcleo de Windows tomó el control total del equipo y comenzó su inicialización.';
+  } else if (stepNumber === 28) {
+    whatChanged = 'Se ejecutó smss.exe para organizar las sesiones internas del sistema operativo.';
+  } else if (stepNumber === 29) {
+    whatChanged = 'Se iniciaron los subsistemas de ventanas básicas (csrss.exe) e inicio (wininit.exe).';
+  } else if (stepNumber === 30) {
+    whatChanged = 'Se activaron los servicios de red, seguridad (lsass.exe) y tareas automáticas.';
+  } else if (stepNumber === 31) {
+    whatChanged = 'Se mostró en pantalla la interfaz para que el usuario ingrese su contraseña.';
+  } else if (stepNumber === 32) {
+    whatChanged = 'LSASS verificó la clave del usuario y cargó sus archivos personales de perfil.';
+  } else if (stepNumber === 33) {
+    whatChanged = 'Se inició explorer.exe, dibujando la barra de tareas y el escritorio.';
+  } else if (stepNumber === 34) {
+    whatChanged = 'El sistema completó los 35 pasos de inicio y quedó 100% responsivo para el usuario.';
+  }
+
+  const interveningComponents = `${step.initiator} ➔ ${step.responder}`;
+
+  let whatShouldHappenNext = nextStep
+    ? `Paso ${String(nextStep.stepNumber).padStart(2, '0')}: ${SIMPLE_STEP_TITLES[nextStep.stepNumber] || nextStep.name}`
+    : 'Windows se encuentra en estado estable de reposo (Idle).';
+
+  return {
+    whatChanged,
+    interveningComponents,
+    whatShouldHappenNext,
+  };
+}
+
 export function getStepForensicDetails(stepNumber: number): StepForensicDetail {
   const step = BOOT_SEQUENCE_STEPS[stepNumber] || BOOT_SEQUENCE_STEPS[0];
   const base = STEP_FORENSIC_DETAILS[stepNumber] || {

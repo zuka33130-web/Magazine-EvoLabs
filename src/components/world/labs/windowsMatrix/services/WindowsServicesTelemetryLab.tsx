@@ -1,7 +1,8 @@
 // ============================================================================
 // EVO LABS // TOMO 02: MATRIX LAB
-// WINDOWS SERVICES TELEMETRY LAB — DUAL ENGINE: SIMULATED & REAL PC
-// Interactive Dependency Graph, Live Consequence Modeling & Rigorous A/B Telemetry
+// WINDOWS 11 SERVICES & TELEMETRY LAB — DUAL ENGINE: SIMULATED & REAL PC
+// Complete Technical Catalog of Native Windows 11 Services Across 9 Domains
+// Interactive Dependency Graph, Live Consequence Modeling, Telemetry & Restoration
 // ============================================================================
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -29,14 +30,27 @@ import {
   Power,
   Info,
   X,
-  Lock
+  Lock,
+  Cpu,
+  Filter,
+  HardDrive,
+  RefreshCw,
+  AlertOctagon,
+  Sparkles,
+  Laptop
 } from 'lucide-react';
 import {
   WINDOWS_SERVICES_DATABASE,
+  WINDOWS_SERVICE_CATEGORIES,
   AUDIO_DEPENDENCY_NODES,
   ServiceDependencyNode
 } from '../data/servicesData';
-import { WindowsServiceItem, TelemetryDeltaResult } from '../engine/types';
+import {
+  WindowsServiceItem,
+  WindowsServiceCategory,
+  WindowsServiceKind,
+  TelemetryDeltaResult
+} from '../engine/types';
 import { SimulatedMonitorScreen } from '../components/SimulatedMonitorScreen';
 import {
   EvoAgentClient,
@@ -77,11 +91,17 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
   className = ''
 }) => {
   const [engineMode, setEngineMode] = useState<'SIMULATED' | 'REAL_PC'>('SIMULATED');
-  const [selectedServiceId, setSelectedServiceId] = useState<string>('svc-audiosrv');
+  
+  // State for simulated services database
   const [servicesState, setServicesState] = useState<WindowsServiceItem[]>(WINDOWS_SERVICES_DATABASE);
+  const [selectedServiceId, setSelectedServiceId] = useState<string>('svc-rpcss');
 
-  // Audio nodes state for audio specific stack
-  const [audioNodes, setAudioNodes] = useState<ServiceDependencyNode[]>(AUDIO_DEPENDENCY_NODES);
+  // Category and Filter states
+  const [activeCategory, setActiveCategory] = useState<WindowsServiceCategory | 'ALL'>('sistema-critico');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filterKind, setFilterKind] = useState<'ALL' | WindowsServiceKind>('ALL');
+  const [filterState, setFilterState] = useState<'ALL' | 'RUNNING' | 'STOPPED'>('ALL');
+  const [filterRisk, setFilterRisk] = useState<'ALL' | 'CRÍTICO' | 'ALTO' | 'MEDIO' | 'BAJO'>('ALL');
 
   // Functional test state
   const [activeTestResult, setActiveTestResult] = useState<{
@@ -132,7 +152,6 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
       if (res && res.services) {
         setRealServices(res.services);
 
-        // Store initial states ONLY if not previously recorded for a service
         setInitialRealStateMap((prev) => {
           const updated = { ...prev };
           res.services.forEach((s) => {
@@ -144,7 +163,6 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
           return updated;
         });
 
-        // Allowlist strictly from Agent response
         if (res.experimentAllowlist && Array.isArray(res.experimentAllowlist)) {
           setRealAllowlist(res.experimentAllowlist);
         }
@@ -164,13 +182,21 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
     agentHealth && agentHealth.status === 'OK' && agentHealth.isWindows === true
   );
 
-  const selectedService =
-    servicesState.find((s) => s.id === selectedServiceId) || servicesState[0];
+  // Selected simulated service
+  const selectedService = useMemo(() => {
+    const found = servicesState.find((s) => s.id === selectedServiceId);
+    return found || servicesState[0];
+  }, [servicesState, selectedServiceId]);
 
-  const selectedRealService =
-    realServices.find((s) => s.name.toLowerCase() === selectedRealServiceName.toLowerCase()) || realServices[0];
+  // Selected real service
+  const selectedRealService = useMemo(() => {
+    const found = realServices.find(
+      (s) => s.name.toLowerCase() === selectedRealServiceName.toLowerCase()
+    );
+    return found || realServices[0];
+  }, [realServices, selectedRealServiceName]);
 
-  // Lookup reference service in pedagogical catalog for selected real service
+  // Lookup reference service in catalog for selected real service
   const referenceService = useMemo(() => {
     if (engineMode !== 'REAL_PC' || !selectedRealService) return null;
     return (
@@ -179,6 +205,88 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
       ) || null
     );
   }, [engineMode, selectedRealService]);
+
+  // Category statistics and stopped counts
+  const categoryStats = useMemo(() => {
+    const stats: Record<string, { total: number; stopped: number }> = {};
+    WINDOWS_SERVICE_CATEGORIES.forEach((cat) => {
+      stats[cat.id] = { total: 0, stopped: 0 };
+    });
+    servicesState.forEach((svc) => {
+      if (svc.category && stats[svc.category]) {
+        stats[svc.category].total += 1;
+        if (svc.state === 'STOPPED') {
+          stats[svc.category].stopped += 1;
+        }
+      }
+    });
+    return stats;
+  }, [servicesState]);
+
+  // Total stopped count across the whole catalog
+  const totalStoppedCount = useMemo(() => {
+    return servicesState.filter((s) => s.state === 'STOPPED').length;
+  }, [servicesState]);
+
+  // Filtered services for current tab and search/filter criteria
+  const filteredServices = useMemo(() => {
+    if (engineMode === 'REAL_PC') {
+      return realServices.filter((rSvc) => {
+        if (!searchQuery.trim()) return true;
+        const q = searchQuery.toLowerCase().trim();
+        return (
+          rSvc.name.toLowerCase().includes(q) ||
+          rSvc.displayName.toLowerCase().includes(q)
+        );
+      });
+    }
+
+    return servicesState.filter((svc) => {
+      // 1. Category Tab Filter
+      if (activeCategory !== 'ALL' && svc.category !== activeCategory) {
+        return false;
+      }
+
+      // 2. Search Query
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchName = svc.serviceName.toLowerCase().includes(q);
+        const matchDisplay = svc.displayName.toLowerCase().includes(q);
+        const matchRole = svc.subsystemRole.toLowerCase().includes(q);
+        const matchBinary = svc.binaryPath.toLowerCase().includes(q);
+        const matchExplanation = svc.simpleExplanation.toLowerCase().includes(q);
+        if (!matchName && !matchDisplay && !matchRole && !matchBinary && !matchExplanation) {
+          return false;
+        }
+      }
+
+      // 3. Service Kind Filter
+      if (filterKind !== 'ALL' && svc.serviceKind !== filterKind) {
+        return false;
+      }
+
+      // 4. State Filter
+      if (filterState !== 'ALL' && svc.state !== filterState) {
+        return false;
+      }
+
+      // 5. Risk Filter
+      if (filterRisk !== 'ALL' && svc.functionalRisk !== filterRisk) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [
+    engineMode,
+    realServices,
+    servicesState,
+    activeCategory,
+    searchQuery,
+    filterKind,
+    filterState,
+    filterRisk
+  ]);
 
   // Build dynamic dependency graph nodes for selected service or reference service
   const dependencyGraph: DependencyChainNode[] = useMemo(() => {
@@ -196,12 +304,14 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
     if (activeSvc.dependencies && activeSvc.dependencies.length > 0) {
       activeSvc.dependencies.forEach((dep) => {
         const parentSvc = servicesState.find(
-          (s) => s.serviceName.toLowerCase() === dep.toLowerCase() || s.id.toLowerCase().includes(dep.toLowerCase())
+          (s) =>
+            s.serviceName.toLowerCase() === dep.toLowerCase() ||
+            s.id.toLowerCase().includes(dep.toLowerCase())
         );
         const isParentRunning = parentSvc ? parentSvc.state === 'RUNNING' : true;
         chain.push({
           name: dep,
-          role: 'Servicio Base (Requerimiento upstream)',
+          role: 'Servicio Base Requerido (Upstream)',
           isParent: true,
           state: isParentRunning ? 'RUNNING' : 'STOPPED'
         });
@@ -209,7 +319,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
     } else {
       chain.push({
         name: 'NT Kernel / SCM Core',
-        role: 'Subsistema raíz de Windows',
+        role: 'Subsistema raíz de Windows NT',
         isParent: true,
         state: 'RUNNING'
       });
@@ -225,10 +335,10 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
 
     // 3. Downstream Consumers (Dependents / Apps)
     if (activeSvc.dependents && activeSvc.dependents.length > 0) {
-      activeSvc.dependents.slice(0, 3).forEach((dep) => {
+      activeSvc.dependents.slice(0, 4).forEach((dep) => {
         chain.push({
           name: dep,
-          role: 'Consumidor / API dependiente downstream',
+          role: 'Consumidor / Subsistema dependiente (Downstream)',
           isChild: true,
           state: isTargetRunning ? 'RUNNING' : 'AFFECTED'
         });
@@ -236,7 +346,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
     } else {
       chain.push({
         name: 'Aplicaciones de Usuario',
-        role: 'Consumidores de API en Espacio de Usuario',
+        role: 'Clientes de API en Modo Usuario',
         isChild: true,
         state: isTargetRunning ? 'RUNNING' : 'AFFECTED'
       });
@@ -247,193 +357,184 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
 
   // Stop simulated service
   const handleSimulateStop = (svcId: string) => {
+    const target = servicesState.find((s) => s.id === svcId);
+    if (!target) return;
+
     setServicesState((prev) =>
       prev.map((s) => (s.id === svcId ? { ...s, state: 'STOPPED' } : s))
     );
 
-    if (svcId === 'svc-audiosrv' || svcId === 'svc-audioendpointbuilder') {
-      setAudioNodes((prev) =>
-        prev.map((n) =>
-          n.id === 'node-audiosrv' || n.id === 'node-mmdevice' || n.id === 'node-apps'
-            ? { ...n, isActive: false }
-            : n
-        )
-      );
-    }
+    const ramGain = target.telemetryImpact.ramDeltaMb;
+    const cpuGain = target.telemetryImpact.cpuDeltaPercent;
 
-    const target = servicesState.find((s) => s.id === svcId);
-    if (target) {
-      const ramSaved = Math.abs(target.telemetryImpact.ramDeltaMb);
-      setTelemetryDelta({
-        metricType: 'SIMULATED',
-        serviceName: target.serviceName,
-        before: {
-          ramUsedMb: 2450,
-          cpuIdlePercent: 96.5,
-          runningProcesses: 148,
-          runningServices: 84,
-          diskQueueLength: 0.02
-        },
-        after: {
-          ramUsedMb: 2450 - ramSaved,
-          cpuIdlePercent: 96.8,
-          runningProcesses: 147,
-          runningServices: 83,
-          diskQueueLength: 0.01
-        },
-        delta: {
-          ramMb: -ramSaved,
-          cpuPercent: 0.3,
-          processes: -1,
-          services: -1
-        },
-        whatYouGained: `-${ramSaved} MB de RAM liberados en memoria física (Dato SIMULATED de referencia).`,
-        whatYouLost: target.telemetryImpact.lostFunctionality,
-        whatBroke:
-          target.functionalRisk === 'CRÍTICO' || target.functionalRisk === 'ALTO'
-            ? `Pruebas funcionales del subsistema arrojaron fallo de comunicación RPC/LPC en ${target.serviceName}.`
-            : 'Ninguna prueba funcional crítica se vio afectada de inmediato.',
-        riskEvaluation: target.functionalRisk,
-        scientificConclusion:
-          target.functionalRisk === 'CRÍTICO' || target.functionalRisk === 'ALTO'
-            ? 'EMPEORÓ'
-            : 'SIN CAMBIO SIGNIFICATIVO',
-        rollbackCommand: `Start-Service -Name "${target.serviceName}"`
-      });
-    }
-  };
+    setTelemetryDelta({
+      metricType: 'SIMULATED',
+      serviceName: target.serviceName,
+      before: {
+        ramUsedMb: 3420,
+        cpuIdlePercent: 96.5,
+        runningProcesses: 142,
+        runningServices: servicesState.filter((s) => s.state === 'RUNNING').length,
+        diskQueueLength: 0.02
+      },
+      after: {
+        ramUsedMb: 3420 + ramGain,
+        cpuIdlePercent: Math.min(100, +(96.5 - cpuGain).toFixed(1)),
+        runningProcesses: 141,
+        runningServices: servicesState.filter((s) => s.state === 'RUNNING').length - 1,
+        diskQueueLength: 0.01
+      },
+      delta: {
+        ramMb: ramGain,
+        cpuPercent: cpuGain,
+        processes: -1,
+        services: -1
+      },
+      whatYouGained: `Memoria de proceso liberada: ${Math.abs(ramGain)} MB. Consumo de CPU reducido en ~${Math.abs(cpuGain)}%.`,
+      whatYouLost: target.telemetryImpact.lostFunctionality,
+      whatBroke: target.telemetryImpact.potentialSideEffect,
+      riskEvaluation: target.functionalRisk,
+      scientificConclusion:
+        target.functionalRisk === 'CRÍTICO' || target.functionalRisk === 'ALTO'
+          ? 'EMPEORÓ'
+          : 'SIN CAMBIO SIGNIFICATIVO',
+      rollbackCommand:
+        target.restoration?.rollbackCommand || `Start-Service -Name "${target.serviceName}"`
+    });
 
-  // Rollback simulated service
-  const handleRollbackService = (svcId: string) => {
-    setServicesState((prev) =>
-      prev.map((s) => (s.id === svcId ? { ...s, state: 'RUNNING', startupType: 'Automatic' } : s))
-    );
-    if (svcId === 'svc-audiosrv' || svcId === 'svc-audioendpointbuilder') {
-      setAudioNodes(AUDIO_DEPENDENCY_NODES);
-    }
     setActiveTestResult(null);
-    setTelemetryDelta(null);
   };
 
-  // Rollback real service to its exact initial state recorded before experiment
-  const handleRollbackRealService = (serviceName: string) => {
-    const normName = serviceName.toLowerCase();
-    const targetState = initialRealStateMap[normName] || 'RUNNING';
-    const currentSvc = realServices.find((s) => s.name.toLowerCase() === normName);
-    const currentNormState = currentSvc?.state.toLowerCase() === 'running' ? 'RUNNING' : 'STOPPED';
+  // Rollback single simulated service
+  const handleRollbackService = (svcId: string) => {
+    const target = servicesState.find((s) => s.id === svcId);
+    if (!target) return;
 
-    if (currentNormState === targetState) {
-      alert(`El servicio ${serviceName} ya se encuentra en su estado inicial (${targetState}).`);
-      return;
-    }
-
-    const rollbackAction: 'START' | 'STOP' = targetState === 'RUNNING' ? 'START' : 'STOP';
-    const rSvc = currentSvc || ({ name: serviceName, displayName: serviceName } as AgentWindowsService);
-    handleRequestRealAction(rSvc, rollbackAction, true);
-  };
-
-  // Open Real Action Confirmation
-  const handleRequestRealAction = (
-    realSvc: AgentWindowsService,
-    action: 'STOP' | 'START',
-    isRollback = false
-  ) => {
-    // Map service risks and dependencies safely
-    const simMatch = WINDOWS_SERVICES_DATABASE.find(
-      (s) => s.serviceName.toLowerCase() === realSvc.name.toLowerCase()
+    setServicesState((prev) =>
+      prev.map((s) => (s.id === svcId ? { ...s, state: 'RUNNING' } : s))
     );
 
-    const pending: PendingRealAction = {
-      serviceName: realSvc.name,
-      displayName: realSvc.displayName,
-      action,
-      isRollback,
-      risk: simMatch?.functionalRisk || 'MEDIO',
-      dependencies: simMatch?.dependencies || ['RPCSS'],
-      lostFunctionality: simMatch?.telemetryImpact.lostFunctionality || 'Detención temporal del servicio en SO.',
-      sideEffect: simMatch?.telemetryImpact.potentialSideEffect || 'Acción reversible. No modifica StartupType.'
-    };
-
-    setPendingRealAction(pending);
+    setTelemetryDelta(null);
+    setActiveTestResult(null);
   };
 
-  // Execute Real Action with EVO Agent after confirmation
+  // Restore ALL simulated services to default state
+  const handleRestoreAllSimulation = () => {
+    setServicesState(WINDOWS_SERVICES_DATABASE);
+    setTelemetryDelta(null);
+    setActiveTestResult(null);
+  };
+
+  // Rollback real service via Agent
+  const handleRollbackRealService = async (serviceName: string) => {
+    const initial = initialRealStateMap[serviceName.toLowerCase()] || 'RUNNING';
+    const action = initial === 'RUNNING' ? 'START' : 'STOP';
+
+    try {
+      const res = await EvoAgentClient.applyServiceExperiment(serviceName, action);
+      if (res && res.success) {
+        await loadRealServices();
+        setTelemetryDelta(null);
+      }
+    } catch (err: any) {
+      alert(`FALLO AL RESTAURAR: ${err?.message || 'Error en EVO Agent.'}`);
+    }
+  };
+
+  // Request real action confirmation
+  const handleRequestRealAction = (rSvc: AgentWindowsService, action: 'STOP' | 'START') => {
+    const ref = WINDOWS_SERVICES_DATABASE.find(
+      (s) => s.serviceName.toLowerCase() === rSvc.name.toLowerCase()
+    );
+
+    const risk = ref ? ref.functionalRisk : 'ALTO';
+    const dependencies = ref ? ref.dependencies : ['Servicios del kernel NT'];
+    const lostFunctionality = ref
+      ? ref.telemetryImpact.lostFunctionality
+      : 'Pérdida de la función del servicio en Windows.';
+    const sideEffect = ref
+      ? ref.telemetryImpact.potentialSideEffect
+      : 'Posibles errores en cascada.';
+
+    setPendingRealAction({
+      serviceName: rSvc.name,
+      displayName: rSvc.displayName,
+      action,
+      risk,
+      dependencies,
+      lostFunctionality,
+      sideEffect
+    });
+  };
+
+  // Confirm and execute real service action via Agent
   const handleConfirmRealAction = async () => {
     if (!pendingRealAction) return;
     setIsExecutingRealAction(true);
 
     try {
+      const targetSvc = realServices.find(
+        (s) => s.name.toLowerCase() === pendingRealAction.serviceName.toLowerCase()
+      );
+      const ramBefore = targetSvc ? targetSvc.workingSetMb : 0;
+
       const res = await EvoAgentClient.applyServiceExperiment(
         pendingRealAction.serviceName,
         pendingRealAction.action
       );
 
-      const normName = pendingRealAction.serviceName.toLowerCase();
-
-      // Record exact initial state ONCE when starting experiment (never overwrite during rollback)
-      if (!pendingRealAction.isRollback && res && res.before && res.before.state) {
-        const initialStateNorm = res.before.state.toLowerCase() === 'running' ? 'RUNNING' : 'STOPPED';
-        setInitialRealStateMap((prev) => {
-          if (!prev[normName]) {
-            return { ...prev, [normName]: initialStateNorm };
-          }
-          return prev;
-        });
-      }
-
-      await loadRealServices();
-
       if (res && res.success) {
-        if (pendingRealAction.isRollback) {
-          // On successful rollback: return to initial state and CLEAR experiment record for that service
-          setTelemetryDelta(null);
-          setInitialRealStateMap((prev) => {
-            const updated = { ...prev };
-            delete updated[normName];
-            return updated;
-          });
-        } else {
-          const ramBefore = res.before?.workingSetMb ?? 0;
-          const ramAfter = res.after?.workingSetMb ?? 0;
-          const ramDelta = ramAfter - ramBefore;
+        await loadRealServices();
 
-          setTelemetryDelta({
-            metricType: 'SYSTEM_REPORTED',
-            serviceName: res.serviceName,
-            before: {
-              ramUsedMb: ramBefore,
-              cpuIdlePercent: -1,
-              runningProcesses: -1,
-              runningServices: -1,
-              diskQueueLength: -1
-            },
-            after: {
-              ramUsedMb: ramAfter,
-              cpuIdlePercent: -1,
-              runningProcesses: -1,
-              runningServices: -1,
-              diskQueueLength: -1
-            },
-            delta: {
-              ramMb: +ramDelta.toFixed(1),
-              cpuPercent: 0,
-              processes: 0,
-              services: 0
-            },
-            whatYouGained:
-              pendingRealAction.action === 'STOP'
-                ? `Memoria de proceso (WorkingSet) reportada por SO: -${Math.abs(ramDelta).toFixed(1)} MB`
-                : `Servicio iniciado en SO. Memoria asignada: ${ramAfter} MB`,
-            whatYouLost: pendingRealAction.action === 'STOP' ? pendingRealAction.lostFunctionality : 'Ninguna (Restaurado)',
-            whatBroke: pendingRealAction.action === 'STOP' ? pendingRealAction.sideEffect : 'Ninguna (Operativo)',
-            riskEvaluation: pendingRealAction.risk,
-            scientificConclusion: 'NO HAY DATOS SUFICIENTES (INCONCLUSO)',
-            rollbackCommand:
-              pendingRealAction.action === 'STOP'
-                ? `Start-Service -Name "${res.serviceName}"`
-                : `Stop-Service -Name "${res.serviceName}"`
-          });
-        }
+        const latestInventory = await EvoAgentClient.fetchWindowsServices();
+        const updatedSvc = latestInventory?.services?.find(
+          (s) => s.name.toLowerCase() === pendingRealAction.serviceName.toLowerCase()
+        );
+        const ramAfter = updatedSvc ? updatedSvc.workingSetMb : 0;
+        const ramDelta = ramAfter - ramBefore;
+
+        setTelemetryDelta({
+          metricType: 'SYSTEM_REPORTED',
+          serviceName: res.serviceName,
+          before: {
+            ramUsedMb: ramBefore,
+            cpuIdlePercent: -1,
+            runningProcesses: -1,
+            runningServices: -1,
+            diskQueueLength: -1
+          },
+          after: {
+            ramUsedMb: ramAfter,
+            cpuIdlePercent: -1,
+            runningProcesses: -1,
+            runningServices: -1,
+            diskQueueLength: -1
+          },
+          delta: {
+            ramMb: +ramDelta.toFixed(1),
+            cpuPercent: 0,
+            processes: 0,
+            services: 0
+          },
+          whatYouGained:
+            pendingRealAction.action === 'STOP'
+              ? `Memoria de proceso (WorkingSet) reportada por SO: -${Math.abs(ramDelta).toFixed(1)} MB`
+              : `Servicio iniciado en SO. Memoria asignada: ${ramAfter} MB`,
+          whatYouLost:
+            pendingRealAction.action === 'STOP'
+              ? pendingRealAction.lostFunctionality
+              : 'Ninguna (Restaurado)',
+          whatBroke:
+            pendingRealAction.action === 'STOP'
+              ? pendingRealAction.sideEffect
+              : 'Ninguna (Operativo)',
+          riskEvaluation: pendingRealAction.risk,
+          scientificConclusion: 'NO HAY DATOS SUFICIENTES (INCONCLUSO)',
+          rollbackCommand:
+            pendingRealAction.action === 'STOP'
+              ? `Start-Service -Name "${res.serviceName}"`
+              : `Stop-Service -Name "${res.serviceName}"`
+        });
       }
     } catch (err: any) {
       alert(`FALLO EN ACCIÓN REAL: ${err?.message || 'Error en EVO Agent.'}`);
@@ -445,7 +546,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
 
   // Run functional test
   const handleRunFunctionalTest = (testType?: string) => {
-    const currentTest = testType || selectedService.functionalTestType || 'generic';
+    const currentTest = testType || selectedService.functionalTestType || 'system';
     const isTargetRunning = selectedService.state === 'RUNNING';
 
     if (currentTest === 'audio') {
@@ -458,15 +559,19 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
         setActiveTestResult({
           type: 'audio',
           passed: false,
-          message: 'FALLO EN TEST DE AUDIO: No se detectó ningún punto final de audio activo. Audiosrv o AudioEndpointBuilder están detenidos. La PC quedó muda.',
-          diagnosticDetails: 'HRESULT: 0x80070426 (SERVICE_NOT_ACTIVE) -> IAudioClient::Initialize() rechazado por el subsistema.'
+          message:
+            'FALLO EN TEST DE AUDIO: No se detectó ningún punto final de audio activo. Audiosrv o AudioEndpointBuilder están detenidos. La PC quedó muda.',
+          diagnosticDetails:
+            'HRESULT: 0x80070426 (SERVICE_NOT_ACTIVE) -> IAudioClient::Initialize() rechazado por el subsistema.'
         });
       } else {
         setActiveTestResult({
           type: 'audio',
           passed: true,
-          message: 'TEST DE AUDIO SUPERADO: MMDeviceAPI respondió en 1.2 ms. Búfer de salida estéreo activo sin latencia añadida.',
-          diagnosticDetails: 'HRESULT: S_OK -> Endpoint render enumerado en altavoces predeterminados.'
+          message:
+            'TEST DE AUDIO SUPERADO: MMDeviceAPI respondió en 1.2 ms. Búfer de salida estéreo activo sin latencia añadida.',
+          diagnosticDetails:
+            'HRESULT: S_OK -> Endpoint render enumerado en altavoces predeterminados.'
         });
       }
     } else if (currentTest === 'network') {
@@ -479,8 +584,10 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
         setActiveTestResult({
           type: 'network',
           passed: false,
-          message: 'FALLO EN TEST DE RED: Resolución de nombres imposible o asignación IP nula. Los navegadores no pueden abrir URLs.',
-          diagnosticDetails: 'DNSAPI: WSAHOST_NOT_FOUND (11001). Pila Winsock no puede resolver consultas FQDN.'
+          message:
+            'FALLO EN TEST DE RED: Resolución de nombres imposible o asignación IP nula. Los navegadores no pueden abrir URLs.',
+          diagnosticDetails:
+            'DNSAPI: WSAHOST_NOT_FOUND (11001). Pila Winsock no puede resolver consultas FQDN.'
         });
       } else {
         setActiveTestResult({
@@ -498,8 +605,10 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
         setActiveTestResult({
           type: 'search',
           passed: false,
-          message: 'TEST DE BÚSQUEDA DEGRADADO: Indexer detenido. Las búsquedas en el Menú Inicio recurren a búsqueda secuencial en disco.',
-          diagnosticDetails: 'Search.Indexer COM interface unattached. Latencia de búsqueda: +4200ms.'
+          message:
+            'TEST DE BÚSQUEDA DEGRADADO: Indexer detenido. Las búsquedas en el Menú Inicio recurren a búsqueda secuencial en disco.',
+          diagnosticDetails:
+            'Search.Indexer COM interface unattached. Latencia de búsqueda: +4200ms.'
         });
       } else {
         setActiveTestResult({
@@ -509,17 +618,142 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
           diagnosticDetails: 'Windows Search Catalog validado.'
         });
       }
-    } else {
-      if (!isTargetRunning) {
+    } else if (currentTest === 'security') {
+      const isDefenderRunning =
+        servicesState.find((s) => s.id === 'svc-windefend')?.state === 'RUNNING';
+      const isBfeRunning =
+        servicesState.find((s) => s.id === 'svc-bfe')?.state === 'RUNNING';
+
+      if (!isDefenderRunning || !isBfeRunning) {
         setActiveTestResult({
-          type: 'general',
+          type: 'security',
           passed: false,
-          message: `FALLO EN SUBSISTEMA: El servicio ${selectedService.serviceName} está detenido. ${selectedService.telemetryImpact.lostFunctionality}`,
-          diagnosticDetails: `SCM State: SERVICE_STOPPED (ExitCode: 0). Consecuencia: ${selectedService.telemetryImpact.potentialSideEffect}`
+          message:
+            'FALLO EN PROTECCIÓN DE SEGURIDAD: El motor de firmas en tiempo real o el Firewall WFP están desactivados. El sistema está expuesto.',
+          diagnosticDetails:
+            'WSC Status: WSC_SECURITY_PROVIDER_HEALTH_POOR. Alertas rojas en Centro de Seguridad.'
         });
       } else {
         setActiveTestResult({
-          type: 'general',
+          type: 'security',
+          passed: true,
+          message:
+            'TEST DE SEGURIDAD SUPERADO: Motores de protección heurística y filtrado de red activos y vigilando.',
+          diagnosticDetails: 'WSC Status: WSC_SECURITY_PROVIDER_HEALTH_GOOD (Firmas actualizadas).'
+        });
+      }
+    } else if (currentTest === 'print') {
+      const isSpoolerRunning =
+        servicesState.find((s) => s.id === 'svc-spooler')?.state === 'RUNNING';
+
+      if (!isSpoolerRunning) {
+        setActiveTestResult({
+          type: 'print',
+          passed: false,
+          message:
+            'FALLO EN COLA DE IMPRESIÓN: El servicio Spooler está detenido. No se pueden generar documentos PDF ni imprimir.',
+          diagnosticDetails:
+            'Win32 Error: 1722 (RPC Server is unavailable) al llamar a OpenPrinterW().'
+        });
+      } else {
+        setActiveTestResult({
+          type: 'print',
+          passed: true,
+          message:
+            'TEST DE IMPRESIÓN SUPERADO: Subproceso spoolsv.exe listo para aceptar colas de trabajos.',
+          diagnosticDetails: 'Printer Driver Host listo.'
+        });
+      }
+    } else if (currentTest === 'update') {
+      const isUpdateRunning =
+        servicesState.find((s) => s.id === 'svc-wuauserv')?.state === 'RUNNING';
+
+      if (!isUpdateRunning) {
+        setActiveTestResult({
+          type: 'update',
+          passed: false,
+          message:
+            'TEST DE ACTUALIZACIONES DETENIDO: Windows Update no puede comprobar firmas ni descargar parches de seguridad.',
+          diagnosticDetails: 'WU Error: 0x8024D00E (WU_E_SETUP_REBOOTREQUIRED / Service Inactive).'
+        });
+      } else {
+        setActiveTestResult({
+          type: 'update',
+          passed: true,
+          message:
+            'TEST DE ACTUALIZACIONES OK: Cliente de Windows Update listo para negociar catálogos seguros.',
+          diagnosticDetails: 'WUA API operativa.'
+        });
+      }
+    } else if (currentTest === 'hardware') {
+      const isPlugPlayRunning =
+        servicesState.find((s) => s.id === 'svc-plugplay')?.state === 'RUNNING';
+      if (!isPlugPlayRunning || !isTargetRunning) {
+        setActiveTestResult({
+          type: 'hardware',
+          passed: false,
+          message: `DEGRADACIÓN EN ENUMERACIÓN DE HARDWARE: ${selectedService.serviceName} o Plug and Play están inactivos. ${selectedService.telemetryImpact.lostFunctionality}`,
+          diagnosticDetails:
+            'SetupAPI Error: 0xE000020B (ERROR_NO_SUCH_DEVINST). PnP Manager no puede resolver enumeradores de bus.'
+        });
+      } else {
+        setActiveTestResult({
+          type: 'hardware',
+          passed: true,
+          message: `TEST DE HARDWARE SUPERADO: ${selectedService.displayName} responde a peticiones de enumeración de dispositivos.`,
+          diagnosticDetails:
+            'SetupAPI S_OK: Controladores y dispositivos sincronizados en el árbol de hardware.'
+        });
+      }
+    } else if (currentTest === 'ui') {
+      const isThemesRunning =
+        servicesState.find((s) => s.id === 'svc-themes')?.state === 'RUNNING';
+      const isFontRunning =
+        servicesState.find((s) => s.id === 'svc-fontcache')?.state === 'RUNNING';
+      if (!isThemesRunning || !isFontRunning || !isTargetRunning) {
+        setActiveTestResult({
+          type: 'ui',
+          passed: false,
+          message: `ANOMALÍA EN EXPERIENCIA VISUAL: ${selectedService.serviceName} está detenido. ${selectedService.telemetryImpact.lostFunctionality}`,
+          diagnosticDetails:
+            'DWM/Shell Warning: Latencia de renderizado tipográfico o composición visual degradada.'
+        });
+      } else {
+        setActiveTestResult({
+          type: 'ui',
+          passed: true,
+          message:
+            'TEST DE INTERFAZ SUPERADO: Estilos visuales, caché de glifos y composición de Windows 11 operando fluidamente.',
+          diagnosticDetails: 'UX Subsystem S_OK: DWM y subsistema de ventanas sincronizados.'
+        });
+      }
+    } else if (currentTest === 'optional') {
+      if (!isTargetRunning) {
+        setActiveTestResult({
+          type: 'optional',
+          passed: false,
+          message: `SERVICIO OPCIONAL/USUARIO DETENIDO: ${selectedService.serviceName} inactivo. ${selectedService.telemetryImpact.lostFunctionality}`,
+          diagnosticDetails: `SCM Status: SERVICE_STOPPED. Efecto: ${selectedService.telemetryImpact.potentialSideEffect}`
+        });
+      } else {
+        setActiveTestResult({
+          type: 'optional',
+          passed: true,
+          message: `SERVICIO OPCIONAL ACTIVO: ${selectedService.displayName} inicializado y atendiendo solicitudes.`,
+          diagnosticDetails: `SCM Status: SERVICE_RUNNING (PID: ${selectedService.pid || 1024}).`
+        });
+      }
+    } else {
+      if (!isTargetRunning) {
+        setActiveTestResult({
+          type: 'system',
+          passed: false,
+          message: `FALLO EN SUBSISTEMA: El servicio ${selectedService.serviceName} está detenido. ${selectedService.telemetryImpact.lostFunctionality}`,
+          diagnosticDetails: `SCM State: SERVICE_STOPPED. Consecuencia: ${selectedService.telemetryImpact.potentialSideEffect}`
+        });
+      } else {
+        setActiveTestResult({
+          type: 'system',
           passed: true,
           message: `TEST OPERATIVO OK: El servicio ${selectedService.serviceName} está respondiendo normalmente a solicitudes IPC.`,
           diagnosticDetails: `SCM State: SERVICE_RUNNING (PID: ${selectedService.pid || 1024}).`
@@ -536,6 +770,31 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
     servicesState.find((s) => s.id === 'svc-dnscache')?.state === 'STOPPED' ||
     servicesState.find((s) => s.id === 'svc-dhcp')?.state === 'STOPPED';
 
+  const getCategoryIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Server':
+        return <Server className="w-3.5 h-3.5" />;
+      case 'Shield':
+        return <Shield className="w-3.5 h-3.5" />;
+      case 'Wifi':
+        return <Wifi className="w-3.5 h-3.5" />;
+      case 'Cpu':
+        return <Cpu className="w-3.5 h-3.5" />;
+      case 'Volume2':
+        return <Volume2 className="w-3.5 h-3.5" />;
+      case 'Layers':
+        return <Layers className="w-3.5 h-3.5" />;
+      case 'Clock':
+        return <Clock className="w-3.5 h-3.5" />;
+      case 'Activity':
+        return <Activity className="w-3.5 h-3.5" />;
+      case 'Sliders':
+        return <Sliders className="w-3.5 h-3.5" />;
+      default:
+        return <Layers className="w-3.5 h-3.5" />;
+    }
+  };
+
   return (
     <div className={`space-y-5 font-mono-tech select-none ${className}`}>
       {/* Top Banner & Dual Engine Switcher */}
@@ -543,7 +802,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded bg-cyan-950 border border-cyan-400 text-cyan-300 text-[10px] font-bold uppercase tracking-wider">
-              TELEMETRÍA SCM // SERVICIOS & DEPENDENCIAS
+              TELEMETRÍA SCM // SERVICIOS & DEPENDENCIAS WINDOWS 11
             </span>
             <span
               className={`text-[10px] font-bold px-2 py-0.5 rounded ${
@@ -554,14 +813,31 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
             >
               MODO: {engineMode}
             </span>
+            {totalStoppedCount > 0 && engineMode === 'SIMULATED' && (
+              <span className="px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/40 text-[10px] font-bold animate-pulse">
+                {totalStoppedCount} SERVICIOS DETENIDOS
+              </span>
+            )}
           </div>
           <h2 className="font-display font-black text-lg sm:text-xl text-white uppercase tracking-tight">
-            Laboratorio de Telemetría de Servicios de Windows
+            Laboratorio de Telemetría de Servicios de Windows 11
           </h2>
         </div>
 
-        {/* Engine Mode Switcher */}
-        <div className="flex items-center gap-2">
+        {/* Engine Mode Switcher & Global Restore Button */}
+        <div className="flex flex-wrap items-center gap-2">
+          {engineMode === 'SIMULATED' && totalStoppedCount > 0 && (
+            <button
+              type="button"
+              onClick={handleRestoreAllSimulation}
+              className="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+              title="Restaurar toda la simulación al estado inicial"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-emerald-400" />
+              <span>RESTAURAR TODOS ({totalStoppedCount})</span>
+            </button>
+          )}
+
           <div className="flex items-center p-1 bg-black/60 rounded-xl border border-cyan-950 text-xs">
             <button
               type="button"
@@ -603,7 +879,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
             <span>
-              <strong>AMBIENTE MODELADO // SIMULATED:</strong> Podés detener o deshabilitar cualquier servicio libremente para observar cómo responde Windows.
+              <strong>CATÁLOGO TÉCNICO OFICIAL WINDOWS 11:</strong> Explorá los servicios organizados por dominios operativos. Podés simular su detención y observar cómo responde el Service Control Manager (SCM).
             </span>
           </div>
           <span className="text-[10px] text-amber-400 font-bold hidden sm:inline">
@@ -647,9 +923,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
         </div>
       )}
 
-      {/* ========================================================
-          CONFIRMATION MODAL FOR REAL PC ACTIONS
-      ======================================================== */}
+      {/* Confirmation Modal for Real PC Actions */}
       {pendingRealAction && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg bg-[#0b0e14] border-2 border-amber-500/80 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 animate-in zoom-in-95">
@@ -738,69 +1012,285 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
       )}
 
       {/* ========================================================
+          PESTAÑAS DE CATEGORÍAS (9 DOMINIOS OPERATIVOS)
+      ======================================================== */}
+      {engineMode === 'SIMULATED' && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5 text-cyan-400" />
+              <span>DOMINIOS DE WINDOWS 11 (9 CATEGORÍAS TÉCNICAS)</span>
+            </span>
+            <span className="text-[10px] text-zinc-500 font-mono">
+              TOTAL: {servicesState.length} SERVICIOS CATALOGADOS
+            </span>
+          </div>
+
+          {/* Horizontal scrollable category tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-800 text-xs">
+            <button
+              type="button"
+              onClick={() => setActiveCategory('ALL')}
+              className={`px-3 py-2 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 shrink-0 ${
+                activeCategory === 'ALL'
+                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]'
+                  : 'bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 hover:border-zinc-700'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>TODOS</span>
+              <span className={`px-1.5 py-0.2 rounded text-[10px] font-black ${
+                activeCategory === 'ALL' ? 'bg-black text-cyan-400' : 'bg-black/50 text-zinc-400'
+              }`}>
+                {servicesState.length}
+              </span>
+            </button>
+
+            {WINDOWS_SERVICE_CATEGORIES.map((cat) => {
+              const isActive = activeCategory === cat.id;
+              const stats = categoryStats[cat.id] || { total: 0, stopped: 0 };
+              const hasStopped = stats.stopped > 0;
+
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`px-3 py-2 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 shrink-0 ${
+                    isActive
+                      ? 'bg-amber-400 text-black shadow-[0_0_15px_rgba(251,191,36,0.4)]'
+                      : hasStopped
+                      ? 'bg-rose-950/40 text-rose-300 border border-rose-500/50 hover:bg-rose-900/40'
+                      : 'bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 hover:border-zinc-700'
+                  }`}
+                >
+                  {getCategoryIcon(cat.iconName)}
+                  <span>{cat.name}</span>
+                  <span className={`px-1.5 py-0.2 rounded text-[10px] font-black ${
+                    isActive
+                      ? 'bg-black text-amber-300'
+                      : hasStopped
+                      ? 'bg-rose-900 text-white'
+                      : 'bg-black/50 text-zinc-400'
+                  }`}>
+                    {hasStopped ? `! ${stats.stopped}/${stats.total}` : stats.total}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          BARRA DE BÚSQUEDA Y FILTROS AVANZADOS
+      ======================================================== */}
+      <div className="p-3.5 rounded-2xl bg-[#0b0e14] border border-cyan-950/80 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          {/* Search Box */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por nombre real o interno (ej. RpcSs, BFE, Defender, SysMain, Spooler)..."
+              className="w-full pl-9 pr-8 py-2 rounded-xl bg-black/60 border border-zinc-800 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-400 font-mono transition-colors"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white p-0.5"
+                title="Limpiar búsqueda"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Quick Filters in Simulated Mode */}
+          {engineMode === 'SIMULATED' && (
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Kind Filter */}
+              <select
+                value={filterKind}
+                onChange={(e) => setFilterKind(e.target.value as any)}
+                className="px-2.5 py-2 rounded-xl bg-black/60 border border-zinc-800 text-[11px] font-bold text-zinc-300 focus:outline-none focus:border-cyan-400 cursor-pointer"
+              >
+                <option value="ALL">TIPO: TODOS</option>
+                <option value="NATIVO">NATIVOS</option>
+                <option value="OPCIONAL">OPCIONALES</option>
+                <option value="POR_USUARIO">POR USUARIO</option>
+                <option value="TERCEROS">TERCEROS (NO NATIVOS)</option>
+              </select>
+
+              {/* State Filter */}
+              <select
+                value={filterState}
+                onChange={(e) => setFilterState(e.target.value as any)}
+                className="px-2.5 py-2 rounded-xl bg-black/60 border border-zinc-800 text-[11px] font-bold text-zinc-300 focus:outline-none focus:border-cyan-400 cursor-pointer"
+              >
+                <option value="ALL">ESTADO: TODOS</option>
+                <option value="RUNNING">EN EJECUCIÓN (RUNNING)</option>
+                <option value="STOPPED">DETENIDOS (STOPPED)</option>
+              </select>
+
+              {/* Risk Filter */}
+              <select
+                value={filterRisk}
+                onChange={(e) => setFilterRisk(e.target.value as any)}
+                className="px-2.5 py-2 rounded-xl bg-black/60 border border-zinc-800 text-[11px] font-bold text-zinc-300 focus:outline-none focus:border-cyan-400 cursor-pointer"
+              >
+                <option value="ALL">RIESGO: TODOS</option>
+                <option value="CRÍTICO">RIESGO: CRÍTICO</option>
+                <option value="ALTO">RIESGO: ALTO</option>
+                <option value="MEDIO">RIESGO: MEDIO</option>
+                <option value="BAJO">RIESGO: BAJO</option>
+              </select>
+            </div>
+          )}
+        </div>
+
+        {/* Filters summary bar */}
+        <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-1 border-t border-zinc-900">
+          <span>
+            MOSTRANDO <strong>{filteredServices.length}</strong> SERVICIOS FILTRADOS
+            {activeCategory !== 'ALL' && (
+              <span className="text-cyan-400 ml-1.5 font-bold">
+                EN "{WINDOWS_SERVICE_CATEGORIES.find((c) => c.id === activeCategory)?.name}"
+              </span>
+            )}
+          </span>
+
+          {(searchQuery || filterKind !== 'ALL' || filterState !== 'ALL' || filterRisk !== 'ALL') && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setFilterKind('ALL');
+                setFilterState('ALL');
+                setFilterRisk('ALL');
+              }}
+              className="text-amber-400 hover:text-amber-300 font-bold transition-colors cursor-pointer"
+            >
+              LIMPIAR FILTROS
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ========================================================
           MASTER 2-COLUMN VIEW (SERVICES LIST & DEPENDENCY GRAPH)
       ======================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* LEFT COLUMN: SERVICES TABLE (6 cols) */}
-        <div className="lg:col-span-6 space-y-4">
+        {/* LEFT COLUMN: SERVICES LIST (5 cols) */}
+        <div className="lg:col-span-5 space-y-4">
           <div className="p-4 sm:p-5 rounded-2xl bg-[#0b0e14] border border-cyan-950 space-y-3">
             <div className="flex items-center justify-between border-b border-cyan-950 pb-2">
-              <span className="font-bold text-white text-xs uppercase tracking-wider">
-                CONSOLA DE SERVICIOS ({engineMode === 'REAL_PC' ? 'SYSTEM_REPORTED // REAL PC' : 'SERVICES.MSC VIRTUAL'})
+              <span className="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
+                <Server className="w-3.5 h-3.5 text-cyan-400" />
+                <span>
+                  CONSOLA DE SERVICIOS ({engineMode === 'REAL_PC' ? 'REAL PC' : 'SERVICES.MSC'})
+                </span>
               </span>
               <span className="text-zinc-500 text-[10.5px]">
-                {engineMode === 'REAL_PC' ? `${realServices.length} SERVICIOS REALES` : `${servicesState.length} SERVICIOS AUDITADOS`}
+                {filteredServices.length} DISPONIBLES
               </span>
             </div>
 
             {/* Services Table List */}
             {engineMode === 'SIMULATED' ? (
-              <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1 text-xs">
-                {servicesState.map((svc) => {
-                  const isSelected = svc.id === selectedServiceId;
-                  const isRunning = svc.state === 'RUNNING';
-
-                  return (
-                    <div
-                      key={svc.id}
-                      onClick={() => setSelectedServiceId(svc.id)}
-                      className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
-                        isSelected
-                          ? 'bg-cyan-950/40 border-cyan-400 text-white shadow-md ring-1 ring-cyan-400/50'
-                          : 'bg-black/50 border-zinc-900 text-zinc-400 hover:border-zinc-700'
-                      }`}
+              <div className="space-y-2 max-h-[440px] overflow-y-auto pr-1 text-xs">
+                {filteredServices.length === 0 ? (
+                  <div className="p-6 text-center text-zinc-500 text-xs space-y-2">
+                    <p>No se encontraron servicios con los filtros actuales.</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setActiveCategory('ALL');
+                        setFilterKind('ALL');
+                        setFilterState('ALL');
+                        setFilterRisk('ALL');
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 text-[10.5px] hover:text-white"
                     >
-                      <div className="space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-white text-xs sm:text-sm">
-                            {svc.serviceName}
-                          </span>
-                          <span
-                            className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
-                              isRunning
-                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                            }`}
-                          >
-                            {svc.state}
+                      Restablecer filtros
+                    </button>
+                  </div>
+                ) : (
+                  filteredServices.map((svc) => {
+                    const isSelected = svc.id === selectedServiceId;
+                    const isRunning = svc.state === 'RUNNING';
+
+                    return (
+                      <div
+                        key={svc.id}
+                        onClick={() => setSelectedServiceId(svc.id)}
+                        className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+                          isSelected
+                            ? 'bg-cyan-950/50 border-cyan-400 text-white shadow-md ring-1 ring-cyan-400/50'
+                            : isRunning
+                            ? 'bg-black/50 border-zinc-900 text-zinc-400 hover:border-zinc-700'
+                            : 'bg-rose-950/20 border-rose-900/60 text-zinc-300 hover:border-rose-700'
+                        }`}
+                      >
+                        <div className="space-y-0.5 min-w-0 pr-2">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-bold text-white text-xs sm:text-sm font-mono">
+                              {svc.serviceName}
+                            </span>
+                            <span
+                              className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
+                                isRunning
+                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                  : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                              }`}
+                            >
+                              {svc.state}
+                            </span>
+                            {svc.serviceKind && (
+                              <span className={`text-[8.5px] font-bold px-1 rounded uppercase ${
+                                svc.serviceKind === 'NATIVO'
+                                  ? 'bg-zinc-800 text-zinc-300'
+                                  : svc.serviceKind === 'POR_USUARIO'
+                                  ? 'bg-purple-950 text-purple-300 border border-purple-800'
+                                  : svc.serviceKind === 'TERCEROS'
+                                  ? 'bg-amber-950 text-amber-300 border border-amber-800'
+                                  : 'bg-blue-950 text-blue-300 border border-blue-800'
+                              }`}>
+                                {svc.serviceKind}
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10.5px] text-zinc-400 font-sans-editorial block truncate">
+                            {svc.displayName}
                           </span>
                         </div>
-                        <span className="text-[10px] text-zinc-400 font-sans-editorial block truncate max-w-xs">
-                          {svc.displayName}
-                        </span>
-                      </div>
 
-                      <div className="text-right font-mono text-[10.5px]">
-                        <span className="text-zinc-400 block">{svc.startupType}</span>
-                        <span className="text-cyan-400 text-[10px]">PID: {svc.pid || '-'}</span>
+                        <div className="text-right font-mono text-[10px] shrink-0">
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold block mb-0.5 ${
+                            svc.functionalRisk === 'CRÍTICO'
+                              ? 'bg-rose-950 text-rose-300 border border-rose-800'
+                              : svc.functionalRisk === 'ALTO'
+                              ? 'bg-amber-950 text-amber-300 border border-amber-800'
+                              : svc.functionalRisk === 'MEDIO'
+                              ? 'bg-blue-950 text-blue-300 border border-blue-800'
+                              : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                          }`}>
+                            {svc.functionalRisk}
+                          </span>
+                          <span className="text-zinc-500 block">{svc.startupType}</span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             ) : isRealAgentActive ? (
-              <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1 text-xs">
-                {realServices.map((rSvc) => {
+              <div className="space-y-2 max-h-[440px] overflow-y-auto pr-1 text-xs">
+                {filteredServices.map((rSvc: any) => {
                   const isSelected = rSvc.name.toLowerCase() === selectedRealServiceName.toLowerCase();
                   const isRunning = rSvc.state.toLowerCase() === 'running';
 
@@ -814,9 +1304,9 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
                           : 'bg-black/50 border-zinc-900 text-zinc-400 hover:border-zinc-700'
                       }`}
                     >
-                      <div className="space-y-0.5">
+                      <div className="space-y-0.5 min-w-0 pr-2">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-white text-xs sm:text-sm">
+                          <span className="font-bold text-white text-xs sm:text-sm font-mono">
                             {rSvc.name}
                           </span>
                           <span
@@ -834,12 +1324,12 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
                             </span>
                           )}
                         </div>
-                        <span className="text-[10px] text-zinc-400 font-sans-editorial block truncate max-w-xs">
+                        <span className="text-[10px] text-zinc-400 font-sans-editorial block truncate">
                           {rSvc.displayName}
                         </span>
                       </div>
 
-                      <div className="text-right font-mono text-[10.5px]">
+                      <div className="text-right font-mono text-[10.5px] shrink-0">
                         <span className="text-zinc-400 block">{rSvc.startMode}</span>
                         <span className="text-emerald-400 text-[10px]">
                           {rSvc.workingSetMb} MB | PID: {rSvc.processId || 'N/A'}
@@ -855,55 +1345,216 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
               </div>
             )}
           </div>
+        </div>
 
-          {/* Selected Service Detailed Dossier */}
+        {/* RIGHT COLUMN: TECHNICAL DOSSIER, DEPENDENCY GRAPH & TELEMETRY (7 cols) */}
+        <div className="lg:col-span-7 space-y-4">
+          {/* Selected Service Detailed Dossier (FICHA TÉCNICA EXHAUSTIVA) */}
           {engineMode === 'SIMULATED' ? (
-            <div className="p-4 sm:p-5 rounded-2xl bg-[#0b0e14] border border-cyan-950 space-y-3.5">
-              <div className="flex items-center justify-between border-b border-cyan-950 pb-2">
-                <div>
-                  <span className="text-[10px] text-cyan-400 font-bold uppercase block">
-                    EXPEDIENTE DE SERVICIO // SIMULATED
-                  </span>
-                  <h3 className="font-bold text-base text-white">{selectedService.serviceName}</h3>
+            <div className="p-5 rounded-2xl bg-[#0b0e14] border border-cyan-950 space-y-4 shadow-xl">
+              {/* Dossier Header */}
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-cyan-950 pb-3">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">
+                      FICHA TÉCNICA OFICIAL // WINDOWS 11 SCM
+                    </span>
+                    {selectedService.serviceKind && (
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
+                        selectedService.serviceKind === 'NATIVO'
+                          ? 'bg-blue-950 text-blue-300 border border-blue-800'
+                          : selectedService.serviceKind === 'POR_USUARIO'
+                          ? 'bg-purple-950 text-purple-300 border border-purple-800'
+                          : selectedService.serviceKind === 'TERCEROS'
+                          ? 'bg-amber-950 text-amber-300 border border-amber-600'
+                          : 'bg-zinc-800 text-zinc-300 border border-zinc-700'
+                      }`}>
+                        {selectedService.serviceKind === 'TERCEROS' ? 'TERCEROS (NO NATIVO)' : selectedService.serviceKind}
+                      </span>
+                    )}
+                    {selectedService.windows11Scope && (
+                      <div className="flex items-center gap-1 flex-wrap">
+                        {selectedService.windows11Scope.editions && (
+                          <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-900 text-[9px] font-mono" title="Ediciones de Windows 11 compatibles">
+                            EDICIONES: {selectedService.windows11Scope.editions.join(', ')}
+                          </span>
+                        )}
+                        {selectedService.windows11Scope.versions && (
+                          <span className="px-1.5 py-0.2 rounded bg-zinc-900 text-zinc-300 border border-zinc-800 text-[9px] font-mono" title="Versiones de Windows 11 compatibles">
+                            VER: {selectedService.windows11Scope.versions.join(', ')}
+                          </span>
+                        )}
+                        {selectedService.windows11Scope.requiredFeature && (
+                          <span className="px-1.5 py-0.2 rounded bg-amber-950/40 text-amber-300/90 border border-amber-900/60 text-[9px] font-mono" title="Característica o subsistema requerido">
+                            {selectedService.windows11Scope.requiredFeature}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="font-display font-black text-xl text-white">
+                    {selectedService.displayName}
+                  </h3>
+                  <div className="flex items-center gap-2 text-xs font-mono">
+                    <span className="text-cyan-400 font-bold">
+                      service_name: <code className="bg-black/60 px-1.5 py-0.5 rounded border border-cyan-900">{selectedService.serviceName}</code>
+                    </span>
+                    <span className="text-zinc-600">•</span>
+                    <span className="text-zinc-400">PID: {selectedService.pid || 'svchost'}</span>
+                    <span className="text-zinc-600">•</span>
+                    <span className="text-zinc-400">Cuenta: {selectedService.account}</span>
+                  </div>
                 </div>
-                <span
-                  className={`text-[10px] font-bold px-2.5 py-0.5 rounded ${
-                    selectedService.functionalRisk === 'CRÍTICO'
-                      ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
-                      : selectedService.functionalRisk === 'ALTO'
-                      ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                      : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
-                  }`}
-                >
-                  RIESGO: {selectedService.functionalRisk}
-                </span>
+
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                  <span
+                    className={`text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-wider ${
+                      selectedService.functionalRisk === 'CRÍTICO'
+                        ? 'bg-rose-950 text-rose-300 border border-rose-500/60 shadow-[0_0_12px_rgba(244,63,94,0.3)]'
+                        : selectedService.functionalRisk === 'ALTO'
+                        ? 'bg-amber-950 text-amber-300 border border-amber-500/60 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
+                        : selectedService.functionalRisk === 'MEDIO'
+                        ? 'bg-blue-950 text-blue-300 border border-blue-500/40'
+                        : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                    }`}
+                  >
+                    RIESGO: {selectedService.functionalRisk}
+                  </span>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                      selectedService.state === 'RUNNING'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                        : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                    }`}
+                  >
+                    ESTADO: {selectedService.state}
+                  </span>
+                </div>
               </div>
 
-              <div className="space-y-2 text-xs">
-                <p className="text-zinc-200 font-sans-editorial leading-relaxed">
-                  <strong className="text-cyan-400 font-mono">QUÉ ES Y PARA QUÉ SIRVE: </strong>
-                  {selectedService.simpleExplanation}
-                </p>
-
-                <div className="p-2.5 rounded-lg bg-black/60 border border-zinc-900 space-y-1">
-                  <span className="text-[10px] text-zinc-400 block font-bold">DEPENDENCIAS CLAVE:</span>
-                  <div className="flex flex-wrap gap-1.5 text-[10px] text-cyan-300">
-                    {selectedService.dependencies.map((d, i) => (
-                      <span key={i} className="px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-900">
-                        {d}
-                      </span>
-                    ))}
+              {/* Critical Warning Banner if CRÍTICO or ALTO */}
+              {(selectedService.functionalRisk === 'CRÍTICO' || selectedService.functionalRisk === 'ALTO') && (
+                <div className="p-3 rounded-xl bg-rose-950/30 border border-rose-500/40 space-y-1 text-xs">
+                  <div className="flex items-center gap-2 font-bold text-rose-300">
+                    <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span>DIRECTIVA DE ESTABILIDAD: NO SE RECOMIENDA DESHABILITAR</span>
                   </div>
+                  <p className="text-[11px] text-zinc-300 font-sans-editorial leading-relaxed pl-6">
+                    {selectedService.criticalRecommendation ||
+                      'Este servicio es un pilar arquitectónico de Windows 11. Deshabilitarlo provocará inestabilidad en cadena o fallos irreversibles en el Service Control Manager.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Función y Rol en el Subsistema */}
+              <div className="space-y-3 text-xs">
+                <div className="p-3 rounded-xl bg-black/60 border border-zinc-900 space-y-1.5">
+                  <div className="text-zinc-400 font-bold uppercase text-[10.5px]">FUNCIÓN Y ARQUITECTURA TÉCNICA:</div>
+                  <p className="text-zinc-200 font-sans-editorial leading-relaxed">
+                    {selectedService.subsystemRole}
+                  </p>
+                  <p className="text-cyan-300 font-sans-editorial leading-relaxed pt-1 border-t border-zinc-900/60">
+                    <strong className="text-cyan-400 font-mono">En palabras sencillas: </strong>
+                    {selectedService.simpleExplanation}
+                  </p>
+                </div>
+
+                {/* Grid con Parámetros SCM y Ejecutable */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] font-mono">
+                  <div className="p-2.5 rounded-lg bg-black/50 border border-zinc-900 space-y-0.5">
+                    <span className="text-zinc-500 text-[10px] block">TIPO DE INICIO HABITUAL:</span>
+                    <span className="text-white font-bold">{selectedService.startupType}</span>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-black/50 border border-zinc-900 space-y-0.5">
+                    <span className="text-zinc-500 text-[10px] block">CONSUMO / IMPACTO BASE:</span>
+                    <span className="text-emerald-400 font-bold">
+                      ~{Math.abs(selectedService.telemetryImpact.ramDeltaMb)} MB RAM | {Math.abs(selectedService.telemetryImpact.cpuDeltaPercent)}% CPU
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-black/50 border border-zinc-900 col-span-1 md:col-span-2 space-y-0.5">
+                    <span className="text-zinc-500 text-[10px] block">RUTA DE EJECUTABLE BINARIO:</span>
+                    <code className="text-zinc-300 text-[10px] break-all">{selectedService.binaryPath}</code>
+                  </div>
+                </div>
+
+                {/* Dependencias y Dependientes */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                  <div className="p-2.5 rounded-xl bg-black/60 border border-zinc-900 space-y-1.5">
+                    <span className="text-[10px] text-zinc-400 font-bold uppercase block flex items-center gap-1">
+                      <span>DEPENDENCIAS (UPSTREAM):</span>
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedService.dependencies.length > 0 ? (
+                        selectedService.dependencies.map((d, i) => (
+                          <span key={i} className="px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-800 text-cyan-300 text-[10px]">
+                            {d}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-zinc-500 text-[10px]">Ninguna (Raíz del kernel NT)</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-black/60 border border-zinc-900 space-y-1.5">
+                    <span className="text-[10px] text-zinc-400 font-bold uppercase block">
+                      DEPENDIENTES AFECTADOS (DOWNSTREAM):
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedService.dependents.slice(0, 3).map((dep, i) => (
+                        <span key={i} className="px-2 py-0.5 rounded bg-amber-950/50 border border-amber-800/80 text-amber-200 text-[10px]">
+                          {dep}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Consecuencias si se detiene & Plan de Restauración */}
+                <div className="p-3 rounded-xl bg-black/70 border border-zinc-900 space-y-2 text-xs font-sans-editorial">
+                  <div>
+                    <span className="text-amber-400 font-mono text-[10.5px] font-bold uppercase block">
+                      ¿QUÉ OCURRE SI SE DETIENE O DESHABILITA?:
+                    </span>
+                    <p className="text-zinc-200 leading-snug">
+                      {selectedService.telemetryImpact.lostFunctionality}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-rose-400 font-mono text-[10.5px] font-bold uppercase block">
+                      RIESGOS Y EFECTOS COLATERALES:
+                    </span>
+                    <p className="text-zinc-300 leading-snug">
+                      {selectedService.telemetryImpact.potentialSideEffect}
+                    </p>
+                  </div>
+
+                  {selectedService.restoration && (
+                    <div className="pt-2 border-t border-zinc-800/80">
+                      <span className="text-emerald-400 font-mono text-[10.5px] font-bold uppercase block">
+                        POSIBILIDAD DE RESTAURACIÓN:
+                      </span>
+                      <p className="text-zinc-300 text-[11px] leading-snug mb-1">
+                        {selectedService.restoration.canRestoreDirectly
+                          ? '✅ Restaurable en caliente sin reiniciar el equipo.'
+                          : '⚠️ Requiere reinicio o intervención en WinRE/Modo Seguro si el sistema queda inoperativo.'}
+                      </p>
+                      <div className="p-2 rounded bg-black border border-emerald-950 font-mono text-[10px] text-emerald-300 break-all">
+                        {selectedService.restoration.rollbackCommand}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Action Buttons: Stop / Disable / Rollback */}
-              <div className="flex items-center justify-between pt-2 border-t border-cyan-950">
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-cyan-950">
                 {selectedService.state === 'RUNNING' ? (
                   <button
                     type="button"
                     onClick={() => handleSimulateStop(selectedService.id)}
-                    className="px-4 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
                   >
                     <Power className="w-3.5 h-3.5" />
                     <span>[ SIMULAR STOP ]</span>
@@ -912,7 +1563,7 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
                   <button
                     type="button"
                     onClick={() => handleRollbackService(selectedService.id)}
-                    className="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>[ RESTABLECER SERVICIO ]</span>
@@ -920,19 +1571,18 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
                 )}
 
                 {/* Functional Test Trigger Button */}
-                {selectedService.functionalTestType && (
-                  <button
-                    type="button"
-                    onClick={() => handleRunFunctionalTest(selectedService.functionalTestType!)}
-                    className="px-4 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold text-xs transition-colors cursor-pointer shadow-md"
-                  >
-                    PROBAR {selectedService.functionalTestType.toUpperCase()} ➔
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => handleRunFunctionalTest(selectedService.functionalTestType)}
+                  className="px-4 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold text-xs transition-colors cursor-pointer shadow-md flex items-center gap-1.5"
+                >
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>PROBAR SUBSISTEMA ➔</span>
+                </button>
               </div>
             </div>
           ) : isRealAgentActive && selectedRealService ? (
-            <div className="p-4 sm:p-5 rounded-2xl bg-[#0b0e14] border border-emerald-950 space-y-3.5">
+            <div className="p-5 rounded-2xl bg-[#0b0e14] border border-emerald-950 space-y-4 shadow-xl">
               <div className="flex items-center justify-between border-b border-emerald-950 pb-2">
                 <div>
                   <span className="text-[10px] text-emerald-400 font-bold uppercase block">
@@ -954,24 +1604,24 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                <div className="p-2 rounded bg-black/60 border border-zinc-900">
+                <div className="p-2.5 rounded bg-black/60 border border-zinc-900">
                   <span className="text-zinc-500 text-[10px] block">ESTADO SO:</span>
                   <span className="text-white font-bold">{selectedRealService.state}</span>
                 </div>
 
-                <div className="p-2 rounded bg-black/60 border border-zinc-900">
+                <div className="p-2.5 rounded bg-black/60 border border-zinc-900">
                   <span className="text-zinc-500 text-[10px] block">TIPO INICIO:</span>
                   <span className="text-white font-bold">{selectedRealService.startMode}</span>
                 </div>
 
-                <div className="p-2 rounded bg-black/60 border border-zinc-900">
+                <div className="p-2.5 rounded bg-black/60 border border-zinc-900">
                   <span className="text-zinc-500 text-[10px] block">PID PROCESO:</span>
                   <span className="text-emerald-400 font-bold">
                     {selectedRealService.processId > 0 ? selectedRealService.processId : 'UNKNOWN'}
                   </span>
                 </div>
 
-                <div className="p-2 rounded bg-black/60 border border-zinc-900">
+                <div className="p-2.5 rounded bg-black/60 border border-zinc-900">
                   <span className="text-zinc-500 text-[10px] block">RAM DE PROCESO:</span>
                   <span className="text-emerald-400 font-bold">{selectedRealService.workingSetMb} MB</span>
                 </div>
@@ -1008,11 +1658,8 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
               </div>
             </div>
           ) : null}
-        </div>
 
-        {/* RIGHT COLUMN: DEPENDENCY GRAPH & LIVE TELEMETRY (6 cols) */}
-        <div className="lg:col-span-6 space-y-4">
-          {/* Mini Simulated Monitor preview showing effect */}
+          {/* Mini Simulated Monitor preview showing effect on screen */}
           <SimulatedMonitorScreen
             screenState="desktop"
             isAudioBroken={isAudioBroken}
@@ -1020,6 +1667,8 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
             customOverlayText={
               isAudioBroken
                 ? 'EFECTO DETECTADO: El icono de sonido muestra una X roja. Las llamadas a MMDeviceAPI fallan.'
+                : isNetworkBroken
+                ? 'EFECTO DETECTADO: El icono de red muestra "Sin Internet". Las consultas DNS no resuelven nombres.'
                 : undefined
             }
           />
@@ -1029,19 +1678,14 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
             <div className="flex items-center justify-between border-b border-cyan-950 pb-2">
               <span className="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-cyan-400" />
-                GRAFO DE DEPENDENCIAS // {engineMode === 'REAL_PC' && selectedRealService ? selectedRealService.name : selectedService.serviceName}
+                <span>
+                  GRAFO DE DEPENDENCIAS // {engineMode === 'REAL_PC' && selectedRealService ? selectedRealService.name : selectedService.serviceName}
+                </span>
               </span>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${engineMode === 'REAL_PC' ? 'bg-amber-950 text-amber-300 border border-amber-500/40' : 'text-zinc-500'}`}>
                 {engineMode === 'REAL_PC' ? 'REFERENCE // CATÁLOGO EVO' : 'SCM DEPENDENCY TREE'}
               </span>
             </div>
-
-            {engineMode === 'REAL_PC' && (
-              <div className="p-2 rounded bg-amber-950/30 border border-amber-500/30 text-[10.5px] font-mono text-amber-200 flex items-center justify-between">
-                <span>DATOS DE GRAFO Y CONSECUENCIAS: <strong>REFERENCE // CATÁLOGO EVO</strong> (Modelo pedagógico, no provisto por Agent)</span>
-                <span className="px-1.5 py-0.2 bg-amber-400 text-black font-black text-[9px] rounded">REFERENCE</span>
-              </div>
-            )}
 
             {/* Dynamic Dependency Chain */}
             <div className="space-y-1.5 text-xs">
@@ -1196,6 +1840,11 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
                 )}
               </div>
               <p>{activeTestResult.message}</p>
+              {activeTestResult.diagnosticDetails && (
+                <div className="text-[10px] font-mono text-zinc-400 bg-black/60 p-2 rounded border border-zinc-800">
+                  {activeTestResult.diagnosticDetails}
+                </div>
+              )}
             </div>
           )}
 
@@ -1267,16 +1916,6 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {engineMode === 'SIMULATED' && (
-                    <button
-                      type="button"
-                      onClick={() => handleRunFunctionalTest(selectedService.functionalTestType)}
-                      className="px-3 py-1 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black font-extrabold text-[10.5px] cursor-pointer shadow-sm"
-                    >
-                      PRUEBA FUNCIONAL ➔
-                    </button>
-                  )}
-
                   <button
                     type="button"
                     onClick={() => {
@@ -1300,4 +1939,3 @@ export const WindowsServicesTelemetryLab: React.FC<WindowsServicesTelemetryLabPr
     </div>
   );
 };
-

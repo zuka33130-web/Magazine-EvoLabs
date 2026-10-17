@@ -1,3 +1,7 @@
+/**
+ * LEGACY / INACTIVO: Conservado como referencia histórica.
+ * La única intro operativa activa del sistema es EvoIntroExperience.tsx.
+ */
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Sparkles,
@@ -96,7 +100,7 @@ export const EvoInstitutionalIntro: React.FC<EvoInstitutionalIntroProps> = ({
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-display font-black text-sm tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">
-                ACADEMIA EVO LABS
+                EVO LABS
               </span>
               <span className="text-[9px] px-1 py-0.5 rounded bg-amber-400/10 text-amber-300 border border-amber-400/20 hidden sm:inline-block">
                 OFICIAL
@@ -123,7 +127,7 @@ export const EvoInstitutionalIntro: React.FC<EvoInstitutionalIntroProps> = ({
       <main className="relative z-10 flex-1 max-w-4xl mx-auto w-full px-4 sm:px-8 py-6 sm:py-10 flex flex-col justify-center items-center">
         
         {/* ========================================================================= */}
-        {/* SCENE 0: BIENVENIDA A LA ACADEMIA                                         */}
+        {/* SCENE 0: BIENVENIDA A EVO LABS                                         */}
         {/* ========================================================================= */}
         {currentStep === 0 && (
           <div className="w-full text-center space-y-6 animate-in fade-in duration-300">
@@ -133,9 +137,9 @@ export const EvoInstitutionalIntro: React.FC<EvoInstitutionalIntroProps> = ({
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-display tracking-tight text-white uppercase leading-tight">
-              BIENVENIDO A LA <br className="hidden sm:inline" />
+              BIENVENIDO A <br className="hidden sm:inline" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">
-                ACADEMIA EVO LABS
+                EVO LABS
               </span>
             </h1>
 
@@ -170,14 +174,14 @@ export const EvoInstitutionalIntro: React.FC<EvoInstitutionalIntroProps> = ({
             </div>
 
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black font-display tracking-tight text-white uppercase">
-              10 TOMOS EVO LABS
+              12 TOMOS EVO LABS
             </h2>
 
             <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial max-w-xl mx-auto">
               Revistas técnicas en formato Magazine creadas para llevarte desde los fundamentos hasta áreas técnicas avanzadas.
             </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 max-w-3xl mx-auto text-left text-xs font-mono-tech pt-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 max-w-4xl mx-auto text-left text-xs font-mono-tech pt-2">
               {[
                 { n: '01', t: 'Hardware & Silicio', c: '#EAB308' },
                 { n: '02', t: 'Windows NT', c: '#00D2FF' },
@@ -187,12 +191,14 @@ export const EvoInstitutionalIntro: React.FC<EvoInstitutionalIntroProps> = ({
                 { n: '06', t: 'Ciberseguridad', c: '#EF4444' },
                 { n: '07', t: 'Gaming Pro', c: '#F59E0B' },
                 { n: '08', t: 'Arranque 35 Estados', c: '#10B981' },
-                { n: '09', t: 'Sistemas & Kernel', c: '#38BDF8' },
-                { n: '10', t: 'Forense & Reversing', c: '#A855F7' },
+                { n: '09', t: 'Programación', c: '#22C55E' },
+                { n: '10', t: 'Prompt & IA Avanzada', c: '#8B5CF6' },
+                { n: '11', t: 'Electrónica Aplicada', c: '#EAB308' },
+                { n: '12', t: 'Game Forge', c: '#EC4899' },
               ].map((item) => (
                 <div
                   key={item.n}
-                  className="p-2.5 rounded-xl bg-[#090d16]/90 border border-white/[0.08] flex flex-col justify-between gap-1 shadow-sm"
+                  className="p-2 rounded-xl bg-[#090d16]/90 border border-white/[0.08] flex flex-col justify-between gap-1 shadow-sm"
                 >
                   <span className="text-[10px] font-bold" style={{ color: item.c }}>
                     TOMO {item.n}
@@ -205,7 +211,7 @@ export const EvoInstitutionalIntro: React.FC<EvoInstitutionalIntroProps> = ({
             </div>
 
             <p className="text-xs text-zinc-400 font-sans-editorial italic">
-              “Diez Tomos creados para llevarte desde los fundamentos hasta áreas técnicas avanzadas.”
+              “Doce Tomos creados para llevarte desde los fundamentos hasta la ingeniería técnica avanzada.”
             </p>
           </div>
         )}
@@ -221,7 +227,7 @@ export const EvoInstitutionalIntro: React.FC<EvoInstitutionalIntroProps> = ({
             </div>
 
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black font-display tracking-tight text-white uppercase">
-              10 TOMOS + 10 LABORATORIOS GUIADOS
+              12 TOMOS + 12 LABORATORIOS GUIADOS
             </h2>
 
             <div className="max-w-2xl mx-auto p-5 sm:p-6 rounded-2xl bg-[#090d16]/90 border border-white/[0.1] text-left space-y-4 shadow-xl">
@@ -441,7 +447,7 @@ export const EvoInstitutionalIntro: React.FC<EvoInstitutionalIntroProps> = ({
                 onClick={onEnterApp}
                 className="w-full sm:w-auto px-8 py-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-mono-tech font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 mx-auto cursor-pointer shadow-[0_0_30px_rgba(245,158,11,0.4)] hover:scale-105 duration-200"
               >
-                <span>ENTRAR A MUNDO EVO</span>
+                <span>ENTRAR A EVO LABS</span>
                 <ArrowRight className="w-5 h-5 text-black" />
               </button>
             </div>

@@ -141,7 +141,7 @@ export const EvoTomo01CompletionScreen: React.FC<EvoTomo01CompletionScreenProps>
                 onClick={onGoToProgress}
                 className="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700 text-left transition-all flex items-center justify-between cursor-pointer"
               >
-                <span>VER MI PROGRESO EN EL CAMPUS</span>
+                <span>VER MI PROGRESO EN MI EVO</span>
                 <BarChart3 className="w-4 h-4 text-zinc-400" />
               </button>
             </div>

@@ -98,7 +98,7 @@ export const WindowsBootExperienceLab: React.FC<WindowsBootExperienceLabProps> =
       }, 2000);
     }
     return () => clearTimeout(timer);
-  }, [isPlaying, currentStepIndex, activeFailureId, currentStep]);
+  }, [isPlaying, currentStepIndex, activeFailureId]);
 
   // Compute active screen state
   const screenState: SimulationScreenState = failureTriggered && currentStep.injectableFailure

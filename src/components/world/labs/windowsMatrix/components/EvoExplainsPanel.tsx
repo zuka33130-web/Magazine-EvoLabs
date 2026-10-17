@@ -93,10 +93,10 @@ export const EvoExplainsPanel: React.FC<EvoExplainsPanelProps> = ({
             <button
               type="button"
               onClick={onOpenSimpleTutor}
-              className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-mono-tech font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+              className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-mono-tech font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
             >
-              <HelpCircle className="w-3 h-3 text-amber-400" />
-              <span>[ NO ENTIENDO ]</span>
+              <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+              <span>EXPLICÁMELO SIMPLE</span>
             </button>
           )}
         </div>

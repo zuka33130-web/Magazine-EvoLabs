@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Lock, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { VolumeItem } from '../types';
+import { normalizeVisibleStatus } from '../utils/statusNormalizer';
 
 interface HorizontalCollectionProps {
   volumes: VolumeItem[];
@@ -32,10 +33,10 @@ export const HorizontalCollection: React.FC<HorizontalCollectionProps> = ({
             </span>
           </div>
           <h2 className="font-display font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
-            Serie de 10 tomos
+            Serie de 12 tomos
           </h2>
           <p className="text-sm text-zinc-300 font-sans-editorial mt-1 max-w-xl">
-            Diez tomos conectados por la metodología EVO: entender, practicar, comprobar y avanzar.
+            Doce tomos conectados por la metodología EVO: entender, practicar, comprobar y avanzar.
           </p>
         </div>
 
@@ -66,7 +67,8 @@ export const HorizontalCollection: React.FC<HorizontalCollectionProps> = ({
         className="flex gap-7 overflow-x-auto pb-6 scroll-smooth no-scrollbar select-none"
       >
         {volumes.map((volume) => {
-          const isCurrent = !volume.isLocked;
+          const isRoadmap = ['tomo-05', 'tomo-06', 'tomo-07', 'tomo-09', 'tomo-10'].includes(volume.id);
+          const isCurrent = !volume.isLocked && !isRoadmap;
 
           return (
             <article
@@ -80,17 +82,28 @@ export const HorizontalCollection: React.FC<HorizontalCollectionProps> = ({
               className={`shrink-0 w-[280px] sm:w-[310px] md:w-[330px] rounded-2xl border transition-all duration-300 flex flex-col group overflow-hidden ${
                 isCurrent
                   ? 'bg-[#121318] border-zinc-700/80 hover:border-yellow-400/80 hover:-translate-y-1.5 cursor-pointer shadow-xl'
-                  : 'bg-[#0e0f13] border-zinc-800/80 hover:border-zinc-700 hover:-translate-y-1 opacity-90 cursor-default'
+                  : isRoadmap
+                  ? 'bg-[#0a0b0d]/50 border-zinc-900/40 opacity-60 filter grayscale'
+                  : 'bg-[#0e0f13] border-zinc-800/80 hover:border-zinc-700 hover:-translate-y-1 opacity-80 cursor-default'
               }`}
             >
               {/* Real Mini Magazine Cover Visual */}
+              {volume.id === 'tomo-02' ? (
+                <div className="relative aspect-[210/297] w-full overflow-hidden bg-[#0a0b0e] border-b border-zinc-800/80">
+                  <img
+                    src={volume.coverImage}
+                    alt={`Portada de ${volume.volumeLabel}: ${volume.title}`}
+                    className="block w-full h-full object-contain"
+                  />
+                </div>
+              ) : (
               <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#0a0b0e] border-b border-zinc-800/80">
                 <img
                   src={volume.coverImage}
                   alt={`Portada de ${volume.volumeLabel}: ${volume.title}`}
                   referrerPolicy="no-referrer"
                   className={`w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.02] ${
-                    isCurrent ? 'filter brightness-100 contrast-[1.02]' : 'filter brightness-75 contrast-95'
+                    isCurrent ? 'filter brightness-100 contrast-[1.02]' : 'filter brightness-50 contrast-90'
                   }`}
                 />
 
@@ -106,6 +119,10 @@ export const HorizontalCollection: React.FC<HorizontalCollectionProps> = ({
                   {isCurrent ? (
                     <span className="text-[10px] font-mono-tech uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-yellow-400 text-black shadow">
                       DISPONIBLE
+                    </span>
+                  ) : isRoadmap ? (
+                    <span className="text-[9px] font-mono-tech uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-zinc-900/90 text-zinc-400 border border-zinc-800">
+                      ROADMAP / EN DESARROLLO
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1.5 text-[10px] font-mono-tech uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-zinc-700 text-zinc-300">
@@ -125,6 +142,7 @@ export const HorizontalCollection: React.FC<HorizontalCollectionProps> = ({
                   </h3>
                 </div>
               </div>
+              )}
 
               {/* Editorial Info under the mini-cover */}
               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
@@ -148,6 +166,11 @@ export const HorizontalCollection: React.FC<HorizontalCollectionProps> = ({
                         ABRIR {volume.volumeLabel ? volume.volumeLabel.toUpperCase() : `TOMO ${volume.number}`}
                       </span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  ) : isRoadmap ? (
+                    <div className="text-[11px] font-mono-tech text-zinc-500 flex items-center justify-between">
+                      <span className="font-bold">{normalizeVisibleStatus('COMING_SOON')}</span>
+                      <span className="text-[9px] bg-zinc-950 px-1.5 py-0.5 rounded text-zinc-400 border border-zinc-900">PLANIFICADO 2026</span>
                     </div>
                   ) : (
                     <div className="text-[11px] font-mono-tech text-zinc-400 flex items-center gap-2">

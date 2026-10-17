@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Cpu,
-  Terminal,
-  Activity,
-  Zap,
   Gauge,
   Shield,
   ShieldAlert,
@@ -11,30 +8,41 @@ import {
   AlertTriangle,
   CheckCircle2,
   Sliders,
-  Play,
-  RotateCcw,
+  Zap,
   Sparkles,
   Info,
   Server,
   Layers,
   ArrowRight,
-  Maximize2,
-  Radio,
-  Flame,
   Clock,
   HardDrive,
   Lock,
   Download,
   Copy,
-  Check
+  Check,
+  HelpCircle,
+  Search,
+  X,
+  FileText,
+  Gamepad2,
+  Briefcase,
+  Monitor,
+  Code2,
+  Music,
+  AlertOctagon,
+  RefreshCw,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+  Activity
 } from 'lucide-react';
 import { useEvoOperatingMode } from '../../../../hooks/useEvoOperatingMode';
 import { EvoOperatingModeSelector } from '../../../common/EvoOperatingModeSelector';
-import { MatrixEngineMode } from './engine/types';
 import { WindowsBootExperienceLab } from './boot/WindowsBootExperienceLab';
 import { WindowsInstallExperienceLab } from './install/WindowsInstallExperienceLab';
 import { WindowsServicesTelemetryLab } from './services/WindowsServicesTelemetryLab';
 import { WindowsFailureRepairLab } from './repair/WindowsFailureRepairLab';
+import { EvoWindowsXRayLab } from './EvoWindowsXRayLab';
 
 export interface EvoWindowsMatrixLabProps {
   initialBuild?: 'win10-22h2' | 'win10-ltsc' | 'win11-23h2' | 'win11-24h2';
@@ -44,1484 +52,1202 @@ export interface EvoWindowsMatrixLabProps {
   onOpenTomo?: (tomoId: string) => void;
 }
 
-// Windows Builds specifications
-interface WindowsBuildData {
+// Windows Lifecycle Reference Data (Microsoft Lifecycle Cutoff: 2026-10-03)
+export interface WindowsVersionLifecycle {
   id: string;
   name: string;
-  buildNumber: string;
   codename: string;
-  year: string;
+  buildNumber: string;
+  supportEnd: string;
+  supportStatus: 'SOPORTADO' | 'MUY_CERCA_FIN_SOPORTE' | 'FUERA_DE_SOPORTE' | 'SOPORTE_LTSC_ESPECIFICO' | 'CASO_ESPECIAL';
+  statusBadge: string;
   badgeColor: string;
-  schedulerType: string;
-  schedulerDesc: string;
-  ramBasalMb: number;
-  session0Count: number; // Services / Kernel
-  session1Count: number; // User Desktop / Shell
-  vbsDefault: boolean;
-  syscallLatencyNs: number; // Base syscall overhead
-  fastStartupDefault: boolean;
-  avx512Optimization: string;
-  threadDirectorLevel: 'Ninguno (SMP Clásico)' | 'EHGS v1 (Básico)' | 'Thread Director 2.0 (Dynamic QoS)';
-  pros: string[];
-  cons: string[];
+  useCase: string;
+  observation: string;
+  minRamGb: number;
+  requiresTpm: boolean;
 }
 
-const WINDOWS_BUILDS: Record<string, WindowsBuildData> = {
+export const MICROSOFT_LIFECYCLE_SNAPSHOT: Record<string, WindowsVersionLifecycle> = {
   'win10-22h2': {
     id: 'win10-22h2',
-    name: 'Windows 10 22H2 Home/Pro',
-    buildNumber: 'Build 19045.4500',
-    codename: '22H2 (Vibranium Refreshed)',
-    year: '2022-2025',
-    badgeColor: '#38bdf8',
-    schedulerType: 'Planificador Clásico SMP (Uniforme)',
-    schedulerDesc: 'No distingue capacidades energéticas entre núcleos. Trata núcleos de alto rendimiento y bajo consumo como idénticos.',
-    ramBasalMb: 2450,
-    session0Count: 94,
-    session1Count: 54,
-    vbsDefault: false,
-    syscallLatencyNs: 145,
-    fastStartupDefault: true,
-    avx512Optimization: 'Legacy x86 context-switching',
-    threadDirectorLevel: 'Ninguno (SMP Clásico)',
-    pros: [
-      'Sin penalización obligatoria de seguridad VBS/HVCI',
-      'Shell clásico de bajo consumo de GPU',
-      'Ecosistema maduro de drivers legacy'
-    ],
-    cons: [
-      'Asigna hilos críticos de juegos a E-Cores en CPUs híbridas',
-      'No realiza Core Parking selectivo para 3D V-Cache sin software externo',
-      'Servicios de telemetría y diagnósticos CEIP activos por defecto'
-    ]
+    name: 'Windows 10 Home/Pro 22H2',
+    codename: '22H2 (Vibranium)',
+    buildNumber: 'Build 19045',
+    supportEnd: '2025-10-14',
+    supportStatus: 'FUERA_DE_SOPORTE',
+    statusBadge: 'FUERA DE SOPORTE GENERAL',
+    badgeColor: 'bg-rose-950/80 text-rose-300 border-rose-600/50',
+    useCase: 'Legacy / Compatibilidad histórica en equipos aislados',
+    observation: 'Soporte oficial de seguridad finalizado el 14 de octubre de 2025. No recibe correcciones ni parches mensuales.',
+    minRamGb: 2,
+    requiresTpm: false
   },
   'win10-ltsc': {
     id: 'win10-ltsc',
     name: 'Windows 10 Enterprise LTSC 2021',
-    buildNumber: 'Build 19044.3800',
-    codename: '21H2 LTSC (Clean Industrial Kernel)',
-    year: '2021-2031',
-    badgeColor: '#10b981',
-    schedulerType: 'Planificador SMP Minimalista',
-    schedulerDesc: 'Kernel ultra limpio sin contenedor de aplicaciones UWP de fondo ni servicios publicitarios de Microsoft Store.',
-    ramBasalMb: 1180,
-    session0Count: 46,
-    session1Count: 16,
-    vbsDefault: false,
-    syscallLatencyNs: 120,
-    fastStartupDefault: false,
-    avx512Optimization: 'Legacy x86 context-switching',
-    threadDirectorLevel: 'Ninguno (SMP Clásico)',
-    pros: [
-      'Huella basal de RAM más baja del mercado (<1.2 GB)',
-      'Cero aplicaciones UWP en segundo plano (sin Cortana/Edge/Xbox)',
-      'Máxima estabilidad para estaciones de audio y simuladores de vuelo'
-    ],
-    cons: [
-      'Requiere asignación manual de afinidad (Process Lasso) en Intel 12/13/14 Gen',
-      'Sin soporte para DirectX 12 Agility SDK moderno'
-    ]
+    codename: '21H2 LTSC',
+    buildNumber: 'Build 19044',
+    supportEnd: '2027-01-12 (2032 IoT)',
+    supportStatus: 'SOPORTE_LTSC_ESPECIFICO',
+    statusBadge: 'SOPORTE LTSC ESPECÍFICO',
+    badgeColor: 'bg-purple-950/80 text-purple-300 border-purple-600/50',
+    useCase: 'Escenarios de ciclo largo, equipos de bajos recursos o industriales',
+    observation: 'Edición Enterprise orientada a estabilidad prolongada sin tienda ni UWP preinstaladas. Licenciamiento y canal de servicio distinto de Home/Pro.',
+    minRamGb: 2,
+    requiresTpm: false
   },
   'win11-23h2': {
     id: 'win11-23h2',
-    name: 'Windows 11 23H2 (Moment 4)',
-    buildNumber: 'Build 22631.3700',
-    codename: 'Sun Valley 2 / Nickel',
-    year: '2023-2024',
-    badgeColor: '#a855f7',
-    schedulerType: 'Heterogeneous Scheduler v1 (HGS+)',
-    schedulerDesc: 'Soporte para Intel Thread Director. Incorpora aislamiento de núcleo HVCI y VBS forzado de fábrica.',
-    ramBasalMb: 3150,
-    session0Count: 116,
-    session1Count: 78,
-    vbsDefault: true,
-    syscallLatencyNs: 285,
-    fastStartupDefault: true,
-    avx512Optimization: 'Standard NT Paging',
-    threadDirectorLevel: 'EHGS v1 (Básico)',
-    pros: [
-      'Asignación inteligente de tareas de fondo a E-Cores',
-      'HAGS (Hardware Accelerated GPU Scheduling) maduro',
-      'Seguridad perimetral hipervisor-enforced contra exploits de memoria'
-    ],
-    cons: [
-      'Penalización de +15-20% en syscalls por aislamiento de núcleo (HVCI)',
-      'Consumo basal de RAM elevado por Windows Widgets, Teams y Edge Webview',
-      'Bug conocido en predicción de ramas en arquitecturas Zen 3 / Zen 4'
-    ]
+    name: 'Windows 11 Home/Pro 23H2',
+    codename: 'Sun Valley 2',
+    buildNumber: 'Build 22631',
+    supportEnd: '2025-11-11',
+    supportStatus: 'FUERA_DE_SOPORTE',
+    statusBadge: 'FUERA DE SOPORTE',
+    badgeColor: 'bg-rose-950/80 text-rose-300 border-rose-600/50',
+    useCase: 'Sistemas pendientes de actualización a 24H2/25H2',
+    observation: 'Soporte general finalizado en noviembre de 2025.',
+    minRamGb: 4,
+    requiresTpm: true
   },
   'win11-24h2': {
     id: 'win11-24h2',
-    name: 'Windows 11 24H2 (Germanium Kernel)',
-    buildNumber: 'Build 26100.1150',
-    codename: 'Germanium / 2024 Overhaul',
-    year: '2024-2026',
-    badgeColor: '#f59e0b',
-    schedulerType: 'Thread Director 2.0 & Zen Branch Patcher',
-    schedulerDesc: 'Reescritura completa del planificador NT para AVX-512, predicción de saltos branch-target en AMD Zen 4/5 y micro-QoS para Intel.',
-    ramBasalMb: 2820,
-    session0Count: 102,
-    session1Count: 66,
-    vbsDefault: true,
-    syscallLatencyNs: 180,
-    fastStartupDefault: true,
-    avx512Optimization: 'AVX-512 & Vector Register Direct Context Routing',
-    threadDirectorLevel: 'Thread Director 2.0 (Dynamic QoS)',
-    pros: [
-      'Elimina cuello de botella en CPU AMD Ryzen 7000/9000 (+3% a +11% en juegos)',
-      'Core Parking nativo sin dependencia de Game Bar para chips dual CCD con 3D V-Cache',
-      'Fast-path optimizado en hypervisor hypercalls que reduce penalización HVCI a <5%'
-    ],
-    cons: [
-      'Exige CPU con instrucción SSE4.2 y POPCNT estricto para arrancar',
-      'Telemetría Copilot integrada en subsistema de búsqueda'
-    ]
+    name: 'Windows 11 Home/Pro 24H2',
+    codename: 'Germanium / Hudson Valley',
+    buildNumber: 'Build 26100',
+    supportEnd: '2026-10-13',
+    supportStatus: 'MUY_CERCA_FIN_SOPORTE',
+    statusBadge: 'MUY CERCA DEL FIN DE SOPORTE',
+    badgeColor: 'bg-amber-950/80 text-amber-300 border-amber-600/50',
+    useCase: 'Compatibilidad x86/ARM64 moderna',
+    observation: 'Soporte general finaliza en octubre de 2026. Se sugiere proyectar migración a 25H2.',
+    minRamGb: 4,
+    requiresTpm: true
+  },
+  'win11-25h2': {
+    id: 'win11-25h2',
+    name: 'Windows 11 Home/Pro 25H2',
+    codename: '25H2 Feature Update',
+    buildNumber: 'Build 26200+',
+    supportEnd: '2027-10-12',
+    supportStatus: 'SOPORTADO',
+    statusBadge: 'VERSIÓN SOPORTADA ACTUALLY',
+    badgeColor: 'bg-emerald-950/80 text-emerald-300 border-emerald-600/50',
+    useCase: 'Estándar para PC gamer, oficina, creación y desarrollo',
+    observation: 'Soporte oficial vigente hasta octubre de 2027.',
+    minRamGb: 8,
+    requiresTpm: true
+  },
+  'win11-26h2': {
+    id: 'win11-26h2',
+    name: 'Windows 11 Home/Pro 26H2',
+    codename: '26H2 Update',
+    buildNumber: 'Build 27xxx',
+    supportEnd: '2028-10-10',
+    supportStatus: 'SOPORTADO',
+    statusBadge: 'VERSIÓN SOPORTADA ACTUALLY',
+    badgeColor: 'bg-cyan-950/80 text-cyan-300 border-cyan-600/50',
+    useCase: 'Hardware moderno validado con drivers del fabricante',
+    observation: 'Versión soportada actualmente. Validar disponibilidad de drivers antes de migrar.',
+    minRamGb: 8,
+    requiresTpm: true
+  },
+  'win11-26h1': {
+    id: 'win11-26h1',
+    name: 'Windows 11 26H1 (Copilot+ / Silicon Espećifico)',
+    codename: 'Dilithium',
+    buildNumber: 'Build 26120+',
+    supportEnd: '2028-05-30',
+    supportStatus: 'CASO_ESPECIAL',
+    statusBadge: 'CASO ESPECIAL / DISPONIBILIDAD DE HARDWARE',
+    badgeColor: 'bg-indigo-950/80 text-indigo-300 border-indigo-600/50',
+    useCase: 'Equipos con NPU dedicada (>40 TOPS) y arquitecturas ARM64 / Silicon específico',
+    observation: 'Rama orientada a hardware específico con NPU. No recomendada como ISO genérica.',
+    minRamGb: 16,
+    requiresTpm: true
   }
 };
 
 export const EvoWindowsMatrixLab: React.FC<EvoWindowsMatrixLabProps> = ({
-  initialBuild = 'win11-24h2',
-  initialSilicon = 'hybrid',
   initialScenario,
-  onNavigateToHardwareBench,
-  onOpenTomo,
 }) => {
-  const { isPericial } = useEvoOperatingMode();
-  const isElite = true;
+  const { mode: evoMode } = useEvoOperatingMode();
 
-  // Master Experience Engine Mode
-  const [activeMode, setActiveMode] = useState<MatrixEngineMode>(() => {
-    if (initialScenario === 'install' || initialScenario?.includes('install')) return 'install';
-    if (initialScenario === 'services' || initialScenario?.includes('services')) return 'services';
-    if (initialScenario === 'repair' || initialScenario?.includes('repair')) return 'repair';
-    if (initialScenario === 'silicon' || initialScenario?.includes('version')) return 'silicon-matrix';
-    return 'boot';
+  // Active View Tab: 'advisor' (Advisor 3 pasos), 'matrix' (Comparar versiones), 'deep' (Profundizar Labs)
+  const [activeTab, setActiveTab] = useState<'advisor' | 'matrix' | 'deep'>(() => {
+    if (initialScenario === 'matrix') return 'matrix';
+    if (initialScenario === 'advisor') return 'advisor';
+    if (['boot', 'install', 'services', 'repair', 'scheduler', 'scheduler-hybrid', 'xray', 'kernel-crash', 'crash-repair', 'bsod', 'diag-bsod-decoder'].includes(initialScenario || '')) {
+      return 'deep';
+    }
+    return 'advisor';
   });
 
-  // State: Windows Build Matrix
-  const [selectedBuildId, setSelectedBuildId] = useState<string>(initialBuild);
-  const [vbsEnabled, setVbsEnabled] = useState<boolean>(WINDOWS_BUILDS[initialBuild]?.vbsDefault ?? true);
-  const [fastStartupEnabled, setFastStartupEnabled] = useState<boolean>(true);
-  const [diagTrackEnabled, setDiagTrackEnabled] = useState<boolean>(true);
-  const [hagsEnabled, setHagsEnabled] = useState<boolean>(true);
+  const [deepLabSubTab, setDeepLabSubTab] = useState<'boot' | 'install' | 'services' | 'repair' | 'scheduler' | 'xray'>(() => {
+    if (initialScenario === 'boot') return 'boot';
+    if (initialScenario === 'install') return 'install';
+    if (initialScenario === 'services') return 'services';
+    if (['repair', 'crash-repair', 'bsod', 'diag-bsod-decoder'].includes(initialScenario || '')) return 'repair';
+    if (['xray', 'kernel-crash'].includes(initialScenario || '')) return 'xray';
+    if (['scheduler', 'scheduler-hybrid'].includes(initialScenario || '')) return 'scheduler';
+    return 'scheduler';
+  });
 
-  // State: Silicon Scheduler Simulator
-  const [selectedSilicon, setSelectedSilicon] = useState<'hybrid' | 'vcache' | 'monolithic'>(initialSilicon);
-  const [gameRunning, setGameRunning] = useState<boolean>(true);
-  const [backgroundLoadActive, setBackgroundLoadActive] = useState<boolean>(true);
-  const [tdpTotalWatts, setTdpTotalWatts] = useState<number>(28); // 15W to 45W
-
-  // State: DPC / ISR Oscilloscope
-  const [driverProfile, setDriverProfile] = useState<'whql' | 'oem' | 'debloated' | 'conflict'>('whql');
-  const [timerResolutionMs, setTimerResolutionMs] = useState<number>(0.5); // 0.5ms (EVO), 1.0ms, 15.625ms
-  const [isInjectingConflict, setIsInjectingConflict] = useState<boolean>(false);
-  const [copiedScript, setCopiedScript] = useState<boolean>(false);
-
-  // Canvas ref for real-time oscilloscope
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  const waveformHistoryRef = useRef<number[]>([]);
-
-  // Pre-load scenario when prop changes
-  useEffect(() => {
-    if (initialScenario) {
-      if (initialScenario === 'boot-sequence') {
-        setSelectedBuildId('win10-22h2');
-        setFastStartupEnabled(true);
-      } else if (initialScenario === 'dpc-conflict') {
-        setDriverProfile('conflict');
-        setIsInjectingConflict(true);
-      } else if (initialScenario === 'scheduler-hybrid') {
-        setSelectedSilicon('hybrid');
-        setSelectedBuildId('win10-22h2');
-      } else if (initialScenario === 'timer-resolution') {
-        setTimerResolutionMs(15.625);
-      } else if (initialScenario === 'vcache-parking') {
-        setSelectedSilicon('vcache');
-        setSelectedBuildId('win11-24h2');
-      }
+  React.useEffect(() => {
+    if (!initialScenario) return;
+    if (initialScenario === 'matrix') {
+      setActiveTab('matrix');
+    } else if (initialScenario === 'advisor') {
+      setActiveTab('advisor');
+    } else if (['boot', 'install', 'services', 'repair', 'scheduler', 'scheduler-hybrid', 'xray', 'kernel-crash', 'crash-repair', 'bsod', 'diag-bsod-decoder'].includes(initialScenario)) {
+      setActiveTab('deep');
+      if (initialScenario === 'boot') setDeepLabSubTab('boot');
+      else if (initialScenario === 'install') setDeepLabSubTab('install');
+      else if (initialScenario === 'services') setDeepLabSubTab('services');
+      else if (['repair', 'crash-repair', 'bsod', 'diag-bsod-decoder'].includes(initialScenario)) setDeepLabSubTab('repair');
+      else if (['xray', 'kernel-crash'].includes(initialScenario)) setDeepLabSubTab('xray');
+      else if (['scheduler', 'scheduler-hybrid'].includes(initialScenario)) setDeepLabSubTab('scheduler');
     }
   }, [initialScenario]);
 
-  // Synchronize VBS default when build changes unless manually overridden
-  const currentBuild = WINDOWS_BUILDS[selectedBuildId] || WINDOWS_BUILDS['win11-24h2'];
+  // Step 1: User Hardware Input
+  const [cpuCategory, setCpuCategory] = useState<string>('');
+  const [ramAmount, setRamAmount] = useState<string>('');
+  const [storageType, setStorageType] = useState<string>('');
+  const [tpmStatus, setTpmStatus] = useState<string>('');
+  const [secureBoot, setSecureBoot] = useState<string>('');
+  const [uefiStatus, setUefiStatus] = useState<string>('');
 
-  // Calculated reactive metrics
-  const activeRamBasal = useMemo(() => {
-    let ram = currentBuild.ramBasalMb;
-    if (vbsEnabled) ram += 220; // Hypervisor isolation pool
-    if (diagTrackEnabled) ram += 95; // Telemetry worker threads
-    if (fastStartupEnabled) ram += 60; // Hibernate state cache
-    return ram;
-  }, [currentBuild, vbsEnabled, diagTrackEnabled, fastStartupEnabled]);
+  // Step 2: Usage Chips
+  const [selectedUsages, setSelectedUsages] = useState<string[]>([]);
 
-  const activeSyscallPenalty = useMemo(() => {
-    let latency = currentBuild.syscallLatencyNs;
-    if (vbsEnabled) {
-      // 24H2 has hypercall fast path, 23H2 has heavier overhead
-      latency += selectedBuildId === 'win11-24h2' ? 35 : selectedBuildId === 'win11-23h2' ? 140 : 90;
-    }
-    return latency;
-  }, [currentBuild, vbsEnabled, selectedBuildId]);
+  // Modals & UI States
+  const [showHowToCheckModal, setShowHowToCheckModal] = useState<boolean>(false);
+  const [showGlossaryModal, setShowGlossaryModal] = useState<boolean>(false);
 
-  // =========================================================================
-  // MOTOR A: THREAD DIRECTOR & SCHEDULER MATHEMATICAL MODEL
-  // =========================================================================
-  const schedulerMetrics = useMemo(() => {
-    const baseFrameTime = 16.67; // 60 FPS Baseline target
-    let frameTime = baseFrameTime;
-    let jitterMs = 0.4;
-    let isMisroutedToECore = false;
-    let baseFps = 60.0;
+  // Analysis Trigger
+  const [analyzed, setAnalyzed] = useState<boolean>(false);
 
-    if (selectedSilicon === 'hybrid') {
-      if (selectedBuildId.startsWith('win10')) {
-        // Win10 lacks Thread Director 2.0 EHFI feedback: Heavy thread lands on E-Core (25% lower IPC)
-        isMisroutedToECore = true;
-        frameTime = +(baseFrameTime * 1.33).toFixed(2); // 22.17 ms
-        jitterMs = 4.8; // Exponential jitter due to quantum starvation
-        baseFps = +(1000 / frameTime).toFixed(1); // ~45.1 FPS
-      } else if (selectedBuildId === 'win11-24h2') {
-        // Win11 24H2 Thread Director 2.0 routes heavy game render loop directly to P-Cores
-        isMisroutedToECore = false;
-        frameTime = baseFrameTime;
-        jitterMs = 0.4;
-        baseFps = 60.0;
-      } else {
-        // Win11 23H2 (HGS+ v1)
-        isMisroutedToECore = false;
-        frameTime = +(baseFrameTime * 1.05).toFixed(2);
-        jitterMs = 1.2;
-        baseFps = +(1000 / frameTime).toFixed(1);
-      }
-    } else if (selectedSilicon === 'vcache') {
-      if (selectedBuildId === 'win11-24h2') {
-        frameTime = baseFrameTime;
-        jitterMs = 0.3;
-        baseFps = 60.0;
-      } else {
-        frameTime = +(baseFrameTime * 1.18).toFixed(2); // CCX hop penalty across Infinity Fabric
-        jitterMs = 3.2;
-        baseFps = +(1000 / frameTime).toFixed(1);
-      }
-    } else {
-      // Monolithic
-      frameTime = baseFrameTime;
-      jitterMs = 0.6;
-      baseFps = 60.0;
-    }
-
-    return {
-      baseFrameTime,
-      frameTime,
-      jitterMs,
-      isMisroutedToECore,
-      baseFps
-    };
-  }, [selectedSilicon, selectedBuildId]);
-
-  // =========================================================================
-  // MOTOR B: SOC / MINI PC THERMAL CONTENTION MODEL
-  // =========================================================================
-  const thermalContentionMetrics = useMemo(() => {
-    const cpuIdleWatts = 2.5;
-    const serviciosFondoWatts = diagTrackEnabled ? 5.2 : 0.8;
-    const presupuestoGpuWatts = +(tdpTotalWatts - (cpuIdleWatts + serviciosFondoWatts)).toFixed(1);
-    const downclockGpu = serviciosFondoWatts > 4.5;
-    
-    // Base FPS before thermal throttling
-    const baseFps = schedulerMetrics.baseFps;
-    // If downclock is active: reduce projected FPS by 28%
-    const projectedFps = downclockGpu ? +(baseFps * 0.72).toFixed(1) : baseFps;
-    const gpuClockMhz = downclockGpu ? 1450 : 2700;
-
-    return {
-      cpuIdleWatts,
-      serviciosFondoWatts,
-      presupuestoGpuWatts,
-      downclockGpu,
-      projectedFps,
-      gpuClockMhz,
-      tdpTotalWatts
-    };
-  }, [tdpTotalWatts, diagTrackEnabled, schedulerMetrics.baseFps]);
-
-  // =========================================================================
-  // MOTOR C: REAL-TIME DPC LATENCY & 1% LOW STATISTICAL ENGINE
-  // =========================================================================
-  const dpcMetrics = useMemo(() => {
-    let baseNvlddmkm = 75;
-    let baseNdis = 35;
-    let baseStorport = 30;
-    let baseNtoskrnl = 20;
-
-    if (driverProfile === 'oem') {
-      baseNvlddmkm = 340;
-      baseNdis = 180;
-      baseStorport = 90;
-    } else if (driverProfile === 'debloated') {
-      baseNvlddmkm = 22;
-      baseNdis = 16;
-      baseStorport = 18;
-    } else if (driverProfile === 'conflict' || isInjectingConflict) {
-      baseNvlddmkm = 980;
-      baseNdis = 420;
-      baseStorport = 310;
-    }
-
-    // Timer resolution impact on quantum jitter
-    const jitterFactor = timerResolutionMs === 0.5 ? 0.08 : timerResolutionMs === 1.0 ? 0.22 : 0.75;
-    const peakDpc = +(baseNvlddmkm * (1 + jitterFactor)).toFixed(1);
-    const avgIsr = +(baseNdis * 0.45).toFixed(1);
-
-    const status = peakDpc < 100 
-      ? 'OPTIMO' 
-      : peakDpc <= 500 
-      ? 'ADVERTENCIA' 
-      : 'CRITICO';
-
-    // Statistical 1% Low Percentile calculation using Standard Deviation:
-    // Percentil_1Low = 1000 / (FrameTime_Medio + (2.33 * StDev_Jitter))
-    const stDevJitter = (peakDpc / 100) * (timerResolutionMs === 0.5 ? 0.35 : timerResolutionMs === 1.0 ? 1.1 : 3.2);
-    const frameTimeMedio = schedulerMetrics.frameTime;
-    const percentil_1Low = +(1000 / (frameTimeMedio + (2.33 * stDevJitter))).toFixed(1);
-
-    return {
-      peakDpc,
-      avgIsr,
-      nvlddmkm: baseNvlddmkm,
-      ndis: baseNdis,
-      storport: baseStorport,
-      ntoskrnl: baseNtoskrnl,
-      status,
-      jitterFactor,
-      stDevJitter: +stDevJitter.toFixed(2),
-      percentil_1Low
-    };
-  }, [driverProfile, isInjectingConflict, timerResolutionMs, schedulerMetrics.frameTime]);
-
-  // Oscilloscope Animation Loop
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let scanX = 0;
-    const bufferLength = 300;
-    if (waveformHistoryRef.current.length === 0) {
-      waveformHistoryRef.current = new Array(bufferLength).fill(50);
-    }
-
-    const render = () => {
-      const width = canvas.width;
-      const height = canvas.height;
-
-      // Dark background with phosphor persistence fade
-      ctx.fillStyle = 'rgba(8, 10, 13, 0.25)';
-      ctx.fillRect(0, 0, width, height);
-
-      // Draw Grid
-      ctx.strokeStyle = 'rgba(34, 211, 238, 0.08)';
-      ctx.lineWidth = 1;
-      const gridSpacingX = 30;
-      const gridSpacingY = 25;
-
-      ctx.beginPath();
-      for (let x = 0; x < width; x += gridSpacingX) {
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-      }
-      for (let y = 0; y < height; y += gridSpacingY) {
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-      }
-      ctx.stroke();
-
-      // Safe threshold line (< 100µs)
-      const safeY = height - (100 / 1200) * height;
-      ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.moveTo(0, safeY);
-      ctx.lineTo(width, safeY);
-      ctx.stroke();
-
-      // Critical threshold line (> 800µs)
-      const critY = height - (800 / 1200) * height;
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
-      ctx.beginPath();
-      ctx.moveTo(0, critY);
-      ctx.lineTo(width, critY);
-      ctx.stroke();
-      ctx.setLineDash([]); // Reset line dash
-
-      // Generate next waveform sample based on current DPC state
-      const targetDpc = dpcMetrics.peakDpc;
-      const randomNoise = (Math.random() - 0.5) * (targetDpc * dpcMetrics.jitterFactor * 0.6);
-      let sample = targetDpc + randomNoise;
-      if (driverProfile === 'conflict' && Math.random() > 0.85) {
-        sample += 450; // Random massive DPC latency spikes
-      }
-      sample = Math.max(10, Math.min(1200, sample));
-
-      // Push to history
-      waveformHistoryRef.current.push(sample);
-      if (waveformHistoryRef.current.length > bufferLength) {
-        waveformHistoryRef.current.shift();
-      }
-
-      // Draw Waveform Line
-      const history = waveformHistoryRef.current;
-      const step = width / (bufferLength - 1);
-
-      ctx.lineWidth = 2;
-      ctx.shadowBlur = 10;
-
-      if (dpcMetrics.status === 'OPTIMO') {
-        ctx.strokeStyle = '#10b981';
-        ctx.shadowColor = '#10b981';
-      } else if (dpcMetrics.status === 'ADVERTENCIA') {
-        ctx.strokeStyle = '#f59e0b';
-        ctx.shadowColor = '#f59e0b';
-      } else {
-        ctx.strokeStyle = '#ef4444';
-        ctx.shadowColor = '#ef4444';
-      }
-
-      ctx.beginPath();
-      for (let i = 0; i < history.length; i++) {
-        const val = history[i];
-        const y = height - (val / 1200) * height;
-        const x = i * step;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-      ctx.shadowBlur = 0; // Reset shadow
-
-      // Draw active scanner head beam
-      scanX = (scanX + 3) % width;
-      ctx.fillStyle = 'rgba(34, 211, 238, 0.8)';
-      ctx.fillRect(scanX - 1, 0, 2, height);
-
-      // Trigger next frame
-      animationFrameRef.current = requestAnimationFrame(render);
-    };
-
-    render();
-
-    return () => {
-      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-    };
-  }, [dpcMetrics, driverProfile, activeMode]);
-
-  // Copy PowerShell diagnostic script
-  const handleCopyDiagScript = () => {
-    const cmd = `Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, BuildNumber, NumberOfProcesses; (Get-Process).Count; (Get-Service | Where-Object {$_.Status -eq 'Running'}).Count; bcdedit /enum {current} | findstr "useplatformclock hypervisorlaunchtype"`;
-    navigator.clipboard.writeText(cmd);
-    setCopiedScript(true);
-    setTimeout(() => setCopiedScript(false), 2000);
+  // Toggle usage chips
+  const toggleUsage = (id: string) => {
+    setSelectedUsages(prev =>
+      prev.includes(id) ? prev.filter(u => u !== id) : [...prev, id]
+    );
   };
 
-  return (
-    <div className="w-full bg-[#080a0d] text-[#f4f4f6] font-mono-tech select-none space-y-6">
-      
-      {/* Top Header Aero Glass Bar */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-[#0b0e14]/90 border border-cyan-500/30 shadow-[0_0_40px_rgba(0,0,0,0.8)] backdrop-blur-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+  // Scheduler Lab State
+  const [schedulerArch, setSchedulerArch] = useState<'hybrid' | 'vcache' | 'monolithic'>('hybrid');
+  const [schedulerWorkload, setSchedulerWorkload] = useState<'foreground' | 'app' | 'background' | 'maintenance'>('foreground');
+  const [showSchedulerDeepDive, setShowSchedulerDeepDive] = useState<boolean>(false);
 
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
-          <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded text-[10px] font-black bg-cyan-400/20 text-cyan-300 border border-cyan-400/40 uppercase tracking-wider">
-                {activeMode === 'silicon-matrix'
-                  ? 'KERNEL NT 10.0 // RING 0 FORENSICS'
-                  : 'EVO WINDOWS X-RAY // WINDOWS EXPERIENCE LAB'}
+  // Missing fields helper
+  const missingFields = useMemo(() => {
+    const list: string[] = [];
+    if (!cpuCategory) list.push('Procesador (CPU)');
+    if (!ramAmount) list.push('Memoria RAM');
+    if (!storageType) list.push('Almacenamiento (HDD/SSD)');
+    if (!tpmStatus) list.push('TPM 2.0');
+    if (!secureBoot) list.push('Secure Boot');
+    if (!uefiStatus) list.push('Firmware UEFI / BIOS');
+    return list;
+  }, [cpuCategory, ramAmount, storageType, tpmStatus, secureBoot, uefiStatus]);
+
+  // Confidence Level Calculation
+  const confidenceLevel = useMemo(() => {
+    if (missingFields.length === 0) return 'DATOS SUFICIENTES';
+    if (missingFields.length <= 3) return 'DATOS PARCIALES';
+    return 'DATOS INSUFICIENTES';
+  }, [missingFields]);
+
+  // Windows 11 Specs Compliance Evaluation
+  const win11Compatibility = useMemo(() => {
+    if (confidenceLevel !== 'DATOS SUFICIENTES') {
+      return { 
+        status: 'DATOS INSUFICIENTES', 
+        text: `Faltan ingresar datos esenciales: ${missingFields.join(', ')}`, 
+        color: 'text-zinc-400 bg-zinc-800' 
+      };
+    }
+
+    const cpuOk = cpuCategory === 'intel-hybrid' || cpuCategory === 'amd-modern' || cpuCategory === 'quad-standard';
+    const ramOk = ramAmount === '8gb' || ramAmount === '16gb' || ramAmount === '32gb';
+    const storageOk = storageType === 'ssd-nvme' || storageType === 'ssd-sata';
+    const tpmOk = tpmStatus === 'active';
+    const uefiOk = uefiStatus === 'uefi';
+    const secureBootOk = secureBoot === 'enabled';
+
+    if (cpuOk && ramOk && storageOk && tpmOk && uefiOk && secureBootOk) {
+      return { status: 'CUMPLE', text: 'Cumple todos los requisitos de Windows 11 declarados', color: 'text-emerald-300 bg-emerald-950/80 border-emerald-600/50' };
+    }
+
+    if (tpmStatus === 'absent' || cpuCategory === 'cpu-legacy' || ramAmount === '4gb' || storageType === 'hdd-legacy') {
+      return { status: 'NO CUMPLE', text: 'No cumple requisitos nativos de Windows 11 de origen', color: 'text-rose-300 bg-rose-950/80 border-rose-600/50' };
+    }
+
+    return { status: 'NO CUMPLE', text: 'Faltan verificar configuraciones en BIOS/Firmware', color: 'text-amber-300 bg-amber-950/80 border-amber-600/50' };
+  }, [confidenceLevel, missingFields, cpuCategory, ramAmount, storageType, tpmStatus, uefiStatus, secureBoot]);
+
+  // Transparent Recommendation Rules
+  const recommendationResult = useMemo(() => {
+    if (!analyzed) return null;
+
+    if (confidenceLevel !== 'DATOS SUFICIENTES') {
+      return {
+        bestFit: 'DATOS INSUFICIENTES',
+        whyFit: [
+          `No se puede determinar la compatibilidad debido a que faltan datos esenciales de hardware:`,
+          ...missingFields.map(f => `• Falta ingresar: ${f}`)
+        ],
+        keepInMind: ['Sin datos de hardware completos no podemos prejuzgar la compatibilidad de forma veraz.'],
+        checkBefore: ['Usa el botón "[ ¿DÓNDE VEO MI HARDWARE? ]" para conocer los componentes de tu equipo.'],
+        alternative: 'N/A',
+        legacyAlert: null
+      };
+    }
+
+    const isNonCompliant = win11Compatibility.status === 'NO CUMPLE';
+
+    if (isNonCompliant) {
+      return {
+        bestFit: 'Evaluación Especial Requerida (Hardware limitado para Win 11)',
+        whyFit: [
+          'Este equipo no cumple los requisitos nativos declarados para Windows 11.',
+          'Windows 10 Home/Pro 22H2 ya está FUERA DE SOPORTE oficial desde octubre de 2025.'
+        ],
+        keepInMind: [
+          'Windows 10 Enterprise LTSC 2021 puede ser considerado para escenarios de ciclo largo en hardware antiguo por tener soporte hasta 2027.',
+          'No instalar Windows 10 22H2 en equipos conectados a internet sin entender los riesgos de seguridad por falta de parches.'
+        ],
+        checkBefore: [
+          'Verificar si TPM 2.0 y Secure Boot están deshabilitados en BIOS antes de descartar Windows 11.',
+          'Revisar si el procesador soporta virtualización e instrucciones SSE4.2.'
+        ],
+        alternative: 'Windows 10 Enterprise LTSC 2021 (Soporte extendido hasta 2027)',
+        legacyAlert: 'AVISO DE SOPORTE: Windows 10 Home/Pro ya no recibe parches mensuales. Evaluar actualización de equipo o LTSC.'
+      };
+    }
+
+    // Modern Compliant PC
+    return {
+      bestFit: MICROSOFT_LIFECYCLE_SNAPSHOT['win11-25h2'].name,
+      whyFit: [
+        'Compatible con el hardware declarado y requisitos de seguridad TPM 2.0 / Secure Boot.',
+        'Versión oficialmente soportada por Microsoft hasta octubre de 2027.',
+        'Optimizada para software, drivers y juegos modernos.'
+      ],
+      keepInMind: [
+        'Confirmar disponibilidad de drivers oficiales en el sitio web del fabricante.',
+        'Windows 11 24H2 está muy cerca de finalizar su ciclo de soporte general (octubre 2026).'
+      ],
+      checkBefore: [
+        'Validar compatibilidad de aplicaciones de trabajo o antivirus antes de actualizar.',
+        'Realizar respaldo de datos antes de una instalación limpia.'
+      ],
+      alternative: MICROSOFT_LIFECYCLE_SNAPSHOT['win11-26h2'].name + ' (Si los drivers ya están validados por el fabricante)',
+      legacyAlert: null
+    };
+  }, [analyzed, confidenceLevel, missingFields, win11Compatibility]);
+
+  return (
+    <div className="w-full min-h-screen bg-zinc-950 text-zinc-100 p-4 md:p-6 space-y-6 font-sans">
+      
+      {/* 1. NUEVO ENCABEZADO */}
+      <div className="border border-cyan-500/30 bg-zinc-900/90 rounded-xl p-5 md:p-6 shadow-xl relative overflow-hidden backdrop-blur-md">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <span className="px-3 py-1 rounded-md text-xs font-mono font-bold tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase">
+                EVO WINDOWS ADVISOR
               </span>
-              <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                {activeMode === 'silicon-matrix'
-                  ? 'THREAD DIRECTOR 2.0 & DPC LAB'
-                  : 'DIGITAL TWIN & TELEMETRÍA'}
-              </span>
-              <span className="px-2 py-0.5 rounded text-[9px] font-mono bg-zinc-900 border border-zinc-700 text-zinc-400">
-                [ SIMULATED / REFERENCE MODEL ]
+              <span className="text-xs font-mono text-zinc-400 flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                SNAPSHOT LIFECYCLE: 2026-10-03
               </span>
             </div>
-
-            <h1 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight">
-              {activeMode === 'silicon-matrix' ? (
-                'MATRIZ DE VERSIONES & PLANIFICADOR DE KERNEL'
-              ) : (
-                <span className="flex flex-wrap items-baseline gap-x-2.5">
-                  <span>EVO WINDOWS X-RAY</span>
-                  <span className="text-cyan-400 font-bold text-lg sm:text-2xl">// WINDOWS EXPERIENCE LAB</span>
-                </span>
-              )}
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white">
+              ¿QUÉ WINDOWS ME CONVIENE PARA MI PC?
             </h1>
-
-            <p className="text-xs sm:text-sm text-zinc-300 font-sans-editorial max-w-3xl leading-relaxed">
-              {activeMode === 'silicon-matrix'
-                ? (isPericial
-                  ? 'Simulador determinista de planificadores NTOSKRNL, mitigaciones VBS/HVCI, direccionamiento de hilos heterogéneos y análisis oscilográfico de latencias diferidas DPC en microsegundos.'
-                  : 'Explorá cómo cada versión de Windows impacta tus FPS y latencia de referencia: observá cómo el planificador de hilos interactúa con procesadores modernos y cómo reducir micro-tirones modelados.')
-                : 'Windows por fuera. Windows por dentro. Windows bajo investigación.'}
+            <p className="text-zinc-300 text-sm max-w-3xl leading-relaxed">
+              Analizamos compatibilidad, soporte, hardware y uso. No elegimos por moda: elegimos por evidencia.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 self-start lg:self-center shrink-0 flex-wrap">
-            <EvoOperatingModeSelector compact />
-
-            {onNavigateToHardwareBench && (
-              <button
-                type="button"
-                onClick={onNavigateToHardwareBench}
-                className="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(251,191,36,0.3)]"
-              >
-                <Cpu className="w-3.5 h-3.5" />
-                <span>BANCO HOT-SWAP</span>
-              </button>
-            )}
+          <div className="flex flex-wrap items-center gap-2">
+            <EvoOperatingModeSelector />
+            <button
+              onClick={() => setShowGlossaryModal(true)}
+              className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5"
+            >
+              <HelpCircle className="w-4 h-4 text-cyan-400" />
+              EXPLICÁMELO SIMPLE
+            </button>
           </div>
         </div>
 
-        {/* Master Experience Engine Navigation Tabs */}
-        <div className="flex items-center gap-2 p-1.5 bg-black/80 rounded-xl border border-cyan-950 overflow-x-auto text-xs mt-4 relative z-10">
+        {/* MÓDULOS TÉCNICOS SECUNDARIOS */}
+        <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-zinc-800">
           <button
-            type="button"
-            onClick={() => setActiveMode('boot')}
-            className={`px-3.5 py-2 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-              activeMode === 'boot'
-                ? 'bg-cyan-500 text-black shadow-md'
-                : 'text-zinc-400 hover:text-white hover:bg-white/5'
+            onClick={() => setActiveTab('advisor')}
+            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'advisor'
+                ? 'bg-cyan-500 text-zinc-950 shadow-md shadow-cyan-500/20'
+                : 'bg-zinc-800/60 text-zinc-400 hover:text-white'
             }`}
           >
-            <span>🚀 BOOT LAB</span>
+            <Sparkles className="w-4 h-4" />
+            EVALUACIÓN DE MI PC
           </button>
 
           <button
-            type="button"
-            onClick={() => setActiveMode('install')}
-            className={`px-3.5 py-2 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-              activeMode === 'install'
-                ? 'bg-cyan-500 text-black shadow-md'
-                : 'text-zinc-400 hover:text-white hover:bg-white/5'
+            onClick={() => setActiveTab('matrix')}
+            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'matrix'
+                ? 'bg-cyan-500 text-zinc-950 shadow-md shadow-cyan-500/20'
+                : 'bg-zinc-800/60 text-zinc-400 hover:text-white'
             }`}
           >
-            <span>💽 INSTALL LAB</span>
+            <Layers className="w-4 h-4" />
+            MATRIZ DE VERSIONES & LIFECYCLE
           </button>
 
           <button
-            type="button"
-            onClick={() => setActiveMode('services')}
-            className={`px-3.5 py-2 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-              activeMode === 'services'
-                ? 'bg-cyan-500 text-black shadow-md'
-                : 'text-zinc-400 hover:text-white hover:bg-white/5'
+            onClick={() => setActiveTab('deep')}
+            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'deep'
+                ? 'bg-cyan-500 text-zinc-950 shadow-md shadow-cyan-500/20'
+                : 'bg-zinc-800/60 text-zinc-400 hover:text-white'
             }`}
           >
-            <span>⚙️ SERVICES LAB</span>
+            <Cpu className="w-4 h-4" />
+            [ PROFUNDIZAR: PLANIFICADOR & SILICIO ]
           </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveMode('repair')}
-            className={`px-3.5 py-2 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-              activeMode === 'repair'
-                ? 'bg-rose-500 text-black shadow-md'
-                : 'text-zinc-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <span>🛠️ REPAIR LAB (24 CASOS)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveMode('silicon-matrix')}
-            className={`px-3.5 py-2 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-              activeMode === 'silicon-matrix'
-                ? 'bg-amber-400 text-black shadow-md'
-                : 'text-zinc-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <span>🔬 PLANIFICADOR & SILICIO</span>
-          </button>
-        </div>
-
-        {/* EVO TIME MACHINE — Visual Stage Bar */}
-        <div className="mt-4 pt-3 border-t border-cyan-950/80 relative z-10 space-y-2">
-          <div className="flex items-center justify-between text-[10px] font-mono-tech">
-            <span className="text-cyan-400 font-bold uppercase flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-cyan-400" />
-              EVO TIME MACHINE // LÍNEA TEMPORAL DE EJECUCIÓN NT
-            </span>
-            <span className="text-zinc-500">
-              ETAPA ACTIVA: {
-                activeMode === 'boot'
-                  ? 'BOOT & KERNEL INIT'
-                  : activeMode === 'install'
-                  ? 'POWER & MEDIA BOOT'
-                  : activeMode === 'services'
-                  ? 'DESKTOP & STABILIZATION'
-                  : activeMode === 'repair'
-                  ? '⚠️ FAILURE POINT (DETECTADO)'
-                  : 'KERNEL & STABILIZATION'
-              }
-            </span>
-          </div>
-
-          <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-mono-tech">
-            {[
-              { id: 'POWER', label: 'POWER', activeOn: ['install'] },
-              { id: 'BOOT', label: 'BOOT', activeOn: ['boot', 'install'] },
-              { id: 'KERNEL', label: 'KERNEL', activeOn: ['boot', 'silicon-matrix'] },
-              { id: 'LOGIN', label: 'LOGIN', activeOn: ['boot'] },
-              { id: 'DESKTOP', label: 'DESKTOP', activeOn: ['services'] },
-              { id: 'STABILIZATION', label: 'STABLE', activeOn: ['services', 'silicon-matrix'] },
-              { id: 'FAILURE', label: 'FAILURE', activeOn: ['repair'], isFail: true }
-            ].map((stage) => {
-              const isCurrent = stage.activeOn.includes(activeMode);
-              const isFailureMode = activeMode === 'repair' && stage.id === 'FAILURE';
-
-              return (
-                <div
-                  key={stage.id}
-                  className={`p-1.5 rounded-lg border transition-all ${
-                    isFailureMode
-                      ? 'bg-rose-950/70 border-rose-500 text-rose-300 font-black shadow-[0_0_10px_rgba(244,63,94,0.4)] animate-pulse'
-                      : isCurrent
-                      ? 'bg-cyan-950/60 border-cyan-400 text-cyan-300 font-bold shadow-[0_0_8px_rgba(6,182,212,0.3)]'
-                      : 'bg-black/40 border-zinc-900 text-zinc-600'
-                  }`}
-                >
-                  <span className="block truncate">{stage.label}</span>
-                </div>
-              );
-            })}
-          </div>
         </div>
       </div>
 
-      {/* ========================================================================= */}
-      {/* 1. BOOT LAB (PASO POR PASO & FALLAS INYECTABLES)                          */}
-      {/* ========================================================================= */}
-      {activeMode === 'boot' && (
-        <WindowsBootExperienceLab
-          onOpenTomo={onOpenTomo}
-          onNavigateToRepair={() => setActiveMode('repair')}
-        />
-      )}
+      {/* 2. EXPERIENCIA EN 3 PASOS */}
+      {activeTab === 'advisor' && (
+        <div className="space-y-8">
+          
+          {/* PASO 1: TU PC */}
+          <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-6 space-y-6 shadow-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-zinc-800 pb-3">
+              <div className="flex items-center gap-3">
+                <span className="w-7 h-7 rounded-full bg-cyan-500 text-zinc-950 font-mono font-black flex items-center justify-center text-sm">
+                  1
+                </span>
+                <div>
+                  <h2 className="text-base font-bold text-white uppercase tracking-wide">PASO 1: TU PC</h2>
+                  <p className="text-xs text-zinc-400">Ingresa los componentes o datos conocidos de tu equipo</p>
+                </div>
+              </div>
 
-      {/* ========================================================================= */}
-      {/* 2. INSTALL LAB (DE UN DISCO VACÍO A WINDOWS FUNCIONAL)                    */}
-      {/* ========================================================================= */}
-      {activeMode === 'install' && (
-        <WindowsInstallExperienceLab />
-      )}
-
-      {/* ========================================================================= */}
-      {/* 3. SERVICES TELEMETRY LAB (SIMULATED & REAL PC DUAL ENGINE)               */}
-      {/* ========================================================================= */}
-      {activeMode === 'services' && (
-        <WindowsServicesTelemetryLab isLocalAgentConnected={false} />
-      )}
-
-      {/* ========================================================================= */}
-      {/* 4. REPAIR LAB (DIAGNÓSTICO PERICIAL DE 24 CASOS REALES)                 */}
-      {/* ========================================================================= */}
-      {activeMode === 'repair' && (
-        <WindowsFailureRepairLab
-          onNavigateToInstallLab={() => setActiveMode('install')}
-        />
-      )}
-
-      {/* ========================================================================= */}
-      {/* 5. SECCIÓN SILICIO & PLANIFICADOR DE KERNEL NT                            */}
-      {/* ========================================================================= */}
-      {activeMode === 'silicon-matrix' && (
-        <>
-      <div className="p-5 sm:p-6 rounded-2xl bg-[#0b0e14]/80 border border-zinc-800/90 shadow-xl space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-cyan-400/10 border border-cyan-400/40 flex items-center justify-center text-cyan-400">
-              <Layers className="w-4 h-4" />
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
+                  ORIGEN: ENTRADA DEL USUARIO
+                </span>
+                <button
+                  onClick={() => setShowHowToCheckModal(true)}
+                  className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-cyan-400 border border-zinc-700 rounded text-xs font-mono flex items-center gap-1.5"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  [ ¿DÓNDE VEO MI HARDWARE? ]
+                </button>
+              </div>
             </div>
-            <div>
-              <h2 className="font-display font-bold text-sm sm:text-base text-white uppercase tracking-tight">
-                SECCIÓN A // SELECTOR MATRICIAL DE COMPILACIONES WINDOWS
-              </h2>
-              <span className="text-[10px] text-zinc-400 font-sans-editorial">
-                Comparativa de huella basal de memoria, procesos en Sesión 0 y penalización por syscall
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              
+              {/* CPU */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-semibold text-zinc-300">Procesador (CPU)</label>
+                <select
+                  value={cpuCategory}
+                  onChange={(e) => setCpuCategory(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-700 focus:border-cyan-500 text-zinc-100 text-xs rounded-lg p-2.5 outline-none"
+                >
+                  <option value="">-- Seleccionar --</option>
+                  <option value="intel-hybrid">Intel Moderno / Híbrido (12ª Gen+)</option>
+                  <option value="amd-modern">AMD Moderno (Ryzen 3000-9000)</option>
+                  <option value="quad-standard">Intel 8ª-11ª Gen / Ryzen 1000-2000</option>
+                  <option value="cpu-legacy">CPU Monolítica / Legacy (&lt; 2018)</option>
+                  <option value="unknown">Desconocido</option>
+                </select>
+              </div>
+
+              {/* RAM */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-semibold text-zinc-300">Memoria RAM</label>
+                <select
+                  value={ramAmount}
+                  onChange={(e) => setRamAmount(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-700 focus:border-cyan-500 text-zinc-100 text-xs rounded-lg p-2.5 outline-none"
+                >
+                  <option value="">-- Seleccionar --</option>
+                  <option value="4gb">4 GB o menos</option>
+                  <option value="8gb">8 GB</option>
+                  <option value="16gb">16 GB</option>
+                  <option value="32gb">32 GB o más</option>
+                  <option value="unknown">Desconocido</option>
+                </select>
+              </div>
+
+              {/* Storage */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-semibold text-zinc-300">Almacenamiento</label>
+                <select
+                  value={storageType}
+                  onChange={(e) => setStorageType(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-700 focus:border-cyan-500 text-zinc-100 text-xs rounded-lg p-2.5 outline-none"
+                >
+                  <option value="">-- Seleccionar --</option>
+                  <option value="ssd-nvme">SSD NVMe M.2</option>
+                  <option value="ssd-sata">SSD SATA</option>
+                  <option value="hdd-legacy">HDD Mecánico</option>
+                  <option value="unknown">Desconocido</option>
+                </select>
+              </div>
+
+              {/* TPM 2.0 */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-semibold text-zinc-300">TPM 2.0</label>
+                <select
+                  value={tpmStatus}
+                  onChange={(e) => setTpmStatus(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-700 focus:border-cyan-500 text-zinc-100 text-xs rounded-lg p-2.5 outline-none"
+                >
+                  <option value="">-- Seleccionar --</option>
+                  <option value="active">Activo / Presente</option>
+                  <option value="disabled">Deshabilitado en BIOS</option>
+                  <option value="absent">Ausente</option>
+                  <option value="unknown">No sé</option>
+                </select>
+              </div>
+
+              {/* Secure Boot */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-semibold text-zinc-300">Secure Boot</label>
+                <select
+                  value={secureBoot}
+                  onChange={(e) => setSecureBoot(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-700 focus:border-cyan-500 text-zinc-100 text-xs rounded-lg p-2.5 outline-none"
+                >
+                  <option value="">-- Seleccionar --</option>
+                  <option value="enabled">Habilitado</option>
+                  <option value="capable">Compatible deshabilitado</option>
+                  <option value="unsupported">No soportado</option>
+                  <option value="unknown">No sé</option>
+                </select>
+              </div>
+
+              {/* Firmware UEFI */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-semibold text-zinc-300">Firmware</label>
+                <select
+                  value={uefiStatus}
+                  onChange={(e) => setUefiStatus(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-700 focus:border-cyan-500 text-zinc-100 text-xs rounded-lg p-2.5 outline-none"
+                >
+                  <option value="">-- Seleccionar --</option>
+                  <option value="uefi">UEFI Native</option>
+                  <option value="legacy">Legacy BIOS / CSM</option>
+                  <option value="unknown">No sé</option>
+                </select>
+              </div>
+
+            </div>
+
+            {/* STATUS BADGES & EVALUATION */}
+            <div className="pt-3 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2 font-mono">
+                <span className="text-zinc-400">Nivel de Confianza:</span>
+                <span className={`px-2.5 py-0.5 rounded font-bold border ${
+                  confidenceLevel === 'DATOS SUFICIENTES' ? 'bg-emerald-950/80 text-emerald-300 border-emerald-600/50' :
+                  confidenceLevel === 'DATOS PARCIALES' ? 'bg-amber-950/80 text-amber-300 border-amber-600/50' :
+                  'bg-zinc-800 text-zinc-400 border-zinc-700'
+                }`}>
+                  {confidenceLevel}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 font-mono">
+                <span className="text-zinc-400">Requisitos Windows 11:</span>
+                <span className={`px-2.5 py-0.5 rounded font-bold border ${win11Compatibility.color}`}>
+                  {win11Compatibility.status}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* PASO 2: TU USO */}
+          <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-6 space-y-4 shadow-lg">
+            <div className="flex items-center gap-3 border-b border-zinc-800 pb-3">
+              <span className="w-7 h-7 rounded-full bg-cyan-500 text-zinc-950 font-mono font-black flex items-center justify-center text-sm">
+                2
               </span>
+              <div>
+                <h2 className="text-base font-bold text-white uppercase tracking-wide">PASO 2: ¿PARA QUÉ USÁS LA PC?</h2>
+                <p className="text-xs text-zinc-400">Selecciona uno o varios chips de uso</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: 'daily', label: 'USO DIARIO' },
+                { id: 'office', label: 'OFICINA / ESTUDIO' },
+                { id: 'gaming', label: 'GAMING' },
+                { id: 'low-res', label: 'PC DE BAJOS RECURSOS' },
+                { id: 'content', label: 'CREACIÓN DE CONTENIDO' },
+                { id: 'dev', label: 'DESARROLLO' },
+                { id: 'audio', label: 'AUDIO / PRODUCCIÓN' },
+                { id: 'workstation', label: 'ESTACIÓN DE TRABAJO' },
+                { id: 'legacy', label: 'SOFTWARE LEGACY' },
+                { id: 'max-compat', label: 'MÁXIMA COMPATIBILIDAD MODERNA' }
+              ].map(item => {
+                const isSelected = selectedUsages.includes(item.id);
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleUsage(item.id)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold transition-all border ${
+                      isSelected
+                        ? 'bg-cyan-500 text-zinc-950 border-cyan-400 shadow-md shadow-cyan-500/20'
+                        : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-zinc-200'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-zinc-500 text-[10px]">COMPILACIÓN ACTIVA:</span>
-            <span className="font-bold text-white px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700">
-              {currentBuild.buildNumber}
-            </span>
+          {/* ACTION BUTTON */}
+          <div className="flex justify-center pt-2">
+            <button
+              onClick={() => setAnalyzed(true)}
+              className="px-8 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold font-mono text-sm rounded-xl shadow-lg shadow-cyan-500/20 transition-all uppercase tracking-wider flex items-center gap-3"
+            >
+              <Sparkles className="w-5 h-5" />
+              [ ANALIZAR MI PC Y VER RECOMENDACIÓN ]
+            </button>
           </div>
-        </div>
 
-        {/* Matrix Build Selector Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {Object.values(WINDOWS_BUILDS).map((b) => {
-            const isSelected = b.id === selectedBuildId;
-            return (
-              <div
-                key={b.id}
-                onClick={() => setSelectedBuildId(b.id)}
-                className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden ${
-                  isSelected
-                    ? 'bg-zinc-900/90 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.25)] ring-1 ring-cyan-400/50'
-                    : 'bg-black/60 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/40'
-                }`}
-              >
-                {isSelected && (
-                  <div className="absolute top-0 right-0 px-2 py-0.5 bg-cyan-400 text-black text-[9px] font-black uppercase rounded-bl">
-                    EN BANCO
+          {/* PASO 3: RESULTADO EVO */}
+          {analyzed && recommendationResult && (
+            <div className="bg-zinc-900/90 border border-cyan-500/40 rounded-xl p-6 md:p-8 space-y-6 shadow-2xl animate-fade-in">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-zinc-800 pb-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-full bg-cyan-500 text-zinc-950 font-mono font-black flex items-center justify-center text-base">
+                    3
+                  </span>
+                  <div>
+                    <h2 className="text-lg font-bold text-white uppercase tracking-wide">PASO 3: RESULTADO EVO</h2>
+                    <p className="text-xs text-zinc-400">Derivado transparente basado en evidencia y reglas oficiales (DERIVED)</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
+                    DERIVED FROM USER_INPUT
+                  </span>
+                  <button
+                    onClick={() => setShowGlossaryModal(true)}
+                    className="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-cyan-400 border border-zinc-700 rounded text-xs font-mono"
+                  >
+                    EXPLICÁMELO SIMPLE
+                  </button>
+                </div>
+              </div>
+
+              {/* MAIN CONCLUSION PANEL */}
+              <div className="bg-zinc-950/90 border border-zinc-800 rounded-xl p-6 space-y-5">
+                <div>
+                  <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider block mb-1">
+                    MEJOR AJUSTE PARA ESTE PERFIL:
+                  </span>
+                  <h3 className="text-2xl font-black text-white">{recommendationResult.bestFit}</h3>
+                </div>
+
+                {recommendationResult.legacyAlert && (
+                  <div className="p-3.5 bg-rose-950/80 border border-rose-600/50 rounded-lg text-xs text-rose-200 font-medium">
+                    {recommendationResult.legacyAlert}
                   </div>
                 )}
 
-                <div className="space-y-1.5">
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block">
-                    {b.year} // {b.codename}
-                  </span>
-                  <h3 className="font-display font-bold text-xs sm:text-sm text-white">
-                    {b.name}
-                  </h3>
-                  <span className="text-[11px] text-cyan-300 font-mono block">
-                    {b.buildNumber}
-                  </span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                  
+                  {/* POR QUÉ ENCAJA */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      POR QUÉ ENCAJA:
+                    </h4>
+                    <ul className="space-y-1 text-xs text-zinc-300 pl-5 list-disc">
+                      {recommendationResult.whyFit.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* QUÉ DEBÉS SABER */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-mono font-bold text-amber-400 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-400" />
+                      QUÉ DEBÉS SABER / RIESGOS:
+                    </h4>
+                    <ul className="space-y-1 text-xs text-zinc-300 pl-5 list-disc">
+                      {recommendationResult.keepInMind.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+
                 </div>
 
-                <div className="pt-3 mt-3 border-t border-zinc-800/80 space-y-1.5 text-[10px] font-mono">
-                  <div className="flex justify-between items-center text-zinc-400">
-                    <span>RAM Basal:</span>
-                    <span className="font-bold text-white">{b.ramBasalMb} MB</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 border-t border-zinc-800">
+                  
+                  {/* QUÉ VERIFICAR ANTES */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-mono font-bold text-cyan-400 flex items-center gap-2">
+                      <Search className="w-4 h-4 text-cyan-400" />
+                      QUÉ VERIFICAR ANTES:
+                    </h4>
+                    <ul className="space-y-1 text-xs text-zinc-300 pl-5 list-disc">
+                      {recommendationResult.checkBefore.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
                   </div>
-                  <div className="flex justify-between items-center text-zinc-400">
-                    <span>Planificador:</span>
-                    <span className="font-bold text-amber-300 truncate max-w-[120px]">{b.threadDirectorLevel}</span>
+
+                  {/* ALTERNATIVA RAZONABLE */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-mono font-bold text-purple-400 flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-purple-400" />
+                      ALTERNATIVA RAZONABLE:
+                    </h4>
+                    <p className="text-xs text-zinc-300 pl-2">
+                      {recommendationResult.alternative}
+                    </p>
                   </div>
-                  <div className="flex justify-between items-center text-zinc-400">
-                    <span>VBS/HVCI:</span>
-                    <span className={b.vbsDefault ? 'text-amber-400 font-bold' : 'text-emerald-400 font-bold'}>
-                      {b.vbsDefault ? 'Activo (Seguro)' : 'Inactivo (Rápido)'}
-                    </span>
-                  </div>
+
                 </div>
               </div>
-            );
-          })}
+
+              {/* DISCREET DISCLAIMER */}
+              <div className="text-[11px] text-zinc-500 font-sans text-center pt-2">
+                EVO no reemplaza la validación del fabricante, Microsoft ni del proveedor de software. La recomendación se basa en los datos disponibles.
+              </div>
+            </div>
+          )}
+
         </div>
+      )}
 
-        {/* Deep Dive Live Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-          {/* Basal RAM Consumption Box */}
-          <div className="p-4 rounded-xl bg-black/60 border border-zinc-800/90 space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-zinc-400 font-bold flex items-center gap-1.5">
-                <Gauge className="w-3.5 h-3.5 text-cyan-400" />
-                CONSUMO BASAL DE RAM
-              </span>
-              <span className="text-cyan-300 font-bold text-sm">{activeRamBasal} MB</span>
-            </div>
-            <div className="w-full bg-zinc-900 rounded-full h-2 overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-amber-400 transition-all duration-300"
-                style={{ width: `${Math.min(100, (activeRamBasal / 4000) * 100)}%` }}
-              />
-            </div>
-            <div className="flex justify-between text-[10px] text-zinc-500 font-sans-editorial">
-              <span>LTSC Limpio (~1.1 GB)</span>
-              <span>Windows 11 Bloat (~3.2 GB)</span>
-            </div>
-          </div>
-
-          {/* Session 0 vs Session 1 Process Breakdown */}
-          <div className="p-4 rounded-xl bg-black/60 border border-zinc-800/90 space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-zinc-400 font-bold flex items-center gap-1.5">
-                <Server className="w-3.5 h-3.5 text-amber-400" />
-                SESIÓN 0 (KERNEL) VS SESIÓN 1 (USER)
-              </span>
-              <span className="text-white font-bold">{currentBuild.session0Count + currentBuild.session1Count} proc</span>
-            </div>
-            <div className="flex h-2 rounded-full overflow-hidden bg-zinc-900">
-              <div
-                className="bg-amber-400"
-                style={{ width: `${(currentBuild.session0Count / (currentBuild.session0Count + currentBuild.session1Count)) * 100}%` }}
-                title={`Sesión 0 (Servicios de sistema): ${currentBuild.session0Count}`}
-              />
-              <div
-                className="bg-cyan-400"
-                style={{ width: `${(currentBuild.session1Count / (currentBuild.session0Count + currentBuild.session1Count)) * 100}%` }}
-                title={`Sesión 1 (Shell de usuario y apps): ${currentBuild.session1Count}`}
-              />
-            </div>
-            <div className="flex justify-between text-[10px] text-zinc-400">
-              <span className="text-amber-300">Sesión 0: {currentBuild.session0Count} servicios</span>
-              <span className="text-cyan-300">Sesión 1: {currentBuild.session1Count} apps</span>
-            </div>
-          </div>
-
-          {/* Syscall Latency & Core Isolation Penalty */}
-          <div className="p-4 rounded-xl bg-black/60 border border-zinc-800/90 space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-zinc-400 font-bold flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-emerald-400" />
-                LATENCIA DE SYSCALL (RING 3 → RING 0)
-              </span>
-              <span className="text-emerald-300 font-bold text-sm">{activeSyscallPenalty} ns</span>
-            </div>
-            <div className="w-full bg-zinc-900 rounded-full h-2 overflow-hidden">
-              <div
-                className={`h-full transition-all duration-300 ${activeSyscallPenalty > 220 ? 'bg-amber-400' : 'bg-emerald-400'}`}
-                style={{ width: `${Math.min(100, (activeSyscallPenalty / 350) * 100)}%` }}
-              />
-            </div>
-            <div className="flex justify-between text-[10px] text-zinc-400">
-              <span>Sobrecarga VBS/HVCI:</span>
-              <span className={vbsEnabled ? 'text-amber-300 font-bold' : 'text-emerald-300 font-bold'}>
-                {vbsEnabled ? 'Modelo EVO: +14.2% en este escenario SIMULATED (Hipervisor activo)' : '0% (Kernel nativo SIMULATED)'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Live Kernel Switches Bar */}
-        <div className="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <span className="text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
-            INTERVENCIÓN DE KERNEL EN CALIENTE:
-          </span>
-
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* VBS / Core Isolation Toggle */}
-            <button
-              type="button"
-              onClick={() => setVbsEnabled(!vbsEnabled)}
-              className={`px-3 py-1 rounded-lg border font-bold text-[11px] flex items-center gap-1.5 cursor-pointer transition-all ${
-                vbsEnabled
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.2)]'
-                  : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-white'
-              }`}
-            >
-              <Shield className="w-3.5 h-3.5" />
-              <span>VBS / HVCI (Aislamiento de Núcleo): {vbsEnabled ? 'ON' : 'OFF'}</span>
-            </button>
-
-            {/* Fast Startup Toggle */}
-            <button
-              type="button"
-              onClick={() => setFastStartupEnabled(!fastStartupEnabled)}
-              className={`px-3 py-1 rounded-lg border font-bold text-[11px] flex items-center gap-1.5 cursor-pointer transition-all ${
-                fastStartupEnabled
-                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50'
-                  : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-white'
-              }`}
-            >
-              <Zap className="w-3.5 h-3.5" />
-              <span>Fast Startup (hiberfil.sys): {fastStartupEnabled ? 'ON' : 'OFF'}</span>
-            </button>
-
-            {/* DiagTrack Telemetry Toggle */}
-            <button
-              type="button"
-              onClick={() => setDiagTrackEnabled(!diagTrackEnabled)}
-              className={`px-3 py-1 rounded-lg border font-bold text-[11px] flex items-center gap-1.5 cursor-pointer transition-all ${
-                diagTrackEnabled
-                  ? 'bg-rose-500/20 text-rose-300 border-rose-500/50'
-                  : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
-              }`}
-            >
-              <Activity className="w-3.5 h-3.5" />
-              <span>DiagTrack Telemetría: {diagTrackEnabled ? 'ACTIVA' : 'DESACTIVADA'}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* SECCIÓN B: SIMULADOR DE PLANIFICADOR DE CPU (THREAD DIRECTOR & TOPOLOGÍA) */}
-      {/* ========================================================================= */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-[#0b0e14]/80 border border-zinc-800/90 shadow-xl space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-amber-400/10 border border-amber-400/40 flex items-center justify-center text-amber-400">
-              <Cpu className="w-4 h-4" />
-            </div>
+      {/* 20. MATRIZ DE VERSIONES & LIFECYCLE (TAB 2) */}
+      {activeTab === 'matrix' && (
+        <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-6 space-y-4 shadow-lg animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-zinc-800 pb-3">
             <div>
-              <h2 className="font-display font-bold text-sm sm:text-base text-white uppercase tracking-tight">
-                SECCIÓN B // SIMULADOR DE PLANIFICADOR DE CPU (THREAD DIRECTOR & TOPOLOGÍA)
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <Layers className="w-5 h-5 text-cyan-400" />
+                MATRIZ DE VERSIONES & LIFECYCLE
               </h2>
-              <span className="text-[10px] text-zinc-400 font-sans-editorial">
-                Demostración gráfica de asignación de hilos, contienda térmica y estacionamiento de núcleos (Core Parking)
-              </span>
+              <p className="text-xs text-zinc-400">Fuente: Microsoft Lifecycle (Snapshot 2026-10-03)</p>
             </div>
           </div>
 
-          {/* Silicon Architecture Selector */}
-          <div className="flex items-center bg-black/60 p-1 rounded-xl border border-zinc-800 text-[11px]">
-            <button
-              type="button"
-              onClick={() => setSelectedSilicon('hybrid')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
-                selectedSilicon === 'hybrid' ? 'bg-amber-400 text-black shadow' : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              CPU HÍBRIDA (P+E)
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedSilicon('vcache')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
-                selectedSilicon === 'vcache' ? 'bg-amber-400 text-black shadow' : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              AMD 3D V-CACHE
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedSilicon('monolithic')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
-                selectedSilicon === 'monolithic' ? 'bg-amber-400 text-black shadow' : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              MINI PC / MONOLÍTICA
-            </button>
+          <div className="overflow-x-auto rounded-lg border border-zinc-800">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead className="bg-zinc-950 text-zinc-400 font-mono font-bold uppercase tracking-wider border-b border-zinc-800">
+                <tr>
+                  <th className="p-3">VERSIÓN</th>
+                  <th className="p-3">SOPORTE</th>
+                  <th className="p-3">COMPATIBILIDAD</th>
+                  <th className="p-3">CASO DE USO</th>
+                  <th className="p-3">OBSERVACIÓN</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800/60 bg-zinc-900/40 text-zinc-300">
+                {Object.values(MICROSOFT_LIFECYCLE_SNAPSHOT).map((item) => (
+                  <tr key={item.id} className="hover:bg-zinc-800/40 transition-colors">
+                    <td className="p-3 font-bold text-white">{item.name}</td>
+                    <td className="p-3">
+                      <span className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold border ${item.badgeColor}`}>
+                        {item.statusBadge}
+                      </span>
+                    </td>
+                    <td className="p-3 font-mono text-zinc-400">
+                      RAM: {item.minRamGb} GB | TPM: {item.requiresTpm ? 'SÍ' : 'NO'}
+                    </td>
+                    <td className="p-3 text-zinc-300">{item.useCase}</td>
+                    <td className="p-3 text-zinc-400 text-[11px]">{item.observation}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
+      )}
 
-        {/* ARCHITECTURE 1: CPU HÍBRIDA (INTEL 8P + 12E) */}
-        {selectedSilicon === 'hybrid' && (
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="space-y-0.5">
-                  <div className="text-xs font-bold text-white uppercase flex items-center gap-2">
-                    <span>ARQUITECTURA HÍBRIDA (8 PERFORMANCE CORES + 12 EFFICIENCY CORES)</span>
-                    <span className="px-2 py-0.2 rounded text-[9px] font-bold bg-amber-400/20 text-amber-300">
-                      INTEL CORE i7-14700K (28 THREADS)
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-zinc-400 font-sans-editorial">
-                    {schedulerMetrics.isMisroutedToECore
-                      ? '⚠️ EN WINDOWS 10: El planificador SMP carece de Thread Director 2.0. Asigna el hilo crítico de render a un E-Core (IPC un 25% inferior). FrameTime = Base × 1.33 = 22.17ms. El jitter aumenta exponencialmente.'
-                      : '✅ EN WINDOWS 11 24H2: EHFI (Enhanced Hardware Feedback Interface) rutea correctamente el hilo principal a P-Cores. FrameTime = Base = 16.67ms. Jitter estable en ±0.4ms.'}
-                  </p>
-                </div>
-
-                <div className="text-right shrink-0">
-                  <span className="text-[10px] text-zinc-500 block">MÉTRICAS DETERMINISTAS:</span>
-                  <div className="space-y-0.5">
-                    <span className={`text-sm font-black font-mono block ${schedulerMetrics.isMisroutedToECore ? 'text-rose-400' : 'text-emerald-400'}`}>
-                      {schedulerMetrics.baseFps} FPS ({schedulerMetrics.frameTime} ms)
-                    </span>
-                    <span className="text-[10px] font-mono text-zinc-400">
-                      Jitter: ±{schedulerMetrics.jitterMs} ms {schedulerMetrics.isMisroutedToECore ? '(Degradación +33%)' : '(QoS Óptimo)'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Graphical Core Map */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                {/* P-Cores Group: Blue Blocks */}
-                <div className="p-3 rounded-xl bg-blue-950/20 border border-blue-500/40 space-y-2">
-                  <div className="flex justify-between items-center text-[11px] font-bold text-blue-400">
-                    <span>8× P-CORES (RAPTOR COVE // 5.6 GHz // L2 2MB c/u)</span>
-                    <span className="text-[10px] text-blue-300 bg-blue-900/40 px-2 py-0.5 rounded border border-blue-700/50">AZUL: RENDIMIENTO</span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-1.5">
-                    {[0, 1, 2, 3, 4, 5, 6, 7].map((coreNum) => {
-                      const isMainGameThread = !schedulerMetrics.isMisroutedToECore && coreNum === 0;
-                      return (
-                        <div
-                          key={coreNum}
-                          className={`p-2 rounded-lg border text-center transition-all ${
-                            isMainGameThread
-                              ? 'bg-blue-500 text-white border-blue-300 font-bold shadow-[0_0_16px_rgba(59,130,246,0.8)] ring-2 ring-blue-400 animate-pulse'
-                              : 'bg-blue-950/40 border-blue-900/60 text-blue-200'
-                          }`}
-                        >
-                          <div className="text-[9px] font-mono">P-CORE {coreNum}</div>
-                          <div className="text-[10px] font-black">{isMainGameThread ? '⚡ JUEGO (5.6G)' : '9% CARGA'}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* E-Cores Group: Green Blocks */}
-                <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/40 space-y-2">
-                  <div className="flex justify-between items-center text-[11px] font-bold text-emerald-400">
-                    <span>12× E-CORES (GRACEMONT // 3.4 GHz // L2 COMPARTIDA)</span>
-                    <span className="text-[10px] text-emerald-300 bg-emerald-900/40 px-2 py-0.5 rounded border border-emerald-700/50">VERDE: EFICIENCIA</span>
-                  </div>
-                  <div className="grid grid-cols-6 gap-1.5">
-                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((coreNum) => {
-                      const isMisassignedGameThread = schedulerMetrics.isMisroutedToECore && coreNum === 2;
-                      return (
-                        <div
-                          key={coreNum}
-                          className={`p-1.5 rounded-lg border text-center transition-all ${
-                            isMisassignedGameThread
-                              ? 'bg-rose-600 text-white border-rose-300 font-bold shadow-[0_0_16px_rgba(239,68,68,0.9)] ring-2 ring-rose-400 animate-bounce'
-                              : 'bg-emerald-950/40 border-emerald-900/60 text-emerald-200'
-                          }`}
-                        >
-                          <div className="text-[8px] font-mono">E{coreNum}</div>
-                          <div className="text-[9px] font-bold">
-                            {isMisassignedGameThread ? '¡FALLO E-CORE!' : 'BACKGROUND'}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* PROFUNDIZAR: PLANIFICADOR & SUB-LABS (TAB 3) */}
+      {activeTab === 'deep' && (
+        <div className="space-y-6 animate-fade-in">
+          
+          {/* DEEP LABS SUB-NAVIGATION */}
+          <div className="flex flex-wrap gap-2 border-b border-zinc-800 pb-3">
+            <button
+              onClick={() => setDeepLabSubTab('scheduler')}
+              className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+                deepLabSubTab === 'scheduler' ? 'bg-cyan-500 text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:text-white'
+              }`}
+            >
+              PLANIFICADOR & SILICIO (MODELO SIMULADO)
+            </button>
+            <button
+              onClick={() => setDeepLabSubTab('boot')}
+              className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+                deepLabSubTab === 'boot' ? 'bg-cyan-500 text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:text-white'
+              }`}
+            >
+              BOOT EXPERIENCIA
+            </button>
+            <button
+              onClick={() => setDeepLabSubTab('install')}
+              className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+                deepLabSubTab === 'install' ? 'bg-cyan-500 text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:text-white'
+              }`}
+            >
+              INSTALL EXPERIENCIA
+            </button>
+            <button
+              onClick={() => setDeepLabSubTab('services')}
+              className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+                deepLabSubTab === 'services' ? 'bg-cyan-500 text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:text-white'
+              }`}
+            >
+              SERVICES & TELEMETRÍA
+            </button>
+            <button
+              onClick={() => setDeepLabSubTab('repair')}
+              className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+                deepLabSubTab === 'repair' ? 'bg-cyan-500 text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:text-white'
+              }`}
+            >
+              REPAIR LAB
+            </button>
+            <button
+              onClick={() => setDeepLabSubTab('xray')}
+              className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+                deepLabSubTab === 'xray' ? 'bg-cyan-500 text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:text-white'
+              }`}
+            >
+              WINDOWS X-RAY
+            </button>
           </div>
-        )}
 
-        {/* ARCHITECTURE 2: AMD 3D V-CACHE (RYZEN 9 7950X3D - DUAL CCD) */}
-        {selectedSilicon === 'vcache' && (
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="space-y-0.5">
-                  <div className="text-xs font-bold text-white uppercase flex items-center gap-2">
-                    <span>AMD 3D V-CACHE TOPOLOGÍA DUAL CCD (RYZEN 9 7950X3D / 16C 32T)</span>
-                    <span className="px-2 py-0.2 rounded text-[9px] font-bold bg-emerald-400/20 text-emerald-300">
-                      96MB V-CACHE APILADA
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-zinc-400 font-sans-editorial">
-                    {selectedBuildId === 'win11-24h2'
-                      ? '✅ EN WIN11 24H2: El planificador activa Core Parking automático en CCD1 (Cores 8-15 en C6 sleep), ejecutando el juego en CCD0 con 96MB V-Cache a 0ns de penalización Infinity Fabric.'
-                      : '⚠️ EN COMPILACIONES ANTERIORES: Los hilos saltan entre CCD0 y CCD1, pagando una penalización de 75 ns de latencia de interconexión CCX que arruina el 1% Low.'}
+          {/* DEDICATED SCHEDULER & SILICON SIMULATOR (deepLabSubTab === 'scheduler') */}
+          {deepLabSubTab === 'scheduler' && (
+            <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-6 space-y-6">
+              
+              {/* HEADER */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-zinc-800 pb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Cpu className="w-5 h-5 text-cyan-400" />
+                    CÓMO WINDOWS DISTRIBUYE EL TRABAJO EN TU CPU
+                  </h3>
+                  <p className="text-xs text-zinc-400 mt-0.5">
+                    Observá cómo el sistema operativo decide qué hilos ejecutar y qué factores pueden influir en esa decisión.
                   </p>
                 </div>
+                <span className="px-2.5 py-1 rounded text-[10px] font-mono font-bold bg-amber-950/80 text-amber-300 border border-amber-600/50 self-start sm:self-auto">
+                  SIMULATED / REFERENCE MODEL
+                </span>
+              </div>
 
-                <div className="text-right shrink-0">
-                  <span className="text-[10px] text-zinc-500 block">ESTADO DE CORE PARKING:</span>
-                  <span className={`text-sm font-black font-mono ${selectedBuildId === 'win11-24h2' ? 'text-emerald-400' : 'text-amber-400'}`}>
-                    {selectedBuildId === 'win11-24h2' ? 'CCD1 APARCADO (ÓPTIMO)' : 'DESPARCADOS (LATENCIA CCX +75ns)'}
-                  </span>
+              {/* FLOW DIAGRAM: TAREA ➔ PLANIFICADOR ➔ CPU ➔ NÚCLEOS / HILOS */}
+              <div className="bg-zinc-950/80 border border-zinc-800/80 rounded-xl p-4 flex flex-wrap items-center justify-between gap-2 text-xs font-mono font-bold">
+                <div className="px-3 py-2 bg-zinc-900 border border-cyan-500/40 rounded text-cyan-300 flex items-center gap-1.5">
+                  <Activity className="w-4 h-4 text-cyan-400" />
+                  1. TAREA / APLICACIÓN
+                </div>
+                <ArrowRight className="w-4 h-4 text-zinc-600 hidden sm:block" />
+                <div className="px-3 py-2 bg-zinc-900 border border-purple-500/40 rounded text-purple-300 flex items-center gap-1.5">
+                  <Sliders className="w-4 h-4 text-purple-400" />
+                  2. PLANIFICADOR WINDOWS
+                </div>
+                <ArrowRight className="w-4 h-4 text-zinc-600 hidden sm:block" />
+                <div className="px-3 py-2 bg-zinc-900 border border-amber-500/40 rounded text-amber-300 flex items-center gap-1.5">
+                  <Cpu className="w-4 h-4 text-amber-400" />
+                  3. CPU & FIRMWARE
+                </div>
+                <ArrowRight className="w-4 h-4 text-zinc-600 hidden sm:block" />
+                <div className="px-3 py-2 bg-zinc-900 border border-emerald-500/40 rounded text-emerald-300 flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-emerald-400" />
+                  4. NÚCLEOS & HILOS
                 </div>
               </div>
 
-              {/* CCD0 vs CCD1 Matrix */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                <div className="p-3 rounded-xl bg-zinc-900/80 border border-emerald-500/40 space-y-2">
-                  <div className="flex justify-between items-center text-[11px] font-bold text-emerald-400">
-                    <span>CCD 0 (CORES 0-7 CON 96MB 3D V-CACHE)</span>
-                    <span>100% ASIGNACIÓN JUEGO</span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-1.5">
-                    {[0, 1, 2, 3, 4, 5, 6, 7].map((c) => (
-                      <div key={c} className="p-2 rounded-lg bg-emerald-950/40 border border-emerald-500/50 text-center">
-                        <div className="text-[9px] text-zinc-400">CORE {c}</div>
-                        <div className="text-[10px] font-bold text-emerald-300">5.0 GHz // V-CACHE</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-700 space-y-2">
-                  <div className="flex justify-between items-center text-[11px] font-bold text-zinc-300">
-                    <span>CCD 1 (CORES 8-15 DE ALTA FRECUENCIA 5.7 GHz // 32MB)</span>
-                    <span className={selectedBuildId === 'win11-24h2' ? 'text-cyan-400' : 'text-amber-400'}>
-                      {selectedBuildId === 'win11-24h2' ? 'PARKED (C6 STATE)' : 'ACTIVO (CONFLICTO)'}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-1.5">
-                    {[8, 9, 10, 11, 12, 13, 14, 15].map((c) => (
-                      <div
-                        key={c}
-                        className={`p-2 rounded-lg border text-center transition-all ${
-                          selectedBuildId === 'win11-24h2'
-                            ? 'bg-black/80 border-zinc-800 text-zinc-600 opacity-60'
-                            : 'bg-amber-950/40 border-amber-500/40 text-amber-300'
+              {/* CONTROLS: ARCHITECTURE & WORKLOAD SELECTOR */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                {/* SELECTOR DE ARQUITECTURA */}
+                <div className="space-y-2">
+                  <label className="text-xs font-mono font-bold text-zinc-300 block">
+                    SELECCIONAR ARQUITECTURA DE CPU:
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'hybrid', label: 'CPU Híbrida', sub: 'P-Cores + E-Cores' },
+                      { id: 'vcache', label: 'Multi-CCD', sub: 'V-Cache / Frequency' },
+                      { id: 'monolithic', label: 'Monolítica', sub: 'Núcleos Uniformes' }
+                    ].map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => setSchedulerArch(item.id as any)}
+                        className={`p-2.5 rounded-lg border text-left font-mono transition-all ${
+                          schedulerArch === item.id
+                            ? 'bg-cyan-950/80 border-cyan-500 text-cyan-200'
+                            : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white'
                         }`}
                       >
-                        <div className="text-[9px]">CORE {c}</div>
-                        <div className="text-[10px] font-bold">
-                          {selectedBuildId === 'win11-24h2' ? 'PARKED (0W)' : '5.7 GHz (CCX JITTER)'}
-                        </div>
-                      </div>
+                        <div className="text-xs font-bold">{item.label}</div>
+                        <div className="text-[10px] text-zinc-500">{item.sub}</div>
+                      </button>
                     ))}
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        )}
 
-        {/* ARCHITECTURE 3: MINI PC / APU MONOLÍTICA (TDP 15-45W) & CONTIENDA TÉRMICA */}
-        {selectedSilicon === 'monolithic' && (
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="space-y-0.5">
-                  <div className="text-xs font-bold text-white uppercase flex items-center gap-2">
-                    <span>MINI PC / APU MONOLÍTICA (MODELO MATEMÁTICO DE CONTIENDA TÉRMICA TDP)</span>
-                    <span className="px-2 py-0.2 rounded text-[9px] font-bold bg-cyan-400/20 text-cyan-300">
-                      AMD RYZEN 7 7840HS / RADEON 780M
-                    </span>
+                {/* SELECTOR DE CARGA / WORKLOAD */}
+                <div className="space-y-2">
+                  <label className="text-xs font-mono font-bold text-zinc-300 block">
+                    SELECCIONAR TIPO DE CARGA:
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {[
+                      { id: 'foreground', label: 'Juego / Foreground' },
+                      { id: 'app', label: 'Aplicación' },
+                      { id: 'background', label: 'Background' },
+                      { id: 'maintenance', label: 'Mantenimiento' }
+                    ].map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => setSchedulerWorkload(item.id as any)}
+                        className={`p-2 rounded-lg border text-center font-mono text-xs transition-all ${
+                          schedulerWorkload === item.id
+                            ? 'bg-cyan-500 text-zinc-950 font-bold border-cyan-400'
+                            : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white'
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
                   </div>
-                  <p className="text-[11px] text-zinc-400 font-sans-editorial">
-                    Fórmula: <code>Presupuesto_GPU = TDP_Total - (CPU_Idle + Servicios_Fondo)</code>. Si Servicios_Fondo &gt; 4.5W continuos, el firmware activa <code>Downclock_GPU = true</code> recortando el rendimiento gráfico en un -28%.
-                  </p>
                 </div>
 
-                {/* Thermal Contention Alert */}
-                {thermalContentionMetrics.downclockGpu ? (
-                  <div className="p-2.5 rounded-xl bg-rose-950/80 border border-rose-500 text-rose-200 text-xs font-bold text-right shadow-[0_0_16px_rgba(239,68,68,0.4)] animate-pulse">
-                    <div className="flex items-center gap-1.5 justify-end text-rose-400">
-                      <Flame className="w-4 h-4" />
-                      <span>ALERTA TÉRMICA: DOWNCLOCK GPU ACTIVO</span>
-                    </div>
-                    <div className="text-[11px] font-mono text-rose-300">
-                      -28% FPS PROYECTADOS ({thermalContentionMetrics.projectedFps} FPS @ {thermalContentionMetrics.gpuClockMhz} MHz)
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-right shrink-0">
-                    <span className="text-[10px] text-zinc-500 block">RELOJ iGPU INTEGRADA:</span>
-                    <span className="text-sm font-black font-mono text-emerald-400">
-                      {thermalContentionMetrics.gpuClockMhz} MHz (MAX BOOST // {thermalContentionMetrics.projectedFps} FPS)
-                    </span>
-                  </div>
-                )}
               </div>
 
-              {/* TDP Total Selector (15W a 45W) */}
-              <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 flex flex-wrap items-center justify-between gap-3 text-xs">
-                <span className="text-zinc-400 font-bold uppercase text-[10px]">
-                  SELECTOR DE TDP TOTAL EN PAQUETE SOC:
+              {/* SIMULATED THREAD DISTRIBUTION VISUALIZATION */}
+              <div className="bg-zinc-950 rounded-xl p-5 border border-zinc-800 space-y-4">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-cyan-400 font-bold flex items-center gap-2">
+                    <Activity className="w-4 h-4" />
+                    MODELO SIMULADO DE DISTRIBUCIÓN DE HILOS
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 text-[10px]">
+                    SIMULATED
+                  </span>
+                </div>
+
+                {/* ARCHITECTURE VISUALIZATION CASES */}
+                {schedulerArch === 'hybrid' && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-zinc-900/80 rounded-lg border border-zinc-800 text-xs text-zinc-300 leading-relaxed">
+                      Intel Thread Director puede aportar información al sistema operativo para ayudar en decisiones de planificación en hardware compatible.
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* P-CORES */}
+                      <div className="p-4 bg-zinc-900/60 rounded-xl border border-cyan-500/30 space-y-2">
+                        <div className="flex items-center justify-between text-xs font-mono font-bold text-cyan-300">
+                          <span>P-CORES (Alto Rendimiento)</span>
+                          <span className="text-[10px] text-zinc-500">Threads Pesados</span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[1, 2, 3, 4].map(num => (
+                            <div
+                              key={num}
+                              className={`p-3 rounded text-center font-mono text-xs border ${
+                                schedulerWorkload === 'foreground' || schedulerWorkload === 'app'
+                                  ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300 animate-pulse'
+                                  : 'bg-zinc-950 border-zinc-800 text-zinc-600'
+                              }`}
+                            >
+                              Core P{num}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* E-CORES */}
+                      <div className="p-4 bg-zinc-900/60 rounded-xl border border-purple-500/30 space-y-2">
+                        <div className="flex items-center justify-between text-xs font-mono font-bold text-purple-300">
+                          <span>E-CORES (Eficiencia Energetica)</span>
+                          <span className="text-[10px] text-zinc-500">Threads Secundarios</span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[1, 2, 3, 4].map(num => (
+                            <div
+                              key={num}
+                              className={`p-3 rounded text-center font-mono text-xs border ${
+                                schedulerWorkload === 'background' || schedulerWorkload === 'maintenance'
+                                  ? 'bg-purple-500/20 border-purple-500 text-purple-300 animate-pulse'
+                                  : 'bg-zinc-950 border-zinc-800 text-zinc-600'
+                              }`}
+                            >
+                              Core E{num}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {schedulerArch === 'vcache' && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-zinc-900/80 rounded-lg border border-zinc-800 text-xs text-zinc-300 leading-relaxed">
+                      En procesadores AMD Multi-CCD con 3D V-Cache, el controlador del chipset orienta cargas sensibles a latencia de memoria hacia el CCD con cache L3 masivo.
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-zinc-900/60 rounded-xl border border-emerald-500/30 space-y-2">
+                        <div className="text-xs font-mono font-bold text-emerald-300">CCD 0 (3D V-CACHE)</div>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[1, 2, 3, 4].map(num => (
+                            <div key={num} className={`p-3 rounded text-center font-mono text-xs border ${schedulerWorkload === 'foreground' ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300' : 'bg-zinc-950 border-zinc-800 text-zinc-600'}`}>
+                              Core {num}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="p-4 bg-zinc-900/60 rounded-xl border border-amber-500/30 space-y-2">
+                        <div className="text-xs font-mono font-bold text-amber-300">CCD 1 (Alta Frecuencia)</div>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[5, 6, 7, 8].map(num => (
+                            <div key={num} className={`p-3 rounded text-center font-mono text-xs border ${schedulerWorkload !== 'foreground' ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'bg-zinc-950 border-zinc-800 text-zinc-600'}`}>
+                              Core {num}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {schedulerArch === 'monolithic' && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-zinc-900/80 rounded-lg border border-zinc-800 text-xs text-zinc-300 leading-relaxed">
+                      En procesadores monolíticos con arquitectura simétrica, los hilos se distribuyen de forma balanceada entre todos los núcleos disponibles.
+                    </div>
+
+                    <div className="p-4 bg-zinc-900/60 rounded-xl border border-zinc-700 space-y-2">
+                      <div className="text-xs font-mono font-bold text-zinc-300">NÚCLEOS SIMÉTRICOS (UNIFORM CACHE/FREQ)</div>
+                      <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
+                          <div key={num} className="p-3 rounded text-center font-mono text-xs bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">
+                            Core {num}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* MANDATORY DISCLAIMER TEXT */}
+                <div className="p-3 bg-zinc-900 rounded-lg border border-zinc-800 text-[11px] text-zinc-400 font-sans leading-relaxed">
+                  Esta visualización representa un modelo educativo. La decisión real del scheduler depende de hardware, firmware, carga, energía, prioridades, drivers y versión del sistema operativo.
+                </div>
+              </div>
+
+              {/* FACTORES QUE INFLUYEN */}
+              <div className="space-y-2">
+                <span className="text-xs font-mono font-bold text-zinc-300 uppercase block">
+                  FACTORES TÉCNICOS QUE INFLUYEN EN LA PLANIFICACIÓN:
                 </span>
-                <div className="flex items-center gap-2">
-                  {[15, 28, 35, 45].map((watts) => (
-                    <button
-                      key={watts}
-                      type="button"
-                      onClick={() => setTdpTotalWatts(watts)}
-                      className={`px-3 py-1 rounded-lg font-mono text-xs font-bold cursor-pointer transition-all ${
-                        tdpTotalWatts === watts
-                          ? 'bg-amber-400 text-black shadow'
-                          : 'bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-700'
-                      }`}
-                    >
-                      {watts}W TDP
-                    </button>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    'PRIORIDAD', 'QoS', 'AFINIDAD', 'ESTADO ENERGÉTICO',
+                    'CARGA', 'TOPOLOGÍA CPU', 'FIRMWARE', 'DRIVERS', 'TEMPERATURA'
+                  ].map((factor, idx) => (
+                    <span key={idx} className="px-2.5 py-1 rounded bg-zinc-950 border border-zinc-800 text-zinc-300 text-[11px] font-mono">
+                      {factor}
+                    </span>
                   ))}
                 </div>
               </div>
 
-              {/* Power Allocation Bar */}
-              <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 space-y-2">
-                <div className="flex justify-between text-xs text-zinc-300">
-                  <span>PRESUPUESTO ENERGÉTICO CALCULADO:</span>
-                  <span className="font-bold text-cyan-300">
-                    GPU: {thermalContentionMetrics.presupuestoGpuWatts}W / CPU Idle: {thermalContentionMetrics.cpuIdleWatts}W / Fondo: {thermalContentionMetrics.serviciosFondoWatts}W
-                  </span>
-                </div>
-
-                <div className="flex h-3.5 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800">
-                  <div
-                    className="bg-rose-500 transition-all duration-300"
-                    style={{ width: `${(thermalContentionMetrics.serviciosFondoWatts / tdpTotalWatts) * 100}%` }}
-                    title={`Servicios Fondo: ${thermalContentionMetrics.serviciosFondoWatts}W`}
-                  />
-                  <div
-                    className="bg-amber-400 transition-all duration-300"
-                    style={{ width: `${(thermalContentionMetrics.cpuIdleWatts / tdpTotalWatts) * 100}%` }}
-                    title={`CPU Idle: ${thermalContentionMetrics.cpuIdleWatts}W`}
-                  />
-                  <div
-                    className={`${thermalContentionMetrics.downclockGpu ? 'bg-amber-600' : 'bg-cyan-400'} transition-all duration-300`}
-                    style={{ width: `${Math.max(0, (thermalContentionMetrics.presupuestoGpuWatts / tdpTotalWatts) * 100)}%` }}
-                    title={`Presupuesto GPU: ${thermalContentionMetrics.presupuestoGpuWatts}W`}
-                  />
-                </div>
-
-                <div className="flex justify-between text-[10px] text-zinc-400 pt-1">
-                  <span className="text-rose-400">■ Servicios Fondo: {thermalContentionMetrics.serviciosFondoWatts}W {thermalContentionMetrics.serviciosFondoWatts > 4.5 ? '(CRÍTICO > 4.5W)' : '(LIMPIO)'}</span>
-                  <span className="text-amber-400">■ CPU Idle: {thermalContentionMetrics.cpuIdleWatts}W</span>
-                  <span className={thermalContentionMetrics.downclockGpu ? 'text-amber-400 font-bold' : 'text-cyan-400 font-bold'}>
-                    ■ Presupuesto GPU: {thermalContentionMetrics.presupuestoGpuWatts}W {thermalContentionMetrics.downclockGpu ? '(THROTTLING)' : '(BOOST)'}
-                  </span>
-                </div>
+              {/* TOGGLE PROFUNDIZAR */}
+              <div className="pt-2 border-t border-zinc-800">
+                <button
+                  onClick={() => setShowSchedulerDeepDive(!showSchedulerDeepDive)}
+                  className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-cyan-400 border border-zinc-700 rounded-lg text-xs font-mono transition-all flex items-center gap-2"
+                >
+                  {showSchedulerDeepDive ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  [ PROFUNDIZAR: MECANISMOS INTERNOS ]
+                </button>
               </div>
-            </div>
-          </div>
-        )}
-      </div>
 
-      {/* ========================================================================= */}
-      {/* SECCIÓN C: OSCILOSCOPIO DINÁMICO DE LATENCIA DPC / ISR                   */}
-      {/* ========================================================================= */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-[#0b0e14]/80 border border-zinc-800/90 shadow-xl space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-emerald-400/10 border border-emerald-400/40 flex items-center justify-center text-emerald-400">
-              <Activity className="w-4 h-4" />
-            </div>
-            <div>
-              <h2 className="font-display font-bold text-sm sm:text-base text-white uppercase tracking-tight">
-                SECCIÓN C // OSCILOSCOPIO VECTORIAL DE LATENCIA DPC / ISR
-              </h2>
-              <span className="text-[10px] text-zinc-400 font-sans-editorial">
-                Medición de colas diferidas en microsegundos (µs), colisiones de controladores e inyección de stuttering
-              </span>
-            </div>
-          </div>
+              {/* PROFUNDIZAR PANEL (CLOSED BY DEFAULT) */}
+              {showSchedulerDeepDive && (
+                <div className="bg-zinc-950 rounded-xl p-5 border border-zinc-800 space-y-4 animate-fade-in text-xs">
+                  <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                    <span className="font-mono font-bold text-white uppercase">MECANISMOS INTERNOS DE PLANIFICACIÓN</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">SIMULATED</span>
+                  </div>
 
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-zinc-500 text-[10px]">ESTADO DE COLA:</span>
-            <span
-              className={`px-2.5 py-0.5 rounded font-black text-[11px] border ${
-                dpcMetrics.status === 'OPTIMO'
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
-                  : dpcMetrics.status === 'ADVERTENCIA'
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/50'
-                  : 'bg-rose-500/20 text-rose-300 border-rose-500/50 animate-pulse'
-              }`}
-            >
-              {dpcMetrics.status} ({dpcMetrics.peakDpc} µs)
-            </span>
-          </div>
-        </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="p-3 bg-zinc-900 rounded-lg border border-zinc-800 space-y-1">
+                      <strong className="text-cyan-300 font-mono block">VBS / HVCI:</strong>
+                      <p className="text-zinc-400 text-[11px]">Seguridad basada en virtualización e integridad de memoria por hipervisor.</p>
+                    </div>
 
-        {/* Live Vector Oscilloscope Canvas Screen */}
-        <div className="relative w-full h-56 sm:h-64 rounded-xl bg-[#06080b] border border-cyan-500/30 overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.9)]">
-          <canvas
-            ref={canvasRef}
-            width={800}
-            height={256}
-            className="w-full h-full object-cover block"
-          />
+                    <div className="p-3 bg-zinc-900 rounded-lg border border-zinc-800 space-y-1">
+                      <strong className="text-cyan-300 font-mono block">HAGS:</strong>
+                      <p className="text-zinc-400 text-[11px]">Planificación de GPU acelerada por hardware para gestionar la VRAM directamente.</p>
+                    </div>
 
-          {/* CRT Screen Overlays & Metadata Badges */}
-          <div className="absolute top-2 left-3 flex items-center gap-3 text-[10px] font-mono text-cyan-400/90 pointer-events-none">
-            <span className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-              OSCILOSCOPIO RIGOL DS1054Z // DPC TRACE
-            </span>
-            <span>TIMING: {timerResolutionMs} ms</span>
-            <span>PEAK: {dpcMetrics.peakDpc} µs</span>
-          </div>
+                    <div className="p-3 bg-zinc-900 rounded-lg border border-zinc-800 space-y-1">
+                      <strong className="text-cyan-300 font-mono block">FAST STARTUP:</strong>
+                      <p className="text-zinc-400 text-[11px]">Inicio rápido mediante hibernación parcial de la sesión de kernel de Windows.</p>
+                    </div>
 
-          <div className="absolute top-2 right-3 text-[10px] font-mono pointer-events-none">
-            <span className="px-2 py-0.5 rounded bg-black/80 border border-zinc-800 text-zinc-300">
-              UMBRAL SEGURO: &lt; 100 µs
-            </span>
-          </div>
+                    <div className="p-3 bg-zinc-900 rounded-lg border border-zinc-800 space-y-1">
+                      <strong className="text-cyan-300 font-mono block">SIMULACIÓN DPC / ISR:</strong>
+                      <p className="text-zinc-400 text-[11px]">Deferred Procedure Calls e Interrupt Service Routines en el sub-sistema de controladores.</p>
+                    </div>
 
-          {/* Audio Drop / Stutter Warning Banner if Critical */}
-          {dpcMetrics.status === 'CRITICO' && (
-            <div className="absolute inset-x-0 bottom-2 mx-auto max-w-md p-2 rounded-lg bg-rose-950/90 border border-rose-500 text-rose-200 text-xs font-bold text-center flex items-center justify-center gap-2 shadow-2xl animate-bounce">
-              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-              <span>COLISIÓN SEVERA: RUPTURA DE AUDIO Y MICRO-CONGELAMIENTO EN JUEGO</span>
+                    <div className="p-3 bg-zinc-900 rounded-lg border border-zinc-800 space-y-1">
+                      <strong className="text-cyan-300 font-mono block">TIMER RESOLUTION:</strong>
+                      <p className="text-zinc-400 text-[11px]">Resolución del reloj del sistema (0.5ms vs 15.6ms estándar) para precisión en juegos y audio.</p>
+                    </div>
+
+                    <div className="p-3 bg-zinc-900 rounded-lg border border-zinc-800 space-y-1">
+                      <strong className="text-cyan-300 font-mono block">SCHEDULER AFFINITY:</strong>
+                      <p className="text-zinc-400 text-[11px]">Máscaras de afinidad asignadas por proceso para limitar la ejecución a hilos específicos.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
             </div>
           )}
+
+          {/* OTHER SUB-LABS REMAIN INTACT AND UNCHANGED */}
+          {deepLabSubTab === 'boot' && <WindowsBootExperienceLab initialSilicon="hybrid" />}
+          {deepLabSubTab === 'install' && <WindowsInstallExperienceLab />}
+          {deepLabSubTab === 'services' && <WindowsServicesTelemetryLab />}
+          {deepLabSubTab === 'repair' && <WindowsFailureRepairLab />}
+          {deepLabSubTab === 'xray' && <EvoWindowsXRayLab initialScenario={initialScenario} />}
+
         </div>
-
-        {/* Driver Matrix & Breakdown Controls */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
-          {/* Driver Evaluation Matrix */}
-          <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-3">
-            <div className="flex justify-between items-center text-xs">
-              <span className="font-bold text-white uppercase flex items-center gap-1.5">
-                <Sliders className="w-3.5 h-3.5 text-cyan-400" />
-                PERFIL DE CONTROLADOR EN EVALUACIÓN
-              </span>
-              <span className="text-[10px] text-zinc-500">SELECCIÓN ACTIVA</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => { setDriverProfile('whql'); setIsInjectingConflict(false); }}
-                className={`p-2.5 rounded-lg border text-left text-xs transition-all cursor-pointer ${
-                  driverProfile === 'whql'
-                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 font-bold'
-                    : 'bg-zinc-900/60 text-zinc-400 border-zinc-800 hover:text-white'
-                }`}
-              >
-                <div className="font-bold">1. WHQL OFICIAL</div>
-                <div className="text-[10px] text-zinc-500">Estándar certificado (~140 µs)</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setDriverProfile('oem'); setIsInjectingConflict(false); }}
-                className={`p-2.5 rounded-lg border text-left text-xs transition-all cursor-pointer ${
-                  driverProfile === 'oem'
-                    ? 'bg-amber-500/20 text-amber-300 border-amber-400 font-bold'
-                    : 'bg-zinc-900/60 text-zinc-400 border-zinc-800 hover:text-white'
-                }`}
-              >
-                <div className="font-bold">2. OEM CON BLOAT</div>
-                <div className="text-[10px] text-zinc-500">Telemetría y polling (~340 µs)</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setDriverProfile('debloated'); setIsInjectingConflict(false); }}
-                className={`p-2.5 rounded-lg border text-left text-xs transition-all cursor-pointer ${
-                  driverProfile === 'debloated'
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400 font-bold'
-                    : 'bg-zinc-900/60 text-zinc-400 border-zinc-800 hover:text-white'
-                }`}
-              >
-                <div className="font-bold">3. DEBLOATED + MSI</div>
-                <div className="text-[10px] text-zinc-500">Message Signaled (&lt;40 µs)</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setDriverProfile('conflict'); setIsInjectingConflict(true); }}
-                className={`p-2.5 rounded-lg border text-left text-xs transition-all cursor-pointer ${
-                  driverProfile === 'conflict' || isInjectingConflict
-                    ? 'bg-rose-500/20 text-rose-300 border-rose-400 font-bold animate-pulse'
-                    : 'bg-zinc-900/60 text-zinc-400 border-zinc-800 hover:text-white'
-                }`}
-              >
-                <div className="font-bold text-rose-400">4. CONFLICTO DPC</div>
-                <div className="text-[10px] text-zinc-500">Tormenta de interrupciones (&gt;900 µs)</div>
-              </button>
-            </div>
-
-            {/* Subsystem Driver Module Latency Bars */}
-            <div className="space-y-1.5 pt-2 border-t border-zinc-800 text-[11px]">
-              <div className="flex justify-between items-center text-zinc-400">
-                <span className="font-mono">nvlddmkm.sys (GPU Driver):</span>
-                <span className={`font-bold ${dpcMetrics.nvlddmkm > 500 ? 'text-rose-400' : 'text-cyan-300'}`}>
-                  {dpcMetrics.nvlddmkm} µs
-                </span>
-              </div>
-              <div className="flex justify-between items-center text-zinc-400">
-                <span className="font-mono">ndis.sys (Network Stack):</span>
-                <span className="font-bold text-emerald-400">{dpcMetrics.ndis} µs</span>
-              </div>
-              <div className="flex justify-between items-center text-zinc-400">
-                <span className="font-mono">storport.sys (NVMe Controller):</span>
-                <span className="font-bold text-zinc-300">{dpcMetrics.storport} µs</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Timer Resolution & Sysinternals Commands */}
-          <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-3 flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs">
-                <span className="font-bold text-white uppercase flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-amber-400" />
-                  RESOLUCIÓN DEL TEMPORIZADOR DE WINDOWS (NtSetTimerResolution)
-                </span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setTimerResolutionMs(15.625)}
-                  className={`p-2 rounded-lg border text-center text-xs transition-all cursor-pointer ${
-                    timerResolutionMs === 15.625
-                      ? 'bg-amber-500/20 text-amber-300 border-amber-400 font-bold'
-                      : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white'
-                  }`}
-                >
-                  <div className="font-bold">15.625 ms</div>
-                  <div className="text-[9px] text-zinc-500">Default (64 Hz)</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setTimerResolutionMs(1.0)}
-                  className={`p-2 rounded-lg border text-center text-xs transition-all cursor-pointer ${
-                    timerResolutionMs === 1.0
-                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 font-bold'
-                      : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white'
-                  }`}
-                >
-                  <div className="font-bold">1.000 ms</div>
-                  <div className="text-[9px] text-zinc-500">Media (1000 Hz)</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setTimerResolutionMs(0.5)}
-                  className={`p-2 rounded-lg border text-center text-xs transition-all cursor-pointer ${
-                    timerResolutionMs === 0.5
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400 font-bold shadow-[0_0_12px_rgba(16,185,129,0.3)]'
-                      : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white'
-                  }`}
-                >
-                  <div className="font-bold">0.500 ms</div>
-                  <div className="text-[9px] text-zinc-500">Precisión EVO (2000 Hz)</div>
-                </button>
-              </div>
-
-              <p className="text-[11px] text-zinc-400 font-sans-editorial leading-relaxed pt-1">
-                El efecto depende del motor, hardware y versión de Windows. Este laboratorio muestra un resultado SIMULATED donde la reducción del quantum jitter estabiliza los percentiles 1% Low en motores sensibles al tiempo de cuadro.
-              </p>
-
-              {/* Statistical 1% Low Math Box */}
-              <div className="p-2.5 rounded-lg bg-zinc-900/90 border border-zinc-800 space-y-1 text-[10px] font-mono">
-                <div className="flex justify-between items-center text-zinc-300">
-                  <span className="font-bold text-amber-300">MODELO ESTADÍSTICO 1% LOW:</span>
-                  <span className="text-cyan-300 font-bold">{dpcMetrics.percentil_1Low} FPS</span>
-                </div>
-                <div className="text-zinc-500 text-[9px]">
-                  Fórmula: <code>1000 / (FT_Medio + 2.33 × σ_Jitter)</code> = <code>1000 / ({schedulerMetrics.frameTime} + 2.33 × {dpcMetrics.stDevJitter})</code>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Diagnostic PowerShell Script Button */}
-            <div className="pt-2 border-t border-zinc-800 flex items-center justify-between gap-2">
-              <span className="text-[10px] text-zinc-500 font-mono">
-                AUDITORÍA EN TU PROPIA PC (SIN INSTALAR NADA):
-              </span>
-              <button
-                type="button"
-                onClick={handleCopyDiagScript}
-                className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-cyan-300 border border-cyan-500/40 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all shrink-0"
-              >
-                {copiedScript ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                <span>{copiedScript ? '¡COMANDO COPIADO!' : 'COPIAR SCRIPT POWERSHELL'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      </>
       )}
 
-      {/* Footer Navigation Bar */}
-      <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2 text-zinc-400 text-[11px]">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          <span>EVO METROLOGY SUITE // CONECTADO CON TOMO 01 (SILICIO), TOMO 02 (KERNEL NT) Y TOMO 03 (BANCO FÍSICO)</span>
-        </div>
-
-        {onOpenTomo && (
-          <div className="flex items-center gap-2">
+      {/* MODAL: ¿DÓNDE VEO MI HARDWARE? */}
+      {showHowToCheckModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-cyan-500/40 rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
             <button
-              type="button"
-              onClick={() => onOpenTomo('tomo-02')}
-              className="px-3 py-1 rounded-lg bg-cyan-400/20 hover:bg-cyan-400 text-cyan-300 hover:text-black border border-cyan-400/40 font-bold transition-all cursor-pointer"
+              onClick={() => setShowHowToCheckModal(false)}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-white"
             >
-              ABRIR TOMO 02 (KERNEL NT) →
+              <X className="w-5 h-5" />
             </button>
+
+            <h3 className="text-base font-bold text-white font-mono flex items-center gap-2">
+              <Search className="w-5 h-5 text-cyan-400" />
+              ¿DÓNDE VEO LOS DATOS DE MI PC EN WINDOWS?
+            </h3>
+
+            <div className="space-y-3 text-xs text-zinc-300 leading-relaxed">
+              <div className="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                <strong className="text-cyan-300 block font-mono">1. PROCESADOR Y RAM:</strong>
+                Presiona <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded font-mono">Win + Pause</kbd> o abre <em>Configuración ➔ Sistema ➔ Información</em>.
+              </div>
+
+              <div className="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                <strong className="text-cyan-300 block font-mono">2. INFORMACIÓN COMPLETA DEL SISTEMA:</strong>
+                Presiona <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded font-mono">Win + R</kbd>, escribe <code className="text-cyan-300">msinfo32</code> y presiona Enter. Verás el estado de UEFI, Secure Boot y TPM.
+              </div>
+
+              <div className="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                <strong className="text-cyan-300 block font-mono">3. ESTADO DE TPM 2.0:</strong>
+                Presiona <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded font-mono">Win + R</kbd>, escribe <code className="text-cyan-300">tpm.msc</code> para verificar si la especificación 2.0 está lista para usarse.
+              </div>
+            </div>
+
+            <div className="text-right pt-2">
+              <button
+                onClick={() => setShowHowToCheckModal(false)}
+                className="px-4 py-2 bg-cyan-500 text-zinc-950 font-bold font-mono text-xs rounded-lg"
+              >
+                ENTENDIDO
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* MODAL: EXPLICÁMELO SIMPLE */}
+      {showGlossaryModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-cyan-500/40 rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative">
+            <button
+              onClick={() => setShowGlossaryModal(false)}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-base font-bold text-white font-mono flex items-center gap-2">
+              <HelpCircle className="w-5 h-5 text-cyan-400" />
+              EXPLICACIÓN SIMPLE DE CONCEPTOS
+            </h3>
+
+            <div className="space-y-3 text-xs text-zinc-300 leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
+              <div className="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                <strong className="text-cyan-300 block font-mono">¿QUÉ ES TPM 2.0?</strong>
+                Es un chip físico de seguridad en la placa madre que resguarda contraseñas y claves de cifrado.
+              </div>
+
+              <div className="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                <strong className="text-cyan-300 block font-mono">¿QUÉ ES SECURE BOOT?</strong>
+                Es una protección en el inicio de la PC que impide que malware infecte el sistema antes de encender.
+              </div>
+
+              <div className="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                <strong className="text-cyan-300 block font-mono">¿QUÉ SIGNIFICA "SOPORTADO"?</strong>
+                Que Microsoft envía actualizaciones de seguridad mensuales. Cuando finaliza el soporte, la PC queda expuesta a vulnerabilidades.
+              </div>
+
+              <div className="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                <strong className="text-cyan-300 block font-mono">¿POR QUÉ NINGUNA VERSIÓN ES AUTOMÁTICAMENTE MEJOR?</strong>
+                Porqué depende de la compatibilidad de controladores (drivers) de tu fabricante específico y del estado de tu hardware.
+              </div>
+            </div>
+
+            <div className="text-right pt-2">
+              <button
+                onClick={() => setShowGlossaryModal(false)}
+                className="px-4 py-2 bg-cyan-500 text-zinc-950 font-bold font-mono text-xs rounded-lg"
+              >
+                CERRAR
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

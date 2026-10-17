@@ -27,7 +27,7 @@ export interface AgentHealthResponse {
   uptimeSeconds: number;
   address: string;
   port: number;
-  sessionToken: string;
+  pairingRequired: boolean;
   timestamp: string;
 }
 
@@ -189,7 +189,7 @@ export interface AgentMachineInventoryResponse {
 export interface AgentTelemetryMetrics {
   timestamp: string;
   cpu: {
-    utilizationPercent: number;
+    utilizationPercent: number | null;
     clockSpeedMhz?: number;
     provenance: EpistemicProvenance;
   };
@@ -206,4 +206,5 @@ export interface AgentTelemetryMetrics {
     agentUptimeSeconds: number;
   };
   isSamplingActive: boolean;
+  observability: import("./observabilityProtocol.js").ObservabilityFrame;
 }

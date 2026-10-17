@@ -20,10 +20,17 @@ import {
   Zap,
   Power,
   Award,
+  Target,
 } from 'lucide-react';
 import { VOLUMES_COLLECTION } from '../../data/collections';
 import { EvoBootLab } from '../tomo08/EvoBootLab';
 import { EvoTomeExamEngine } from '../exam/EvoTomeExamEngine';
+import { EvoNetworkForensicsLab } from '../labs/tomo05/EvoNetworkForensicsLab';
+import { EvoDefensiveSecurityLab } from '../labs/tomo06/EvoDefensiveSecurityLab';
+import { EvoPerformanceMetrologyLab } from '../labs/tomo07/EvoPerformanceMetrologyLab';
+import { EvoCodeEngineeringLab } from '../labs/tomo09/EvoCodeEngineeringLab.tsx';
+import { EvoAiSystemsLab } from '../labs/tomo10/EvoAiSystemsLab';
+import { useEvoAccess } from '../../auth/EvoAccessContext';
 
 export interface ForensicBenchTarget {
   tomoId: string;
@@ -402,40 +409,40 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     tomoKey: 'tomo-09',
     number: '09',
     volumeLabel: 'TOMO 09',
-    editionLabel: 'EN DESARROLLO // KERNEL & SISTEMAS 2026',
-    primaryColor: '#38bdf8',
-    accentGradient: 'from-sky-500/25 via-blue-600/10 to-transparent',
-    glowShadow: 'rgba(56, 189, 248, 0.28)',
-    tagline: '“Entendé qué pasa debajo del sistema operativo.”',
-    title: 'SISTEMA EVO LABS DE SISTEMAS Y KERNEL',
+    editionLabel: 'EN DESARROLLO // PROGRAMACIÓN 2026',
+    primaryColor: '#22c55e',
+    accentGradient: 'from-emerald-500/25 via-green-600/10 to-transparent',
+    glowShadow: 'rgba(34, 197, 94, 0.28)',
+    tagline: '“Empezá sin saber programar. Creá tus primeras aplicaciones y herramientas.”',
+    title: 'EVO LABS // PROGRAMACIÓN DESDE CERO',
     editorialSubtitle:
-      'Procesos, memoria, virtualización y funcionamiento interno del sistema.',
-    pagesBadge: 'EN DESARROLLO // ARQUITECTURA DE SISTEMAS',
-    systemStandard: 'POSIX / LINUX KERNEL SUBSYSTEM SPEC',
+      'Lógica computacional, JavaScript, TypeScript, Python, APIs y control de versiones con IA como copiloto.',
+    pagesBadge: 'EN DESARROLLO // PROGRAMACIÓN CON IA',
+    systemStandard: 'ECMASCRIPT / PYTHON 3 & GIT SPECIFICATIONS',
     keyTopics: [
       {
         num: '01',
-        title: 'Arquitectura del Kernel Linux & Subsistemas',
-        description: 'Estructura monolithic modular, sysfs, procfs, systemd, llamadas de sistema y control de procesos.',
+        title: 'Fundamentos de Algoritmos & Lógica de Programación',
+        description: 'Variables, estructuras de control, tipos de datos, funciones y resolución metódica de problemas.',
       },
       {
         num: '02',
-        title: 'Gestión de Memoria & Almacenamiento ZFS',
-        description: 'Paginación virtual, TLB, pools RAID-Z, snapshots atómicos y compresión ZSTD.',
+        title: 'JavaScript / TypeScript & Consumo de APIs REST',
+        description: 'Desarrollo web moderno, tipado estático, asincronía (Promises/async-await) e integración de endpoints.',
       },
       {
         num: '03',
-        title: 'Hipervisores KVM & Contenedores OCI',
-        description: 'Virtualización Tipo 1 por hardware, passthrough PCIe con VFIO, cgroups v2 y namespaces aislados.',
+        title: 'Python, Automatización y Git/GitHub',
+        description: 'Scripting de utilidades, gestión de paquetes, flujos de trabajo en ramas y depuración pericial con IA.',
       },
     ],
     heroGraphic: {
-      badge: 'SUBSISTEMAS KERNEL // KVM HYPERVISOR',
-      chipName: 'LINUX KERNEL MONOLITHIC & CGROUPS V2',
-      frequencyOrSpec: 'KVM VFIO Passthrough // ZFS RAID-Z // eBPF',
-      statusLabel: 'FUNCIONAMIENTO INTERNO DEL SISTEMA OPERATIVO',
-      features: ['Sysfs & Procfs Governance', 'KVM / VFIO Hardware Passthrough', 'ZFS Atomic CoW Resiliency'],
-      bgPattern: 'radial-gradient(ellipse at center, rgba(56,189,248,0.18) 0%, rgba(8,10,13,0.95) 75%)',
+      badge: 'PROGRAMACIÓN // COPILOTOS IA',
+      chipName: 'TYPESCRIPT & PYTHON RUNTIME SUITE',
+      frequencyOrSpec: 'TypeScript 5 // Python 3.12 // Git Workflow',
+      statusLabel: 'DESARROLLO DE SOFTWARE & APLICACIONES PRÁCTICAS',
+      features: ['Lógica y Algoritmia Estructurada', 'APIs REST & Asincronía', 'Git / GitHub Versioning'],
+      bgPattern: 'radial-gradient(ellipse at center, rgba(34,197,94,0.18) 0%, rgba(8,10,13,0.95) 75%)',
     },
   },
 
@@ -443,40 +450,122 @@ export const TOMOS_EDITORIAL_COVERS: Record<string, TomoEditorialCoverMeta> = {
     tomoKey: 'tomo-10',
     number: '10',
     volumeLabel: 'TOMO 10',
-    editionLabel: 'EN DESARROLLO // INGENIERÍA INVERSA & FORENSE',
-    primaryColor: '#a855f7',
-    accentGradient: 'from-purple-600/25 via-fuchsia-600/10 to-transparent',
-    glowShadow: 'rgba(168, 85, 247, 0.28)',
-    tagline: '“No mires sólo el resultado. Reconstruí lo que pasó.”',
-    title: 'SISTEMA EVO LABS // FORENSE E INGENIERÍA INVERSA',
+    editionLabel: 'EN DESARROLLO // PROMPT E IA AVANZADA 2026',
+    primaryColor: '#8b5cf6',
+    accentGradient: 'from-violet-600/25 via-purple-600/10 to-transparent',
+    glowShadow: 'rgba(139, 92, 246, 0.28)',
+    tagline: '“Aprendé a dirigir la IA con rigor técnico, contexto y metodología.”',
+    title: 'EVO LABS // PROMPT E IA AVANZADA',
     editorialSubtitle:
-      'Análisis profundo, evidencia, memoria, binarios e investigación técnica.',
-    pagesBadge: 'EN DESARROLLO // PERITAJE TÉCNICO',
-    systemStandard: 'VOLATILITY 3 & DISASSEMBLER SRE STANDARDS',
+      'Fundamentos de LLMs, prompting estructurado, arquitectura de contexto, agentes autónomos y verificación empírica.',
+    pagesBadge: 'EN DESARROLLO // PROMPTING & AGENTES IA',
+    systemStandard: 'OPENAI / ANTHROPIC / GEMINI API SPECS & PROMPT ENGINEERING',
     keyTopics: [
       {
         num: '01',
-        title: 'Análisis Estático de Binarios con Ghidra',
-        description: 'Desensamblado x86/x64, cabeceras PE/ELF, tablas IAT, grafos de flujo de control y firmas YARA.',
+        title: 'Arquitectura de Tokens, Ventana de Contexto y LLMs',
+        description: 'Atención posicional, parámetros de inferencia (temperatura, top_p) y límites físicos de cómputo.',
       },
       {
         num: '02',
-        title: 'Análisis Forense de Memoria Volátil',
-        description: 'Extracción de volcados RAM con Volatility 3, inyección DLL reflectiva y reconstrucción de procesos ocultos.',
+        title: 'Técnicas de Prompting Estructurado (CoT, Few-Shot, ReAct)',
+        description: 'Diseño de roles de sistema, plantillas JSON/XML, razonamiento guiado y reducción de sesgos.',
       },
       {
         num: '03',
-        title: 'Rootkits de Kernel (Ring 0) & EDR Bypass',
-        description: 'DKOM (Direct Kernel Object Manipulation), hook de IRPs, evasión de sandboxes y cadena de custodia pericial.',
+        title: 'Agentes Autónomos, Tool Calling y RAG',
+        description: 'Llamadas a funciones, recuperación con embeddings vectoriales, flujos multiagente y mitigación de alucinaciones.',
       },
     ],
     heroGraphic: {
-      badge: 'INGENIERÍA INVERSA // FORENSE DE MEMORIA',
-      chipName: 'GHIDRA SRE // VOLATILITY 3 SUITE',
-      frequencyOrSpec: 'PE/ELF Disassembly // Ring 0 DKOM // SHA-256 Custodia',
-      statusLabel: 'PERITAJE TÉCNICO & EXTRACCIÓN DE EVIDENCIA',
-      features: ['Desensamblado x86/x64 Ghidra', 'Forense de RAM Volatility 3', 'Auditoría DKOM & Cadena de Custodia'],
-      bgPattern: 'radial-gradient(ellipse at center, rgba(168,85,247,0.18) 0%, rgba(8,10,13,0.95) 75%)',
+      badge: 'PROMPTING AVANZADO // MULTI-AGENTE',
+      chipName: 'GENAI AGENT ENGINE & RAG PIPELINE',
+      frequencyOrSpec: 'Structured Prompts // Tool Calling // Context Window',
+      statusLabel: 'INGENIERÍA DE PROMPTS & AGENTES AUTÓNOMOS',
+      features: ['Prompting Estructurado CoT & ReAct', 'Tool Calling & RAG Vectorial', 'Validación Empírica Anti-Alucinación'],
+      bgPattern: 'radial-gradient(ellipse at center, rgba(139,92,246,0.18) 0%, rgba(8,10,13,0.95) 75%)',
+    },
+  },
+
+  'tomo-11': {
+    tomoKey: 'tomo-11',
+    number: '11',
+    volumeLabel: 'TOMO 11',
+    editionLabel: 'EDICIÓN 11 // ELECTRÓNICA & VRM 2026',
+    primaryColor: '#eab308',
+    accentGradient: 'from-amber-500/25 via-yellow-500/10 to-transparent',
+    glowShadow: 'rgba(234, 179, 8, 0.28)',
+    tagline: '“Desde la física del electrón hasta el diagnóstico a nivel componente en motherboards y GPUs.”',
+    title: 'EVO LABS // ELECTRÓNICA APLICADA A LA INFORMÁTICA',
+    editorialSubtitle:
+      'Física del silicio, convertidores Buck DC-DC, inductores, capacitores de polímero, medición de osciloscopio y descarte de cortos en rieles de alimentación.',
+    pagesBadge: '5 CAPÍTULOS DE FÍSICA & VRM',
+    systemStandard: 'IPC-A-610 / JEDEC / ATX12VO ELECTRONICS SPECIFICATION',
+    keyTopics: [
+      {
+        num: '01',
+        title: 'Física del Silicio, Semiconductores & Rieles de Tensión',
+        description: 'Ley de Ohm aplicada a 180A, dopaje PN, conmutación MOSFET y resistencia parásita en planos de cobre.',
+      },
+      {
+        num: '02',
+        title: 'Arquitectura VRM, Fases de Potencia & Convertidores Buck',
+        description: 'Controladores PWM, drivers de compuerta, inductores SMD, DrMOS y filtrado de rizado con osciloscopio.',
+      },
+      {
+        num: '03',
+        title: 'Metrología de Banco, Multímetro & Prueba de Cortos',
+        description: 'Medición de caída de tensión en diodo, inyección de voltaje con fuente regulada y cámara térmica.',
+      },
+    ],
+    heroGraphic: {
+      badge: 'ELECTRÓNICA // VRM & SILICIO',
+      chipName: 'VRM MULTI-PHASE & BUCK CONTROLLER',
+      frequencyOrSpec: 'DrMOS // Buck DC-DC // VCore 0.8V-1.4V',
+      statusLabel: 'LABORATORIO DE ELECTRÓNICA & PERITAJE DE PLACA',
+      features: ['Leyes Eléctricas & Resistencia de Riel', 'Modulación PWM & Ondulación de Rizado', 'Aislamiento de Cortos en Standby'],
+      bgPattern: 'radial-gradient(ellipse at center, rgba(234,179,8,0.18) 0%, rgba(8,10,13,0.95) 75%)',
+    },
+  },
+
+  'tomo-12': {
+    tomoKey: 'tomo-12',
+    number: '12',
+    volumeLabel: 'TOMO 12',
+    editionLabel: 'EDICIÓN 12 // EVO GAME FORGE 2026',
+    primaryColor: '#06b6d4',
+    accentGradient: 'from-cyan-500/25 via-blue-600/10 to-transparent',
+    glowShadow: 'rgba(6, 182, 212, 0.28)',
+    tagline: '“EVO Game Forge: De las matemáticas vectoriales y shaders al desarrollo del proyecto Mundo Max.”',
+    title: 'EVO LABS // INGENIERÍA Y CREACIÓN DE VIDEOJUEGOS',
+    editorialSubtitle:
+      'Arquitectura de motores de juego, game loop determinista desacoplado, delta time, física 2D/3D, pipeline gráfico y diseño técnico.',
+    pagesBadge: '5 CAPÍTULOS DE GAME FORGE STUDIO',
+    systemStandard: 'WEBGL 2.0 / VULKAN / GLSL SHADER PIPELINE',
+    keyTopics: [
+      {
+        num: '01',
+        title: 'Arquitectura del Game Loop & Delta Time Desacoplado',
+        description: 'Fixed timestep para física vs. variable timestep para renderizado. Prevención del espiral de la muerte (death spiral).',
+      },
+      {
+        num: '02',
+        title: 'Matemáticas Vectoriales, Físicas & Detección de Colisiones',
+        description: 'Álgebra lineal, matrices de transformación, producto punto/cruz y algoritmo de separación de ejes (SAT).',
+      },
+      {
+        num: '03',
+        title: 'Pipeline de Renderizado, GLSL Shaders & Proyecto Mundo Max',
+        description: 'Vertex & fragment shaders, optimización de draw calls, iluminación dinámica y arquitectura de Mundo Max.',
+      },
+    ],
+    heroGraphic: {
+      badge: 'GAME FORGE // ARQUITECTURA DE MOTOR',
+      chipName: 'EVO GAME FORGE ENGINE & MUNDO MAX',
+      frequencyOrSpec: 'Fixed Timestep 60Hz // SAT Physics // GLSL Pipeline',
+      statusLabel: 'MOTOR LÚDICO & SIMULACIÓN VIRTUAL',
+      features: ['Game Loop Desacoplado con Delta Time', 'Físicas Vectoriales & Detección SAT', 'Shaders & Proyecto Mundo Max'],
+      bgPattern: 'radial-gradient(ellipse at center, rgba(6,182,212,0.18) 0%, rgba(8,10,13,0.95) 75%)',
     },
   },
 };
@@ -777,10 +866,47 @@ const TOMO_EXTENDED_DATA: Record<
     ],
   },
   'tomo-07': {
-    pages: 'En desarrollo',
-    modulesCount: 'En fase de investigación técnica',
+    pages: '210 páginas A4',
+    modulesCount: '6 módulos de metrología y estabilidad',
     targetAudience: 'Entusiastas del rendimiento, gamers competitivos e ingenieros de benchmarking',
-    modules: [],
+    modules: [
+      {
+        number: 'M01',
+        title: 'Metrología de Frametimes & Percentiles 1% Low',
+        desc: 'Captura PresentMon, conversión de microsegundos a FPS y descarte de ruido.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'FRAMETIME LAB' },
+      },
+      {
+        number: 'M02',
+        title: 'Frame Pacing & Detección de Clusters de Stutter',
+        desc: 'Identificación de periodicidad en tirones: interrupciones de fondo vs shaders.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'dpc-conflict', badgeLabel: 'PACING ANALYZER' },
+      },
+      {
+        number: 'M03',
+        title: 'Bottleneck Investigator: Hilo Principal vs GPU',
+        desc: 'Diagnóstico de cuellos de botella monohilo en Core 0 con GPU subutilizada.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'BOTTLENECK' },
+      },
+      {
+        number: 'M04',
+        title: 'Benchmarking A/B: Resizable BAR & Rendimiento',
+        desc: 'Pruebas controladas de 1 variable con 3 corridas, cálculo de mediana y varianza.',
+        benchConfig: { labView: 'hotswap-lab', scenario: 'ab-bench', badgeLabel: 'A/B BENCH' },
+      },
+      {
+        number: 'M05',
+        title: 'Cap & Refresh: Sincronización 144Hz/240Hz & VRR',
+        desc: 'Ventana de sincronización G-Sync / FreeSync y eliminación de lag de V-Sync.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'timer-resolution', badgeLabel: 'CAP & REFRESH' },
+      },
+      {
+        number: 'M06',
+        title: 'Input Pipeline: Cadena Click-to-Photon & Reflex',
+        desc: 'Desglose etapa por etapa: Polling rate de ratón vs cola de renderizado GPU.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'timer-resolution', badgeLabel: 'INPUT PIPELINE' },
+      },
+    ],
   },
   'tomo-08': {
     pages: '16 páginas A4',
@@ -851,75 +977,149 @@ const TOMO_EXTENDED_DATA: Record<
   },
   'tomo-09': {
     pages: 'En desarrollo',
-    modulesCount: '5 módulos de arquitectura interna y sistemas',
-    targetAudience: 'Administradores de sistemas Linux, desarrolladores de sistemas y entusiastas del kernel',
+    modulesCount: '5 módulos de lógica computacional y desarrollo con IA',
+    targetAudience: 'Estudiantes, técnicos y entusiastas que inician en programación moderna con copilotos',
     modules: [
       {
         number: 'M01',
-        title: 'Arquitectura del Kernel Linux & Subsistemas',
-        desc: 'Estructura monolithic modular, sysfs, procfs, systemd e inicialización de servicios.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'LINUX KERNEL SYSFS' }
+        title: 'Fundamentos de Algoritmos & Lógica Computacional',
+        desc: 'Variables, condicionales, bucles, estructuras de datos y resolución metódica de problemas.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'ALGORITMOS & LÓGICA' }
       },
       {
         number: 'M02',
-        title: 'Administración de Almacenamiento ZFS & Btrfs',
-        desc: 'Pools RAID-Z, snapshots atómicos, compresión ZSTD y reparación por paridad.',
-        benchConfig: { labView: 'hotswap-lab', scenario: 'ab-bench', badgeLabel: 'ZFS ATOMIC' }
+        title: 'JavaScript y TypeScript Moderno',
+        desc: 'Tipado estático, asincronía, funciones puras y manipulación de estructuras complejas.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'win10-ltsc', badgeLabel: 'TYPESCRIPT RUNTIME' }
       },
       {
         number: 'M03',
-        title: 'Fundamentos de Hipervisores Tipo 1 vs Tipo 2',
-        desc: 'Virtualización KVM/QEMU por hardware (Intel VT-x / AMD-V) y passthrough de PCI.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'KVM VFIO PASSTHROUGH' }
+        title: 'Consumo e Integración de APIs REST & JSON',
+        desc: 'Endpoints HTTP, promesas, async/await, manejo pericial de errores y validación de esquemas.',
+        benchConfig: { labView: 'hotswap-lab', scenario: 'ab-bench', badgeLabel: 'REST CLIENT & APIS' }
       },
       {
         number: 'M04',
-        title: 'Despliegue de Clúster Proxmox VE',
-        desc: 'Alta disponibilidad (HA), almacenamiento compartido Ceph y migración en caliente.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'PROXMOX CLUSTER' }
+        title: 'Control de Versiones Profesional con Git y GitHub',
+        desc: 'Ramas, commits atómicos, pull requests, resolución de conflictos y repositorios remotos.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'boot-sequence', badgeLabel: 'GIT WORKFLOW' }
       },
       {
         number: 'M05',
-        title: 'Contenedores Docker & Arquitectura OCI',
-        desc: 'Cgroups v2, namespaces, procesos y aislamiento de subsistemas.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'win10-ltsc', badgeLabel: 'DOCKER CGROUPS' }
+        title: 'Python Práctico & Scripting de Automatización',
+        desc: 'Automatización de tareas repetitivas de sistema, parsing de archivos y scripting forense.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'timer-resolution', badgeLabel: 'PYTHON SCRIPTING' }
       },
     ],
   },
   'tomo-10': {
     pages: 'En desarrollo',
-    modulesCount: '5 módulos de peritaje e ingeniería inversa',
-    targetAudience: 'Peritos forenses, analistas de binarios, investigadores de malware e ingenieros inversos',
+    modulesCount: '5 módulos de arquitectura de prompts y agentes autónomos',
+    targetAudience: 'Desarrolladores, investigadores y profesionales técnicos que dirigen IA avanzada',
     modules: [
       {
         number: 'M01',
-        title: 'Análisis Estático de Binarios con Ghidra',
-        desc: 'Desensamblado x86/x64, PE headers, tablas de importación (IAT) y firmas YARA.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'boot-sequence', badgeLabel: 'GHIDRA SRE' }
+        title: 'Arquitectura de Tokens, Ventana de Contexto & LLMs',
+        desc: 'Mecanismos de atención, asignación de tokens, parámetros de muestreo y límites físicos.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'TOKENS & CONTEXT' }
       },
       {
         number: 'M02',
-        title: 'Técnicas de Evasión y Desofuscación',
-        desc: 'Detección de hipervisor/sandbox, timing attacks, packers UPX y strings cifradas con XOR.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'timer-resolution', badgeLabel: 'TIMING ATTACKS' }
+        title: 'Técnicas de Prompting Estructurado (CoT & Few-Shot)',
+        desc: 'Plantillas formales, roles de sistema, delimitadores XML/JSON y razonamiento paso a paso.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'win10-ltsc', badgeLabel: 'STRUCTURED PROMPT' }
       },
       {
         number: 'M03',
-        title: 'Análisis Forense de Memoria con Volatility 3',
-        desc: 'Extracción de volcados RAM, pslist, malfind, inyección DLL y dump de procesos.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'scheduler-hybrid', badgeLabel: 'VOLATILITY 3 DUMP' }
+        title: 'RAG (Retrieval-Augmented Generation) & Embeddings',
+        desc: 'Indexación vectorial, búsqueda semántica y recuperación fundamentada en conocimiento propio.',
+        benchConfig: { labView: 'hotswap-lab', scenario: 'ab-bench', badgeLabel: 'RAG & EMBEDDINGS' }
       },
       {
         number: 'M04',
-        title: 'Rootkits de Kernel (Ring 0) & EDR Bypass',
-        desc: 'DKOM (Direct Kernel Object Manipulation), hook de IRPs y anulación de callbacks.',
-        benchConfig: { labView: 'windows-matrix', scenario: 'dpc-conflict', badgeLabel: 'RING 0 DKOM' }
+        title: 'Function Calling & Herramientas Multimodales',
+        desc: 'Conexión de modelos con APIs reales, ejecución de código y lectura de esquemáticos.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'dpc-conflict', badgeLabel: 'FUNCTION CALLING' }
       },
       {
         number: 'M05',
-        title: 'Respuesta ante Incidentes & Cadena de Custodia',
-        desc: 'Adquisición forense de discos (dd/E01), hashing SHA-256 y reporte pericial judicial.',
-        benchConfig: { labView: 'hotswap-lab', scenario: 'ab-bench', badgeLabel: 'SHA-256 CUSTODIA' }
+        title: 'Agentes Autónomos & Verificación Empírica',
+        desc: 'Bucles ReAct, gobernanza de decisiones, mitigación de alucinaciones y auditoría técnica.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'timer-resolution', badgeLabel: 'AUTONOMOUS AGENTS' }
+      },
+    ],
+  },
+  'tomo-11': {
+    pages: '5 capítulos de microelectrónica',
+    modulesCount: '5 módulos de hardware, VRM y física de componentes',
+    targetAudience: 'Técnicos de reparación avanzada, microsoldadores y entusiastas del hardware a nivel componente',
+    modules: [
+      {
+        number: 'M01',
+        title: 'Física del Electrón, Ley de Ohm & Rieles de Potencia',
+        desc: 'Cálculo de pérdidas resistivas, caída de tensión y conductividad en planos de cobre.',
+        benchConfig: { labView: 'hotswap-lab', scenario: 'atx-power-bench', badgeLabel: 'LEY DE OHM' }
+      },
+      {
+        number: 'M02',
+        title: 'Semiconductores, Diodos & Transistores MOSFET',
+        desc: 'Unión PN, transistores de efecto de campo, conmutación de compuerta y curvas I-V.',
+        benchConfig: { labView: 'hotswap-lab', scenario: 'pcb-schematic', badgeLabel: 'MOSFET & DIODOS' }
+      },
+      {
+        number: 'M03',
+        title: 'Arquitectura de Convertidores Buck & Fases VRM',
+        desc: 'Generación de VCore por modulación PWM, inductores, capacitores de filtrado y rizado.',
+        benchConfig: { labView: 'hotswap-lab', scenario: 'cache-imc-flow', badgeLabel: 'VRM & BUCK' }
+      },
+      {
+        number: 'M04',
+        title: 'Metrología de Banco: Multímetro, Osciloscopio & Shunts',
+        desc: 'Diagnóstico en escala de diodo, medición de resistencia parásita e inyección de voltaje segura.',
+        benchConfig: { labView: 'boot-lab', scenario: 'post-sequence', badgeLabel: 'METROLOGÍA DE BANCO' }
+      },
+      {
+        number: 'M05',
+        title: 'Secuencia de Encendido & Aislamiento de Cortocircuitos',
+        desc: 'Árbol de diagnóstico lógico ante rieles colapsados, protección contra sobrecorriente (OCP).',
+        benchConfig: { labView: 'boot-lab', scenario: 'boot-diagnostics', badgeLabel: 'AISLAMIENTO DE CORTOS' }
+      },
+    ],
+  },
+  'tomo-12': {
+    pages: '5 capítulos de arquitectura de motor',
+    modulesCount: '5 módulos de ingeniería de videojuegos y simulación física',
+    targetAudience: 'Programadores de videojuegos, arquitectos de software técnico y desarrolladores de simuladores',
+    modules: [
+      {
+        number: 'M01',
+        title: 'Arquitectura del Game Loop & Delta Time Desacoplado',
+        desc: 'Bucle principal determinista, fixed timestep para física y extrapolación de cuadros.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'timer-resolution', badgeLabel: 'GAME LOOP & DT' }
+      },
+      {
+        number: 'M02',
+        title: 'Matemáticas Vectoriales & Transformaciones de Coordenadas',
+        desc: 'Vectores, matrices, proyecciones 2D/3D y cálculo de trayectorias físicas.',
+        benchConfig: { labView: 'hotswap-lab', scenario: 'ab-bench', badgeLabel: 'MATEMÁTICAS VECTORIALES' }
+      },
+      {
+        number: 'M03',
+        title: 'Físicas, Gravedad & Detección de Colisiones SAT',
+        desc: 'Integración de Euler y Verlet, cuerpos rígidos y algoritmo de separación de ejes.',
+        benchConfig: { labView: 'hotswap-lab', scenario: 'hardware', badgeLabel: 'COLISIONES & FÍSICAS' }
+      },
+      {
+        number: 'M04',
+        title: 'Pipeline de Gráficos, Shaders GLSL & Iluminación',
+        desc: 'Vertex shaders, fragment shaders, buffers de profundidad y optimización de lotes.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'xray', badgeLabel: 'GLSL SHADERS' }
+      },
+      {
+        number: 'M05',
+        title: 'Proyecto Mundo Max: Integración & Pruebas de Estrés',
+        desc: 'Ensamblaje del proyecto integral Mundo Max con mapa virtual, entidades y telemetría.',
+        benchConfig: { labView: 'windows-matrix', scenario: 'services', badgeLabel: 'MUNDO MAX ENGINE' }
       },
     ],
   },
@@ -932,35 +1132,44 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
   onOpenTomoView,
   onOpenForensicBench,
 }) => {
-  // CRITICAL DIRECTIVE: The modal MUST ALWAYS open in 'portada' (cover) view by default
-  const [modalView, setModalView] = useState<'portada' | 'indice'>('portada');
+  // Opens in 'ficha' (pedagogical dossier) view by default
+  const [modalView, setModalView] = useState<'ficha' | 'portada' | 'indice'>('ficha');
   const [isBootLabOpen, setIsBootLabOpen] = useState<boolean>(false);
+  const [isTomoLabOpen, setIsTomoLabOpen] = useState<boolean>(false);
   const [isExamOpen, setIsExamOpen] = useState<boolean>(false);
+  const { canAccess, openUpgradeModal, isFreeUser } = useEvoAccess();
 
-  // Reset to 'portada' whenever the modal opens or tomoId changes
+  // Reset to 'ficha' whenever the modal opens or tomoId changes
   useEffect(() => {
     if (isOpen) {
-      setModalView('portada');
+      setModalView('ficha');
       setIsBootLabOpen(false);
+      setIsTomoLabOpen(false);
       setIsExamOpen(false);
     }
   }, [isOpen, tomoId]);
 
   if (!isOpen || !tomoId) return null;
 
+  const resolvedTomoId = tomoId.startsWith('tomo-')
+    ? tomoId
+    : `tomo-${tomoId.replace('tomo-', '').padStart(2, '0')}`;
+
   if (isExamOpen) {
     return (
       <div className="fixed inset-0 z-[130] bg-[#07090e] text-zinc-100 overflow-y-auto animate-in fade-in duration-200">
         <EvoTomeExamEngine
-          tomoId={tomoId}
+          tomoId={resolvedTomoId}
           onBackToTomoCover={() => setIsExamOpen(false)}
           onBackToIndex={() => setIsExamOpen(false)}
           onContinueToLab={() => {
             setIsExamOpen(false);
-            if (tomoId === 'tomo-08') {
+            if (resolvedTomoId === 'tomo-08') {
               setIsBootLabOpen(true);
+            } else if (['tomo-05', 'tomo-06', 'tomo-07', 'tomo-09', 'tomo-10'].includes(resolvedTomoId)) {
+              setIsTomoLabOpen(true);
             } else if (onOpenTomoView) {
-              onOpenTomoView(tomoId);
+              onOpenTomoView(resolvedTomoId);
             }
           }}
         />
@@ -968,7 +1177,7 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
     );
   }
 
-  if (isBootLabOpen && tomoId === 'tomo-08') {
+  if (isBootLabOpen && resolvedTomoId === 'tomo-08') {
     return (
       <div className="fixed inset-0 z-[120] bg-black animate-in fade-in duration-200">
         <EvoBootLab onClose={() => setIsBootLabOpen(false)} />
@@ -976,9 +1185,48 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
     );
   }
 
-  const volume = VOLUMES_COLLECTION.find((v) => v.id === tomoId);
-  const coverMeta = TOMOS_EDITORIAL_COVERS[tomoId] || TOMOS_EDITORIAL_COVERS['tomo-01'];
-  const extended = TOMO_EXTENDED_DATA[tomoId];
+  if (isTomoLabOpen) {
+    if (resolvedTomoId === 'tomo-05') {
+      return (
+        <div className="fixed inset-0 z-[120] bg-black p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+          <EvoNetworkForensicsLab onClose={() => setIsTomoLabOpen(false)} />
+        </div>
+      );
+    }
+    if (resolvedTomoId === 'tomo-06') {
+      return (
+        <div className="fixed inset-0 z-[120] bg-black p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+          <EvoDefensiveSecurityLab onClose={() => setIsTomoLabOpen(false)} />
+        </div>
+      );
+    }
+    if (resolvedTomoId === 'tomo-07') {
+      return (
+        <div className="fixed inset-0 z-[120] bg-black p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+          <EvoPerformanceMetrologyLab onClose={() => setIsTomoLabOpen(false)} />
+        </div>
+      );
+    }
+    if (resolvedTomoId === 'tomo-09') {
+      return (
+        <div className="fixed inset-0 z-[120] bg-black p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+          <EvoCodeEngineeringLab onClose={() => setIsTomoLabOpen(false)} />
+        </div>
+      );
+    }
+    if (resolvedTomoId === 'tomo-10') {
+      return (
+        <div className="fixed inset-0 z-[120] bg-black p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+          <EvoAiSystemsLab onClose={() => setIsTomoLabOpen(false)} />
+        </div>
+      );
+    }
+  }
+
+
+  const volume = VOLUMES_COLLECTION.find((v) => v.id === resolvedTomoId || v.id === tomoId);
+  const coverMeta = TOMOS_EDITORIAL_COVERS[resolvedTomoId] || TOMOS_EDITORIAL_COVERS[tomoId] || TOMOS_EDITORIAL_COVERS['tomo-01'];
+  const extended = TOMO_EXTENDED_DATA[resolvedTomoId] || TOMO_EXTENDED_DATA[tomoId];
 
   if (!volume) return null;
 
@@ -987,8 +1235,14 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
   };
 
   const handleOpenInteractive = () => {
+    const tomoCleanNum = resolvedTomoId.replace('tomo-', '');
+    const tomoAccess = canAccess({ type: 'tomo_reader', tomoNumber: tomoCleanNum });
+    if (!tomoAccess.allowed && isFreeUser && tomoCleanNum !== '01') {
+      openUpgradeModal(`Tomo ${tomoCleanNum} // ${volume.title}`);
+      return;
+    }
     if (onOpenTomoView) {
-      onOpenTomoView(tomoId);
+      onOpenTomoView(resolvedTomoId);
     } else {
       // Fallback: switch to internal syllabus index
       setModalView('indice');
@@ -1015,13 +1269,18 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
       target = chapterIdOrTarget;
     }
 
-    if (target.labView === 'boot-lab') {
+    if (target.labView === 'boot-lab' || resolvedTomoId === 'tomo-08') {
       if (onOpenForensicBench) {
         onOpenForensicBench(target);
         onClose();
       } else {
         setIsBootLabOpen(true);
       }
+      return;
+    }
+
+    if (['tomo-05', 'tomo-06', 'tomo-07', 'tomo-09', 'tomo-10'].includes(resolvedTomoId)) {
+      setIsTomoLabOpen(true);
       return;
     }
 
@@ -1070,6 +1329,20 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
             <div className="inline-flex rounded-lg bg-zinc-900/90 p-0.5 border border-zinc-800 text-[10px] font-mono-tech">
               <button
                 type="button"
+                onClick={() => setModalView('ficha')}
+                className={`px-2.5 py-1 rounded-md transition-all cursor-pointer font-bold ${
+                  modalView === 'ficha'
+                    ? 'text-black shadow'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+                style={{
+                  background: modalView === 'ficha' ? coverMeta.primaryColor : 'transparent',
+                }}
+              >
+                FICHA PEDAGÓGICA
+              </button>
+              <button
+                type="button"
                 onClick={() => setModalView('portada')}
                 className={`px-2.5 py-1 rounded-md transition-all cursor-pointer font-bold ${
                   modalView === 'portada'
@@ -1108,6 +1381,181 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
             </button>
           </div>
         </div>
+
+        {/* ============================================================ */}
+        {/* VIEW 0: FICHA PEDAGÓGICA ESTRUCTURADA (6 PILARES)            */}
+        {/* ============================================================ */}
+        {modalView === 'ficha' && (
+          <div className="p-5 sm:p-7 overflow-y-auto space-y-6 text-xs text-zinc-300">
+            {/* Header Ficha */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#12100a] via-[#0d1017] to-[#080b12] border border-amber-400/30 space-y-2">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <span className="px-2.5 py-0.5 rounded text-[10px] font-mono-tech font-bold uppercase bg-amber-400/20 text-amber-300 border border-amber-400/40">
+                  FICHA PEDAGÓGICA OFICIAL // {coverMeta.volumeLabel}
+                </span>
+                <span className="text-[10px] font-mono-tech text-zinc-400">
+                  ESTÁNDAR: {coverMeta.systemStandard}
+                </span>
+              </div>
+              <h2 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight">
+                {coverMeta.title}
+              </h2>
+              <p className="text-xs sm:text-sm font-sans-editorial text-zinc-300 leading-relaxed max-w-3xl">
+                {coverMeta.editorialSubtitle}
+              </p>
+            </div>
+
+            {/* 6 PILARES PEDAGÓGICOS GRID */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* 1. OBJETIVOS */}
+              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                <div className="flex items-center gap-2 text-amber-400">
+                  <Target className="w-4 h-4 text-amber-400 shrink-0" />
+                  <h3 className="font-mono-tech font-bold text-xs uppercase text-white">
+                    1. OBJETIVOS PEDAGÓGICOS
+                  </h3>
+                </div>
+                <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
+                  {volume?.description || coverMeta.editorialSubtitle}
+                </p>
+                <div className="pt-2 text-[11px] font-mono-tech text-zinc-400 border-t border-zinc-900">
+                  <strong className="text-amber-300">¿Qué problema resuelve?</strong> {(volume as any)?.solvesProblem || 'Aporta criterios objetivos de medición y resolución de problemas sin mitos.'}
+                </div>
+              </div>
+
+              {/* 2. COMPETENCIAS */}
+              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                <div className="flex items-center gap-2 text-cyan-400">
+                  <Award className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <h3 className="font-mono-tech font-bold text-xs uppercase text-white">
+                    2. COMPETENCIAS TÉCNICAS
+                  </h3>
+                </div>
+                <ul className="space-y-1.5 text-xs font-sans-editorial text-zinc-300">
+                  {coverMeta.keyTopics.map((top, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="text-cyan-400 font-mono-tech text-[10px] font-bold mt-0.5">•</span>
+                      <span><strong className="text-white">{top.title}:</strong> {top.description}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* 3. CONTENIDOS */}
+              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-emerald-400">
+                    <Layers className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <h3 className="font-mono-tech font-bold text-xs uppercase text-white">
+                      3. CONTENIDOS & TEMARIO
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-mono-tech text-zinc-400 font-bold bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+                    {extended?.modulesCount || 'Capítulos de Investigación'}
+                  </span>
+                </div>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+                  {(extended?.modules || []).map((m) => (
+                    <div key={m.number} className="p-2 rounded bg-black/60 border border-zinc-900 flex items-start gap-2 text-[11px]">
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold font-mono-tech bg-amber-400/10 text-amber-300 border border-amber-400/30 shrink-0">
+                        {m.number}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="font-bold text-white font-mono-tech text-[11px] truncate">{m.title}</div>
+                        <p className="text-zinc-400 text-[10.5px] font-sans-editorial line-clamp-1">{m.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 4. PRÁCTICAS */}
+              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                <div className="flex items-center gap-2 text-purple-400">
+                  <Wrench className="w-4 h-4 text-purple-400 shrink-0" />
+                  <h3 className="font-mono-tech font-bold text-xs uppercase text-white">
+                    4. PRÁCTICAS EN VIVO
+                  </h3>
+                </div>
+                <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
+                  Ejercicios de medición, análisis de trazas periciales, diagnóstico deductivo de fallas y pruebas deterministas en entorno controlado.
+                </p>
+                <div className="pt-2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setModalView('indice')}
+                    className="px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] font-mono-tech font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span>VER MÓDULOS DE PRÁCTICA →</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 5. LABORATORIO */}
+              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-cyan-400">
+                    <Zap className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <h3 className="font-mono-tech font-bold text-xs uppercase text-white">
+                      5. LABORATORIO ASOCIADO
+                    </h3>
+                  </div>
+                  <span className="px-1.5 py-0.5 rounded text-[8px] font-mono-tech font-black uppercase bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                    LAB INTEGRADO
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-white font-mono-tech">
+                  {coverMeta.heroGraphic.chipName}
+                </div>
+                <p className="text-xs font-sans-editorial text-zinc-400 leading-relaxed">
+                  {coverMeta.heroGraphic.badge} — {coverMeta.heroGraphic.statusLabel}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => handleNavigateToLab('c01')}
+                  className="w-full py-2 px-3 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-mono-tech font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                >
+                  <span>INICIAR LABORATORIO VIRTUAL</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* 6. EVALUACIÓN */}
+              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-emerald-400">
+                    <Award className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <h3 className="font-mono-tech font-bold text-xs uppercase text-white">
+                      6. EVALUACIÓN & ACREDITACIÓN
+                    </h3>
+                  </div>
+                  <span className="px-1.5 py-0.5 rounded text-[8px] font-mono-tech font-black uppercase bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+                    CERTIFICABLE
+                  </span>
+                </div>
+                <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
+                  Examen final de opción múltiple y casos prácticos. Acredita el dominio técnico en tu expediente pericial personal.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isFreeUser) {
+                      openUpgradeModal(`Examen Final // ${coverMeta.volumeLabel}`);
+                      return;
+                    }
+                    setIsExamOpen(true);
+                  }}
+                  className="w-full py-2 px-3 rounded-lg bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/40 text-xs font-mono-tech font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                >
+                  {isFreeUser ? <Lock className="w-3.5 h-3.5 text-amber-400" /> : <Award className="w-3.5 h-3.5 text-amber-400" />}
+                  <span>RENDIR EXAMEN DE CERTIFICACIÓN</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
 
         {/* ============================================================ */}
         {/* VIEW 1: PORTADA EDITORIAL GRÁFICA COMPLETA                   */}
@@ -1196,7 +1644,7 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
 
                 {/* Botones de Acción de Portada */}
                 <div className="pt-2 flex flex-wrap items-center gap-3">
-                  {tomoId === 'tomo-08' ? (
+                  {resolvedTomoId === 'tomo-08' ? (
                     <>
                       <button
                         type="button"
@@ -1209,18 +1657,48 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
 
                       <button
                         type="button"
-                        onClick={() => setIsBootLabOpen(true)}
+                        onClick={() => {
+                          if (isFreeUser) {
+                            openUpgradeModal('Laboratorio de Arranque y POST (Tomo 08)');
+                            return;
+                          }
+                          setIsBootLabOpen(true);
+                        }}
                         className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase text-emerald-300 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 shadow-lg transition-all cursor-pointer"
                       >
-                        <Power className="w-4 h-4 text-emerald-400" />
-                        <span>LABORATORIO DE ARRANQUE</span>
+                        {isFreeUser ? <Lock className="w-4 h-4 text-emerald-400" /> : <Power className="w-4 h-4 text-emerald-400" />}
+                        <span>{isFreeUser ? 'LAB ARRANQUE (REQUIERE PLAN)' : 'LABORATORIO DE ARRANQUE'}</span>
                       </button>
                     </>
-                  ) : ['tomo-07', 'tomo-09', 'tomo-10'].includes(tomoId) ? (
-                    <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase border border-amber-400/40 bg-amber-400/10 text-amber-300 shadow-lg">
-                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                      <span>EDICIÓN EN DESARROLLO</span>
-                    </div>
+                  ) : ['tomo-05', 'tomo-06', 'tomo-07', 'tomo-09', 'tomo-10'].includes(resolvedTomoId) ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (isFreeUser) {
+                          openUpgradeModal(`Laboratorio Especializado // ${coverMeta.volumeLabel}`);
+                          return;
+                        }
+                        setIsTomoLabOpen(true);
+                      }}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono-tech font-black text-xs tracking-wider uppercase text-black shadow-xl hover:brightness-110 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                      style={{
+                        background: coverMeta.primaryColor,
+                        boxShadow: `0 8px 24px -6px ${coverMeta.primaryColor}50`,
+                      }}
+                    >
+                      {isFreeUser ? <Lock className="w-4 h-4 text-black" /> : <Zap className="w-4 h-4 text-black" />}
+                      <span>
+                        {isFreeUser ? 'LABORATORIO (REQUIERE PLAN)' : resolvedTomoId === 'tomo-05'
+                          ? 'INICIAR NETWORK FORENSICS LAB'
+                          : resolvedTomoId === 'tomo-06'
+                          ? 'INICIAR DEFENSIVE SECURITY LAB'
+                          : resolvedTomoId === 'tomo-07'
+                          ? 'INICIAR PERFORMANCE METROLOGY LAB'
+                          : resolvedTomoId === 'tomo-09'
+                          ? 'INICIAR CODE ENGINEERING LAB'
+                          : 'INICIAR AI SYSTEMS LAB'}
+                      </span>
+                    </button>
                   ) : (
                     <button
                       type="button"
@@ -1238,11 +1716,17 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => setIsExamOpen(true)}
+                    onClick={() => {
+                      if (isFreeUser) {
+                        openUpgradeModal(`Examen Final y Acreditación // ${coverMeta.volumeLabel}`);
+                        return;
+                      }
+                      setIsExamOpen(true);
+                    }}
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 transition-all duration-200 cursor-pointer shadow-lg"
                   >
-                    <Award className="w-4 h-4 text-amber-400" />
-                    <span>EXAMEN FINAL</span>
+                    {isFreeUser ? <Lock className="w-4 h-4 text-amber-400" /> : <Award className="w-4 h-4 text-amber-400" />}
+                    <span>{isFreeUser ? 'EXAMEN FINAL (REQUIERE PLAN)' : 'EXAMEN FINAL'}</span>
                   </button>
 
                   <button
@@ -1500,7 +1984,7 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
                   <span>En fase activa de investigación técnica y preparación de laboratorios</span>
                 </div>
 
-                {tomoId === 'tomo-08' && (
+                {resolvedTomoId === 'tomo-08' && (
                   <button
                     type="button"
                     onClick={() => setIsBootLabOpen(true)}

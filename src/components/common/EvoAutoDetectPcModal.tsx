@@ -23,6 +23,8 @@ import {
 import { UserHardwarePassport } from '../../types';
 import { HardwareSensorService } from '../evoLabCore/services/hardwareSensorService';
 import { WindowsDetectionService } from '../evoLabCore/services/windowsDetectionService';
+import { useEvoAccess } from '../../auth/EvoAccessContext';
+import { Lock } from 'lucide-react';
 
 interface EvoAutoDetectPcModalProps {
   isOpen: boolean;
@@ -35,6 +37,7 @@ export const EvoAutoDetectPcModal: React.FC<EvoAutoDetectPcModalProps> = ({
   onClose,
   onHardwareDetected,
 }) => {
+  const { openUpgradeModal, isFreeUser } = useEvoAccess();
   const [copied, setCopied] = useState(false);
   const [isDownloadingZip, setIsDownloadingZip] = useState(false);
   const [zipDownloaded, setZipDownloaded] = useState(false);
@@ -369,19 +372,32 @@ export const EvoAutoDetectPcModal: React.FC<EvoAutoDetectPcModalProps> = ({
 
               <button
                 type="button"
-                onClick={handleDownloadZip}
+                onClick={() => {
+                  if (isFreeUser) {
+                    openUpgradeModal('Descarga de Paquetes y Scripts de Telemetría Nativa (.ZIP)');
+                    return;
+                  }
+                  handleDownloadZip();
+                }}
                 disabled={isDownloadingZip}
                 className={`px-4 py-2.5 rounded-xl font-mono-tech font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 shadow-md ${
-                  zipDownloaded
+                  isFreeUser
+                    ? 'bg-amber-400/20 text-amber-300 hover:bg-amber-400/30 border border-amber-400/50'
+                    : zipDownloaded
                     ? 'bg-emerald-500 text-black border border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
                     : 'bg-amber-400/15 hover:bg-amber-400 text-amber-300 hover:text-black border border-amber-400/40 hover:border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.15)]'
                 }`}
-                title="Descargar EVO_Telemetria_Script.zip para ejecutar directamente"
+                title={isFreeUser ? 'Requiere Plan Complete para descargar scripts empaquetados' : 'Descargar EVO_Telemetria_Script.zip para ejecutar directamente'}
               >
                 {isDownloadingZip ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
                     <span>EMPAQUETANDO...</span>
+                  </>
+                ) : isFreeUser ? (
+                  <>
+                    <Lock className="w-4 h-4 text-amber-400" />
+                    <span>DESCARGAR .ZIP (REQUIERE PLAN)</span>
                   </>
                 ) : zipDownloaded ? (
                   <>

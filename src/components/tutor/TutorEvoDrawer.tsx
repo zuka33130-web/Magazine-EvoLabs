@@ -100,7 +100,7 @@ export const TutorEvoDrawer: React.FC = () => {
               <div className="flex items-center gap-2">
                 <h2 className="font-extrabold text-white text-base tracking-tight">TUTOR EVO</h2>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-400 text-black font-bold">
-                  ACADEMIA AVANZADA
+                  SISTEMA OFICIAL
                 </span>
               </div>
               <p className="text-xs text-zinc-400 font-sans-editorial">
@@ -185,7 +185,7 @@ export const TutorEvoDrawer: React.FC = () => {
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>SECTORES DE LA ACADEMIA</span>
+            <span>SECTORES EVO LABS</span>
           </button>
 
           <button
@@ -471,12 +471,12 @@ export const TutorEvoDrawer: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 3: SECTORES DE LA ACADEMIA */}
+        {/* Tab 3: SECTORES DE EVO LABS */}
         {activeTutorTab === 'tour' && (
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
             <div className="space-y-1">
               <h3 className="text-lg font-extrabold text-white">
-                Los 9 Sectores de la Academia EVO LABS
+                Sectores y Consola de EVO LABS
               </h3>
               <p className="text-xs text-zinc-400">
                 Cada área cumple un rol pedagógico específico. No des nada por entendido.

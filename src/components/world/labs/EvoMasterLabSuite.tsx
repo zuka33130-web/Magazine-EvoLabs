@@ -25,13 +25,24 @@ import {
   Eye,
   ShieldCheck,
   Hash,
-  Scale
+  Scale,
+  Compass,
+  ChevronDown,
+  ArrowRight,
+  HelpCircle,
+  Wrench,
+  BarChart3,
+  Search,
+  RefreshCw,
+  Flame,
+  Battery
 } from 'lucide-react';
 import { Sector02HardwareHotSwap } from './sector02/Sector02HardwareHotSwap';
 import { Sector02SoftwareHotSwap } from './sector02/Sector02SoftwareHotSwap';
 import { EvoWindowsMatrixLab } from './windowsMatrix/EvoWindowsMatrixLab';
 import { EvoUltimateSandbox } from './ultimateSandbox/EvoUltimateSandbox';
 import { EvoMasterLabPrintDossier, EvoMasterLabPrintData } from './EvoMasterLabPrintDossier';
+import { EvoMotherboardCanvas } from '../EvoMotherboardCanvas';
 import { useEvoOperatingMode } from '../../../hooks/useEvoOperatingMode';
 import { UserHardwarePassport } from '../../../types';
 import { EvoOperatingModeSelector } from '../../common/EvoOperatingModeSelector';
@@ -41,7 +52,7 @@ interface EvoMasterLabSuiteProps {
   onNavigateTomo?: (tomoId: string) => void;
   onNavigateHome?: () => void;
   passport?: UserHardwarePassport | null;
-  initialPanel?: 'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all';
+  initialPanel?: 'sandbox' | 'gaming' | 'architecture' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all';
   initialScenario?: string;
 }
 
@@ -54,12 +65,59 @@ export const EvoMasterLabSuite: React.FC<EvoMasterLabSuiteProps> = ({
   initialScenario,
 }) => {
   const { mode, isPericial } = useEvoOperatingMode();
-  const isElite = true;
-  const [activePanel, setActivePanel] = useState<'sandbox' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>(initialPanel);
+  const [activePanel, setActivePanel] = useState<'sandbox' | 'gaming' | 'architecture' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>(initialPanel);
+
+  // Beginner (Principiante / Guiado) vs Technical (Técnico / Sysinternals) View Mode
+  const [uiMode, setUiMode] = useState<'principiante' | 'tecnico'>(initialPanel === 'sandbox' ? 'principiante' : 'tecnico');
+
+  // Interactive Section for Beginners (Novato targets)
+  const [activeNovatoSection, setActiveNovatoSection] = useState<'procesador' | 'memoria' | 'gpu' | 'almacenamiento' | 'energia' | 'temperatura'>('procesador');
+
+  // Deep-dive expanded layer state
+  const [showDeepDiveDetails, setShowDeepDiveDetails] = useState<boolean>(false);
 
   useEffect(() => {
     setActivePanel(initialPanel);
   }, [initialPanel]);
+
+  // Sync section selector with panels for seamless operation
+  useEffect(() => {
+    if (uiMode === 'principiante') {
+      if (activeNovatoSection === 'procesador' || activeNovatoSection === 'memoria') {
+        setActivePanel('sandbox');
+      } else if (activeNovatoSection === 'gpu') {
+        setActivePanel('hardware');
+      } else if (activeNovatoSection === 'almacenamiento') {
+        setActivePanel('telemetry');
+      } else if (activeNovatoSection === 'energia' || activeNovatoSection === 'temperatura') {
+        setActivePanel('matrix');
+      }
+    }
+  }, [activeNovatoSection, uiMode]);
+
+  // Dynamic overlays & target components mapped directly to EvoMotherboardCanvas
+  const selectedOverlay = useMemo(() => {
+    if (activeNovatoSection === 'temperatura') return 'thermal';
+    if (activeNovatoSection === 'energia') return 'power';
+    if (activeNovatoSection === 'memoria') return 'signals';
+    return 'default';
+  }, [activeNovatoSection]);
+
+  const selectedComponent = useMemo(() => {
+    if (activeNovatoSection === 'memoria') return 'ram';
+    if (activeNovatoSection === 'gpu') return 'pcie';
+    if (activeNovatoSection === 'almacenamiento') return 'm2';
+    if (activeNovatoSection === 'energia') return 'vrm';
+    if (activeNovatoSection === 'temperatura') return 'cpu';
+    return 'cpu';
+  }, [activeNovatoSection]);
+
+  const selectedLoadProfile = useMemo(() => {
+    if (activeNovatoSection === 'temperatura') return 'torture';
+    if (activeNovatoSection === 'memoria') return 'gaming';
+    if (activeNovatoSection === 'energia') return 'torture';
+    return 'shaders';
+  }, [activeNovatoSection]);
 
   // Print & PDF Export State
   const [showPrintModal, setShowPrintModal] = useState<boolean>(false);
@@ -183,8 +241,6 @@ export const EvoMasterLabSuite: React.FC<EvoMasterLabSuiteProps> = ({
   }, [liveHardware, isPericial]);
 
   const handleTriggerPrint = () => {
-    // Invocación nativa del sistema de impresión del navegador
-    // index.css @media print formatea automáticamente el componente A4 a 210mm x 297mm
     setTimeout(() => {
       window.print();
     }, 150);
@@ -243,12 +299,10 @@ export const EvoMasterLabSuite: React.FC<EvoMasterLabSuiteProps> = ({
         isVerified: true,
       };
 
-      // Store in localStorage
       localStorage.setItem('evo_c01_specs', JSON.stringify(newPassport));
       localStorage.setItem('evo_autodetected_hardware', JSON.stringify(data));
       setLiveHardware(newPassport);
 
-      // Trigger events across the applet
       window.dispatchEvent(new Event('evo_hardware_updated'));
       window.dispatchEvent(new CustomEvent('evo_telemetry_parsed', { detail: data }));
 
@@ -262,7 +316,6 @@ export const EvoMasterLabSuite: React.FC<EvoMasterLabSuiteProps> = ({
     const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
     const sessionId = `EVO-METRO-${Date.now()}`;
     
-    // Check if user has detected specs or fallback to defaults
     const cpuName = liveHardware?.cpuModel || 'AMD Ryzen 7 7800X3D (Silicio de Banco)';
     const ramSpeed = liveHardware?.ramSpeedMhz || 6000;
     const ramCl = ramSpeed >= 6000 ? 30 : ramSpeed >= 5200 ? 36 : ramSpeed >= 3600 ? 18 : 16;
@@ -277,11 +330,9 @@ export const EvoMasterLabSuite: React.FC<EvoMasterLabSuiteProps> = ({
       ? 'NOMINAL ACEPTABLE (10.0 - 13.5 ns)'
       : 'CRÍTICO // CUELLO DE BOTELLA (>13.5 ns)';
 
-    // Deterministic Thermal Paste Degradation Index
     const pasteDegradationIndex = 18.5;
     const pasteLifeCycleYears = '3.5 años (Excelente estabilidad térmica / Sin bombeo)';
 
-    // Deterministic SHA-256 simulation calculation from session parameters
     const seedString = `${sessionId}:${cpuName}:${ramSpeed}:${ramCl}:${gpuName}:${timestamp}`;
     let hashNum = 0x811c9dc5;
     for (let i = 0; i < seedString.length; i++) {
@@ -374,417 +425,723 @@ ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#080a0d] text-[#f4f4f6] font-mono-tech select-none pb-24">
+    <div className="w-full min-h-screen bg-[#080a0d] text-[#f4f4f6] font-sans select-none pb-24">
       {/* Interactive Suite for Screen Display */}
       <div className="print:hidden">
-        {/* Top Industrial Glass Banner */}
-      <div 
-        className="w-full border-b border-zinc-800/80 sticky top-18 z-30"
-        style={{
-          background: 'rgba(14, 18, 25, 0.85)',
-          backdropFilter: 'blur(16px)',
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
-          
-          {/* Silicon Status Left */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-400/10 border border-amber-400/40 flex items-center justify-center text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.25)] shrink-0">
-              <Zap className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-display font-black text-sm sm:text-base text-white uppercase tracking-tight">
-                  TALLER METROLÓGICO // HOT-SWAP DE SILICIO & KERNEL
-                </h1>
-                <span className="px-2 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                  ONLINE // SYSINTERNALS
-                </span>
-              </div>
-              <p className="text-[11px] text-zinc-400 font-sans-editorial">
-                Banco interactivo para probar procesadores, latencia RAM en nanosegundos, buses PCIe y colas DPC.
-              </p>
-            </div>
-          </div>
-
-          {/* Right Action Buttons */}
-          <div className="flex items-center gap-2 shrink-0 flex-wrap">
-            {/* Live Detected Silicon Badge */}
-            {liveHardware ? (
-              <div 
-                className="px-3 py-1.5 rounded-xl border border-emerald-500/40 text-[11px] text-emerald-300 flex items-center gap-2"
-                style={{ background: 'rgba(16, 185, 129, 0.08)' }}
-                title={`Silicio detectado: ${liveHardware.cpuModel} | ${liveHardware.ramSpeedMhz || 3200} MT/s`}
-              >
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-bold text-white max-w-[140px] truncate">{liveHardware.cpuModel}</span>
-                <span className="text-zinc-500">•</span>
-                <span className="text-emerald-400 font-mono font-bold">{liveHardware.ramSpeedMhz || 3200} MT/s</span>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={onOpenAutoDetectModal}
-                className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-400 text-amber-300 hover:text-black border border-amber-400/50 hover:border-amber-400 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(251,191,36,0.2)]"
-              >
-                <Zap className="w-3.5 h-3.5 text-amber-400" />
-                <span>⚡ AUTO-DETECTAR MI PC</span>
-              </button>
-            )}
-
-            {/* Operating Mode Selector Compact */}
-            <EvoOperatingModeSelector compact />
-
-            {/* Generate & Print A4 PDF Dossier Button */}
-            <button
-              type="button"
-              onClick={() => setShowPrintModal(true)}
-              className="px-3 py-1.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(34,211,238,0.35)]"
-              title="Abrir vista previa e imprimir dossier A4 / Guardar como PDF"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">IMPRIMIR DOSSIER A4 (PDF)</span>
-              <span className="sm:hidden">DOSSIER (PDF)</span>
-            </button>
-
-            {/* Export Metrology Report Button */}
-            <button
-              type="button"
-              onClick={handleExportReportMetrologiaSuite}
-              className="px-3 py-1.5 rounded-xl bg-amber-400/10 hover:bg-amber-400 text-amber-300 hover:text-black border border-amber-400/50 hover:border-amber-400 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(251,191,36,0.2)]"
-              title="Generar y descargar archivo Reporte_Metrologia_EVO.txt"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">REPORTE (.TXT)</span>
-              <span className="sm:hidden">.TXT</span>
-            </button>
-          </div>
-
-        </div>
-
-        {/* View Mode Navigation Pills */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 pb-3 flex items-center gap-2 overflow-x-auto">
-          <button
-            type="button"
-            onClick={() => setActivePanel('sandbox')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold font-mono-tech transition-all cursor-pointer flex items-center gap-2 shrink-0 border ${
-              activePanel === 'sandbox'
-                ? 'bg-gradient-to-r from-amber-400 to-cyan-400 text-black border-amber-300 shadow-[0_0_18px_rgba(251,191,36,0.5)]'
-                : 'bg-zinc-900/90 text-amber-300 hover:text-white border-amber-500/40 hover:border-amber-400'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5 fill-current" />
-            <span>🎮 SIMULADOR DEFINITIVO EVO</span>
-            <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-black text-amber-300 border border-amber-400/50">
-              DIDÁCTICO
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActivePanel('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
-              activePanel === 'all'
-                ? 'bg-amber-400 text-black shadow-[0_0_14px_rgba(251,191,36,0.4)]'
-                : 'bg-zinc-900/90 text-zinc-400 hover:text-white border border-zinc-800'
-            }`}
-          >
-            <Sliders className="w-3.5 h-3.5" />
-            <span>VISTA INTEGRAL</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActivePanel('hardware')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
-              activePanel === 'hardware'
-                ? 'bg-amber-400 text-black shadow-[0_0_14px_rgba(251,191,36,0.4)]'
-                : 'bg-zinc-900/90 text-zinc-400 hover:text-amber-400 border border-zinc-800'
-            }`}
-          >
-            <Cpu className="w-3.5 h-3.5 text-amber-400" />
-            <span>A. HOT-SWAP HARDWARE</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActivePanel('software')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
-              activePanel === 'software'
-                ? 'bg-cyan-400 text-black shadow-[0_0_14px_rgba(34,211,238,0.4)]'
-                : 'bg-zinc-900/90 text-zinc-400 hover:text-cyan-300 border border-zinc-800'
-            }`}
-          >
-            <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-            <span>B. HOT-SWAP SOFTWARE (DPC µs)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActivePanel('telemetry')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
-              activePanel === 'telemetry'
-                ? 'bg-emerald-400 text-black shadow-[0_0_14px_rgba(16,185,129,0.4)]'
-                : 'bg-zinc-900/90 text-zinc-400 hover:text-emerald-400 border border-zinc-800'
-            }`}
-          >
-            <Zap className="w-3.5 h-3.5 text-emerald-400" />
-            <span>C. PARSER TELEMETRÍA</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActivePanel('matrix')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
-              activePanel === 'matrix'
-                ? 'bg-cyan-400 text-black shadow-[0_0_14px_rgba(34,211,238,0.4)]'
-                : 'bg-zinc-900/90 text-zinc-400 hover:text-cyan-400 border border-zinc-800'
-            }`}
-          >
-            <Activity className="w-3.5 h-3.5 text-cyan-400" />
-            <span>D. MATRIZ KERNEL NT</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Suite Content Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 space-y-8">
         
-        {/* Dynamic Operating Mode Diagnostic HUD Banner */}
+        {/* Top Header Glass Banner */}
         <div 
-          className="p-4 sm:p-5 rounded-2xl border transition-all"
+          className="w-full border-b border-zinc-800/80 sticky top-16 z-30 animate-in fade-in"
           style={{
-            background: isPericial ? 'rgba(8, 20, 30, 0.7)' : 'rgba(25, 20, 10, 0.7)',
-            borderColor: isPericial ? 'rgba(6, 182, 212, 0.3)' : 'rgba(245, 158, 11, 0.3)',
-            boxShadow: isPericial ? '0 0 30px rgba(6, 182, 212, 0.1)' : '0 0 30px rgba(245, 158, 11, 0.1)',
+            background: 'rgba(12, 16, 24, 0.94)',
+            backdropFilter: 'blur(16px)',
           }}
         >
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div className="flex items-start gap-3">
-              <div className={`p-2.5 rounded-xl border ${isPericial ? 'bg-cyan-500/10 border-cyan-500/40 text-cyan-400' : 'bg-amber-500/10 border-amber-500/40 text-amber-400'}`}>
-                {isPericial ? <Microscope className="w-5 h-5" /> : <Gauge className="w-5 h-5" />}
+          <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            
+            {/* Silicon Status / Mode Selector */}
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-400/10 border border-amber-400/40 flex items-center justify-center text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.25)] shrink-0">
+                <Compass className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                    DIAGNÓSTICO EN TIEMPO REAL // {isPericial ? 'MODO PERICIAL' : 'MODO ESENCIAL'}
-                  </span>
-                  <span className={`px-2 py-0.2 rounded text-[9px] font-black uppercase ${isPericial ? 'bg-cyan-400/20 text-cyan-300' : 'bg-amber-400/20 text-amber-300'}`}>
-                    {isPericial ? 'Ring 0 & Nanosegundos' : 'Lenguaje Claro & Gamers'}
+                  <h1 className="font-display font-black text-sm sm:text-base text-white uppercase tracking-tight">
+                    LABORATORIO INTERACTIVO // EVO LABS
+                  </h1>
+                  <span className="px-2 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    DIAGNÓSTICO EN TIEMPO REAL
                   </span>
                 </div>
-                
-                {/* Natural Language for Esencial vs Sysinternals for Pericial */}
-                <p className="text-xs sm:text-sm text-zinc-200 font-sans-editorial mt-1 leading-relaxed">
-                  {isPericial
-                    ? 'Telemetría metrológica activa: Medición directa de tCK en nanosegundos, dispersión DPC de nvlddmkm.sys en microsegundos, topología de carril 128b/130b y sobrecarga de mitigaciones VBS en saltos de Syscalls.'
-                    : liveHardware
-                    ? `Tu equipo real (${liveHardware.cpuModel} con memoria a ${liveHardware.ramSpeedMhz || 3200} MT/s) está sincronizado. Verificá abajo si tu latencia RAM está por debajo de 13.5 ns para evitar micro-tirones.`
-                    : 'Modo Esencial activado: Los diagnósticos complejos se traducen a consejos directos. Podés cambiar piezas virtuales abajo o usar el botón [⚡ AUTO-DETECTAR MI PC] para cargar tu máquina real.'}
+                <p className="text-xs text-zinc-400 font-sans">
+                  Monitoreo estructural y simulador de flujo de señal para optimización.
                 </p>
               </div>
             </div>
 
-            {/* Quick action buttons */}
-            <div className="flex items-center gap-2 self-end md:self-auto shrink-0 flex-wrap">
+            {/* Right Action Buttons */}
+            <div className="flex items-center gap-2 shrink-0 flex-wrap">
+              {/* Beginner vs Advanced Mode Toggle Pill */}
+              <div className="bg-zinc-900 p-1 rounded-xl border border-zinc-800 flex items-center gap-1 text-xs font-bold shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUiMode('principiante');
+                    setShowDeepDiveDetails(false);
+                  }}
+                  className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    uiMode === 'principiante'
+                      ? 'bg-amber-400 text-black font-black shadow-[0_0_12px_rgba(251,191,36,0.35)]'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  <span>🌱 Modo Principiante</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUiMode('tecnico')}
+                  className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    uiMode === 'tecnico'
+                      ? 'bg-cyan-400 text-black font-black shadow-[0_0_12px_rgba(34,211,238,0.35)]'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  <span>🔬 Modo Técnico</span>
+                </button>
+              </div>
+
+              {/* Detected Machine Badge / Honest Simulated State */}
+              {liveHardware ? (
+                <div 
+                  className="px-3 py-1.5 rounded-xl border border-emerald-500/40 text-[11px] text-emerald-300 flex items-center gap-2"
+                  style={{ background: 'rgba(16, 185, 129, 0.08)' }}
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="font-bold text-white max-w-[130px] truncate">{liveHardware.cpuModel}</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[10px] font-mono text-zinc-400 border border-zinc-800 px-2 py-1 rounded-lg bg-zinc-950/80">
+                    CONTEXTO DE USUARIO NO DISPONIBLE // ESCENARIO DE LABORATORIO SIMULADO
+                  </span>
+                  <button
+                    type="button"
+                    onClick={onOpenAutoDetectModal}
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-400 text-amber-300 hover:text-black border border-amber-400/50 hover:border-amber-400 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(251,191,36,0.2)]"
+                  >
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>⚡ DETECTAR MI PC</span>
+                  </button>
+                </div>
+              )}
+
+              {/* PDF Dossier Button */}
               <button
                 type="button"
                 onClick={() => setShowPrintModal(true)}
-                className="px-3 py-1.5 rounded-xl bg-cyan-400/20 hover:bg-cyan-400 text-cyan-300 hover:text-black border border-cyan-400/40 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(34,211,238,0.2)]"
-                title="Abrir vista previa del dossier A4 y guardar como PDF"
+                className="px-3 py-1.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(34,211,238,0.35)]"
               >
-                <Printer className="w-3.5 h-3.5 text-cyan-400" />
-                <span>DOSSIER PDF (A4)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleCopyScript}
-                className="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-                title="Copiar comando PowerShell de solo lectura"
-              >
-                {copiedScript ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-zinc-400" />}
-                <span>{copiedScript ? 'COMANDO COPIADO' : 'COPIAR SCRIPT PS'}</span>
+                <Printer className="w-3.5 h-3.5" />
+                <span>PDF REPORT</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* FEATURED: EL SIMULADOR DEFINITIVO EVO (ULTIMATE SANDBOX) */}
-        {(activePanel === 'sandbox' || activePanel === 'all') && (
-          <div className="space-y-4">
-            <EvoUltimateSandbox
-              passport={liveHardware || passport}
-              onNavigateToHardwareBench={() => setActivePanel('hardware')}
-              onOpenTomo={onNavigateTomo}
-            />
-          </div>
-        )}
-
-        {/* PANEL C: PARSER REACTIVO DE TELEMETRÍA (Direct Inline Component) */}
-        {(activePanel === 'telemetry' || activePanel === 'all') && (
+        {/* Dynamic Operating Mode Diagnostic HUD Banner */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-4">
           <div 
-            className="p-5 sm:p-6 rounded-2xl border space-y-4 font-mono-tech"
+            className="p-4 rounded-xl border transition-all"
             style={{
-              background: 'rgba(14, 18, 25, 0.75)',
-              backdropFilter: 'blur(16px)',
-              borderColor: 'rgba(16, 185, 129, 0.3)',
-              boxShadow: '0 0 30px rgba(0,0,0,0.5)',
+              background: uiMode === 'principiante' ? 'rgba(8, 20, 30, 0.65)' : 'rgba(25, 20, 10, 0.65)',
+              borderColor: uiMode === 'principiante' ? 'rgba(6, 182, 212, 0.25)' : 'rgba(245, 158, 11, 0.25)',
+              boxShadow: uiMode === 'principiante' ? '0 0 20px rgba(6, 182, 212, 0.05)' : '0 0 20px rgba(245, 158, 11, 0.05)',
             }}
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                  <Zap className="w-4 h-4" />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div className={`p-2 rounded-xl border ${uiMode === 'principiante' ? 'bg-cyan-500/10 border-cyan-500/40 text-cyan-400' : 'bg-amber-500/10 border-amber-500/40 text-amber-400'}`}>
+                  {uiMode === 'principiante' ? <Compass className="w-5 h-5" /> : <Microscope className="w-5 h-5" />}
                 </div>
                 <div>
-                  <span className="text-xs font-black text-emerald-400 uppercase tracking-wider block">
-                    PANEL C // PARSER REACTIVO DE TELEMETRÍA NATIVA (CIM/WMI)
-                  </span>
-                  <span className="text-[10px] text-zinc-500">
-                    Ingestión directa en 1 clic • Sin instaladores • Solo lectura
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                      DIAGNÓSTICO EN TIEMPO REAL // MODO {uiMode === 'principiante' ? 'GUIADO DE INICIO' : 'SISTEMA COMPLETO'}
+                    </span>
+                    <span className={`px-2 py-0.2 rounded text-[9px] font-black uppercase ${uiMode === 'principiante' ? 'bg-cyan-400/20 text-cyan-300' : 'bg-amber-400/20 text-amber-300'}`}>
+                      {uiMode === 'principiante' ? 'Lenguaje Claro y Simulaciones' : 'Sysinternals Ring 0'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-300 mt-1 leading-relaxed">
+                    {uiMode === 'principiante'
+                      ? 'La placa interactiva es el laboratorio central. Cada componente que toques o selecciones mostrará su estado de flujo, señales y temperatura en tiempo real en los paneles de control de la derecha.'
+                      : 'Acceso directo a carriles PCIe Gen 4/5, temporizaciones avanzadas tCL/tRFC, medición del controlador de memoria IMC en nanosegundos y dispersión de tiempos de interrupción DPC en microsegundos.'}
+                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">
-                  WIN32_PROCESSOR // PHYSICALMEMORY
-                </span>
-              </div>
-            </div>
-
-            {/* PowerShell Script Instructions & Copy Box */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs text-zinc-300">
-                <span className="font-bold flex items-center gap-1.5">
-                  <Terminal className="w-3.5 h-3.5 text-emerald-400" />
-                  1. EJECUTAR EN POWERSHELL (SIN PRIVILEGIOS DE ADMINISTRADOR):
-                </span>
+              {/* PS Script quick action */}
+              <div className="flex items-center gap-2 self-end md:self-auto shrink-0 flex-wrap">
                 <button
                   type="button"
                   onClick={handleCopyScript}
-                  className="text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  {copiedScript ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                  <span>{copiedScript ? '¡Copiado!' : 'Copiar comando'}</span>
+                  {copiedScript ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-zinc-400" />}
+                  <span>{copiedScript ? 'COPIADO' : 'COPIAR SCRIPT PS'}</span>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <div className="p-3 rounded-xl bg-black/80 border border-zinc-800/80 text-[11px] text-emerald-300 font-mono overflow-x-auto select-all">
-                {powershellCommand}
+        {/* ========================================================================= */}
+        {/* OPERATIVE TWO-COLUMN LAYOUT                                              */}
+        {/* LEFT AREA: 65-70% (Motherboard) | RIGHT PANEL: 30-35% (Controls/Guides) */}
+        {/* ========================================================================= */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            {/* ========================================================================= */}
+            {/* LEFT COLUMN: PLACA GRANDE INTERACTIVA (65-70%)                          */}
+            {/* ========================================================================= */}
+            <div className="lg:col-span-8 space-y-6">
+              
+              {/* Motherboard Header Banner */}
+              <div className="p-4 rounded-t-2xl bg-zinc-950/80 border-t border-x border-zinc-800 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">
+                    MICRO-ARQUITECTURA DE BANCO EVO // PLACA EN VIVO
+                  </span>
+                </div>
+                <div className="text-[10px] text-zinc-500 font-mono">
+                  ANÁLISIS DINÁMICO DE SILICIO • {selectedOverlay.toUpperCase()} OVERLAY
+                </div>
               </div>
+
+              {/* The Grand Interactive Motherboard Component (Central visual lab element) */}
+              <div className="border border-zinc-800 bg-black/40 rounded-b-2xl p-2.5 shadow-2xl relative overflow-hidden group">
+                <EvoMotherboardCanvas
+                  passport={liveHardware || passport}
+                  activeOverlay={selectedOverlay}
+                  activeLoadProfile={selectedLoadProfile}
+                  initialComponent={selectedComponent}
+                  onSelectComponent={(id, name) => {
+                    // Map component selection back to beginner tabs if in beginner mode
+                    if (uiMode === 'principiante') {
+                      if (id === 'ram') setActiveNovatoSection('memoria');
+                      else if (id === 'pcie') setActiveNovatoSection('gpu');
+                      else if (id === 'm2') setActiveNovatoSection('almacenamiento');
+                      else if (id === 'vrm') setActiveNovatoSection('energia');
+                      else if (id === 'cpu') setActiveNovatoSection('procesador');
+                    }
+                  }}
+                  className="w-full min-h-[480px] lg:min-h-[580px]"
+                />
+
+                {/* Micro instructions overlay on the board */}
+                <div className="absolute bottom-4 left-4 right-4 bg-black/85 border border-zinc-800/80 p-3 rounded-xl flex items-center justify-between text-xs text-zinc-300">
+                  <div className="flex items-center gap-2">
+                    <Info className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span>Hacé clic sobre cualquier sector de la placa para inspeccionar sus pistas, buses de cobre y latencia operativa.</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-800 text-zinc-400 border border-zinc-700 uppercase">
+                    Interactiva
+                  </span>
+                </div>
+              </div>
+
+              {/* FLOW / FAILURE REALTIME DIAGRAM CIRCUIT (Satisface punto de fallas) */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-zinc-950/80 border border-zinc-800/90 space-y-3.5">
+                <div className="flex items-center justify-between border-b border-zinc-900 pb-2">
+                  <div className="flex items-center gap-2">
+                    <Battery className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold text-white uppercase tracking-widest block">
+                      SECUENCIA DE ALIMENTACIÓN Y TRANSMISIÓN DE SEÑAL
+                    </span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[8px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 uppercase tracking-widest">
+                    Live stream
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-2 py-1 text-xs font-mono">
+                  {/* Node: FUENTE */}
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-bold">FUENTE (12V)</span>
+                  </div>
+
+                  <span className="text-emerald-500 font-bold animate-pulse">➔</span>
+
+                  {/* Node: VRM */}
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-bold">VRM (VCore)</span>
+                  </div>
+
+                  <span className="text-emerald-500 font-bold animate-pulse">➔</span>
+
+                  {/* Node: CPU */}
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-bold">CPU (IMC)</span>
+                  </div>
+
+                  <span className="text-emerald-500 font-bold animate-pulse">➔</span>
+
+                  {/* Node: RAM / MEMORIA WITH PROMPT-SPECIFIED FAILURE */}
+                  {activeNovatoSection === 'memoria' ? (
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/15 border border-rose-500 text-rose-300 animate-bounce shadow-[0_0_20px_rgba(239,68,68,0.25)]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                      <span className="font-bold">⚠️ MEMORIA RAM (Falla de tREFI)</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      <span className="font-bold">RAM (Estable)</span>
+                    </div>
+                  )}
+
+                  <span className={activeNovatoSection === 'memoria' ? 'text-rose-500/40' : 'text-emerald-500 animate-pulse'}>➔</span>
+
+                  {/* Node: GPU */}
+                  <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all ${
+                    activeNovatoSection === 'memoria' 
+                      ? 'bg-zinc-900 border border-zinc-800 text-zinc-600' 
+                      : 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+                  }`}>
+                    {activeNovatoSection !== 'memoria' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+                    <span className="font-bold">PLACA DE VIDEO</span>
+                  </div>
+                </div>
+
+                {activeNovatoSection === 'memoria' && (
+                  <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800/60 text-xs text-rose-300 flex items-start gap-2 animate-in slide-in-from-bottom-2">
+                    <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="block text-rose-200">SECUENCIA DE INICIO INTERRUMPIDA EN MEMORIA RAM:</strong>
+                      <span>La simulación detectó tiempos de acceso (timings avanzados) excesivamente ajustados. La señal se interrumpe antes de llegar a la placa de video, provocando un congelamiento de pantalla (micro-stutter). Te recomendamos activar Gear 1 o relajar los ciclos de refresco tREFI.</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
             </div>
 
-            {/* JSON Textarea and Ingest Button */}
-            <div className="space-y-2 pt-1">
-              <span className="text-xs font-bold text-zinc-300 block">
-                2. PEGAR EL RESULTADO JSON AQUÍ:
-              </span>
-              <textarea
-                value={jsonText}
-                onChange={(e) => setJsonText(e.target.value)}
-                placeholder='Pegá aquí la salida JSON, por ejemplo: {"CPU":"AMD Ryzen 7 7800X3D","Cores":8,"Threads":16,"GPU":"NVIDIA GeForce RTX 4070 Ti SUPER","VRAM_GB":16,"RAM_GB":32,"RAM_Speed":6000}'
-                rows={3}
-                className="w-full p-3 rounded-xl bg-black/70 border border-zinc-800 text-xs text-zinc-200 font-mono focus:border-emerald-500 focus:outline-none placeholder:text-zinc-600 resize-none transition-all"
+            {/* ========================================================================= */}
+            {/* RIGHT COLUMN: INFORMATION AND CONTROLS PANEL (30-35%)                  */}
+            {/* ========================================================================= */}
+            <div className="lg:col-span-4 space-y-6">
+              
+              {/* QUESTION / GUIDE HEADER BANNER FOR BEGINNERS */}
+              {uiMode === 'principiante' && (
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-[#0d131f] to-[#0a0e16] border border-amber-400/30 shadow-lg space-y-4">
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block">
+                      ¿QUÉ QUERÉS EVALUAR HOY?
+                    </span>
+                    <h2 className="font-display font-black text-lg text-white tracking-tight">
+                      Selección de Pruebas
+                    </h2>
+                    <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                      Elegí qué sector de la placa madre querés inspeccionar y simular en tiempo real.
+                    </p>
+                  </div>
+
+                  {/* 6 NOVICE SECTION BUTTONS (As requested) */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    
+                    {/* PROCESADOR */}
+                    <button
+                      type="button"
+                      onClick={() => setActiveNovatoSection('procesador')}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                        activeNovatoSection === 'procesador'
+                          ? 'bg-amber-400 text-black font-bold border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.3)]'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                      }`}
+                    >
+                      <Cpu className="w-4 h-4" />
+                      <span className="text-[11px] uppercase tracking-wider font-bold">Procesador</span>
+                    </button>
+
+                    {/* MEMORIA */}
+                    <button
+                      type="button"
+                      onClick={() => setActiveNovatoSection('memoria')}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                        activeNovatoSection === 'memoria'
+                          ? 'bg-amber-400 text-black font-bold border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.3)]'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                      }`}
+                    >
+                      <Layers className="w-4 h-4" />
+                      <span className="text-[11px] uppercase tracking-wider font-bold">Memoria</span>
+                    </button>
+
+                    {/* PLACA DE VIDEO */}
+                    <button
+                      type="button"
+                      onClick={() => setActiveNovatoSection('gpu')}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                        activeNovatoSection === 'gpu'
+                          ? 'bg-amber-400 text-black font-bold border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.3)]'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                      }`}
+                    >
+                      <Gauge className="w-4 h-4" />
+                      <span className="text-[11px] uppercase tracking-wider font-bold">Placa de Video</span>
+                    </button>
+
+                    {/* ALMACENAMIENTO */}
+                    <button
+                      type="button"
+                      onClick={() => setActiveNovatoSection('almacenamiento')}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                        activeNovatoSection === 'almacenamiento'
+                          ? 'bg-amber-400 text-black font-bold border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.3)]'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                      }`}
+                    >
+                      <HardDrive className="w-4 h-4" />
+                      <span className="text-[11px] uppercase tracking-wider font-bold">Almacenamiento</span>
+                    </button>
+
+                    {/* ENERGÍA */}
+                    <button
+                      type="button"
+                      onClick={() => setActiveNovatoSection('energia')}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                        activeNovatoSection === 'energia'
+                          ? 'bg-amber-400 text-black font-bold border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.3)]'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                      }`}
+                    >
+                      <Battery className="w-4 h-4" />
+                      <span className="text-[11px] uppercase tracking-wider font-bold">Energía</span>
+                    </button>
+
+                    {/* TEMPERATURA */}
+                    <button
+                      type="button"
+                      onClick={() => setActiveNovatoSection('temperatura')}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                        activeNovatoSection === 'temperatura'
+                          ? 'bg-amber-400 text-black font-bold border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.3)]'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                      }`}
+                    >
+                      <Flame className="w-4 h-4" />
+                      <span className="text-[11px] uppercase tracking-wider font-bold">Temperatura</span>
+                    </button>
+
+                  </div>
+                </div>
+              )}
+
+              {/* FLOW DETAILS AND ACTION CARD */}
+              <div className="p-5 rounded-2xl bg-zinc-950/90 border border-zinc-800 space-y-4">
+                
+                {/* Context / Target header */}
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest block">
+                    SECCIÓN EN EVALUACIÓN
+                  </span>
+                  <h3 className="font-display font-black text-base text-white uppercase tracking-tight">
+                    {uiMode === 'principiante' ? activeNovatoSection : 'MODALIDAD AVANZADA'}
+                  </h3>
+                </div>
+
+                {/* What it does / When to use / What you get (Simple language for beginners) */}
+                {uiMode === 'principiante' && (
+                  <div className="space-y-3.5 text-xs">
+                    
+                    {/* QUE HACE */}
+                    <div className="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/80 space-y-1">
+                      <span className="text-[9px] font-black text-amber-400 uppercase tracking-wider block">
+                        🔋 Qué hace:
+                      </span>
+                      <p className="text-zinc-200 font-sans leading-relaxed">
+                        {activeNovatoSection === 'procesador' && 'Simula la respuesta del procesador principal al procesar instrucciones complejas de juego en paralelo.'}
+                        {activeNovatoSection === 'memoria' && 'Envía ráfagas continuas de datos desde la memoria temporal al procesador para evaluar su velocidad.'}
+                        {activeNovatoSection === 'gpu' && 'Analiza la transferencia directa de texturas gráficas de alta definición desde la memoria gráfica a la pantalla.'}
+                        {activeNovatoSection === 'almacenamiento' && 'Mide la velocidad de lectura directa de archivos y partidas desde el disco de estado sólido NVMe.'}
+                        {activeNovatoSection === 'energia' && 'Supervisa cómo las fases de poder estabilizan el voltaje que alimenta los componentes de silicio.'}
+                        {activeNovatoSection === 'temperatura' && 'Mide el calor acumulado en el procesador principal bajo cargas pesadas para evitar estrangulamiento térmico.'}
+                      </p>
+                    </div>
+
+                    {/* CUANDO USARLA */}
+                    <div className="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/80 space-y-1">
+                      <span className="text-[9px] font-black text-cyan-400 uppercase tracking-wider block">
+                        📅 Cuándo usarla:
+                      </span>
+                      <p className="text-zinc-200 font-sans leading-relaxed">
+                        {activeNovatoSection === 'procesador' && 'Si los cuadros de tu juego caen drásticamente cuando hay mucha acción en pantalla.'}
+                        {activeNovatoSection === 'memoria' && 'Si notas micro-tirones o lentitud al cargar texturas en tiempo real mientras te desplazas.'}
+                        {activeNovatoSection === 'gpu' && 'Antes de cambiar de resolución o actualizar tu monitor para comprobar si tu placa gráfica es suficiente.'}
+                        {activeNovatoSection === 'almacenamiento' && 'Si los tiempos de carga entre pantallas son muy lentos o tardas en iniciar el sistema.'}
+                        {activeNovatoSection === 'energia' && 'Si tu computadora se reinicia de manera repentina al abrir aplicaciones o juegos pesados.'}
+                        {activeNovatoSection === 'temperatura' && 'Si los ventiladores de tu computadora suenan muy fuerte y sientes que el rendimiento cae.'}
+                      </p>
+                    </div>
+
+                    {/* QUE VAS A OBTENER */}
+                    <div className="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/80 space-y-1">
+                      <span className="text-[9px] font-black text-emerald-400 uppercase tracking-wider block">
+                        🎯 Qué vas a obtener:
+                      </span>
+                      <p className="text-zinc-200 font-sans leading-relaxed">
+                        {activeNovatoSection === 'procesador' && 'Diagnóstico del porcentaje de carga y sugerencias para calibrar el despacho de hilos de ejecución.'}
+                        {activeNovatoSection === 'memoria' && 'Medición directa de velocidad en nanosegundos (tCK) y veredicto de estabilidad de frecuencia.'}
+                        {activeNovatoSection === 'gpu' && 'Identificación de cuellos de botella físicos y nivel de saturación del canal PCIe directo.'}
+                        {activeNovatoSection === 'almacenamiento' && 'Gráfico interactivo de tasas de transferencia en megabytes por segundo (MB/s).'}
+                        {activeNovatoSection === 'energia' && 'Informe detallado de respuesta transitoria y estabilidad del voltaje bajo simulación de carga.'}
+                        {activeNovatoSection === 'temperatura' && 'Mapa térmico de la placa que muestra los puntos más calientes y el margen seguro de disipación.'}
+                      </p>
+                    </div>
+
+                  </div>
+                )}
+
+                {/* ADVANCED PROFUNDIZAR DRAWER FOR THE NOVICE SECTION */}
+                {uiMode === 'principiante' && (
+                  <div className="pt-2 border-t border-zinc-800/80">
+                    <button
+                      type="button"
+                      onClick={() => setShowDeepDiveDetails(!showDeepDiveDetails)}
+                      className="w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white font-mono-tech font-bold text-xs flex items-center justify-center gap-2 border border-zinc-800 transition-colors cursor-pointer"
+                    >
+                      <Microscope className="w-4 h-4 text-cyan-400" />
+                      <span>{showDeepDiveDetails ? 'OCULTAR CAPA TÉCNICA' : '🔬 [ PROFUNDIZAR DETALLES TÉCNICOS ]'}</span>
+                    </button>
+
+                    {showDeepDiveDetails && (
+                      <div className="mt-3 p-3.5 rounded-xl bg-black border border-cyan-500/30 text-[11px] text-zinc-300 font-mono space-y-2.5 animate-in slide-in-from-top-2">
+                        <div className="flex items-center gap-1.5 text-cyan-400 font-bold border-b border-zinc-900 pb-1.5">
+                          <Sliders className="w-3.5 h-3.5" />
+                          <span>REGISTRO DE ARQUITECTURA DE SILICIO</span>
+                        </div>
+                        
+                        <div className="space-y-1 text-zinc-400">
+                          {activeNovatoSection === 'procesador' && (
+                            <>
+                              <div><strong className="text-white">CPU / IMC:</strong> Ring Bus / Mesh Interconnect a 4.2 GHz.</div>
+                              <div><strong className="text-white">SYS CALLS:</strong> Overhead bajo Windows Thread Director 2.0.</div>
+                              <div><strong className="text-white">LATENCIA:</strong> Latencia L1/L2 directa a cache L3 &lt; 0.85 ns.</div>
+                            </>
+                          )}
+                          {activeNovatoSection === 'memoria' && (
+                            <>
+                              <div><strong className="text-white">DDR / CHANNELS:</strong> Dual-Channel 128-bit topology.</div>
+                              <div><strong className="text-white">TIMINGS:</strong> Temporizaciones secundarias tRFC / tREFI calibradas.</div>
+                              <div><strong className="text-white">LATENCIA IMC:</strong> Latencia real absoluta de acceso &lt; 13.5 ns nominal.</div>
+                            </>
+                          )}
+                          {activeNovatoSection === 'gpu' && (
+                            <>
+                              <div><strong className="text-white">PCIE LANES:</strong> PEG (PCIe Graphics Dedicated Lanes) a x16 lanes.</div>
+                              <div><strong className="text-white">REBAR:</strong> Resizable BAR Activo con multiplexación directa.</div>
+                              <div><strong className="text-white">BANDWIDTH:</strong> 31.52 GB/s de ancho de banda efectivo.</div>
+                            </>
+                          )}
+                          {activeNovatoSection === 'almacenamiento' && (
+                            <>
+                              <div><strong className="text-white">NVME CHIP:</strong> Bus PCIe directo sin overhead del chipset PCH.</div>
+                              <div><strong className="text-white">S.M.A.R.T:</strong> Monitoreo de sectores lógicos de almacenamiento GPT.</div>
+                              <div><strong className="text-white">THROTTLING:</strong> Margen térmico de controladora de silicio safe.</div>
+                            </>
+                          )}
+                          {activeNovatoSection === 'energia' && (
+                            <>
+                              <div><strong className="text-white">VRM PHASES:</strong> Módulo Buck Multifase 16+2+1 etapas directas.</div>
+                              <div><strong className="text-white">VCore:</strong> Curva adaptativa a 1.220V con LLC Nivel 6.</div>
+                              <div><strong className="text-white">Vdroop Delta:</strong> Caída controlada bajo carga pesada transitoria &lt; 28mV.</div>
+                            </>
+                          )}
+                          {activeNovatoSection === 'temperatura' && (
+                            <>
+                              <div><strong className="text-white">TjMax limit:</strong> Estrangulamiento de reloj automático a 100°C.</div>
+                              <div><strong className="text-white">VRM thermal:</strong> Mosfets térmicamente limitados a 105°C.</div>
+                              <div><strong className="text-white">DPC latency:</strong> Jitter de frametimes bajo fluctuaciones térmicas estables.</div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* RE-RENDER ORIGINAL PANELS DEPENDING ON ACTIVE MODAL / VIEWS              */}
+        {/* ========================================================================= */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 space-y-8">
+          
+          {/* FEATURED: EL SIMULADOR DEFINITIVO EVO (ULTIMATE SANDBOX) */}
+          {(activePanel === 'sandbox' || activePanel === 'gaming' || activePanel === 'all') && (
+            <div className="space-y-4">
+              <EvoUltimateSandbox
+                initialStep={activePanel === 'gaming' ? 'gaming' : 'assembler'}
+                passport={liveHardware || passport}
+                onNavigateToHardwareBench={() => setActivePanel('hardware')}
+                onOpenTomo={onNavigateTomo}
               />
+            </div>
+          )}
 
-              {parseError && (
-                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-600 text-xs text-rose-300 flex items-center gap-2 animate-in fade-in">
-                  <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-                  <span>{parseError}</span>
+          {/* PANEL C: PARSER REACTIVO DE TELEMETRÍA */}
+          {(activePanel === 'telemetry' || activePanel === 'all') && (
+            <div 
+              className="p-5 sm:p-6 rounded-2xl border space-y-4 font-mono-tech"
+              style={{
+                background: 'rgba(14, 18, 25, 0.75)',
+                backdropFilter: 'blur(16px)',
+                borderColor: 'rgba(16, 185, 129, 0.3)',
+                boxShadow: '0 0 30px rgba(0,0,0,0.5)',
+              }}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                    <Zap className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-black text-emerald-400 uppercase tracking-wider block">
+                      VER MÉTRICAS DEL SISTEMA // PARSER REACTIVO (CIM/WMI)
+                    </span>
+                    <span className="text-[10px] text-zinc-500">
+                      Ingestión directa en 1 clic • Sin instaladores • Solo lectura
+                    </span>
+                  </div>
                 </div>
-              )}
 
-              {parseSuccess && (
-                <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500 text-xs text-emerald-300 flex items-center gap-2 animate-in fade-in">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>{parseSuccess}</span>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">
+                    WIN32_PROCESSOR // PHYSICALMEMORY
+                  </span>
                 </div>
-              )}
+              </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
-                <span className="text-[11px] text-zinc-500 font-sans-editorial">
-                  Al procesar, se actualizan al instante la frecuencia de RAM, latencia, CPU, GPU y simulador de cuello de botella sin recargar la página.
+              {/* PowerShell Script Instructions & Copy Box */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-xs text-zinc-300">
+                  <span className="font-bold flex items-center gap-1.5">
+                    <Terminal className="w-3.5 h-3.5 text-emerald-400" />
+                    1. EJECUTAR EN POWERSHELL (SIN PRIVILEGIOS DE ADMINISTRADOR):
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopyScript}
+                    className="text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    {copiedScript ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    <span>{copiedScript ? '¡Copiado!' : 'Copiar comando'}</span>
+                  </button>
+                </div>
+
+                <div className="p-3 rounded-xl bg-black/80 border border-zinc-800/80 text-[11px] text-emerald-300 font-mono overflow-x-auto select-all">
+                  {powershellCommand}
+                </div>
+              </div>
+
+              {/* JSON Textarea and Ingest Button */}
+              <div className="space-y-2 pt-1">
+                <span className="text-xs font-bold text-zinc-300 block">
+                  2. PEGAR EL RESULTADO JSON AQUÍ:
                 </span>
+                <textarea
+                  value={jsonText}
+                  onChange={(e) => setJsonText(e.target.value)}
+                  placeholder='Pegá aquí la salida JSON, por ejemplo: {"CPU":"AMD Ryzen 7 7800X3D","Cores":8,"Threads":16,"GPU":"NVIDIA GeForce RTX 4070 Ti SUPER","VRAM_GB":16,"RAM_GB":32,"RAM_Speed":6000}'
+                  rows={3}
+                  className="w-full p-3 rounded-xl bg-black/70 border border-zinc-800 text-xs text-zinc-200 font-mono focus:border-emerald-500 focus:outline-none placeholder:text-zinc-600 resize-none transition-all"
+                />
 
-                <button
-                  type="button"
-                  onClick={handleProcessTelemetry}
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.35)] shrink-0"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>PROCESAR TELEMETRÍA</span>
-                </button>
+                {parseError && (
+                  <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-600 text-xs text-rose-300 flex items-center gap-2 animate-in fade-in">
+                    <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span>{parseError}</span>
+                  </div>
+                )}
+
+                {parseSuccess && (
+                  <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500 text-xs text-emerald-300 flex items-center gap-2 animate-in fade-in">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>{parseSuccess}</span>
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+                  <span className="text-[11px] text-zinc-500 font-sans">
+                    Al procesar, se actualizan al instante la frecuencia de RAM, latencia, CPU, GPU y simulador sin recargar la página.
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={handleProcessTelemetry}
+                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.35)] shrink-0"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                    <span>PROCESAR MÉTRICAS</span>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* PANEL A: HOT-SWAP DE HARDWARE (BANCO LIBRE) */}
-        {(activePanel === 'hardware' || activePanel === 'all') && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
-              <div className="flex items-center gap-2">
-                <Cpu className="w-5 h-5 text-amber-400" />
-                <h2 className="font-display font-black text-base sm:text-lg text-white uppercase tracking-tight">
-                  PANEL A // HOT-SWAP DE HARDWARE (BANCO LIBRE DE SILICIO)
-                </h2>
+          {/* PANEL A: LABORATORIO DE PRUEBA DE COMPONENTES */}
+          {(activePanel === 'hardware' || activePanel === 'architecture' || activePanel === 'all') && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
+                <div className="flex items-center gap-2">
+                  <Cpu className="w-5 h-5 text-amber-400" />
+                  <h2 className="font-display font-black text-base sm:text-lg text-white uppercase tracking-tight">
+                    LABORATORIO DE PRUEBA DE COMPONENTES (PRUEBA VIRTUAL LIBRE)
+                  </h2>
+                </div>
+                <span className="text-[10px] text-zinc-500 font-bold hidden sm:inline">
+                  PROCESADORES, MEMORIA Y PLACAS DE VIDEO
+                </span>
               </div>
-              <span className="text-[10px] text-zinc-500 font-bold hidden sm:inline">
-                METROLOGÍA DE NANO-SEGUNDOS & BUS PCIE
-              </span>
+
+              {/* Render full hardware hot-swap component */}
+              <Sector02HardwareHotSwap initialFocus={activePanel === 'architecture' ? 'cpu' : undefined}/>
             </div>
+          )}
 
-            {/* Render full hardware hot-swap component */}
-            <Sector02HardwareHotSwap />
-          </div>
-        )}
-
-        {/* PANEL B: HOT-SWAP DE SOFTWARE & DRIVERS */}
-        {(activePanel === 'software' || activePanel === 'all') && (
-          <div className="space-y-4 pt-6">
-            <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
-              <div className="flex items-center gap-2">
-                <Terminal className="w-5 h-5 text-cyan-400" />
-                <h2 className="font-display font-black text-base sm:text-lg text-white uppercase tracking-tight">
-                  PANEL B // HOT-SWAP DE SOFTWARE, KERNEL & CONTROLADORES (DPC µs)
-                </h2>
+          {/* PANEL B: PROBAR CAMBIOS SIN TOCAR TU PC */}
+          {(activePanel === 'software' || activePanel === 'all') && (
+            <div className="space-y-4 pt-4">
+              <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
+                <div className="flex items-center gap-2">
+                  <Terminal className="w-5 h-5 text-cyan-400" />
+                  <h2 className="font-display font-black text-base sm:text-lg text-white uppercase tracking-tight">
+                    PROBAR CAMBIOS SIN TOCAR TU PC (OPTIMIZACIÓN DE SOFTWARE Y CONTROLADORES)
+                  </h2>
+                </div>
+                <span className="text-[10px] text-zinc-500 font-bold hidden sm:inline">
+                  CONTROLADORES, LATENCIA Y PROCESOS
+                </span>
               </div>
-              <span className="text-[10px] text-zinc-500 font-bold hidden sm:inline">
-                COLAS ISR/DPC • RESOLUCIÓN DE TEMPORIZADOR • MITIGACIONES
-              </span>
+
+              {/* Render full software hot-swap component */}
+              <Sector02SoftwareHotSwap />
             </div>
+          )}
 
-            {/* Render full software hot-swap component */}
-            <Sector02SoftwareHotSwap />
-          </div>
-        )}
-
-        {/* PANEL D: MATRIZ DE VERSIONES & KERNEL NT */}
-        {(activePanel === 'matrix' || activePanel === 'all') && (
-          <div className="space-y-4 pt-6">
-            <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
-              <div className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-cyan-400" />
-                <h2 className="font-display font-black text-base sm:text-lg text-white uppercase tracking-tight">
-                  PANEL D // MATRIZ DE VERSIONES WINDOWS & PLANIFICADOR DE KERNEL NT
-                </h2>
+          {/* PANEL D: COMPARAR CONFIGURACIONES */}
+          {(activePanel === 'matrix' || activePanel === 'all') && (
+            <div className="space-y-4 pt-4">
+              <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-violet-400" />
+                  <h2 className="font-display font-black text-base sm:text-lg text-white uppercase tracking-tight">
+                    COMPARAR CONFIGURACIONES Y AJUSTES AVANZADOS DE SEGURIDAD
+                  </h2>
+                </div>
+                <span className="text-[10px] text-zinc-500 font-bold hidden sm:inline">
+                  MATRIZ DE WINDOWS Y CONFIGURACIONES
+                </span>
               </div>
-              <span className="text-[10px] text-zinc-500 font-bold hidden sm:inline">
-                THREAD DIRECTOR 2.0 • OSCILOSCOPIO DPC/ISR • MITIGACIONES VBS/HVCI
-              </span>
+
+              <EvoWindowsMatrixLab
+                initialScenario={initialScenario}
+                onNavigateToHardwareBench={() => setActivePanel('hardware')}
+                onOpenTomo={onNavigateTomo}
+              />
             </div>
+          )}
 
-            <EvoWindowsMatrixLab
-              initialScenario={initialScenario}
-              onNavigateToHardwareBench={() => setActivePanel('hardware')}
-              onOpenTomo={onNavigateTomo}
-            />
-          </div>
-        )}
-
-      </div>
+        </div>
       </div>
 
       {/* ========================================================================= */}
@@ -815,14 +1172,14 @@ ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="font-display font-black text-sm sm:text-base text-white uppercase tracking-tight">
-                      VISTA PREVIA // DOSSIER DE METROLOGÍA A4
+                      VISTA PREVIA // INFORME DE RENDIMIENTO A4
                     </h2>
                     <span className="px-2 py-0.2 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                       LISTO PARA PDF
                     </span>
                   </div>
-                  <span className="text-[10px] text-zinc-400 block font-sans-editorial">
-                    Formato editorial estándar ISO 216 (210 × 297 mm) con sello pericial SHA-256
+                  <span className="text-[10px] text-zinc-400 block font-sans">
+                    Formato ISO 216 (210 × 297 mm) con sello pericial SHA-256
                   </span>
                 </div>
               </div>
@@ -879,7 +1236,7 @@ ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
             <div className="px-5 py-2.5 bg-cyan-950/20 border-b border-cyan-500/20 flex flex-wrap items-center justify-between gap-2 text-[11px] text-cyan-200">
               <div className="flex items-center gap-2">
                 <Info className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                <span className="font-sans-editorial">
+                <span className="font-sans">
                   <strong>Recomendación para PDF:</strong> En el cuadro de impresión, seleccioná <em>Destino: Guardar como PDF</em>, <em>Márgenes: Ninguno</em> y activá <em>Gráficos de fondo</em>.
                 </span>
               </div>

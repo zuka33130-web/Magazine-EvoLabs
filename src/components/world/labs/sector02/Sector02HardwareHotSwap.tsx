@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Cpu, 
   Layers, 
@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useEvoOperatingMode } from '../../../../hooks/useEvoOperatingMode';
 import { UserHardwarePassport } from '../../../../types';
+import { calculateRamLatency } from '../../../../utils/ramLatencyUtils';
 
 interface CpuPreset {
   id: string;
@@ -365,7 +366,9 @@ const COOLING_PRESETS: CoolingPreset[] = [
   },
 ];
 
-export const Sector02HardwareHotSwap: React.FC = () => {
+export const Sector02HardwareHotSwap: React.FC<{initialFocus?:'cpu'}> = ({initialFocus}) => {
+  const cpuSection = useRef<HTMLDivElement>(null);
+  useEffect(()=>{if(initialFocus==='cpu')cpuSection.current?.scrollIntoView({block:'start'});},[initialFocus]);
   const { isPericial } = useEvoOperatingMode();
 
   // State
@@ -565,11 +568,11 @@ ${realUserHardware ? `[8] SILICIO DETECTADO EN EL EQUIPO DEL USUARIO
 - RAM Detectada          : ${realUserHardware.ramCapacityGb || realUserHardware.ramSizeGb || 16} GB @ ${realUserHardware.ramSpeedMhz || 3200} MT/s (${realUserHardware.ramType || 'DDR'})
 - Fecha de Captura       : ${realUserHardware.capturedAt || 'N/D'}
 ` : ''}================================================================================
-           SELLO CRIPTOGRÁFICO DE INTEGRIDAD PERICIAL // SHA-256
+           SELLO DE INTEGRIDAD LOCAL // HASH SHA-256
 ================================================================================
-HASH SHA-256 : ${sha256Simulated}
-AUDITORÍA    : FIRMA PERICIAL DIGITAL DE VALIDACIÓN FORENSE EVO LABS
-ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
+DIGEST SHA-256 : ${sha256Simulated}
+AUDITORÍA      : REGISTRO LOCAL GENERADO POR EVO LABS
+INTEGRIDAD     : SU VALIDEZ DEPENDE DEL ENTORNO DEL USUARIO
 ================================================================================
 `;
 
@@ -604,20 +607,18 @@ ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
     [coolingPresetId]
   );
 
-  // Immediate Absolute Real Latency: Latency (ns) = (CL * 2000) / MT/s
-  const absoluteRamLatencyNs = useMemo(() => {
-    if (!ramFrequency || ramFrequency <= 0) return 0;
-    return +((ramCl * 2000) / ramFrequency).toFixed(2);
-  }, [ramCl, ramFrequency]);
+  // Single source of truth calculation via calculateRamLatency
+  const ramLatencyMetrics = useMemo(() => {
+    return calculateRamLatency({
+      frequencyMhz: ramFrequency,
+      cl: ramCl,
+      channelTopology,
+    });
+  }, [ramCl, ramFrequency, channelTopology]);
 
-  // Bottleneck flag if latency > 13.5 ns
-  const isLatencyBottleneck = absoluteRamLatencyNs > 13.5;
-
-  // Clock Cycle Time tCK (ns) = 2000 / Frequency(MT/s)
-  const tCkNs = useMemo(() => {
-    if (!ramFrequency || ramFrequency <= 0) return 0;
-    return +(2000 / ramFrequency).toFixed(3);
-  }, [ramFrequency]);
+  const absoluteRamLatencyNs = ramLatencyMetrics.absoluteLatencyNs;
+  const isLatencyBottleneck = ramLatencyMetrics.isBottleneck;
+  const tCkNs = ramLatencyMetrics.tCkNs;
 
   // Channel multiplier for bandwidth
   const channelMultiplier = channelTopology === 'single' ? 1 : channelTopology === 'dual' ? 2 : 4;
@@ -763,7 +764,7 @@ ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
           </div>
 
           {/* Master Latency Meter Badge */}
-          <div className="p-4 rounded-xl bg-black/80 border border-zinc-800 text-right shrink-0 min-w-[200px]">
+          <div className="p-4 rounded-xl bg-black/80 border border-zinc-800 text-right shrink-0 w-full lg:w-auto lg:min-w-[200px]">
             <span className="text-[10px] text-zinc-500 uppercase block tracking-wider font-bold">
               LATENCIA REAL ABSOLUTA (ns)
             </span>
@@ -818,7 +819,7 @@ ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
         <div className="lg:col-span-7 space-y-6">
           
           {/* STEP 1: CPU SELECTOR & MICROARCHITECTURE */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#0c0e15] border border-zinc-800 space-y-3.5">
+          <div ref={cpuSection} data-hardware-section="cpu" className="p-4 sm:p-5 rounded-2xl bg-[#0c0e15] border border-zinc-800 space-y-3.5">
             <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
               <span className="text-xs font-bold text-amber-400 uppercase flex items-center gap-2">
                 <Cpu className="w-4 h-4" />

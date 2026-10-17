@@ -141,10 +141,25 @@ export interface DiskPartitionItem {
   };
 }
 
+export type WindowsServiceCategory =
+  | 'sistema-critico'
+  | 'seguridad-permisos'
+  | 'redes-internet'
+  | 'hardware-dispositivos'
+  | 'audio-multimedia'
+  | 'interfaz-experiencia'
+  | 'update-mantenimiento'
+  | 'diagnostico-telemetria'
+  | 'opcionales-usuario';
+
+export type WindowsServiceKind = 'NATIVO' | 'OPCIONAL' | 'POR_USUARIO' | 'TERCEROS';
+
 export interface WindowsServiceItem {
   id: string;
   serviceName: string;
   displayName: string;
+  category?: WindowsServiceCategory;
+  serviceKind?: WindowsServiceKind;
   state: 'RUNNING' | 'STOPPED' | 'START_PENDING' | 'STOP_PENDING';
   startupType: 'Automatic' | 'Automatic (Delayed)' | 'Manual' | 'Disabled';
   pid?: number;
@@ -155,7 +170,19 @@ export interface WindowsServiceItem {
   subsystemRole: string;
   simpleExplanation: string;
   functionalRisk: 'BAJO' | 'MEDIO' | 'ALTO' | 'CRÍTICO';
-  functionalTestType?: 'audio' | 'network' | 'print' | 'search' | 'update';
+  functionalTestType?: 'audio' | 'network' | 'print' | 'search' | 'update' | 'security' | 'system' | 'hardware' | 'ui' | 'optional';
+  windows11Scope?: {
+    editions?: string[];
+    versions?: string[];
+    requiredFeature?: string;
+  };
+  restoration?: {
+    canRestoreDirectly: boolean;
+    rollbackCommand: string;
+    requiresReboot: boolean;
+    restorationNotes: string;
+  };
+  criticalRecommendation?: string;
   telemetryImpact: {
     ramDeltaMb: number; // e.g. -42 MB
     cpuDeltaPercent: number; // e.g. -0.8%

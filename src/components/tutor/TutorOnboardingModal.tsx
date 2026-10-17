@@ -41,7 +41,7 @@ export const TutorOnboardingModal: React.FC = () => {
         {/* Header Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold mb-4">
           <Sparkles className="w-4 h-4 text-amber-400" />
-          <span>ACADEMIA EVO LABS // BIENVENIDO</span>
+          <span>EVO LABS // BIENVENIDO</span>
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-3">
@@ -49,7 +49,7 @@ export const TutorOnboardingModal: React.FC = () => {
         </h2>
 
         <p className="text-sm sm:text-base text-zinc-300 font-light leading-relaxed mb-6">
-          <strong className="text-white font-semibold">Tutor EVO</strong> te va a enseñar cómo funciona la Academia y te va a acompañar durante todo el recorrido: desde entender qué es un procesador hasta diagnosticar tu propia computadora como un perito.
+          <strong className="text-white font-semibold">Tutor EVO</strong> te va a enseñar cómo funciona EVO LABS y te va a acompañar durante todo el recorrido: desde entender qué es un procesador hasta diagnosticar tu propia computadora como un perito.
         </p>
 
         {/* 3 Pillars of Zero Knowledge UX */}

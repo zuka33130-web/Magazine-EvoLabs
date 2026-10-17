@@ -69,7 +69,7 @@ export const Tomo02EditorialComparison: React.FC<Tomo02EditorialComparisonProps>
                 <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                 LO QUE MIDE EL PERITO // EVIDENCIA DEL KERNEL
               </span>
-              <span className="text-[9px] text-cyan-500/80 font-mono-tech">TELEMETRÍA REAL</span>
+              <span className="text-[9px] text-cyan-500/80 font-mono-tech">SIMULACIÓN EDUCATIVA / DATOS ESTIMADOS</span>
             </div>
             <p className="text-xs sm:text-[12px] text-zinc-200 font-sans-editorial leading-relaxed my-1.5">
               {reality}

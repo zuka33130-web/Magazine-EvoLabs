@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { safeStorage } from '../../utils/safeStorage';
+import type { LegacySectorStatus } from './shared/useTomo02LegacySectorProgress';
+import { getExamHistory } from '../exam/utils/examStorage';
 import {
   ChevronLeft,
   ChevronRight,
@@ -33,7 +36,7 @@ import {
   TOMO_02_GLOSSARY,
 } from '../../data/tomo02Data';
 import { Tomo02Cover } from './Tomo02Cover';
-import coverTomo2HeroImg from '../../assets/images/cover_tomo2_win_1789531499967.jpg';
+import { TOMO_02_COVER } from '../../data/tomoCoversData';
 import { Tomo02EditorialIndex, ModuleProgressStatus } from './Tomo02EditorialIndex';
 import {
   Tomo02ModuleReader,
@@ -53,6 +56,19 @@ import { Tomo02ComoUsarElTomo } from './Tomo02ComoUsarElTomo';
 import { EvoTomo02FinalExam } from './EvoTomo02FinalExam';
 import { EvoTomo02CompletionScreen } from './EvoTomo02CompletionScreen';
 import { Tomo02OfficialPdfMagazine } from './Tomo02OfficialPdfMagazine';
+import { Tomo02Sector00View } from './sector00/Tomo02Sector00View';
+import { Tomo02Sector01View } from './sector01/Tomo02Sector01View';
+import { Tomo02Sector02View } from './sector02/Tomo02Sector02View';
+import { Tomo02Sector03View } from './sector03/Tomo02Sector03View';
+import { Tomo02Sector04View } from './sector04/Tomo02Sector04View';
+import { Tomo02Sector05View } from './sector05/Tomo02Sector05View';
+import { Tomo02Sector06View } from './sector06/Tomo02Sector06View';
+import { Tomo02Sector07View } from './sector07/Tomo02Sector07View';
+import { Tomo02Sector08View } from './sector08/Tomo02Sector08View';
+import { Tomo02Sector09View } from './sector09/Tomo02Sector09View';
+import { Tomo02Sector10View } from './sector10/Tomo02Sector10View';
+import { getAdvancedSector } from '../../data/tomo02AdvancedContent';
+const Tomo02AdvancedSectorView = React.lazy(() => import('./advanced/Tomo02AdvancedSectorView').then((m) => ({ default: m.Tomo02AdvancedSectorView })));
 
 export type Tomo02SubView =
   | 'cover'
@@ -61,7 +77,20 @@ export type Tomo02SubView =
   | 'reader'
   | 'exam'
   | 'completion'
-  | 'a4_magazine';
+  | 'a4_magazine'
+  | 'sector_00'
+  | 'sector_01'
+  | 'sector_02'
+  | 'sector_03'
+  | 'sector_04'
+  | 'sector_05'
+  | 'sector_06'
+  | 'sector_07'
+  | 'sector_08'
+  | 'sector_09'
+  | 'sector_10'
+  | 'advanced_sector'
+  | 'original_sector';
 
 interface Tomo02MagazineViewProps {
   onBackToApp?: () => void;
@@ -69,6 +98,7 @@ interface Tomo02MagazineViewProps {
   onOpenLab?: () => void;
   initialPage?: number;
   initialSubView?: Tomo02SubView;
+  initialSectorNumber?: string;
 }
 
 type ViewMode = 'continuous' | 'single';
@@ -136,12 +166,24 @@ const getModuleEditorialVariant = (
   }
 };
 
+const TOMO_02_SECTOR_IDS = Array.from({ length: 40 }, (_, number) => `sector-${String(number).padStart(2, '0')}`);
+const verifiedTomo02Exam = () => getExamHistory('tomo-02').find(attempt =>
+  attempt.passed === true && Number.isInteger(attempt.score) && Number.isInteger(attempt.totalQuestions) &&
+  attempt.totalQuestions > 0 && attempt.score >= 0 && attempt.score <= attempt.totalQuestions &&
+  attempt.score / attempt.totalQuestions >= 0.7
+);
+const hasFinalExperimentEvidence = () => {
+  try { return JSON.parse(safeStorage.getItem('evo_tomo02_sector39_learning_v1') || '{}')?.finalExperiment === true; }
+  catch { return false; }
+};
+
 export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   onBackToApp,
   onNavigateTomo,
   onOpenLab,
   initialPage = 1,
   initialSubView,
+  initialSectorNumber,
 }) => {
   // Sub-view management
   const [subView, setSubView] = useState<Tomo02SubView>(() => {
@@ -156,12 +198,14 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     return initialSubView || 'cover';
   });
 
+  const [selectedSectorNumber, setSelectedSectorNumber] = useState(getAdvancedSector(initialSectorNumber || safeStorage.getItem('evo_tomo02_last_sector') || '')?.number || '11');
+
   const [selectedModuleIndex, setSelectedModuleIndex] = useState<number>(0);
 
-  // Real progress state initialized from localStorage
+  // Real progress state initialized from safeStorage
   const [moduleProgress, setModuleProgress] = useState<ModuleProgressStatus>(() => {
     try {
-      const saved = localStorage.getItem('evo_tomo02_progress');
+      const saved = safeStorage.getItem('evo_tomo02_progress');
       if (saved) return JSON.parse(saved);
     } catch {
       // ignore
@@ -169,22 +213,18 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     return {};
   });
 
-  const [hasPassedFinalExam, setHasPassedFinalExam] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem('evo_tomo02_completed') === 'true';
-    } catch {
-      return false;
-    }
-  });
+  // Tomo 02 completion is strictly FALSE until all 40 sectors (Sector 00 to 39),
+  // master lab and final exam are completed.
+  const [hasPassedFinalExam, setHasPassedFinalExam] = useState<boolean>(() => Boolean(verifiedTomo02Exam()));
 
-  const [examScore, setExamScore] = useState<number>(() => {
-    try {
-      const saved = localStorage.getItem('evo_tomo02_exam_score');
-      return saved ? parseInt(saved, 10) : 10;
-    } catch {
-      return 10;
-    }
-  });
+  const [examScore, setExamScore] = useState<number>(() => verifiedTomo02Exam()?.score ?? 0);
+  const [examTotal, setExamTotal] = useState<number>(() => verifiedTomo02Exam()?.totalQuestions ?? 0);
+  const sectorCompletionReady = TOMO_02_SECTOR_IDS.every(id => moduleProgress[id] === 'completed');
+  const completionEligible = hasPassedFinalExam && sectorCompletionReady && hasFinalExperimentEvidence();
+  useEffect(() => {
+    // A legacy exam-only completion flag must not grant a certificate.
+    safeStorage.setItem('evo_tomo02_completed', completionEligible ? 'true' : 'false');
+  }, [completionEligible]);
 
   const completedCount = Object.values(moduleProgress).filter((s) => s === 'completed').length;
 
@@ -195,7 +235,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
       setModuleProgress((prev) => {
         const updated: ModuleProgressStatus = { ...prev, [modId]: 'in_progress' };
         try {
-          localStorage.setItem('evo_tomo02_progress', JSON.stringify(updated));
+          safeStorage.setItem('evo_tomo02_progress', JSON.stringify(updated));
         } catch {
           // ignore
         }
@@ -203,14 +243,25 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
       });
     }
     setSubView('reader');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
   };
+
+  const handleSectorProgress = useCallback((moduleId: string, status: LegacySectorStatus) => {
+    setModuleProgress(prev => {
+      if ((prev[moduleId] || 'not_started') === status) return prev;
+      const updated: ModuleProgressStatus = { ...prev, [moduleId]: status };
+      try { safeStorage.setItem('evo_tomo02_progress', JSON.stringify(updated)); }
+      catch { /* localStorage can be unavailable */ }
+      return updated;
+    });
+  }, []);
 
   const handleMarkCompleted = (moduleId: string) => {
     setModuleProgress((prev) => {
+      if (prev[moduleId] === 'completed') return prev;
       const updated: ModuleProgressStatus = { ...prev, [moduleId]: 'completed' };
       try {
-        localStorage.setItem('evo_tomo02_progress', JSON.stringify(updated));
+        safeStorage.setItem('evo_tomo02_progress', JSON.stringify(updated));
       } catch {
         // ignore
       }
@@ -220,15 +271,17 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
 
   const handleExamPassed = (score: number, total: number) => {
     setExamScore(score);
+    setExamTotal(total);
     setHasPassedFinalExam(true);
-    try {
-      localStorage.setItem('evo_tomo02_completed', 'true');
-      localStorage.setItem('evo_tomo02_exam_score', String(score));
-    } catch {
-      // ignore
+    // La teoría aprobada se conserva por separado de la finalización del tomo.
+    safeStorage.setItem('evo_tomo02_exam_score', String(score));
+    if (sectorCompletionReady && hasFinalExperimentEvidence()) {
+      safeStorage.setItem('evo_tomo02_completed', 'true');
+      setSubView('completion');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    setSubView('completion');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Si faltan sectores o evidencia, EvoTomeExamEngine muestra el resultado,
+    // pero no se emite una constancia de tomo completo.
   };
 
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
@@ -311,8 +364,9 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             // ignore
           }
 
-          setTimeout(() => {
+          setTimeout(async () => {
             try {
+              await document.querySelector<HTMLImageElement>('#t02-page-01 img')?.decode();
               window.print();
             } catch (err) {
               console.warn('Auto-print falló o requiere interacción del usuario:', err);
@@ -347,6 +401,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
       } catch {
         // ignore
       }
+      await document.querySelector<HTMLImageElement>('#t02-page-01 img')?.decode();
       window.print();
       setIsPreparingPrint(false);
     }, 400);
@@ -399,12 +454,356 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  // If subView is 'cover', 'pdf_magazine', 'index', 'reader', 'exam', or 'completion', render their respective view
+  const handleOpenAdvancedSector = (number: string) => {
+    if (!getAdvancedSector(number)) return;
+    setSelectedSectorNumber(number);
+    setSubView('advanced_sector');
+    safeStorage.setItem('evo_tomo02_last_sector', number);
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
+  };
+
+  const handleOpenOriginalSector = (number: string) => {
+    if (!/^(0[0-9]|[12][0-9]|3[0-9])$/.test(number)) return;
+    if (Number(number) < 11) {
+      setSubView(`sector_${number}` as Tomo02SubView);
+    } else {
+      handleOpenAdvancedSector(number);
+    }
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
+  };
+
+  if (subView === 'advanced_sector' || subView === 'original_sector') {
+    const content = getAdvancedSector(selectedSectorNumber)!;
+    return <div className="min-h-screen bg-[#07090e] text-zinc-100">
+      <React.Suspense fallback={<p role="status" className="p-8 text-cyan-300">Cargando Sector {content.number}…</p>}>
+        <Tomo02AdvancedSectorView key={content.number} content={content} completed={moduleProgress[`sector-${content.number}`] === 'completed'}
+          onBack={() => setSubView('index')} onNavigate={handleOpenAdvancedSector} onComplete={handleMarkCompleted} />
+      </React.Suspense>
+    </div>;
+  }
+
+  // If subView is 'cover', 'pdf_magazine', 'index', 'reader', 'exam', 'completion', 'sector_00', or 'sector_01', render their respective view
+  if (subView === 'sector_00') {
+    return (
+      <Tomo02Sector00View
+        onSectorProgress={handleSectorProgress}
+        onBackToMagazine={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
+
+  if (subView === 'sector_01') {
+    return (
+      <Tomo02Sector01View
+        onSectorProgress={handleSectorProgress}
+        onBackToMagazine={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector00={() => {
+          setSubView('sector_00');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
+
+  if (subView === 'sector_02') {
+    return (
+      <Tomo02Sector02View
+        onSectorProgress={handleSectorProgress}
+        onBackToMagazine={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector00={() => {
+          setSubView('sector_00');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector01={() => {
+          setSubView('sector_01');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
+
+  if (subView === 'sector_03') {
+    return (
+      <Tomo02Sector03View
+        onSectorProgress={handleSectorProgress}
+        onBackToMagazine={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector00={() => {
+          setSubView('sector_00');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector01={() => {
+          setSubView('sector_01');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector02={() => {
+          setSubView('sector_02');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector04={() => {
+          setSubView('sector_04');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
+
+  if (subView === 'sector_04') {
+    return (
+      <Tomo02Sector04View
+        onSectorProgress={handleSectorProgress}
+        onBackToMagazine={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector00={() => {
+          setSubView('sector_00');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector01={() => {
+          setSubView('sector_01');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector02={() => {
+          setSubView('sector_02');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector03={() => {
+          setSubView('sector_03');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
+
+  if (subView === 'sector_05') {
+    return (
+      <Tomo02Sector05View
+        onSectorProgress={handleSectorProgress}
+        onBackToMagazine={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector00={() => {
+          setSubView('sector_00');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector01={() => {
+          setSubView('sector_01');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector02={() => {
+          setSubView('sector_02');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
+
+  if (subView === 'sector_06') {
+    return (
+      <Tomo02Sector06View
+        onSectorProgress={handleSectorProgress}
+        onBackToMagazine={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector00={() => {
+          setSubView('sector_00');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector01={() => {
+          setSubView('sector_01');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector02={() => {
+          setSubView('sector_02');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector05={() => {
+          setSubView('sector_05');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
+
+  if (subView === 'sector_07') {
+    return (
+      <Tomo02Sector07View
+        onSectorProgress={handleSectorProgress}
+        onBackToMagazine={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector00={() => {
+          setSubView('sector_00');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector01={() => {
+          setSubView('sector_01');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector02={() => {
+          setSubView('sector_02');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector05={() => {
+          setSubView('sector_05');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector06={() => {
+          setSubView('sector_06');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
+
+  if (subView === 'sector_08') {
+    return (
+      <Tomo02Sector08View
+        onSectorProgress={handleSectorProgress}
+        onBackToMagazine={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector00={() => {
+          setSubView('sector_00');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector01={() => {
+          setSubView('sector_01');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector02={() => {
+          setSubView('sector_02');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector05={() => {
+          setSubView('sector_05');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector06={() => {
+          setSubView('sector_06');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector07={() => {
+          setSubView('sector_07');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
+
+  if (subView === 'sector_09') {
+    return (
+      <Tomo02Sector09View
+        onSectorProgress={handleSectorProgress}
+        onBackToMagazine={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector00={() => {
+          setSubView('sector_00');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector01={() => {
+          setSubView('sector_01');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector02={() => {
+          setSubView('sector_02');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector05={() => {
+          setSubView('sector_05');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector06={() => {
+          setSubView('sector_06');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector07={() => {
+          setSubView('sector_07');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector08={() => {
+          setSubView('sector_08');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
+
+  if (subView === 'sector_10') {
+    return (
+      <Tomo02Sector10View
+        onSectorProgress={handleSectorProgress}
+        onBackToMagazine={() => {
+          setSubView('index');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector00={() => {
+          setSubView('sector_00');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector01={() => {
+          setSubView('sector_01');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector02={() => {
+          setSubView('sector_02');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector05={() => {
+          setSubView('sector_05');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector06={() => {
+          setSubView('sector_06');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector07={() => {
+          setSubView('sector_07');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector08={() => {
+          setSubView('sector_08');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenSector09={() => {
+          setSubView('sector_09');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
+
   if (subView === 'cover') {
     return (
       <div className="min-h-screen bg-[#07090e] text-zinc-100 flex flex-col font-sans-editorial">
         <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Tomo02Cover
+            onOpenSector00={() => {
+              setSubView('sector_00');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSector01={() => {
+              setSubView('sector_01');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             onOpenMagazine={() => {
               setSubView('a4_magazine');
               window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -456,12 +855,63 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     return (
       <div className="min-h-screen bg-[#060709] text-zinc-100 flex flex-col font-sans-editorial px-4 sm:px-8">
         <div className="max-w-7xl mx-auto w-full">
+          {getAdvancedSector(safeStorage.getItem('evo_tomo02_last_sector') || '') && <button type="button"
+            onClick={() => handleOpenAdvancedSector(safeStorage.getItem('evo_tomo02_last_sector')!)}
+            className="mt-4 px-4 py-2 rounded-xl border border-cyan-400 text-cyan-300 text-sm">
+            Continuar último sector: {safeStorage.getItem('evo_tomo02_last_sector')}
+          </button>}
           <Tomo02EditorialIndex
+            onOpenOriginalSector={handleOpenOriginalSector}
+            onOpenAdvancedSector={handleOpenAdvancedSector}
             onBackToCover={() => {
               setSubView('cover');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onBackToApp={onBackToApp}
+            onOpenSector00={() => {
+              setSubView('sector_00');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSector01={() => {
+              setSubView('sector_01');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSector02={() => {
+              setSubView('sector_02');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSector03={() => {
+              setSubView('sector_03');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSector04={() => {
+              setSubView('sector_04');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSector05={() => {
+              setSubView('sector_05');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSector06={() => {
+              setSubView('sector_06');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSector07={() => {
+              setSubView('sector_07');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSector08={() => {
+              setSubView('sector_08');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSector09={() => {
+              setSubView('sector_09');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenSector10={() => {
+              setSubView('sector_10');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             onOpenA4Magazine={() => {
               setSubView('a4_magazine');
               window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -472,13 +922,14 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onOpenCompletionScreen={() => {
-              setSubView('completion');
+              setSubView(completionEligible ? 'completion' : 'index');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onOpenWindowsMatrixLab={onOpenLab}
             moduleProgress={moduleProgress}
             completedCount={completedCount}
             hasPassedFinalExam={hasPassedFinalExam}
+            canIssueCertificate={completionEligible}
           />
         </div>
       </div>
@@ -534,6 +985,13 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   }
 
   if (subView === 'completion') {
+    if (!completionEligible) {
+      return <div className="min-h-screen bg-[#060709] text-zinc-100 p-8 max-w-3xl mx-auto space-y-4">
+        <h2 className="text-xl font-bold text-amber-400">Finalización pendiente</h2>
+        <p>La constancia requiere los 40 sectores completados, evidencia válida del Sector 39 y examen general aprobado. Aprobar solo la teoría no completa el tomo.</p>
+        <button type="button" className="px-4 py-2 rounded-lg bg-sky-700" onClick={() => setSubView('index')}>Volver al índice</button>
+      </div>;
+    }
     return (
       <div className="min-h-screen bg-[#060709] text-zinc-100 flex flex-col font-sans-editorial px-4 sm:px-6">
         <EvoTomo02CompletionScreen
@@ -552,6 +1010,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           score={examScore}
+          total={examTotal}
         />
       </div>
     );
@@ -595,9 +1054,10 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             <button
               type="button"
               onClick={onBackToApp}
+              title="Volver a Inicio // Centro de Operaciones Mundo EVO"
               className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-cyan-900/60 hover:border-cyan-400 text-zinc-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer hidden lg:inline-flex"
             >
-              <span>CAMPUS EVO</span>
+              <span>INICIO</span>
             </button>
           )}
 
@@ -725,198 +1185,11 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
             hideHeaderFooter
             accentColor="#00D2FF"
           >
-            <div className="relative w-full h-full flex flex-col justify-between p-7 sm:p-9 md:p-10 bg-gradient-to-b from-[#0a0c10] via-[#07080b] to-[#040507] text-white select-none overflow-hidden font-sans-editorial">
-              {/* Background Subtle Technical Grid */}
-              <div className="absolute inset-0 pointer-events-none opacity-[0.035] bg-tech-grid z-0" />
-
-              {/* ========================================================================= */}
-              {/* 1. TOP HEADER STRIP: COLLECTIBLE SYSTEM BRANDING                          */}
-              {/* ========================================================================= */}
-              <div className="relative z-10 flex items-center justify-between border-b-2 border-cyan-400 pb-3 text-[10px] font-mono-tech tracking-wider text-zinc-300">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 bg-cyan-400 inline-block shadow-[0_0_10px_rgba(0,210,255,0.75)]" />
-                  <span className="font-black text-white tracking-widest uppercase">
-                    COLECCIÓN EDITORIAL // TOMO 02
-                  </span>
-                </div>
-
-                <div className="hidden sm:flex items-center gap-3 text-zinc-400 text-[10px]">
-                  <span className="uppercase tracking-widest">ARQUITECTURA DE WINDOWS & SISTEMA OPERATIVO</span>
-                  <span className="text-zinc-600">•</span>
-                  <span className="text-cyan-400 font-bold uppercase tracking-wider">EDICIÓN COLECCIONABLE // 2026</span>
-                </div>
-
-                <div className="font-mono-tech font-bold text-cyan-400 text-[10px] tracking-widest">
-                  A4 210×297 MM
-                </div>
-              </div>
-
-              {/* ========================================================================= */}
-              {/* 2. BIG MAGAZINE MASTHEAD (EVO LABS)                                       */}
-              {/* ========================================================================= */}
-              <div className="relative z-10 mt-4 mb-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-zinc-800/80 pb-3.5">
-                <div>
-                  <div className="flex items-baseline gap-2">
-                    <h1 className="font-display font-black text-5xl sm:text-7xl md:text-8xl tracking-tight uppercase leading-[0.92] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
-                      EVO LABS
-                    </h1>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 mt-2.5">
-                    <span className="bg-cyan-400 text-black text-[11px] font-mono-tech font-black tracking-widest uppercase px-2 py-0.5 rounded-xs shadow-[0_0_10px_rgba(0,210,255,0.4)]">
-                      MAGAZINE // TOMO 02
-                    </span>
-                    <span className="font-mono-tech text-[10px] sm:text-[11px] tracking-wider text-zinc-400 uppercase font-semibold">
-                      LA BIBLIA NEGRA DE WINDOWS
-                    </span>
-                  </div>
-                </div>
-
-                {/* Sello Editorial: DE USUARIO A INVESTIGADOR */}
-                <div className="flex items-center gap-2.5 bg-[#12151e] border border-cyan-400/40 rounded-md px-3.5 py-2 shadow-lg shrink-0">
-                  <div className="w-8 h-8 rounded-full border-2 border-cyan-400 flex items-center justify-center bg-cyan-400/10 text-cyan-400 shrink-0">
-                    <Layers className="w-4 h-4 text-cyan-400" />
-                  </div>
-                  <div className="font-mono-tech leading-tight">
-                    <span className="block text-[9.5px] font-black text-cyan-400 tracking-wider uppercase">
-                      DE USUARIO A INVESTIGADOR
-                    </span>
-                    <span className="block text-[8.5px] text-zinc-400">
-                      Windows deja de ser una caja negra.
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* ========================================================================= */}
-              {/* 3. HERO SECTION: REALISTIC WINDOWS ARCHITECTURE + HEADLINES                */}
-              {/* ========================================================================= */}
-              <div className="relative z-10 my-2 rounded-xl overflow-hidden border border-zinc-800 bg-[#0d1017] shadow-2xl flex-1 flex flex-col justify-between min-h-[310px]">
-                {/* Background Photography */}
-                <img
-                  src={coverTomo2HeroImg}
-                  alt="Fotografía editorial // Dominá Windows — La Biblia Negra de Windows"
-                  className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.70] contrast-[1.18]"
-                />
-
-                {/* Cinematic Vignette Overlays for High Contrast & Text Legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#07090d] via-[#07090d]/65 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#07090d]/95 via-[#07090d]/60 to-[#07090d]/80" />
-
-                {/* Top Stamp Tag in Image */}
-                <div className="relative z-10 p-4 sm:p-5 flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-black/80 backdrop-blur-md border border-cyan-400/60 rounded text-cyan-400 text-[10px] font-mono-tech font-bold uppercase tracking-widest">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                    INVESTIGACIÓN PRINCIPAL // TOMO 02
-                  </span>
-
-                  <span className="hidden sm:inline-block font-mono-tech text-[9.5px] text-zinc-300 bg-black/70 px-2.5 py-1 rounded border border-zinc-800">
-                    DESMONTAJE DEL KERNEL NT // EDICIÓN 2026
-                  </span>
-                </div>
-
-                {/* Central Commercial Core: DOMINÁ WINDOWS + PROMESA CENTRAL */}
-                <div className="relative z-10 px-5 sm:px-7 md:px-8 pb-5 sm:pb-6 space-y-2.5">
-                  {/* Título Principal */}
-                  <div>
-                    <h2 className="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white tracking-tight leading-[0.92] uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
-                      DOMINÁ WINDOWS
-                    </h2>
-                    <p className="font-display font-bold text-sm sm:text-base md:text-lg text-cyan-300 mt-1.5 tracking-wide drop-shadow">
-                      “DESCUBRÍ QUÉ HACE WINDOWS CUANDO VOS NO ESTÁS MIRANDO.”
-                    </p>
-                  </div>
-
-                  {/* Gancho Editorial de Alto Impacto */}
-                  <div className="p-3 sm:p-3.5 bg-gradient-to-r from-cyan-400/20 via-black/85 to-black/90 border-l-4 border-cyan-400 rounded-r-lg backdrop-blur-md max-w-2xl">
-                    <h3 className="font-display font-black text-sm sm:text-base md:text-lg text-white uppercase tracking-tight leading-tight">
-                      ¿QUÉ ESTÁ HACIENDO TU SISTEMA ANTES DE QUE ABRAS TU PRIMER PROGRAMA?
-                    </h3>
-                    <p className="font-sans-editorial text-[11px] sm:text-xs text-zinc-300 mt-1 leading-relaxed">
-                      Procesos invisibles, servicios en segundo plano, la memoria virtual que nadie te explicó y la telemetría bajo escrutinio forense.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* ========================================================================= */}
-              {/* 4. DOSSIER CENTRAL BANNER (EL LADO OSCURO DE WINDOWS)                      */}
-              {/* ========================================================================= */}
-              <div className="relative z-10 my-1 p-2.5 sm:p-3 bg-[#0d1017] border-2 border-cyan-500/60 rounded-lg shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 bg-cyan-400 text-black text-[9.5px] font-mono-tech font-black tracking-wider uppercase rounded-xs">
-                      DOSSIER CENTRAL
-                    </span>
-                    <h4 className="font-display font-black text-sm sm:text-base text-white uppercase tracking-tight">
-                      EL LADO OSCURO DE WINDOWS
-                    </h4>
-                  </div>
-                  <p className="text-[10.5px] sm:text-[11.5px] text-zinc-300 font-sans-editorial leading-snug">
-                    Arranque, procesos, memoria, servicios, Registro y recuperación explicados desde cero y comprobados con metodología EVO.
-                  </p>
-                </div>
-
-                <div className="hidden sm:flex items-center gap-1.5 text-[9.5px] font-mono-tech text-cyan-400 font-bold bg-cyan-400/10 px-2.5 py-1 rounded border border-cyan-400/30 shrink-0">
-                  <span>38 PÁGINAS A4</span>
-                </div>
-              </div>
-
-              {/* ========================================================================= */}
-              {/* 5. EDITORIAL HIGHLIGHTS (4 PILARES)                                       */}
-              {/* ========================================================================= */}
-              <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-2 pt-1 font-mono-tech">
-                <div className="p-2.5 bg-[#0d1017]/90 border border-zinc-800 rounded-md flex flex-col justify-between">
-                  <span className="text-[9.5px] text-cyan-400 font-black uppercase tracking-wider block">
-                    ARRANQUE
-                  </span>
-                  <p className="text-[10px] text-zinc-300 font-sans-editorial mt-1 leading-snug">
-                    UEFI, ESP, BCD y Winload.
-                  </p>
-                </div>
-
-                <div className="p-2.5 bg-[#0d1017]/90 border border-zinc-800 rounded-md flex flex-col justify-between">
-                  <span className="text-[9.5px] text-cyan-400 font-black uppercase tracking-wider block">
-                    PROCESOS
-                  </span>
-                  <p className="text-[10px] text-zinc-300 font-sans-editorial mt-1 leading-snug">
-                    svchost, servicios y tareas.
-                  </p>
-                </div>
-
-                <div className="p-2.5 bg-[#0d1017]/90 border border-zinc-800 rounded-md flex flex-col justify-between">
-                  <span className="text-[9.5px] text-cyan-400 font-black uppercase tracking-wider block">
-                    MEMORIA
-                  </span>
-                  <p className="text-[10px] text-zinc-300 font-sans-editorial mt-1 leading-snug">
-                    Working Set, Commit y Pagefile.
-                  </p>
-                </div>
-
-                <div className="p-2.5 bg-[#0d1017]/90 border border-zinc-800 rounded-md flex flex-col justify-between">
-                  <span className="text-[9.5px] text-cyan-400 font-black uppercase tracking-wider block">
-                    RECUPERACIÓN
-                  </span>
-                  <p className="text-[10px] text-zinc-300 font-sans-editorial mt-1 leading-snug">
-                    WinRE, SFC, DISM y diagnóstico.
-                  </p>
-                </div>
-              </div>
-
-              {/* ========================================================================= */}
-              {/* 6. PIE / FOOTER: ACREDITACIÓN EDITORIAL LIMPIA                            */}
-              {/* ========================================================================= */}
-              <div className="relative z-10 mt-2.5 pt-2.5 border-t border-zinc-800/80 flex items-center justify-between text-[9.5px] font-mono-tech text-zinc-400">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-white uppercase">EVO LABS MAGAZINE // TOMO 02</span>
-                  <span className="text-zinc-600">•</span>
-                  <span className="text-zinc-400 hidden sm:inline">INGENIERÍA DEL SISTEMA OPERATIVO & KERNEL NT</span>
-                </div>
-                <div className="text-cyan-400 font-bold uppercase tracking-wider">
-                  38 PÁGINAS A4
-                </div>
-              </div>
-            </div>
+            <img
+              src={TOMO_02_COVER}
+              alt="Portada definitiva de EVO LABS — Tomo 02: La Biblia Negra de Windows"
+              className="block w-full h-full object-contain"
+            />
           </Tomo02MasterPage>
         )}
 

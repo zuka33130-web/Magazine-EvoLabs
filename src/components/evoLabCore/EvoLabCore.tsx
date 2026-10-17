@@ -41,6 +41,7 @@ import { EvoLabCoreBuildView } from './views/EvoLabCoreBuildView';
 import { EvoLabCoreBottleneckView } from './views/EvoLabCoreBottleneckView';
 import { EvoLabCoreOptimizationView } from './views/EvoLabCoreOptimizationView';
 import { EvoLabCoreUpgradeView } from './views/EvoLabCoreUpgradeView';
+import { useLabAestheticMode } from '../../utils/labAestheticMode';
 
 interface EvoLabCoreProps {
   onNavigateToTomo?: (tomoId: '01' | '02' | '03' | '04') => void;
@@ -70,7 +71,7 @@ export const EvoLabCore: React.FC<EvoLabCoreProps> = ({
   initialPhase,
   initialMission,
 }) => {
-  const isElite = true;
+  const { isElite } = useLabAestheticMode();
 
   // Phase state: strictly starts at SELECT_PC ("¿QUÉ PC QUERÉS EVALUAR?") unless specified
   const [corePhase, setCorePhase] = useState<CorePhase>(initialPhase || 'SELECT_PC');

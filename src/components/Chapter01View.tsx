@@ -40,6 +40,7 @@ import {
   UserPcEvidenceMap,
   PassportJsonSchema
 } from '../types';
+import { REQUIRED_C01_SECTIONS } from '../utils/tomo01Progress';
 import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
 import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
 import { TutorChapterBanner } from './tutor/TutorChapterBanner';
@@ -544,6 +545,16 @@ export const Chapter01View: React.FC<Chapter01ViewProps> = ({
 
   const markSectionCompleted = (sec: SectionKey) => {
     setCompletedSections((prev) => new Set([...prev, sec]));
+  };
+
+  const markEntireChapterCompleted = () => {
+    setCompletedSections(new Set([...REQUIRED_C01_SECTIONS, 'cover', 'tu-pc']));
+    try {
+      localStorage.setItem('evo_c01_completed', JSON.stringify(Array.from(REQUIRED_C01_SECTIONS)));
+      localStorage.setItem('evo_c02_unlocked', 'true');
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleCopy = (text: string, id: string) => {
@@ -2646,15 +2657,17 @@ Test-Path $Archivo`;
             </div>
 
             {/* ACTIVIDAD DE COMPROBACIÓN // COMPROBÁ LO QUE APRENDISTE */}
-            <EvoChapterCheckSection
-              chapterNumber="01"
-              chapterTitle="CONOCÉ TU PC"
-              isAlreadyCompleted={completedSections.has('tu-pc')}
-              onPassCheck={() => {
-                markSectionCompleted('tu-pc');
-                onChapterCompleted();
-              }}
-            />
+            <div id="evo-chapter-check">
+              <EvoChapterCheckSection
+                chapterNumber="01"
+                chapterTitle="CONOCÉ TU PC"
+                isAlreadyCompleted={completedSections.has('tu-pc')}
+                onPassCheck={() => {
+                  markEntireChapterCompleted();
+                  onChapterCompleted();
+                }}
+              />
+            </div>
 
             {/* CLIFFHANGER // PRÓXIMO CAPÍTULO */}
             <div className="p-6 sm:p-8 rounded-2xl border-2 border-zinc-700 bg-gradient-to-r from-zinc-900 to-black space-y-6">
@@ -2684,14 +2697,26 @@ Test-Path $Archivo`;
                   type="button"
                   id="btn-desbloquear-cap02"
                   onClick={() => {
-                    markSectionCompleted('tu-pc');
-                    onChapterCompleted();
-                    if (onStartChapter02) onStartChapter02();
+                    if (completedSections.has('tu-pc') || isChapter02Unlocked) {
+                      if (onStartChapter02) onStartChapter02();
+                      else onBackToIndex();
+                    } else {
+                      const el = document.getElementById('evo-chapter-check');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }
                   }}
-                  className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-yellow-400 text-black hover:bg-yellow-300 transition-all duration-200 cursor-pointer shadow-xl hover:shadow-yellow-400/20 group shrink-0"
+                  className={`inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-xl group shrink-0 ${
+                    completedSections.has('tu-pc') || isChapter02Unlocked
+                      ? 'bg-yellow-400 text-black hover:bg-yellow-300 hover:shadow-yellow-400/20'
+                      : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700'
+                  }`}
                 >
-                  <span>DESBLOQUEAR CAPÍTULO 02</span>
-                  <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" />
+                  <span>
+                    {completedSections.has('tu-pc') || isChapter02Unlocked
+                      ? 'IR AL CAPÍTULO 02'
+                      : 'COMPROBAR Y DESBLOQUEAR CAP. 02'}
+                  </span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
@@ -2702,18 +2727,26 @@ Test-Path $Archivo`;
               currentChapterTitle="IDENTIDAD DE TU PC"
               isCompleted={completedSections.has('tu-pc')}
               onMarkCompleted={() => {
-                markSectionCompleted('tu-pc');
-                onChapterCompleted();
+                if (completedSections.has('tu-pc')) {
+                  markEntireChapterCompleted();
+                  onChapterCompleted();
+                } else {
+                  const el = document.getElementById('evo-chapter-check');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }
               }}
               onBackToIndex={onBackToIndex}
               onNextChapter={() => {
-                markSectionCompleted('tu-pc');
-                onChapterCompleted();
-                if (onStartChapter02) onStartChapter02();
-                else onBackToIndex();
+                if (completedSections.has('tu-pc') || isChapter02Unlocked) {
+                  if (onStartChapter02) onStartChapter02();
+                  else onBackToIndex();
+                } else {
+                  const el = document.getElementById('evo-chapter-check');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }
               }}
               nextChapterLabel="CAPÍTULO 02: CÓMO TRABAJAN JUNTOS"
-              isNextAvailable={true}
+              isNextAvailable={Boolean(completedSections.has('tu-pc') || isChapter02Unlocked)}
             />
           </div>
         )}

@@ -36,6 +36,7 @@ import { HardwareSensorService, SiliconSensorReport } from '../services/hardware
 import { MachineAdapter } from '../services/machineAdapter';
 import { EvoCaseRepository } from '../services/caseRepository';
 import { EvoAgentClient, AgentHealth, AgentMachineImportResult } from '../services/evoAgentClient';
+import { useLabAestheticMode } from '../../../utils/labAestheticMode';
 
 interface EvoMachineIntakeScreenProps {
   onImportThisPc: (detectedMachine: Machine) => void;
@@ -48,7 +49,7 @@ export const EvoMachineIntakeScreen: React.FC<EvoMachineIntakeScreenProps> = ({
   onCreateNewPc,
   onSelectSavedMachine,
 }) => {
-  const isElite = true;
+  const { isElite } = useLabAestheticMode();
   const [isImporting, setIsImporting] = useState(false);
   const [agentHealth, setAgentHealth] = useState<AgentHealth | null>(null);
   const [agentError, setAgentError] = useState<string | null>(null);

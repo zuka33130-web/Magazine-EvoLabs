@@ -20,6 +20,7 @@ import {
   Award,
 } from 'lucide-react';
 import { Tomo03MasterPage } from './Tomo03MasterPage';
+import { Tomo03WorkbenchView } from './Tomo03WorkbenchView';
 import { EvoTomeExamEngine } from '../exam/EvoTomeExamEngine';
 import {
   TOMO_03_META,
@@ -48,6 +49,14 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
   const [isExamOpen, setIsExamOpen] = useState<boolean>(false);
+  const [isWorkbenchOpen, setIsWorkbenchOpen] = useState<boolean>(false);
+  const [workbenchModuleNumber, setWorkbenchModuleNumber] = useState<string | undefined>();
+  const openProfessionalModule = (moduleNumber: string) => {
+    setWorkbenchModuleNumber(moduleNumber);
+    setIsExamOpen(false);
+    setIsWorkbenchOpen(true);
+    window.scrollTo(0, 0);
+  };
 
   const totalPages = TOMO_03_META.totalPages;
 
@@ -264,7 +273,16 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
 
           <button
             type="button"
-            onClick={() => setIsExamOpen(true)}
+            onClick={() => { setWorkbenchModuleNumber(undefined); setIsWorkbenchOpen(true); setIsExamOpen(false); }}
+            className="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-bold text-xs flex items-center gap-1.5 hover:bg-emerald-400"
+          >
+            <Wrench className="w-3.5 h-3.5"/>
+            <span>BANCO INTERACTIVO</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setIsExamOpen(true); setIsWorkbenchOpen(false); }}
             className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-emerald-400 font-bold border border-emerald-500/40 text-xs flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)] cursor-pointer"
           >
             <Award className="w-3.5 h-3.5 text-emerald-400" />
@@ -290,6 +308,8 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
             onBackToIndex={() => setIsExamOpen(false)}
           />
         </div>
+      ) : isWorkbenchOpen ? (
+        <Tomo03WorkbenchView key={workbenchModuleNumber ?? 'general'} initialModuleNumber={workbenchModuleNumber} onBack={() => setIsWorkbenchOpen(false)} />
       ) : (
         /* Main Magazine Pages Container */
         <main className="flex-1 py-8 px-2 sm:px-4 flex flex-col items-center gap-8 print:p-0 print:m-0 print:gap-0">
@@ -350,13 +370,13 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                     </div>
                     <div className="p-2.5 rounded bg-black/50 border border-emerald-950 flex items-center justify-between">
                       <span className="text-emerald-300 font-bold">BANCO DE MESA:</span>
-                      <span className="text-zinc-400">Armado fuera del gabinete sobre caja de cartón</span>
+                      <span className="text-zinc-400">Prueba de configuración mínima sobre superficie adecuada para ESD</span>
                     </div>
                   </div>
 
                   <div className="pt-3 border-t border-emerald-950 flex items-center justify-between text-[11px] font-mono-tech text-zinc-400">
                     <span>“NO REEMPLACES A CIEGAS. MEDÍ PRIMERO.”</span>
-                    <span className="text-emerald-400 font-bold">48 PÁGINAS A4</span>
+                    <span className="text-emerald-400 font-bold">{totalPages} PÁGINAS A4</span>
                   </div>
                 </div>
               </div>
@@ -371,7 +391,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                   <div className="tracking-widest font-mono-tech text-sm text-emerald-400 font-bold">
                     |||||||| | |||| | |||||||
                   </div>
-                  <span className="text-[9px] text-zinc-500">ISBN-EVO-T03-2026</span>
+                  <span className="text-[9px] text-zinc-500">EVO-T03-2026</span>
                 </div>
               </div>
             </div>
@@ -437,14 +457,14 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 03: ÍNDICE DE LOS 32 MÓDULOS DE ESCRITORIO
+            PAGE 03: ÍNDICE DE LOS 35 MÓDULOS DE ESCRITORIO
         ======================================================== */}
         {(viewMode === 'continuous' || currentPage === 3) && (
           <Tomo03MasterPage
             pageId="t03-page-03"
             pageNumber={3}
             sectionTitle="SUMARIO DE TALLER"
-            subSlug="ÍNDICE DE 32 MÓDULOS"
+            subSlug="ÍNDICE DE 35 MÓDULOS"
             accentColor="#10B981"
           >
             <div className="h-full flex flex-col justify-between space-y-3">
@@ -456,7 +476,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                   ÍNDICE MAESTRO DE SERVICIO TÉCNICO
                 </h2>
                 <p className="text-xs font-mono-tech text-zinc-400">
-                  32 módulos estructurados según la cadena física de arranque de una PC de escritorio.
+                  35 módulos estructurados según la cadena física de arranque de una PC de escritorio.
                 </p>
               </div>
 
@@ -464,13 +484,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                 {TOMO_03_MODULES.map((m) => (
                   <div
                     key={m.id}
-                    onClick={() => {
-                      if (viewMode === 'single') {
-                        setCurrentPage(4);
-                      }
-                      const el = document.getElementById(`t03-mod-${m.moduleNumber}`);
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }}
+                    onClick={() => openProfessionalModule(m.moduleNumber)}
                     className="p-2 rounded bg-zinc-950/60 border border-emerald-950 hover:border-emerald-500/60 transition-all flex items-start gap-2.5 cursor-pointer group"
                   >
                     <span className="text-emerald-400 font-bold group-hover:text-emerald-300">
@@ -492,14 +506,14 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
               </div>
 
               <div className="text-[10px] font-mono-tech text-zinc-500 text-center">
-                HAZ CLIC EN CUALQUIER MÓDULO PARA ABRIR DIRECTAMENTE SU PROTOCOLO DE BANCO
+                SELECCIONÁ UN MÓDULO PARA ABRIR SU DESARROLLO PROFESIONAL, PRÁCTICAS Y LABORATORIOS
               </div>
             </div>
           </Tomo03MasterPage>
         )}
 
         {/* ========================================================
-            MODULE PAGES: 32 DESKTOP REPAIR MODULES (A4 SPREADS)
+            MODULE PAGES: 35 DESKTOP REPAIR MODULES (A4 SPREADS)
         ======================================================== */}
         {TOMO_03_MODULES.map((mod, idx) => {
           const modPageNumber = 4 + idx;
@@ -645,8 +659,15 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
 
                 {/* Footer Callout */}
                 <div className="p-2 rounded bg-emerald-950/20 border border-emerald-900/40 text-[10px] font-mono-tech text-emerald-300 flex items-center justify-between">
-                  <span>EVO LABS // GUÍA DE SERVICIO TÉCNICO DE ESCRITORIO</span>
-                  <span className="text-zinc-500">MÓDULO {mod.moduleNumber} / 32</span>
+                  <span>EVO LABS // RESUMEN EDITORIAL DEL MÓDULO {mod.moduleNumber}</span>
+                  <button
+                    type="button"
+                    data-open-full-module={mod.moduleNumber}
+                    onClick={() => openProfessionalModule(mod.moduleNumber)}
+                    className="rounded border border-emerald-500/60 bg-emerald-950/70 px-2 py-1 text-emerald-200 font-bold hover:bg-emerald-800 hover:text-white"
+                  >
+                    ABRIR DESARROLLO, PRÁCTICAS Y LABORATORIO →
+                  </button>
                 </div>
               </div>
             </Tomo03MasterPage>
@@ -654,14 +675,14 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         })}
 
         {/* ========================================================
-            PAGE 40: CASOS GUIADOS DE TALLER DE ESCRITORIO
+            PAGE 39: CASOS GUIADOS DE TALLER DE ESCRITORIO
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 40) && (
+        {(viewMode === 'continuous' || currentPage === 39) && (
           <Tomo03MasterPage
-            pageId="t03-page-40"
-            pageNumber={40}
+            pageId="t03-page-39"
+            pageNumber={39}
             sectionTitle="EXPEDIENTES DE BANCO"
-            subSlug="CASOS REALES DE ESCRITORIO"
+            subSlug="CASOS DIDÁCTICOS SIMULADOS"
             accentColor="#10B981"
           >
             <div className="h-full flex flex-col justify-between space-y-3">
@@ -673,7 +694,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                   CASOS DE REPARACIÓN DE ESCRITORIO RESUELTOS
                 </h2>
                 <p className="text-xs font-mono-tech text-zinc-400">
-                  Desmontaje analítico: cómo el método pericial evitó compras inútiles de hardware.
+                  Escenarios sintéticos de aprendizaje: los valores y diagnósticos son ilustrativos, no mediciones reales verificadas.
                 </p>
               </div>
 
@@ -689,13 +710,13 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                       </div>
                       <div className="text-[11px] text-zinc-300 space-y-1">
                         <p><strong className="text-zinc-400">Síntoma:</strong> {c.symptom}</p>
-                        <p><strong className="text-amber-400">Hipótesis falsa:</strong> {c.hypothesis}</p>
+                        <p><strong className="text-amber-400">Hipótesis inicial:</strong> {c.hypothesis}</p>
                         <p><strong className="text-emerald-400">Medición clave:</strong> {c.measurement}</p>
                         <p><strong className="text-zinc-400">Descartado:</strong> {c.discarded}</p>
                       </div>
                     </div>
                     <div className="pt-2 border-t border-zinc-900 text-[10px] text-emerald-400">
-                      <strong>Causa Raíz & Reparación:</strong> {c.rootCause} → {c.repairAction}
+                      <strong>Causa propuesta y reparación simulada:</strong> {c.rootCause} → {c.repairAction}
                     </div>
                   </div>
                 ))}
@@ -704,7 +725,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
               <div className="p-3 rounded-xl bg-black/60 border border-emerald-950 text-xs font-mono-tech text-zinc-300 flex items-center justify-between">
                 <span>PRINCIPIO EVO DE BANCO:</span>
                 <span className="text-emerald-400 font-bold">
-                  “EL 60% DE LAS FALLAS DE HARDWARE SON PROBLEMAS DE CONTACTO MECÁNICO O TÉRMICO.”
+                  “LAS CAUSAS SE DETERMINAN POR PRUEBAS, NO POR ESTADÍSTICAS INVENTADAS.”
                 </span>
               </div>
             </div>
@@ -712,12 +733,12 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 41: GLOSARIO DE TALLER Y ELECTRÓNICA BÁSICA
+            PAGE 40: GLOSARIO DE TALLER Y ELECTRÓNICA BÁSICA
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 41) && (
+        {(viewMode === 'continuous' || currentPage === 40) && (
           <Tomo03MasterPage
-            pageId="t03-page-41"
-            pageNumber={41}
+            pageId="t03-page-40"
+            pageNumber={40}
             sectionTitle="DICCIONARIO DE TALLER"
             subSlug="GLOSARIO ELECTRÓNICO & BANCO"
             accentColor="#10B981"
@@ -764,12 +785,12 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 42: PARTE DE SERVICIO DE TALLER IMPRIMIBLE
+            PAGE 41: PARTE DE SERVICIO DE TALLER IMPRIMIBLE
         ======================================================== */}
-        {(viewMode === 'continuous' || currentPage === 42) && (
+        {(viewMode === 'continuous' || currentPage === 41) && (
           <Tomo03MasterPage
-            pageId="t03-page-42"
-            pageNumber={42}
+            pageId="t03-page-41"
+            pageNumber={41}
             sectionTitle="PARTE DE SERVICIO"
             subSlug="PLANILLA TÉCNICA OFICIAL"
             accentColor="#10B981"
@@ -853,11 +874,11 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
         )}
 
         {/* ========================================================
-            PAGE 43: BACK COVER / CONTRATAPA
+            PAGE 42: BACK COVER / CONTRATAPA
         ======================================================== */}
         {(viewMode === 'continuous' || currentPage === totalPages) && (
           <Tomo03MasterPage
-            pageId="t03-page-43"
+            pageId="t03-page-42"
             pageNumber={totalPages}
             isBackCover
             hideHeaderFooter
@@ -883,7 +904,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                     HABILIDADES DE BANCO ADQUIRIDAS:
                   </span>
                   <p className="text-zinc-400">
-                    ✔ Testeo completo de fuentes ATX con multímetro y puente verde-negro.<br />
+                    ✔ Interpretación de tensiones ATX sin abrir la fuente.<br />
                     ✔ Decodificación pericial de beeps del BIOS y luces Q-LED.<br />
                     ✔ Montaje y prueba en banco aislado fuera del gabinete.<br />
                     ✔ Descarte de bucles de reinicio y falsos contactos de RAM.

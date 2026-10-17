@@ -5,6 +5,7 @@
 // Principle: "NO SE ADIVINA. SE MIDE. SI NO PUEDE COMPROBARSE: UNKNOWN."
 // ============================================================================
 
+import type { ObservabilityFrame } from '../../../../evo-agent/src/observabilityProtocol';
 import { Machine } from '../types';
 import { MachineAdapter } from './machineAdapter';
 
@@ -19,14 +20,14 @@ export interface AgentHealth {
   uptimeSeconds: number;
   address: string;
   port: number;
-  sessionToken: string;
+  pairingRequired?: boolean;
   timestamp: string;
 }
 
 export interface AgentLiveTelemetry {
   timestamp: string;
   cpu: {
-    utilizationPercent: number;
+    utilizationPercent: number | null;
     clockSpeedMhz?: number;
     provenance: string;
   };
@@ -43,6 +44,7 @@ export interface AgentLiveTelemetry {
     agentUptimeSeconds: number;
   };
   isSamplingActive: boolean;
+  observability?: ObservabilityFrame;
 }
 
 export interface AgentWindowsService {
@@ -81,7 +83,7 @@ export interface AgentMachineImportResult {
   rawPayload?: any;
   health?: AgentHealth;
   error?: string;
-  errorCode?: 'AGENT_NOT_CONNECTED' | 'HANDSHAKE_FAILED' | 'INVENTORY_QUERY_FAILED' | 'INVALID_PAYLOAD';
+  errorCode?: 'PAIRING_REQUIRED' | 'AGENT_NOT_CONNECTED' | 'HANDSHAKE_FAILED' | 'INVENTORY_QUERY_FAILED' | 'INVALID_PAYLOAD';
   stage?: 'HEALTH_CHECK' | 'HANDSHAKE' | 'MACHINE_QUERY' | 'VALIDATION' | 'ADAPTATION' | 'PERSISTENCE' | 'COMPLETED';
 }
 
@@ -108,9 +110,6 @@ export class EvoAgentClient {
 
       if (!response.ok) return null;
       const data: AgentHealth = await response.json();
-      if (data && data.sessionToken) {
-        this.cachedSessionToken = data.sessionToken;
-      }
       return data;
     } catch {
       return null;
@@ -130,14 +129,27 @@ export class EvoAgentClient {
     }
 
     const health = await this.pingAgent(timeoutMs);
-    if (!health || health.status !== 'OK' || !health.sessionToken) {
-      const err: any = new Error('AGENT_NOT_CONNECTED: No se pudo conectar con el agente local EVO en http://127.0.0.1:43921.');
-      err.code = 'AGENT_NOT_CONNECTED';
-      throw err;
-    }
+    if (!health || health.status !== 'OK') throw new Error('AGENT_NOT_CONNECTED: iniciá EVO Local Agent en 127.0.0.1:43921.');
+    if (health.pairingRequired === undefined) throw new Error('AGENT_UPDATE_REQUIRED: actualizá el agente a 1.1.0; health antiguo no permite emparejamiento seguro.');
+    throw new Error('PAIRING_REQUIRED: ingresá el código de la consola del agente en ANALIZAR MI PC → Observabilidad.');
+  }
 
-    this.cachedSessionToken = health.sessionToken;
-    return this.cachedSessionToken;
+  /** The one-time code is entered explicitly. Bearer credentials stay in memory only. */
+  public static async pair(code: string): Promise<void> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2500);
+    try {
+      const response = await fetch(`${this.AGENT_BASE_URL}/v1/pair`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }), signal: controller.signal });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || `PAIRING_HTTP_${response.status}`);
+      if (typeof body.sessionToken !== 'string' || !/^[a-f0-9]{64}$/.test(body.sessionToken)) throw new Error('PAIRING_INVALID_RESPONSE');
+      this.cachedSessionToken = body.sessionToken;
+    } finally { clearTimeout(timeout); }
+  }
+  public static async disconnect(): Promise<void> {
+    const token = this.cachedSessionToken;
+    this.resetSessionToken();
+    if (token) await fetch(`${this.AGENT_BASE_URL}/v1/pair/revoke`, { method: 'POST', headers: { 'X-Evo-Agent-Token': token }, signal: AbortSignal.timeout(2000) }).catch(() => undefined);
   }
 
   /**
@@ -167,7 +179,7 @@ export class EvoAgentClient {
     let health: AgentHealth | null = null;
     try {
       health = await this.pingAgent(2000);
-      if (!health || health.status !== 'OK' || !health.sessionToken) {
+      if (!health || health.status !== 'OK') {
         return {
           success: false,
           error: 'AGENT_NOT_CONNECTED: No se pudo establecer conexión con http://127.0.0.1:43921. Verificá que el agente local esté iniciado ejecutando START-EVO-AGENT.cmd.',
@@ -175,13 +187,12 @@ export class EvoAgentClient {
           stage: 'HEALTH_CHECK',
         };
       }
-      this.cachedSessionToken = health.sessionToken;
-      token = health.sessionToken;
-    } catch {
+      token = await this.ensureHandshake(2000);
+    } catch (error) {
       return {
         success: false,
-        error: 'AGENT_NOT_CONNECTED: El agente local de EVO no responde en 127.0.0.1:43921.',
-        errorCode: 'AGENT_NOT_CONNECTED',
+        error: error instanceof Error ? error.message : 'AGENT_NOT_CONNECTED',
+        errorCode: error instanceof Error && error.message.includes('PAIRING_REQUIRED') ? 'PAIRING_REQUIRED' : 'HANDSHAKE_FAILED',
         stage: 'HEALTH_CHECK',
       };
     }
@@ -285,20 +296,34 @@ export class EvoAgentClient {
   /**
    * Fetches real-time telemetry metrics
    */
-  public static async fetchLiveTelemetry(): Promise<AgentLiveTelemetry | null> {
-    try {
-      const token = await this.ensureHandshake(1500);
-      const response = await fetch(`${this.AGENT_BASE_URL}/v1/telemetry`, {
-        headers: {
-          Accept: 'application/json',
-          'X-Evo-Agent-Token': token,
-        },
-      });
-      if (!response.ok) return null;
-      return await response.json();
-    } catch {
-      return null;
+  private static telemetryRequest: { promise: Promise<AgentLiveTelemetry>; controller: AbortController; users: Set<symbol> } | null = null;
+  /** Coalesces concurrent legacy/EOE readers; abort only when the last reader leaves. */
+  public static async fetchTelemetryStrict(signal?: AbortSignal): Promise<AgentLiveTelemetry> {
+    if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
+    const token = await this.ensureHandshake(1500);
+    if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
+    if (!this.telemetryRequest) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 6500);
+      const promise = fetch(`${this.AGENT_BASE_URL}/v1/telemetry`, { headers: { Accept: 'application/json', 'X-Evo-Agent-Token': token }, signal: controller.signal }).then(async response => {
+        if (response.status === 401) { this.resetSessionToken(); throw new Error('PAIRING_REQUIRED: sesión expirada o agente reiniciado.'); }
+        if (!response.ok) throw new Error(`TELEMETRY_HTTP_${response.status}`);
+        return await response.json() as AgentLiveTelemetry;
+      }).finally(() => { clearTimeout(timer); if (this.telemetryRequest?.controller === controller) this.telemetryRequest = null; });
+      this.telemetryRequest = { promise, controller, users: new Set() };
     }
+    const request = this.telemetryRequest, user = Symbol();
+    request.users.add(user);
+    return new Promise((resolve, reject) => {
+      const leave = () => { signal?.removeEventListener('abort', cancel); request.users.delete(user); };
+      const cancel = () => { leave(); if (!request.users.size) { if (this.telemetryRequest === request) this.telemetryRequest = null; request.controller.abort(); } reject(new DOMException('Cancelled', 'AbortError')); };
+      signal?.addEventListener('abort', cancel, { once: true });
+      request.promise.then(value => { leave(); resolve(value); }, error => { leave(); reject(error); });
+      if (signal?.aborted) cancel();
+    });
+  }
+  public static async fetchLiveTelemetry(): Promise<AgentLiveTelemetry | null> {
+    return this.fetchTelemetryStrict().catch(() => null);
   }
 
   /**

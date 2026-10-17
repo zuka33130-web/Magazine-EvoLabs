@@ -4,7 +4,7 @@ import {
   ArrowLeft,
   Layers,
 } from 'lucide-react';
-import coverHeroImg from '../../assets/images/cover_tomo2_win_1789531499967.jpg';
+import { TOMO_02_COVER as coverHeroImg } from '../../data/tomoCoversData';
 import { VOLUMES_COLLECTION } from '../../data/collections';
 import { VolumeItem } from '../../types';
 import { HorizontalCollection } from '../HorizontalCollection';
@@ -12,6 +12,8 @@ import { HorizontalCollection } from '../HorizontalCollection';
 interface Tomo02CoverProps {
   onOpenMagazine: () => void;
   onOpenInteractive: () => void;
+  onOpenSector00?: () => void;
+  onOpenSector01?: () => void;
   onOpenLab: () => void;
   onOpenA4WebVersion?: () => void;
   onBackToApp?: () => void;
@@ -23,6 +25,8 @@ interface Tomo02CoverProps {
 export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
   onOpenMagazine,
   onOpenInteractive,
+  onOpenSector00,
+  onOpenSector01,
   onOpenLab,
   onOpenA4WebVersion,
   onBackToApp,
@@ -80,20 +84,27 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
           {/* Left Column: Big typography, punchy brief subtitle, generous air */}
           <div className="lg:col-span-6 flex flex-col space-y-10">
             {/* Main Title & Subtitle */}
-            <div className="space-y-4">
-              <span className="text-[11px] font-mono-tech tracking-widest text-cyan-400 uppercase font-semibold block">
-                LA BIBLIA NEGRA DE WINDOWS
-              </span>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-xs font-mono-tech tracking-widest text-[#60CDFF] uppercase font-bold">
+                <span className="w-2 h-2 rounded-full bg-[#00A4EF] inline-block shadow-[0_0_8px_#00A4EF]" />
+                <span>TOMO 02 // INVESTIGACIÓN PERICIAL</span>
+              </div>
 
-              <h1 className="font-display font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white tracking-tight leading-[0.93] uppercase">
-                DOMINÁ WINDOWS
+              <h1 className="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white tracking-tight leading-[0.95] uppercase">
+                LA BIBLIA NEGRA DE WINDOWS
               </h1>
 
-              <p className="text-base sm:text-lg text-zinc-300 font-sans-editorial leading-snug max-w-md pt-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-black font-mono tracking-wider uppercase text-[#00A4EF] flex items-center gap-3">
+                <span className="text-[#60CDFF]">MENTIRA</span>
+                <span className="text-zinc-600">Y</span>
+                <span className="text-[#00A4EF]">VERDAD</span>
+              </div>
+
+              <p className="text-base sm:text-lg text-zinc-300 font-sans-editorial leading-snug max-w-md pt-1">
                 Descubrí qué hace Windows cuando vos no estás mirando.
               </p>
 
-              <p className="text-xs font-mono-tech text-cyan-400/90 tracking-wider uppercase font-semibold pt-1">
+              <p className="text-xs font-mono-tech text-[#60CDFF]/90 tracking-wider uppercase font-semibold pt-1">
                 “SI NO PODÉS REVERTIRLO, NO LO TOQUES.”
               </p>
             </div>
@@ -151,36 +162,35 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
 
             {/* Action Buttons: 1 Dominant Action + max 2 Secondary Actions */}
             <div className="pt-2 flex flex-wrap items-center gap-3">
-              {/* ACCIÓN PRINCIPAL DOMINANTE */}
+              {/* ACCIÓN PRINCIPAL DOMINANTE: SECTOR 01 ANTES DEL LOGO */}
+              <button
+                id="btn-abrir-sector01-tomo02"
+                type="button"
+                onClick={onOpenSector01 || onOpenInteractive}
+                className="inline-flex items-center gap-3 px-7 py-4 rounded-xl font-mono-tech font-bold text-xs sm:text-sm tracking-wider uppercase bg-gradient-to-r from-[#0078D4] to-[#00A4EF] hover:from-[#0067C0] hover:to-[#60CDFF] text-white transition-all duration-200 cursor-pointer shadow-[0_0_24px_rgba(0,164,239,0.30)] hover:shadow-[0_0_30px_rgba(0,164,239,0.45)] group"
+              >
+                <span>SECTOR 01 // ANTES DEL LOGO (ACTIVO)</span>
+                <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              {/* ACCIÓN SECTOR 00 */}
+              <button
+                id="btn-abrir-sector00-tomo02"
+                type="button"
+                onClick={onOpenSector00 || onOpenInteractive}
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-[#11161D] hover:bg-[#151B23] text-[#60CDFF] border border-[#00A4EF]/40 transition-all duration-200 cursor-pointer shadow-md"
+              >
+                <span>SECTOR 00 // DÍA CERO</span>
+              </button>
+
+              {/* ACCIÓN: ÍNDICE MAESTRO CANÓNICO 00-39 */}
               <button
                 id="btn-abrir-tomo-interactivo-tomo02"
                 type="button"
                 onClick={onOpenInteractive}
-                className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-mono-tech font-black text-xs sm:text-sm tracking-wider uppercase bg-cyan-400 text-black hover:bg-cyan-300 transition-all duration-200 cursor-pointer shadow-xl shadow-cyan-400/20 hover:shadow-cyan-400/30 group"
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-[#080B10] hover:bg-[#11161D] text-zinc-300 hover:text-white border border-sky-500/20 transition-all duration-200 cursor-pointer"
               >
-                <span>COMENZAR TOMO 02</span>
-                <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" />
-              </button>
-
-              {/* ACCIÓN SECUNDARIA 1: REVISTA EDITORIAL A4 */}
-              <button
-                id="btn-leer-descargar-magazine-tomo02"
-                type="button"
-                onClick={onOpenMagazine}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700/80 transition-all duration-200 cursor-pointer"
-              >
-                <span>📖 REVISTA EDITORIAL A4</span>
-              </button>
-
-              {/* ACCIÓN SECUNDARIA 2: WINDOWS MATRIX LAB */}
-              <button
-                id="btn-laboratorio-asociado-tomo02"
-                type="button"
-                onClick={onOpenLab}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900/80 hover:bg-zinc-800 text-cyan-400 hover:text-cyan-300 border border-cyan-950 hover:border-cyan-800 transition-all duration-200 cursor-pointer"
-              >
-                <Layers className="w-3.5 h-3.5 text-cyan-400" />
-                <span>WINDOWS MATRIX LAB</span>
+                <span>ÍNDICE CANÓNICO 00–39</span>
               </button>
             </div>
           </div>
@@ -191,7 +201,7 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
               <img
                 src={coverHeroImg}
                 alt="Fotografía editorial // Dominá Windows — La Biblia Negra de Windows"
-                className="w-full aspect-[4/3] object-cover object-center filter contrast-[1.04] brightness-[0.97] transition-transform duration-500 hover:scale-[1.015]"
+                className="block w-full h-auto object-contain"
               />
             </div>
             <p className="mt-3 text-[11px] font-mono-tech text-zinc-300 text-right tracking-wider uppercase">

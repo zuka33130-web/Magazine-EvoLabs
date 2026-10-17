@@ -40,6 +40,7 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
       }`}
       style={{
         boxSizing: 'border-box',
+        ...(isCover ? { height: 'auto', minHeight: 0, maxHeight: 'none', aspectRatio: '210 / 297' } : {}),
         ...(isLast ? { breakAfter: 'avoid', pageBreakAfter: 'avoid' } : {}),
       }}
     >
@@ -79,7 +80,7 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
 
       {/* Page Content Body */}
       {hideHeaderFooter ? (
-        <div className="relative z-10 w-full h-full flex flex-col min-h-0">
+        <div className={`relative z-10 w-full flex flex-col min-h-0 ${isCover ? 'flex-1' : 'h-full'}`}>
           {children}
         </div>
       ) : (

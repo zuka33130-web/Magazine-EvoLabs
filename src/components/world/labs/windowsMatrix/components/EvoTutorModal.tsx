@@ -61,17 +61,32 @@ export const EvoTutorModal: React.FC<EvoTutorModalProps> = ({
           </p>
         </div>
 
-        {/* Real World Analogy */}
-        <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-1.5 text-xs">
-          <strong className="text-amber-400 font-mono-tech text-xs uppercase block font-bold flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            ANALOGÍA DE LA VIDA REAL:
-          </strong>
-          <p className="text-zinc-300 font-sans-editorial text-xs leading-relaxed">
-            {realWorldAnalogy ||
-              'Pensá en Windows como un edificio de oficinas: este componente es como el conserje que verifica qué llaves tenés antes de dejarte pasar al ascensor.'}
-          </p>
-        </div>
+        {/* Real World Analogy or Question */}
+        {(() => {
+          let headerText = "ANALOGÍA DE LA VIDA REAL:";
+          if (realWorldAnalogy) {
+            const trimmed = realWorldAnalogy.trim();
+            if (trimmed.startsWith('¿') || trimmed.endsWith('?')) {
+              headerText = "PREGUNTA DE INVESTIGACIÓN / GUÍA:";
+            } else if (trimmed.toLowerCase().includes('explicación') || trimmed.toLowerCase().includes('explicar')) {
+              headerText = "EXPLICACIÓN SIMPLE:";
+            } else if (trimmed.toLowerCase().includes('ejemplo')) {
+              headerText = "EJEMPLO REAL:";
+            }
+          }
+          return (
+            <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-1.5 text-xs">
+              <strong className="text-amber-400 font-mono-tech text-xs uppercase block font-bold flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                {headerText}
+              </strong>
+              <p className="text-zinc-300 font-sans-editorial text-xs leading-relaxed">
+                {realWorldAnalogy ||
+                  'Pensá en Windows como un edificio de oficinas: este componente es como el conserje que verifica qué llaves tenés antes de dejarte pasar al ascensor.'}
+              </p>
+            </div>
+          );
+        })()}
 
         {/* Bottom Acknowledgment Button */}
         <div className="pt-2 flex justify-end">

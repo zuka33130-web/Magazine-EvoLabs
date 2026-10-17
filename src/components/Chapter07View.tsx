@@ -777,6 +777,7 @@ export const Chapter07View: React.FC<Chapter07ViewProps> = ({
           labReport={finalReport}
           onBackToIndex={onBackToIndex}
           onReopenLabReport={() => setIsReportModalOpen(true)}
+          onGoToFinalExam={onGoToFinalExam}
         />
       ) : (
         <div className="max-w-5xl mx-auto space-y-10">
