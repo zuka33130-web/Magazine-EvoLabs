@@ -40,7 +40,6 @@ type ViewMode = 'continuous' | 'single';
 
 export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
   onBackToApp,
-  onNavigateTomo,
   initialPage = 1,
 }) => {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
@@ -181,42 +180,14 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
             </span>
           </div>
 
-          {/* Tomo Selector */}
-          <div className="flex items-center gap-1 bg-zinc-950/90 p-1 rounded-xl border border-emerald-950 ml-2">
-            <span className="text-[10px] font-mono-tech text-zinc-500 font-bold px-1.5 hidden lg:inline">COLECCIÓN:</span>
-            <button
-              type="button"
-              onClick={() => onNavigateTomo ? onNavigateTomo('01') : onBackToApp?.()}
-              className="px-2 py-0.5 rounded text-[10px] font-bold font-mono-tech text-amber-400 hover:bg-amber-950/40 border border-amber-500/30 transition-all cursor-pointer"
-              title="Tomo 01: La Guía Definitiva del Hardware"
-            >
-              T01
-            </button>
-            <button
-              type="button"
-              onClick={() => onNavigateTomo?.('02')}
-              className="px-2 py-0.5 rounded text-[10px] font-bold font-mono-tech text-cyan-400 hover:bg-cyan-950/40 border border-cyan-500/30 transition-all cursor-pointer"
-              title="Tomo 02: La Biblia Negra de Windows"
-            >
-              T02
-            </button>
-            <button
-              type="button"
-              onClick={() => onNavigateTomo?.('03')}
-              className="px-2 py-0.5 rounded text-[10px] font-bold font-mono-tech bg-emerald-500 text-black border border-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)] cursor-pointer"
-              title="Tomo 03: Repará tu Propia PC"
-            >
-              T03
-            </button>
-            <button
-              type="button"
-              onClick={() => onNavigateTomo?.('04')}
-              className="px-2 py-0.5 rounded text-[10px] font-bold font-mono-tech text-purple-400 hover:bg-purple-950/40 border border-purple-500/30 transition-all cursor-pointer"
-              title="Tomo 04: Microelectrónica y Portátiles"
-            >
-              T04
-            </button>
-          </div>
+          {/* La navegación por los 12 tomos está disponible en el menú global TOMOS.
+              Este lector muestra solo la identificación del volumen actual. */}
+          <span
+            aria-label="Volumen 03 de 12"
+            className="hidden lg:inline-flex items-center rounded-full border border-emerald-900/50 bg-emerald-950/20 px-3 py-1 text-[10px] font-bold tracking-wider text-emerald-300"
+          >
+            VOL. 03 / 12
+          </span>
         </div>
 
         {/* Center: View mode toggles */}
