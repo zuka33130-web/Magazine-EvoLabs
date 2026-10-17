@@ -50,6 +50,13 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
   const [isExamOpen, setIsExamOpen] = useState<boolean>(false);
   const [isWorkbenchOpen, setIsWorkbenchOpen] = useState<boolean>(false);
+  const [workbenchModuleNumber, setWorkbenchModuleNumber] = useState<string | undefined>();
+  const openProfessionalModule = (moduleNumber: string) => {
+    setWorkbenchModuleNumber(moduleNumber);
+    setIsExamOpen(false);
+    setIsWorkbenchOpen(true);
+    window.scrollTo(0, 0);
+  };
 
   const totalPages = TOMO_03_META.totalPages;
 
@@ -266,7 +273,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
 
           <button
             type="button"
-            onClick={() => { setIsWorkbenchOpen(true); setIsExamOpen(false); }}
+            onClick={() => { setWorkbenchModuleNumber(undefined); setIsWorkbenchOpen(true); setIsExamOpen(false); }}
             className="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-bold text-xs flex items-center gap-1.5 hover:bg-emerald-400"
           >
             <Wrench className="w-3.5 h-3.5"/>
@@ -302,7 +309,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
           />
         </div>
       ) : isWorkbenchOpen ? (
-        <Tomo03WorkbenchView onBack={() => setIsWorkbenchOpen(false)} />
+        <Tomo03WorkbenchView key={workbenchModuleNumber ?? 'general'} initialModuleNumber={workbenchModuleNumber} onBack={() => setIsWorkbenchOpen(false)} />
       ) : (
         /* Main Magazine Pages Container */
         <main className="flex-1 py-8 px-2 sm:px-4 flex flex-col items-center gap-8 print:p-0 print:m-0 print:gap-0">
@@ -477,14 +484,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                 {TOMO_03_MODULES.map((m) => (
                   <div
                     key={m.id}
-                    onClick={() => {
-                      if (viewMode === 'single') {
-                        setCurrentPage(4 + TOMO_03_MODULES.indexOf(m));
-                        return;
-                      }
-                      const el = document.getElementById(`t03-mod-${m.moduleNumber}`);
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }}
+                    onClick={() => openProfessionalModule(m.moduleNumber)}
                     className="p-2 rounded bg-zinc-950/60 border border-emerald-950 hover:border-emerald-500/60 transition-all flex items-start gap-2.5 cursor-pointer group"
                   >
                     <span className="text-emerald-400 font-bold group-hover:text-emerald-300">
@@ -506,7 +506,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
               </div>
 
               <div className="text-[10px] font-mono-tech text-zinc-500 text-center">
-                HAZ CLIC EN CUALQUIER MÓDULO PARA ABRIR DIRECTAMENTE SU PROTOCOLO DE BANCO
+                SELECCIONÁ UN MÓDULO PARA ABRIR SU DESARROLLO PROFESIONAL, PRÁCTICAS Y LABORATORIOS
               </div>
             </div>
           </Tomo03MasterPage>
@@ -659,8 +659,15 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
 
                 {/* Footer Callout */}
                 <div className="p-2 rounded bg-emerald-950/20 border border-emerald-900/40 text-[10px] font-mono-tech text-emerald-300 flex items-center justify-between">
-                  <span>EVO LABS // GUÍA DE SERVICIO TÉCNICO DE ESCRITORIO</span>
-                  <span className="text-zinc-500">MÓDULO {mod.moduleNumber} / {TOMO_03_MODULES.length}</span>
+                  <span>EVO LABS // RESUMEN EDITORIAL DEL MÓDULO {mod.moduleNumber}</span>
+                  <button
+                    type="button"
+                    data-open-full-module={mod.moduleNumber}
+                    onClick={() => openProfessionalModule(mod.moduleNumber)}
+                    className="rounded border border-emerald-500/60 bg-emerald-950/70 px-2 py-1 text-emerald-200 font-bold hover:bg-emerald-800 hover:text-white"
+                  >
+                    ABRIR DESARROLLO, PRÁCTICAS Y LABORATORIO →
+                  </button>
                 </div>
               </div>
             </Tomo03MasterPage>
