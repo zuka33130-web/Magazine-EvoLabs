@@ -8,6 +8,9 @@ import {parseProfessionalState,moduleAssessment,assessAtxUncertainty} from '../.
 import {Tomo03ProfessionalModule} from './Tomo03ProfessionalModule';
 import {EvoRepairLab} from './EvoRepairLab';
 import {Tomo03RepairTools} from './Tomo03RepairTools';
+import {TOMO03_TREATISE_TOPICS} from '../../data/tomo03Treatise';
+import {TOMO03_TREATISE_LABS,getTreatiseLab} from '../../data/tomo03TreatiseLabs';
+import {Tomo03TreatiseIndex,Tomo03TreatiseGuide} from './Tomo03TreatiseGuide';
 
 type Section = 'protocolos'|'laboratorios'|'herramientas'|'expediente';
 type Branch = 'untested'|'yes'|'no';
@@ -58,11 +61,15 @@ const tabs: {id:Section;label:string}[]=[
   {id:'herramientas',label:'Herramientas'},
   {id:'expediente',label:'Expediente de taller'}
 ];
-export const Tomo03WorkbenchView:React.FC<{onBack:()=>void;initialModuleNumber?:string}>=({onBack,initialModuleNumber})=>{
+export const Tomo03WorkbenchView:React.FC<{onBack:()=>void;initialModuleNumber?:string;initialTopicId?:string}>=({onBack,initialModuleNumber,initialTopicId})=>{
   const [section,setSection]=useState<Section>('protocolos');
   const [store,setStore]=useState<Store>(readStore);
-  const [moduleId,setModuleId]=useState(()=>TOMO_03_MODULES.find(item=>item.moduleNumber===initialModuleNumber)?.id||'mod03');
+  const [moduleId,setModuleId]=useState(()=>{
+    const topic=TOMO03_TREATISE_TOPICS.find(item=>item.id===initialTopicId);
+    return TOMO_03_MODULES.find(item=>item.moduleNumber===(topic?.modules[0]||initialModuleNumber))?.id||'mod01';
+  });
   const [filter,setFilter]=useState('');
+  const [referenceExpanded,setReferenceExpanded]=useState(Boolean(initialModuleNumber)&&!initialTopicId);
   const [labId,setLabId]=useState(TOMO03_REPAIR_LABS[0].id);
   const [rail,setRail]=useState<string>(()=>{const value=readAtxDraft().rail;return ATX_RAILS.some(r=>r.id===value)?value:'12';});
   const [voltage,setVoltage]=useState(()=>readAtxDraft().voltage||'');
@@ -70,9 +77,11 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void;initialModuleNumber?:
   const [showTheory,setShowTheory]=useState(false);
   const [professionalCase,setProfessionalCase]=useState<string|null>(null);
   const [professionalTool,setProfessionalTool]=useState('power-checklist');
+  const [treatiseTopic,setTreatiseTopic]=useState<string|null>(()=>TOMO03_TREATISE_TOPICS.some(item=>item.id===initialTopicId)?initialTopicId!:initialModuleNumber?null:'t00');
+  const topic=TOMO03_TREATISE_TOPICS.find(item=>item.id===treatiseTopic);
   const current=TOMO_03_MODULES.find(item=>item.id===moduleId)||TOMO_03_MODULES[0];
   const professional=getProfessionalModule(current.moduleNumber);
-  const caseContent=getProfessionalModule(professionalCase||'');
+  const caseContent=getProfessionalModule(professionalCase||'')||getTreatiseLab(professionalCase||'');
   const updateProfessional=(number:string,state:ProfessionalState)=>setStore(prev=>({...prev,professional:{...prev.professional,[number]:state}}));
   const record={...blank(),...(store.records[current.id]||{})};
   const lab=TOMO03_REPAIR_LABS.find(item=>item.id===labId)!;
@@ -95,6 +104,7 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void;initialModuleNumber?:
     ...prev,labs:{...prev.labs,[lab.id]:{...prev.labs[lab.id],[stepId]:answerId}}
   }));
   const openLab=(id:string)=>{setLabId(id);setSection('laboratorios');};
+  const openTreatiseLab=(id:string)=>{const content=getTreatiseLab(id);if(content){setProfessionalCase(id);setModuleId('mod'+content.number);setSection('laboratorios');}};
   const report=()=>{
     const lines=[
       'EVO LABS // EXPEDIENTE DE DIAGNÓSTICO DE TALLER',
@@ -119,6 +129,11 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void;initialModuleNumber?:
         'CAUSA Y REPARACIÓN SIMULADAS: '+(parseProfessionalState(store.professional?.[professional.number],professional).verified?professional.scenario.hypotheses.find(h=>h.id===professional.scenario.cause)?.label:'Aún sin resolución validada'),
         'LÍMITES: '+professional.scenario.limits
       ]:[]),
+      ...TOMO03_TREATISE_LABS.filter(item=>item.owner===current.moduleNumber).map(item=>{
+        const content=getTreatiseLab(item.id)!;
+        const state=parseProfessionalState(store.professional?.[item.id],content);
+        return `${item.title} · SIMULADO: ${JSON.stringify(state)}\nRESOLUCIÓN: ${state.verified?item.scenario.after:'Sin resolución validada'}\nLÍMITES: ${item.scenario.limits}`;
+      }),
       '',
       'PRÁCTICAS DIDÁCTICAS (NO SON MEDICIONES FÍSICAS):',
       ...TOMO03_REPAIR_LABS.map(item=>{
@@ -162,14 +177,20 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void;initialModuleNumber?:
       </nav>
       {section==='protocolos'&&<div className="grid lg:grid-cols-[270px_minmax(0,1fr)] gap-5 items-start">
         <aside className="rounded-xl border border-emerald-900/60 bg-zinc-950/70 p-3 space-y-3 lg:sticky lg:top-32">
+          <Tomo03TreatiseIndex selected={treatiseTopic} onSelect={id=>{setTreatiseTopic(id);const selected=TOMO03_TREATISE_TOPICS.find(item=>item.id===id);if(selected)setModuleId('mod'+selected.modules[0]);setShowTheory(false);}}/>
+          <details open={referenceExpanded} onToggle={event=>setReferenceExpanded(event.currentTarget.open)} data-canonical-index className="border-t border-emerald-900 pt-3">
+          <summary className="cursor-pointer text-xs font-bold text-emerald-300">Banco técnico · 35 módulos originales</summary>
+          <p className="text-[10px] text-zinc-400 my-2">Referencia complementaria. Conserva los IDs y progresos anteriores.</p>
           <label className="text-xs text-emerald-300 flex gap-2 items-center"><Search size={16}/> Buscar módulo</label>
           <input aria-label="Buscar módulo" value={filter} onChange={event=>setFilter(event.target.value)} placeholder="RAM, BIOS, arranque…" className="w-full border border-zinc-700 bg-black rounded-lg p-2 text-sm"/>
           <div className="max-h-[60vh] overflow-y-auto space-y-1">
-            {filtered.map(mod=><button key={mod.id} type="button" onClick={()=>{setModuleId(mod.id);setShowTheory(false);}} aria-pressed={current.id===mod.id} className={'block w-full text-left rounded-lg px-2 py-2 text-xs border '+(current.id===mod.id?'border-emerald-500 bg-emerald-950/40 text-emerald-200':'border-transparent text-zinc-300 hover:bg-zinc-900')}><span className="font-bold">[{mod.moduleNumber}]</span> {mod.title}</button>)}
+            {filtered.map(mod=><button key={mod.id} data-canonical-module={mod.id} type="button" onClick={()=>{setModuleId(mod.id);setTreatiseTopic(null);setShowTheory(false);}} aria-pressed={current.id===mod.id} className={'block w-full text-left rounded-lg px-2 py-2 text-xs border '+(current.id===mod.id?'border-emerald-500 bg-emerald-950/40 text-emerald-200':'border-transparent text-zinc-300 hover:bg-zinc-900')}><span className="font-bold">[{mod.moduleNumber}]</span> {mod.title}</button>)}
             {filtered.length===0&&<p className="text-xs text-zinc-400 p-2">No hay coincidencias.</p>}
           </div>
+          </details>
         </aside>
         <div className="space-y-5 min-w-0">
+          {topic&&<Tomo03TreatiseGuide key={topic.id} topic={topic} onModule={number=>setModuleId('mod'+number)} onLab={openTreatiseLab} onTool={id=>{setProfessionalTool(id);setSection('herramientas');}} onGuidedLab={id=>{setProfessionalCase(null);openLab(id);}} onClose={()=>setTreatiseTopic(null)}/>}
           <section className="p-5 rounded-2xl border border-emerald-800/60 bg-[#09140e] space-y-4">
             <div className="text-xs font-mono text-emerald-400">{current.categoryTag} · MÓDULO {current.moduleNumber}/35</div>
             <h2 className="font-black text-xl sm:text-2xl">{current.title}</h2>
@@ -224,8 +245,8 @@ export const Tomo03WorkbenchView:React.FC<{onBack:()=>void;initialModuleNumber?:
         </div>
       </div>}
       {section==='laboratorios'&&<div className="space-y-5">
-       <section className="p-4 rounded-xl border border-emerald-800 space-y-3"><h2 className="text-xl font-bold">EVO Repair Lab · investigación de fallas</h2><label className="text-xs block">Equipo y escenario simulado<select aria-label="Equipo y escenario simulado" className="block w-full bg-black border border-zinc-700 p-2 rounded-lg mt-1" value={professionalCase||''} onChange={e=>{setProfessionalCase(e.target.value||null);if(e.target.value)setModuleId('mod'+e.target.value);}}><option value="">Seleccionar equipo simulado</option>{TOMO03_PROFESSIONAL_MODULES.map(m=><option key={m.number} value={m.number}>[{m.number}] {m.scenario.equipment} · {m.scenario.symptom}</option>)}</select></label><p className="text-xs text-zinc-400">Elegís un equipo y un síntoma. Las pruebas revelan evidencia del caso; la resolución permanece oculta hasta sustentar y comprobar una reparación.</p></section>
-       {caseContent&&<EvoRepairLab key={caseContent.number} content={caseContent} state={parseProfessionalState(store.professional?.[caseContent.number],caseContent)} onChange={state=>updateProfessional(caseContent.number,state)} onDocument={()=>{setModuleId('mod'+caseContent.number);setSection('expediente');}}/>}
+       <section className="p-4 rounded-xl border border-emerald-800 space-y-3"><h2 className="text-xl font-bold">EVO Repair Lab · investigación de fallas</h2><label className="text-xs block">Equipo y escenario simulado<select aria-label="Equipo y escenario simulado" className="block w-full bg-black border border-zinc-700 p-2 rounded-lg mt-1" value={professionalCase||''} onChange={e=>{const id=e.target.value;setProfessionalCase(id||null);const selected=getProfessionalModule(id)||getTreatiseLab(id);if(selected)setModuleId('mod'+selected.number);}}><option value="">Seleccionar equipo simulado</option>{TOMO03_PROFESSIONAL_MODULES.map(m=><option key={m.number} value={m.number}>[{m.number}] {m.scenario.equipment} · {m.scenario.symptom}</option>)}<optgroup label="Tratado · electrónica especializada">{TOMO03_TREATISE_LABS.map(item=><option key={item.id} value={item.id}>{item.title}</option>)}</optgroup></select></label><p className="text-xs text-zinc-400">Elegís un equipo y un síntoma. Las pruebas revelan evidencia del caso; la resolución permanece oculta hasta sustentar y comprobar una reparación.</p></section>
+       {caseContent&&professionalCase&&<EvoRepairLab key={professionalCase} content={caseContent} state={parseProfessionalState(store.professional?.[professionalCase],caseContent)} onChange={state=>updateProfessional(professionalCase,state)} onDocument={()=>{setModuleId('mod'+caseContent.number);setSection('expediente');}}/>}
        <h2 className="font-bold text-lg">Cuatro prácticas guiadas originales</h2>
        <section className="grid lg:grid-cols-[270px_minmax(0,1fr)] gap-5">
         <aside className="space-y-2">{TOMO03_REPAIR_LABS.map(item=><button key={item.id} type="button" onClick={()=>setLabId(item.id)} aria-pressed={lab.id===item.id} className={'block w-full text-left p-3 rounded-xl border text-sm '+(lab.id===item.id?'bg-emerald-950/50 border-emerald-500':'bg-zinc-950 border-zinc-800')}>{item.title}<span className="block text-xs text-zinc-400 mt-1">{item.steps.length} decisiones</span></button>)}</aside>

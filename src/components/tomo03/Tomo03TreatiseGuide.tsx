@@ -1,0 +1,18 @@
+import React from 'react';
+import {TOMO03_TREATISE_TOPICS,TOMO03_TREATISE_METHOD,TOMO03_TREATISE_RESOURCES,type TreatiseTopic} from '../../data/tomo03Treatise';
+import {TOMO03_TOOL_LABELS} from '../../data/tomo03ProfessionalTypes';
+export const Tomo03TreatiseIndex:React.FC<{selected:string|null;onSelect:(id:string)=>void}>=({selected,onSelect})=><nav aria-label="Índice principal del tratado" className="space-y-3">
+ <h2 className="font-bold text-emerald-300 text-sm">Tratado profesional de reparación</h2>
+ <p className="text-xs text-zinc-400">De principiante a especialista. Módulos temáticos 00–12 y niveles VI–VII.</p>
+ <div className="grid grid-cols-1 gap-1">{TOMO03_TREATISE_TOPICS.map(topic=><button key={topic.id} type="button" data-treatise-link={topic.id} aria-pressed={selected===topic.id} onClick={()=>onSelect(topic.id)} className={'text-left rounded-lg border p-2 text-xs '+(selected===topic.id?'border-emerald-500 bg-emerald-950/50 text-emerald-200':'border-emerald-950 text-zinc-300 hover:border-emerald-700')}><span className="font-bold text-emerald-400">{topic.label}</span> · {topic.title}</button>)}</div>
+ <p className="text-[10px] text-zinc-400 leading-relaxed">{TOMO03_TREATISE_METHOD.join(' → ')}. Cada tema conecta con el banco técnico y su expediente.</p>
+</nav>;
+export const Tomo03TreatiseGuide:React.FC<{topic:TreatiseTopic;onModule:(number:string)=>void;onLab:(id:string)=>void;onTool:(id:string)=>void;onGuidedLab:(id:string)=>void;onClose:()=>void}>=({topic,onModule,onLab,onTool,onGuidedLab,onClose})=><section data-treatise-topic={topic.id} className="rounded-2xl border border-emerald-700 bg-[#09140e] p-4 sm:p-5 space-y-4">
+ <header className="space-y-2"><span className="text-xs text-emerald-400">TRATADO · {topic.label}</span><h2 className="text-xl font-bold">{topic.title}</h2><p className="text-xs text-amber-200">{topic.audience}</p></header>
+ {(['understand','observe','measure','diagnose','verify'] as const).map((key,index)=><details key={key} open={index===0?true:undefined} className="p-3 border border-emerald-950 rounded-xl"><summary className="cursor-pointer text-sm font-bold text-emerald-300">{index+1}. {TOMO03_TREATISE_METHOD[index]}</summary><p className="text-sm text-zinc-300 mt-3 leading-relaxed" data-treatise-stage={key}>{topic.stages[key]}</p></details>)}
+ <p className="text-sm"><strong>Práctica: </strong>{topic.practice}</p>
+ <div className="flex flex-wrap gap-2">{TOMO03_TREATISE_RESOURCES[topic.id].tools.map(id=><button key={id} type="button" onClick={()=>onTool(id)} className="border border-zinc-700 rounded-lg p-2 text-xs">{TOMO03_TOOL_LABELS[id]}</button>)}{TOMO03_TREATISE_RESOURCES[topic.id].guidedLab&&<button type="button" onClick={()=>onGuidedLab(TOMO03_TREATISE_RESOURCES[topic.id].guidedLab!)} className="border border-emerald-700 rounded-lg p-2 text-xs">Abrir práctica guiada relacionada</button>}</div>
+ <div className="flex flex-wrap gap-2">{topic.modules.map(number=><button key={number} type="button" onClick={()=>onModule(number)} className="border border-emerald-700 rounded-lg p-2 text-xs">Abrir módulo del banco {number}</button>)}{topic.lab&&<button type="button" onClick={()=>onLab(topic.lab!)} className="bg-emerald-500 text-black font-bold rounded-lg p-2 text-xs">{topic.lab==='treatise-lab-08'?'Abrir Laboratorio 8 · capacitores':'Abrir Laboratorio 9 · GPU avanzada'}</button>}</div>
+ <p className="text-xs text-zinc-400">El número del tema no reemplaza al del módulo canónico. Las respuestas y notas de cada módulo se conservan en el mismo expediente.</p>
+ <button type="button" onClick={onClose} className="text-xs underline text-zinc-400">Cerrar guía del tratado</button>
+</section>;

@@ -17,7 +17,8 @@ try{
  const page=await browser.newPage({viewport:{width:1440,height:1000}});page.setDefaultTimeout(15000);const errors=[];page.on('pageerror',error=>errors.push(error.message));
  await page.addInitScript(()=>{if(!localStorage.getItem('evo_tomo03_repair_workbench_v1'))localStorage.setItem('evo_tomo03_repair_workbench_v1',JSON.stringify({schema:1,records:{mod35:{symptom:'EVIDENCIA LEGACY CONSERVADA',observation:'Nota previa del glosario'}},labs:{'power-zero':{p1:'a'}}}));});
  await page.goto(`http://127.0.0.1:${server.address().port}`);await page.getByRole('heading',{name:'BANCO DE REPARACIÓN INTERACTIVO'}).waitFor();
- assert.equal(await page.locator('aside button[aria-pressed]').count(),35);
+ assert.equal(await page.locator('[data-canonical-module]').count(),35);
+ await page.locator('[data-canonical-index] > summary').click();
  const numbers=await page.evaluate(()=>window.modules.map(m=>m.number));
  for(const number of numbers){
   await page.getByRole('button',{name:'Protocolos y síntomas',exact:true}).click();await page.locator('aside button').filter({hasText:`[${number}]`}).click();

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Tomo03MasterPage } from './Tomo03MasterPage';
 import { Tomo03WorkbenchView } from './Tomo03WorkbenchView';
+import { Tomo03TreatiseIndex } from './Tomo03TreatiseGuide';
 import { EvoTomeExamEngine } from '../exam/EvoTomeExamEngine';
 import {
   TOMO_03_META,
@@ -50,7 +51,9 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
   const [isExamOpen, setIsExamOpen] = useState<boolean>(false);
   const [isWorkbenchOpen, setIsWorkbenchOpen] = useState<boolean>(false);
   const [workbenchModuleNumber, setWorkbenchModuleNumber] = useState<string | undefined>();
+  const [workbenchTopicId, setWorkbenchTopicId] = useState<string | undefined>();
   const openProfessionalModule = (moduleNumber: string) => {
+    setWorkbenchTopicId(undefined);
     setWorkbenchModuleNumber(moduleNumber);
     setIsExamOpen(false);
     setIsWorkbenchOpen(true);
@@ -244,7 +247,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
 
           <button
             type="button"
-            onClick={() => { setWorkbenchModuleNumber(undefined); setIsWorkbenchOpen(true); setIsExamOpen(false); }}
+            onClick={() => { setWorkbenchModuleNumber(undefined); setWorkbenchTopicId(undefined); setIsWorkbenchOpen(true); setIsExamOpen(false); }}
             className="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-bold text-xs flex items-center gap-1.5 hover:bg-emerald-400"
           >
             <Wrench className="w-3.5 h-3.5"/>
@@ -280,7 +283,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
           />
         </div>
       ) : isWorkbenchOpen ? (
-        <Tomo03WorkbenchView key={workbenchModuleNumber ?? 'general'} initialModuleNumber={workbenchModuleNumber} onBack={() => setIsWorkbenchOpen(false)} />
+        <Tomo03WorkbenchView key={workbenchTopicId ?? workbenchModuleNumber ?? 'general'} initialTopicId={workbenchTopicId} initialModuleNumber={workbenchModuleNumber} onBack={() => setIsWorkbenchOpen(false)} />
       ) : (
         /* Main Magazine Pages Container */
         <main className="flex-1 py-8 px-2 sm:px-4 flex flex-col items-center gap-8 print:p-0 print:m-0 print:gap-0">
@@ -435,7 +438,7 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
             pageId="t03-page-03"
             pageNumber={3}
             sectionTitle="SUMARIO DE TALLER"
-            subSlug="ÍNDICE DE 35 MÓDULOS"
+            subSlug="TRATADO · 00–12 / VI–VII"
             accentColor="#10B981"
           >
             <div className="h-full flex flex-col justify-between space-y-3">
@@ -447,11 +450,15 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                   ÍNDICE MAESTRO DE SERVICIO TÉCNICO
                 </h2>
                 <p className="text-xs font-mono-tech text-zinc-400">
-                  35 módulos estructurados según la cadena física de arranque de una PC de escritorio.
+                  De principiante a especialista: recorrido 00–12 y niveles VI–VII. Los 35 módulos técnicos originales siguen disponibles como referencia.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-mono-tech overflow-y-auto max-h-[720px] pr-1">
+              <div className="overflow-y-auto max-h-[720px] pr-1 space-y-4">
+                <Tomo03TreatiseIndex selected={null} onSelect={id=>{setWorkbenchTopicId(id);setWorkbenchModuleNumber(undefined);setIsExamOpen(false);setIsWorkbenchOpen(true);window.scrollTo(0,0);}}/>
+                <details className="text-xs font-mono-tech">
+                <summary className="cursor-pointer text-emerald-300 mb-2">Referencia complementaria · 35 módulos del banco</summary>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {TOMO_03_MODULES.map((m) => (
                   <div
                     key={m.id}
@@ -474,10 +481,12 @@ export const Tomo03MagazineView: React.FC<Tomo03MagazineViewProps> = ({
                     </div>
                   </div>
                 ))}
+                </div>
+                </details>
               </div>
 
               <div className="text-[10px] font-mono-tech text-zinc-500 text-center">
-                SELECCIONÁ UN MÓDULO PARA ABRIR SU DESARROLLO PROFESIONAL, PRÁCTICAS Y LABORATORIOS
+                ENTENDER → OBSERVAR → MEDIR → DIAGNOSTICAR → COMPROBAR
               </div>
             </div>
           </Tomo03MasterPage>

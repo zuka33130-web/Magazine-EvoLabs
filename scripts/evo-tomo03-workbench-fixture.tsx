@@ -39,7 +39,8 @@ async function run(){
  flushSync(()=>root.render(<Tomo03WorkbenchView onBack={()=>{}}/>));
  await pause();
  assert(document.body.textContent!.includes('BANCO DE REPARACIÓN INTERACTIVO'),'Workbench not rendered');
- assert(document.querySelectorAll('aside button[aria-pressed]').length===35,'Not all 35 modules navigable');
+ assert(document.querySelectorAll('[data-canonical-module]').length===35,'Not all 35 modules navigable');
+ assert(document.querySelectorAll('[data-treatise-link]').length===15,'Treatise must be the main 00–12/VI–VII index');
  click('[08] DIAGNÓSTICO PERICIAL DE RAM');
  assert(document.body.textContent!.includes('MÓDULO 08/35'),'Module context did not switch');
  click('No, comprobado');
