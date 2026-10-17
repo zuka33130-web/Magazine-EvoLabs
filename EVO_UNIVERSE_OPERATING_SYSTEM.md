@@ -1,6 +1,6 @@
 # EVO LABS // UNIVERSE OPERATING SYSTEM (CANONICAL)
 **Versión de Especificación**: 1.0.0-PRO  
-**Branch Activo**: `evo-recovery-pro`  
+**Rama activa canónica**: `main` (documento iniciado históricamente en `evo-recovery-pro`)  
 **Branding Principal Oficial**: `EVO LABS` (Se prohíbe el uso de "Academia EVO LABS" en interfaces activas)
 
 ---
