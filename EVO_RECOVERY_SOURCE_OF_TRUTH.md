@@ -1,6 +1,6 @@
 # EVO LABS // RECOVERY SOURCE OF TRUTH (CANONICAL)
 **Versión de Referencia**: 1.0.0-PRO  
-**Branch Activo**: `evo-recovery-pro`  
+**Rama activa canónica**: `main` (documento iniciado históricamente en `evo-recovery-pro`)  
 **Última Auditoría**: TRANSFORMACIÓN 01 — INTEGRITY GATE  
 
 ---
