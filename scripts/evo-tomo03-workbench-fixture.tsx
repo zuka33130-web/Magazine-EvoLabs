@@ -69,6 +69,9 @@ async function run(){
  assert(document.body.textContent!.includes('Equipo de prueba sin video con LED DRAM'),'Manual case notes omitted from export preview');
  assert(document.body.textContent!.includes('PRÁCTICAS DIDÁCTICAS'),'Lab history omitted');
  assert(!localStorage.getItem('evo_tomo03_completed'),'Must not fabricate certification');
+ flushSync(()=>root.render(<Tomo03WorkbenchView key="direct-module-14" initialModuleNumber="14" onBack={()=>{}}/>));
+ await pause();
+ assert(document.querySelector('[data-professional-module="14"]'),'Deep-linked professional module 14 is not visible');
  document.getElementById('result')!.textContent='PASS: 35 guided protocols, four interactive labs, manual evidence persistence, ATX tolerances and workshop dossier. No automatic telemetry or false certificate.';
 }
 run().catch(err=>document.getElementById('result')!.textContent='FAIL: '+(err instanceof Error?err.stack:String(err)));
