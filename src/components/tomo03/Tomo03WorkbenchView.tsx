@@ -58,10 +58,10 @@ const tabs: {id:Section;label:string}[]=[
   {id:'herramientas',label:'Herramientas'},
   {id:'expediente',label:'Expediente de taller'}
 ];
-export const Tomo03WorkbenchView:React.FC<{onBack:()=>void}>=({onBack})=>{
+export const Tomo03WorkbenchView:React.FC<{onBack:()=>void;initialModuleNumber?:string}>=({onBack,initialModuleNumber})=>{
   const [section,setSection]=useState<Section>('protocolos');
   const [store,setStore]=useState<Store>(readStore);
-  const [moduleId,setModuleId]=useState('mod03');
+  const [moduleId,setModuleId]=useState(()=>TOMO_03_MODULES.find(item=>item.moduleNumber===initialModuleNumber)?.id||'mod03');
   const [filter,setFilter]=useState('');
   const [labId,setLabId]=useState(TOMO03_REPAIR_LABS[0].id);
   const [rail,setRail]=useState<string>(()=>{const value=readAtxDraft().rail;return ATX_RAILS.some(r=>r.id===value)?value:'12';});
