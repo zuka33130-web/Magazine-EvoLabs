@@ -1,5 +1,5 @@
 # EVO LABS // TOMO 03 — SISTEMA PROFESIONAL DE REPARACIÓN
-**Estado:** desarrollo incremental; no Gold Master. **Base preservada:** Tomo 02 en `3a9b9e2`. **Rama:** `evo-tomo03-workbench`.
+**Estado:** desarrollo incremental; no Gold Master. **Base preservada:** Tomo 02 en `3a9b9e2`. **Rama canónica actual:** `main` (integración consolidada; `evo-tomo03-workbench` se conserva como referencia histórica).
 
 ## Producto, no solo curso
 La edición A4 es una vista editorial. La capa operativa "Banco interactivo" es una herramienta de diagnóstico, práctica y registro. Evitar confundir ambas interfaces o repetir la misma ficha 35 veces.
