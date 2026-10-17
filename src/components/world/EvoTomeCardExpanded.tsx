@@ -36,7 +36,8 @@ export const EvoTomeCardExpanded: React.FC<EvoTomeCardExpandedProps> = ({
   onOpenMagazine,
 }) => {
   const [imageError, setImageError] = useState(false);
-  const { canAccess, openUpgradeModal, isFreeUser } = useEvoAccess();
+  const { canAccess, openUpgradeModal, isFreeUser, entitlements } = useEvoAccess();
+  const ownerCanPreviewTomo03 = tome.number === '03' && entitlements.isOwner;
   const isAvailableForContent = tome.technicalStatus === 'COMPLETE' || tome.commercialStatus === 'AVAILABLE';
   const isRealLab = tome.associatedLab.labRealStatus === 'REAL_FUNCTIONAL';
 
@@ -44,6 +45,10 @@ export const EvoTomeCardExpanded: React.FC<EvoTomeCardExpandedProps> = ({
   const isTomeGranted = tomeAccess.allowed;
 
   const handleReadClick = () => {
+    if (ownerCanPreviewTomo03 && onOpenTomo) {
+      onOpenTomo(tome.number);
+      return;
+    }
     if (!isTomeGranted && isFreeUser && tome.number !== '01') {
       openUpgradeModal(`Tomo ${tome.number} // ${tome.title}`);
       return;
@@ -115,6 +120,14 @@ export const EvoTomeCardExpanded: React.FC<EvoTomeCardExpandedProps> = ({
   };
 
   const getPrimaryCta = () => {
+    if (ownerCanPreviewTomo03) {
+      return {
+        label: 'ABRIR TOMO 03 EN DESARROLLO →',
+        action: handleReadClick,
+        className: 'bg-emerald-500 hover:bg-emerald-400 text-black font-bold',
+        disabled: false,
+      };
+    }
     switch (tome.commercialStatus) {
       case 'AVAILABLE':
         if (tome.number === '01') {
