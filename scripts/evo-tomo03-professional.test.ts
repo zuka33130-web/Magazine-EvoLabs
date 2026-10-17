@@ -19,7 +19,11 @@ test('specializations have unique original module ownership and a complete techn
 test('all 35 module IDs and the complete content of 15–35 remain intact',()=>{
  assert.equal(TOMO_03_MODULES.length,35);assert.equal(new Set(TOMO_03_MODULES.map(m=>m.id)).size,35);
  const file='src/data/tomo03Data.ts',baseline=execFileSync('git',['show',`11bc22b:${file}`],{encoding:'utf8'}),current=fs.readFileSync(file,'utf8');
- const marker="    id: 'mod15',";assert.ok(baseline.includes(marker));assert.equal(current.slice(current.indexOf(marker)),baseline.slice(baseline.indexOf(marker)));
+ const marker="    id: 'mod15',";assert.ok(baseline.includes(marker));assert.ok(current.includes(marker));
+ // git show yields LF while fs.readFileSync can yield CRLF on Windows.
+ // Compare content verbatim except for platform-specific line endings.
+ const normalizeEol=(value:string)=>value.replace(/\r\n?/g,'\n');
+ assert.equal(normalizeEol(current.slice(current.indexOf(marker))),normalizeEol(baseline.slice(baseline.indexOf(marker))));
 });
 for(const content of TOMO03_PROFESSIONAL_MODULES)test(`case ${content.number}: evidence gates, incorrect repairs, validation and safe restoration`,()=>{
  const scenario=content.scenario;
