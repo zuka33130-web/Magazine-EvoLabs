@@ -172,13 +172,13 @@ Repositorio: `EvoMaxPC/Magazine-EvoLabs`
 
 
 
-Rama canónica única para TODO EVO LABS: `evo-tomo03-workbench`. Todos los tomos (01 a 12), herramientas, laboratorios, portadas y funcionalidades pertenecen a UNA SOLA aplicación y se desarrollan, integran y validan en esta misma rama. No crear ramas por tomo, fase, agente ni tarea. No cambiar de rama sin indicación expresa del usuario. Las ramas históricas se preservan solo como referencias: no son aplicaciones independientes ni destinos de desarrollo.
+Rama canónica única para TODO EVO LABS: `main`. Todos los tomos (01 a 12), herramientas, laboratorios, portadas y funcionalidades pertenecen a UNA SOLA aplicación y se desarrollan, integran y validan en esta misma rama. No crear ramas por tomo, fase, agente ni tarea. No cambiar de rama sin indicación expresa del usuario. Las ramas históricas se preservan solo como referencias: no son aplicaciones independientes ni destinos de desarrollo.
 
 
 
 \- Conservar el historial y las ramas existentes.
 
-\- No modificar ni fusionar `main` automáticamente.
+\- Modificar únicamente `main` para nuevas tareas, respetando las comprobaciones y sin alterar ramas históricas.
 
 \- No crear commits ni hacer push sin autorización.
 
@@ -214,4 +214,4 @@ No declarar una tarea finalizada mientras existan errores conocidos relacionados
 
 
 
-REGLA DE TRABAJO UNIFICADO (2026-10-16): no entregar contenidos de un tomo solo en una rama aislada; cada nueva función debe quedar integrada en la aplicación EVO LABS del mismo árbol de trabajo. Antes de publicar, comprobar visualmente que se puede acceder a la función desde la navegación real, además de ejecutar pruebas técnicas. No fusionar `main`, borrar ramas históricas o alterar entornos locales sin autorización.
+REGLA DE TRABAJO UNIFICADO (2026-10-16): no entregar contenidos de un tomo solo en una rama aislada; cada nueva función debe quedar integrada en la aplicación EVO LABS del mismo árbol de trabajo. Antes de publicar, comprobar visualmente que se puede acceder a la función desde la navegación real, además de ejecutar pruebas técnicas. No borrar ramas históricas ni alterar entornos locales sin autorización. `main` es la rama consolidada y único destino de desarrollo.
