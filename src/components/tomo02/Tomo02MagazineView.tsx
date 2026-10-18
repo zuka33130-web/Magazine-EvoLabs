@@ -347,39 +347,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     };
   }, []);
 
-  // The new edition owns its own print flow; do not invoke the legacy print dialog.
-  useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('print') === 'true' || params.get('pdf') === 'true') {
-        setViewMode('continuous');
-        document.title = 'EVO-LABS-MAGAZINE-TOMO-02-LA-BIBLIA-NEGRA-DE-WINDOWS';
-
-        const triggerAutoPrint = async () => {
-          try {
-            if (document.fonts?.ready) {
-              await document.fonts.ready;
-            }
-          } catch {
-            // ignore
-          }
-
-          setTimeout(async () => {
-            try {
-              await document.querySelector<HTMLImageElement>('#t02-page-01 img')?.decode();
-              window.print();
-            } catch (err) {
-              console.warn('Auto-print falló o requiere interacción del usuario:', err);
-            }
-          }, 800);
-        };
-
-        triggerAutoPrint();
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
+  // El lector del magazine fue retirado; no iniciar una descarga/impresión antigua por URL.
 
   const handleCopySnippet = (snippet: string) => {
     if (navigator.clipboard) {
