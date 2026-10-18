@@ -1,14 +1,10 @@
 import React from 'react';
-import kernelImage from '../../assets/images/cap_05_kernel_1789531884339.jpg';
-import siliconImage from '../../assets/images/cap_01_silicon_1789531835511.jpg';
-import frametimeImage from '../../assets/images/cap_03_frametime_1789531858625.jpg';
-import workshopImage from '../../assets/images/cap_06_workshop_1789531894578.jpg';
-import laboratoryImage from '../../assets/images/cap_07_lab_1789531904106.jpg';
+import { Tomo02WindowsEditorialArt, type WindowsArtKind } from './Tomo02WindowsEditorialArt';
 
 /**
  * Atlas visual de los cinco niveles de la Biblia Virtual.
- * Reutiliza la fotografía editorial ya presente en el Tomo 01
- * con un tratamiento cromático propio del Tomo 02.
+ * Ilustraciones vectoriales Windows exclusivas del Tomo 02.
+ * No reutiliza imágenes de otros tomos.
  * Las imágenes ilustran conceptos: NO representan diagnósticos ni lecturas del usuario.
  */
 const WINDOWS_ATLAS = [
@@ -18,8 +14,7 @@ const WINDOWS_ATLAS = [
     range: '00–07',
     title: 'WINDOWS POR DENTRO',
     subtitle: 'Arranque · kernel · procesos',
-    image: kernelImage,
-    alt: 'Ilustración editorial técnica relacionada con la arquitectura interna del procesador y el kernel de Windows',
+    art: 'kernel' as WindowsArtKind,
   },
   {
     id: 'lvl-2',
@@ -27,8 +22,7 @@ const WINDOWS_ATLAS = [
     range: '08–15',
     title: 'CONTROL TOTAL',
     subtitle: 'Memoria · consola · registro',
-    image: siliconImage,
-    alt: 'Fotografía editorial de silicio utilizada para ilustrar memoria y arquitectura de hardware',
+    art: 'tasks' as WindowsArtKind,
   },
   {
     id: 'lvl-3',
@@ -36,8 +30,7 @@ const WINDOWS_ATLAS = [
     range: '16–23',
     title: 'RENDIMIENTO REAL',
     subtitle: 'Energía · red · pantalla',
-    image: frametimeImage,
-    alt: 'Fotografía editorial sobre rendimiento y tiempos de respuesta del equipo',
+    art: 'cpu' as WindowsArtKind,
   },
   {
     id: 'lvl-4',
@@ -45,8 +38,7 @@ const WINDOWS_ATLAS = [
     range: '24–31',
     title: 'DIAGNÓSTICO FORENSE',
     subtitle: 'Errores · BSOD · latencias',
-    image: workshopImage,
-    alt: 'Fotografía editorial de un banco de trabajo técnico usado para ilustrar diagnóstico y reparación',
+    art: 'security' as WindowsArtKind,
   },
   {
     id: 'lvl-5',
@@ -54,8 +46,7 @@ const WINDOWS_ATLAS = [
     range: '32–39',
     title: 'LABORATORIO EXPERTO',
     subtitle: 'NTFS · Sysinternals · pruebas',
-    image: laboratoryImage,
-    alt: 'Imagen editorial de laboratorio técnico que representa el método experimental EVO LABS',
+    art: 'experiment' as WindowsArtKind,
   },
 ] as const;
 
@@ -95,13 +86,7 @@ export const Tomo02VisualAtlas: React.FC<Tomo02VisualAtlasProps> = ({
           const active = activeLevel === item.id;
           const tile = (
             <>
-              <img
-                src={item.image}
-                alt={item.alt}
-                loading="lazy"
-                decoding="async"
-                className="absolute inset-0 h-full w-full object-cover opacity-80 saturate-[0.78] transition-transform duration-500 group-hover:scale-110 group-hover:opacity-100"
-              />
+              <Tomo02WindowsEditorialArt kind={item.art} variant="background" />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#020814] via-[#041425]/65 to-[#0078D4]/10" />
               <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#0078D4] via-[#00D2FF] to-[#60CDFF]" />
               <div className="relative z-10 flex h-full flex-col justify-between p-3.5 text-left">
@@ -155,7 +140,7 @@ export const Tomo02VisualAtlas: React.FC<Tomo02VisualAtlasProps> = ({
 };
 
 /**
- * Apertura fotográfica común para los sectores avanzados de la Biblia Virtual.
+ * Apertura ilustrada original para los sectores avanzados de la Biblia Virtual.
  * El sector mantiene su título y contenido original; solo se añade contexto visual.
  */
 export const Tomo02SectorVisualHero: React.FC<{
@@ -168,13 +153,7 @@ export const Tomo02SectorVisualHero: React.FC<{
 
   return (
     <figure className="relative isolate mb-5 min-h-48 overflow-hidden rounded-[22px] border border-[#00D2FF]/40 bg-[#051321] shadow-[0_18px_45px_rgba(0,0,0,0.45)] sm:min-h-56">
-      <img
-        src={level.image}
-        alt={level.alt}
-        loading="lazy"
-        decoding="async"
-        className="absolute inset-0 h-full w-full object-cover saturate-[0.75]"
-      />
+      <Tomo02WindowsEditorialArt kind={level.art} variant="background" />
       <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-[#030912] via-[#041324]/95 to-[#041324]/40" />
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#0078D4] via-[#00D2FF] to-[#60CDFF]" />
       <div className="relative z-10 flex min-h-48 max-w-2xl flex-col justify-between p-5 sm:min-h-56 sm:p-7">
