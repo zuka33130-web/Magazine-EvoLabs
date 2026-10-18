@@ -150,21 +150,21 @@ assert(!wrapper.includes('onOpenSector={handleOpenOriginalSector}') && wrapper.i
 const magazine40Catalog = file('src/data/tomo02Magazine40.ts');
 const magazine40Chapter001 = file('src/data/tomo02Magazine40Chapter001.ts');
 const magazine40Reader = file('src/components/tomo02/Tomo02Magazine40.tsx');
-const headlineMatch = magazine40Catalog.match(/EVO_WINDOWS_40_HEADLINES\\s*=\\s*\\[([\\s\\S]*?)\\] as const/);
+const headlineMatch = magazine40Catalog.match(/EVO_WINDOWS_40_HEADLINES\s*=\s*\[([\s\S]*?)\] as const/);
 assert(Boolean(headlineMatch), 'El catálogo conserva los 40 títulos destacados');
-const magazine40Titles = [...headlineMatch[1].matchAll(/^  '(?:[^'\\\\]|\\\\.)*',?$/gm)];
+const magazine40Titles = headlineMatch[1].split('\n').filter(line => /^\s*'[^']*',?\s*$/.test(line));
 assert(magazine40Titles.length === 40, 'El nuevo magazine tiene exactamente 40 titulares');
-const originalIdMatch = magazine40Catalog.match(/EVO_WINDOWS_40_IDS\\s*=\\s*\\[([\\s\\S]*?)\\] as const/);
+const originalIdMatch = magazine40Catalog.match(/EVO_WINDOWS_40_IDS\s*=\s*\[([\s\S]*?)\] as const/);
 assert(Boolean(originalIdMatch), 'Los 40 temas conservan referencia a los 200 títulos originales');
 const originalIds = originalIdMatch[1].split(',').map(x => Number(x.trim())).filter(Number.isInteger);
 assert(originalIds.length === 40 && new Set(originalIds).size === 40 && originalIds.every(id => id >= 1 && id <= 200), 'Los 40 IDs originales son válidos y únicos');
-assert((magazine40Chapter001.match(/eyebrow: 'EXPEDIENTE 001/g) || []).length === 8, 'Investigación 001: ocho páginas editoriales de desarrollo');
+assert((magazine40Chapter001.match(/eyebrow: 'EXPEDIENTE 001/g) || []).length === 8 && magazine40Reader.includes('EVO_WINDOWS40_001.length * 2'), 'Investigación 001: ocho secciones originales maquetadas en dieciséis páginas A4');
 assert(['LAB 01','LAB 02','LAB 03'].every(label => magazine40Chapter001.includes(label)), 'Investigación 001: tres laboratorios reproducibles de solo lectura');
 assert(magazine40Chapter001.includes('ESCENARIO FICTICIO') && magazine40Chapter001.includes('EVO_WINDOWS40_001_REFERENCES'), 'Los ejemplos ficticios y las fuentes se identifican explícitamente');
 assert(cover.includes('btn-abrir-biblia-virtual-tomo02') && cover.includes('btn-magazine40-a4-tomo02'), 'La portada enlaza tanto Biblia Virtual como Magazine A4');
 assert(wrapper.includes('Tomo02Magazine40') && wrapper.includes("if (subView === 'a4_magazine')"), 'El nuevo Magazine A4 tiene ruta propia');
 assert(!wrapper.includes("import { Tomo02MagazineEstrella }") && !magazine40Reader.includes('Tomo02MagazineEstrella'), 'No se reactivó el antiguo lector de 200 fichas');
 assert(magazine40Reader.includes('GUARDAR AVANCE PDF A4') && magazine40Reader.includes('window.print()'), 'La edición A4 se exporta por impresión nativa');
-assert(magazine40Reader.includes('39 EN DESARROLLO') && magazine40Catalog.includes('published: i === 0'), 'No se declara completo el contenido todavía no desarrollado');
+assert(magazine40Reader.includes('Las otras 39 no se muestran como terminadas.') && magazine40Catalog.includes('published: i === 0'), 'No se declara completo el contenido todavía no desarrollado');
 
 process.stdout.write('EVO MAGAZINE: ' + passed.length + ' verificaciones OK; archivo histórico de 200 guías y catálogo nuevo de 40 titulares.\n');
