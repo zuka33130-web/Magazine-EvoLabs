@@ -196,47 +196,152 @@ export const EVO_WINDOWS40_CORPUS_B: EvoWindowsResearch[] = [
   {
     "number": 14,
     "premise": [
-      "Copiás una contraseña, una dirección o un párrafo y lo pegás después. Ese mecanismo práctico puede representar una superficie de exposición si compartís equipo, habilitás historial o sincronización, o dejás información sensible en el portapapeles. Pero afirmar que Windows conserva indefinidamente todo lo copiado es falso: el comportamiento cambia según configuración y tipo de contenido.",
-      "El experimento enseña a diferenciar portapapeles actual, historial opcional, sincronización entre dispositivos y gestores de terceros. Se realizará con texto ficticio, porque una auditoría de privacidad no debe multiplicar secretos reales."
+      "Escena realista: copiás una contraseña para pegarla en una aplicación. Cerrás esa aplicación, comprobás que el historial Win+V está desactivado y suponés que la contraseña quedó fuera del alcance de cualquier otro programa. Esa conclusión puede ser equivocada. El dato que acabás de copiar está en un mecanismo de intercambio del sistema operativo, no necesariamente protegido por la ventana de origen.",
+      "El misterio no es si Windows guarda un historial visible. Es si una aplicación local, ejecutándose en un contexto con acceso al portapapeles, puede obtener el texto actual sin que vos presiones pegar dentro de esa aplicación. Windows ofrece funciones de lectura del portapapeles y mecanismos para detectar sus cambios. Esa capacidad es legítima para editores, portapapeles extendidos y accesibilidad; también es una superficie de exposición si ejecutás software no confiable.",
+      "Vamos a demostrar ese límite mediante un observador temporal que solo reconoce una frase inventada. La prueba NO busca contraseñas, NO registra otros contenidos, NO usa Internet y NO se instala ni permanece activo. Después investigaremos por separado el historial Win+V, elementos fijados, sincronización con otros equipos, acceso remoto y administradores de portapapeles de terceros.",
+      "El premio para el lector es un mapa de amenazas que permite decidir qué controlar y qué no creer: un historial vacío no garantiza confidencialidad; un programa con acceso local no equivale a un sitio web; y un elemento sincronizado no se comporta necesariamente como una simple copia local."
     ],
     "mechanisms": [
-      "La API del portapapeles permite a aplicaciones intercambiar texto e imágenes en el contexto de usuario. Windows puede ofrecer historial accesible por Win+V y sincronización, si están disponibles y habilitados. Los gestores de portapapeles de terceros pueden aplicar reglas y retenciones diferentes.",
-      "Algunas aplicaciones limpian el portapapeles tras copiar contraseñas, otras no. La protección de contenido depende de la propia aplicación, la sesión, controles empresariales y el gestor seleccionado; no se resuelve mirando si una configuración está marcada como activada."
+      "CAPA 1 — El portapapeles actual. Cuando presionás Ctrl+C, la aplicación ofrece datos al sistema mediante formatos como texto Unicode, HTML o mapa de bits. La aplicación que pega pide un formato compatible. En la API Win32 se usan operaciones como OpenClipboard y GetClipboardData. Que el dato pueda cambiar de propietario o formato no significa que quede asociado exclusivamente al programa que lo copió. También existen mecanismos de renderizado diferido: la aplicación original puede generar algunos formatos solo cuando otro programa los solicita.",
+      "CAPA 2 — Notificación de cambios. Windows expone GetClipboardSequenceNumber, que cambia cuando cambia el portapapeles bajo las condiciones documentadas, y AddClipboardFormatListener, que envía WM_CLIPBOARDUPDATE a ventanas registradas. Por lo tanto, una aplicación puede enterarse de que hubo un nuevo contenido sin esperar a que el usuario pegue en ella. Recibir la notificación y leer el dato son acciones diferentes, y los permisos y el contexto de ejecución importan.",
+      "CAPA 3 — Historial Win+V. Es una función opcional de Windows que permite recuperar entradas anteriores. Según la documentación de Microsoft, su capacidad está limitada a 25 elementos, admite texto/HTML/bitmap con un máximo de 4 MB por elemento y descarta los más antiguos salvo que estén fijados. El historial normalmente se limpia al reiniciar, excepto los elementos fijados. Estos límites corresponden al HISTORIAL, no a un supuesto límite universal de todas las aplicaciones que utilizan el portapapeles actual.",
+      "CAPA 4 — Sincronización. El historial puede ofrecer sincronización entre dispositivos cuando la edición, la cuenta y la configuración lo permiten. La opción de sincronizar automáticamente no equivale a compartir cada acción con todas las cuentas de la red. Si está desactivada, eso tampoco demuestra que ninguna otra aplicación tenga su propia nube. Una auditoría precisa distingue las funciones de Windows de OneDrive, gestores independientes y portapapeles integrados en aplicaciones.",
+      "CAPA 5 — Acceso remoto. Algunas sesiones de Escritorio remoto permiten redirigir el portapapeles entre el equipo local y el remoto. Microsoft documenta políticas para permitir, bloquear o restringir esa redirección. La exposición potencial existe cuando la función está habilitada y la sesión está establecida; la mera instalación de un cliente remoto no demuestra que haya transferido un secreto.",
+      "CAPA 6 — Navegadores. Una página web no dispone automáticamente de las mismas capacidades de una aplicación nativa. La API web Clipboard.readText se limita a contextos seguros y los navegadores implementan permisos, interacciones o avisos específicos. Firefox y navegadores Chromium no resuelven todas las solicitudes de lectura de la misma forma. No confundas una aplicación instalada con cualquier pestaña que visitás.",
+      "CAPA 7 — Límites de la observación. Ni Get-Clipboard ni Win+V permiten reconstruir quién leyó antes un valor, saber si una aplicación guardó una copia privada o certificar que una contraseña nunca abandonó la máquina. Son instrumentos de observación de estado; una atribución de acceso malicioso necesitaría telemetría adicional, contexto del proceso y posiblemente análisis forense especializado."
     ],
     "traps": [
-      "Que Win+V muestre entradas no implica que todo lo que alguna vez copiaste esté allí. Que aparezca vacío tampoco garantiza que nunca existiera dato sensible en memoria de otros procesos o gestores. El alcance de la prueba es la interfaz de historial disponible.",
-      "Copiar contraseñas reales para probar el historial es un mal diseño experimental. Nunca pegues ni exportes tu portapapeles a una herramienta de terceros durante una revisión de seguridad; la prueba usa un marcador ficticio sin valor personal."
+      "MITO 1: 'Si apago Win+V, nadie puede leer lo que copio'. Falso. Apagar una función de historial no elimina la API de intercambio de datos necesaria para Ctrl+C y Ctrl+V. Un programa que puede leer el portapapeles actual sigue pudiendo hacerlo bajo su contexto de seguridad. Nuestra prueba mostrará precisamente esa diferencia.",
+      "MITO 2: 'El historial vacío demuestra que mi secreto fue borrado'. Falso. El historial visible solo muestra lo que esa función conserva en ese momento; no audita copias hechas por gestores de terceros, procesos que ya leyeron el dato ni sesiones remotas anteriores. Ausencia de entradas visibles no es evidencia universal de eliminación.",
+      "MITO 3: 'Windows almacena absolutamente todo para siempre'. Tampoco. Win+V tiene límites de cantidad y tamaño y reglas de retención; aplicaciones pueden no publicar ciertos contenidos y existen programas que los limpian deliberadamente. Un inventario verdadero distingue retención actual, historial, fijados, nube y almacenamiento de terceros.",
+      "MITO 4: 'Toda página web puede espiarme sin permiso'. La API web tiene restricciones de contexto y activación/permiso que difieren por navegador. Un sitio que intenta leer el portapapeles y una aplicación de escritorio con acceso local no son amenazas equivalentes. A la inversa, confiar en un sitio porque usa HTTPS no convierte el texto copiado en privado si se lo pegás voluntariamente.",
+      "MITO 5: 'Borrar el historial recupera la seguridad de una contraseña ya expuesta'. Si un tercero obtuvo una copia, limpiar el portapapeles no revoca esa copia. La medida apropiada puede ser cambiar credenciales y revisar la aplicación o el dispositivo involucrado; borrar solo modifica el estado disponible en ese momento."
     ],
     "protocol": [
-      "Usá un texto inventado, por ejemplo 'EVO-PRUEBA-CLIP-001', copialo y pegalo en un editor local. Presioná Win+V y observá si el historial está disponible y habilitado. Documentá qué aparece y cómo cambian los resultados si el historial está desactivado, sin modificar funciones innecesariamente.",
-      "Revisá Configuración > Sistema > Portapapeles. Registrá el estado de historial y sincronización si existe en tu edición. Comprobá también si hay gestores de portapapeles instalados; cada uno tiene políticas de persistencia independientes."
+      "FASE A — Preparación segura. Cerrá gestores de portapapeles de terceros si pueden interferir, o anotá expresamente que estaban activos. Abrí Bloc de notas y dos terminales PowerShell locales bajo tu propia sesión. No utilices ninguna contraseña, correo, ruta privada ni información personal. Elegí el texto ficticio EVO-CLIP-LAB-014 y conservá ese mismo marcador para que el resultado sea comparable.",
+      "FASE B — Demostración del secreto técnico. En la primera terminal poné en marcha el observador temporal del laboratorio principal. En el Bloc de notas escribí y copiá SOLO el marcador. Si la terminal informa 'DETECTADO', acabás de comprobar que otro proceso local leyó el contenido actual sin que presionaras pegar en su ventana. Que el proceso sea TU observador voluntario importa: demuestra una capacidad técnica, NO que una aplicación desconocida haya leído algo.",
+      "FASE C — Diferencia entre presente e historial. Con el marcador aún en el portapapeles, presioná Win+V. Si el historial está activado, buscá el marcador. Si está desactivado, registrá ese estado; no hace falta habilitarlo. Repetí en la segunda terminal una consulta de igualdad con el marcador y comprobá que el portapapeles actual puede seguir accesible aunque Win+V no muestre historial. No cambies configuraciones solo para conseguir un resultado llamativo.",
+      "FASE D — Sustitución. Copiá un segundo texto ficticio, EVO-CLIP-OTRO-015. Comprobá con la misma consulta que el valor actual cambió. Si el historial está activado, revisá si el primer marcador sigue en Win+V. Esta es la experiencia clave: sustituir el contenido ACTUAL no implica necesariamente eliminar las entradas del HISTORIAL.",
+      "FASE E — Superficies adicionales sin exponer datos. En Configuración > Sistema > Portapapeles registrá si existen las opciones de historial y sincronización; no actives sincronización para experimentar. Si usás Escritorio remoto, consultá si la sesión autorizada tiene redirección de portapapeles. Si usás un gestor de terceros, anotá nombre, versión, retención y si sincroniza; no pegues ni exportes su contenido real.",
+      "FASE F — Cierre. Detené el observador (se cierra automáticamente a los 20 segundos). Registrá solo respuestas Sí/No y las condiciones de la prueba. Reemplazá el marcador por otro valor ficticio si no querés dejarlo como contenido actual. Tené presente que reemplazar el contenido no borra necesariamente el historial ni las copias que pudiera haber realizado otra aplicación."
     ],
     "interpretation": [
-      "El portapapeles actual y el historial tienen comportamientos distintos. Una entrada visible confirma retención en ese contexto; una entrada no visible no es prueba universal de eliminación segura. La sincronización exige analizar la configuración de cuenta y la función asociada.",
-      "Un resultado útil incluye versión de Windows, estado de la función, texto de prueba, hora, observación y limitación. Los secretos y datos reales quedan fuera del experimento."
+      "RESULTADO A: el observador detecta el marcador y Win+V está desactivado. Conclusión válida: un proceso de TU sesión pudo leer el portapapeles actual sin que la función de historial estuviera activa. Conclusión inválida: 'Windows transmitió ese texto a Internet' o 'tengo malware'. No hubo ninguna lectura remota ni comunicación en la prueba.",
+      "RESULTADO B: el observador no lo detecta. Posibles causas: expiró antes de que copiaras, el texto no coincidió exactamente, otra aplicación reemplazó el contenido, la sesión/ventana no era la esperada, o una lectura temporal falló. No sirve para demostrar que la lectura por otros procesos sea imposible. Repetí con más control antes de concluir.",
+      "RESULTADO C: copiás un segundo marcador y el primero permanece en Win+V. Demuestra retención en el historial visible bajo esa configuración concreta. Si no permanece, no demuestra que ninguna aplicación lo haya conservado por otro medio. Documentá si la entrada estaba fijada; no deduzcas políticas de retención a partir de una sola captura.",
+      "RESULTADO D: descubrís la sincronización habilitada. Eso identifica una posible vía adicional de circulación, no demuestra que un texto concreto se haya transmitido ni a qué dispositivo llegó. Para una atribución real necesitás configuración de cuenta, tipo de sincronización y, cuando sea legal y posible, observación de la acción o registros de servicio.",
+      "RESULTADO E: encontrás redirección de portapapeles permitida en RDP. 'Permitida' y 'utilizada' son condiciones distintas. Sin sesión remota activa y sin transferencias observadas no podés concluir que hubo exposición. En entornos corporativos también pueden aplicar restricciones por dirección y tipo de contenido.",
+      "RESULTADO F: desactivás historial o borrás entradas después de copiar un secreto real. La medida puede reducir retención visible futura, pero no protege retroactivamente una copia exfiltrada. La respuesta depende del riesgo: revisar extensiones y aplicaciones con privilegios, reducir gestores innecesarios, usar funciones de autocompletado del gestor de contraseñas y cambiar credenciales ante una exposición fundamentada."
     ],
     "conclusion": [
-      "Ahora el lector entiende por qué copiar algo sensible merece precaución, especialmente en un equipo compartido. Puede gestionar la superficie de exposición desde controles explícitos en lugar de recurrir a 'limpiadores de privacidad' sin transparencia.",
-      "La lección aplicable es sencilla: no uses el portapapeles como almacén de secretos, comprobá si hay historial y respetá el contexto de sincronización."
+      "VEREDICTO EVO: el portapapeles es un canal de intercambio, no una caja fuerte. Windows necesita permitir que otra aplicación autorizada reciba lo copiado; precisamente por eso hay una frontera de confianza al depositar datos sensibles allí. El historial Win+V añade una segunda capa de conservación; sincronización y redirección pueden ampliar la superficie según su configuración; software de terceros añade políticas propias.",
+      "El descubrimiento central es práctico: podés tener el historial apagado y aun así permitir, por diseño, que otra aplicación local lea el valor actual. El laboratorio te hace verificarlo con un marcador falso. Por sí solo no detecta espías ni audita accesos históricos, pero destruye una falsa sensación de protección.",
+      "¿Qué se lleva el lector? Un protocolo repetible y seguro, un inventario de las cuatro superficies que debe revisar (actual, historial, sincronización/redirección y gestores), una tabla de qué evidencia sirve para cada afirmación y criterios para actuar sin instalar limpiadores dudosos ni introducir contraseñas reales en herramientas de diagnóstico.",
+      "Regla para recordar: no copies al portapapeles aquello que no aceptarías compartir temporalmente con aplicaciones de tu sesión. Preferí el autocompletado integrado de un gestor confiable cuando esté disponible, comprobá las capacidades de borrado automático y nunca confundas vaciar la interfaz de Win+V con revocar accesos que ya ocurrieron. Lo que no podés medir, no lo presentes como certeza."
     ],
     "lab": {
-      "title": "LAB 014 · PORTAPAPELES CON DATOS FICTICIOS",
-      "why": "Experimento manual con marcador inventado. No extrae ni publica contenidos personales.",
-      "code": "# El experimento principal se hace con Win+V y Configuración > Sistema > Portapapeles.\n# Solo consultamos contexto del sistema:\nGet-ComputerInfo | Select-Object WindowsProductName,WindowsVersion,OsBuildNumber",
-      "readout": "No uses Get-Clipboard ni capturas del historial si contiene secretos: ese dato puede terminar en una transcripción o screenshot."
+      "title": "LAB 014 · ¿PUEDE OTRA VENTANA LEER LO QUE COPIASTE?",
+      "why": "PRUEBA REAL CON MARCADOR FICTICIO. Abrí PowerShell en una ventana y Bloc de notas en otra. Ejecutá este observador; durante los 20 segundos siguientes, copiá exactamente EVO-CLIP-LAB-014 desde Bloc de notas. Solo informa coincidencia; jamás muestra contenidos ajenos, no guarda archivos ni transmite nada.",
+      "code": "# SOLO PARA TU PC: detector temporal de un marcador FICTICIO.\n# No ejecuta cambios de Windows ni guarda el contenido copiado.\n$marker = 'EVO-CLIP-LAB-014'\n$detectado = $false\n$fin = (Get-Date).AddSeconds(20)\nWrite-Host 'Tenes 20 segundos para copiar el marcador desde Bloc de notas.'\nwhile ((Get-Date) -lt $fin) {\n  try {\n    $valor = Get-Clipboard -Raw -ErrorAction Stop\n    if ($valor -eq $marker) {\n      $detectado = $true\n      break\n    }\n  } catch {\n    # Una aplicacion puede tener el portapapeles ocupado brevemente.\n  }\n  Start-Sleep -Milliseconds 250\n}\nif ($detectado) {\n  Write-Host 'DETECTADO: esta ventana leyo el marcador sin pegarlo aqui.'\n} else {\n  Write-Host 'NO DETECTADO: repetí verificando tiempo y coincidencia.'\n}\nRemove-Variable valor -ErrorAction SilentlyContinue",
+      "readout": "Si aparece DETECTADO, un proceso local controlado por vos leyó el texto actual. No probaste que haya malware, espionaje ni subida a la nube. NO DETECTADO no demuestra seguridad: puede ser un falso negativo por momento, contexto o formato. Get-Clipboard solo se usa con un marcador ficticio; nunca pegues valores personales."
     },
-    "insight": "El historial opcional no equivale al portapapeles actual ni a los gestores de terceros.",
-    "challenge": "Copiá una frase ficticia, comprobá Win+V y dejá registrado si la función está habilitada.",
-    "video": "Copiás una contraseña... ¿quién la puede pegar después? Probalo con texto falso.",
+    "insight": "La desactivación de Win+V NO impide que programas locales autorizados lean el contenido ACTUAL del portapapeles. Historial, sincronización, RDP y gestores son superficies de exposición diferentes.",
+    "challenge": "Repetí A: historial desactivado, B: historial activado solo si ya lo usás, C: segundo marcador. Entregá una tabla de Sí/No que distinga lectura local, retención visible y configuraciones de sincronización; no anotes contenidos sensibles.",
+    "video": "Tu historial está apagado... ¿igual se puede leer lo que copiaste? Mirá este experimento: dos ventanas, un código inventado y una sorpresa que no aparece en Win+V.",
     "sources": [
       {
-        "name": "Get-ItemProperty — Microsoft Learn",
-        "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-itemproperty"
+        "name": "Windows: usar el portapapeles, historial, 25 entradas y límites — Microsoft Support",
+        "url": "https://support.microsoft.com/en-us/windows/apps/using-the-clipboard"
       },
       {
-        "name": "Datos requeridos de servicios conectados — Microsoft",
-        "url": "https://learn.microsoft.com/en-us/windows/privacy/required-service-data"
+        "name": "Cómo funciona la API de lectura/escritura del portapapeles — Microsoft Learn",
+        "url": "https://learn.microsoft.com/en-us/windows/win32/dataxchg/clipboard-operations"
+      },
+      {
+        "name": "Notificaciones de cambios y GetClipboardSequenceNumber — Microsoft Learn",
+        "url": "https://learn.microsoft.com/en-us/windows/win32/dataxchg/using-the-clipboard"
+      },
+      {
+        "name": "Get-Clipboard PowerShell 5.1 — Microsoft Learn",
+        "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-clipboard?view=powershell-5.1"
+      },
+      {
+        "name": "Políticas de redirección del portapapeles RDP — Microsoft Learn",
+        "url": "https://learn.microsoft.com/en-us/windows/client-management/mdm/policy-csp-admx-terminalserver"
+      },
+      {
+        "name": "Permisos del portapapeles en navegadores — MDN",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API"
       }
+    ],
+    "caseStudy": {
+      "title": "EL FALSO ALIVIO DE WIN+V DESACTIVADO",
+      "classification": "SIMULACIÓN DIDÁCTICA · TODOS LOS PERSONAJES, HORARIOS Y RESULTADOS SON FICTICIOS",
+      "scenario": "A las 11:02 una persona copia el texto ficticio EVO-CLIP-LAB-014 desde Bloc de notas. Win+V está desactivado. A las 11:03 otra aplicación local de prueba consulta el portapapeles y reconoce ese texto. A las 11:04 el usuario copia otro marcador; el anterior ya no es el contenido actual. Nadie inició sesión remotamente y la prueba no produjo tráfico de red.",
+      "evidence": "Observación 1: la aplicación de prueba reconoce el marcador. Observación 2: no había historial Win+V habilitado. Observación 3: el portapapeles actual cambia al copiar otro texto. La evidencia ilustra lectura local del valor actual; no registra qué hicieron otras aplicaciones durante ese período.",
+      "verdict": "La conclusión defendible es que Win+V desactivado no bloquea la lectura del portapapeles actual por el programa de prueba. No se puede concluir que hubo robo de credenciales ni que Windows envió el texto a Microsoft. Si el marcador hubiera sido una contraseña real, el problema habría sido la exposición temporal a software local no confiable."
+    },
+    "extraLabs": [
+      {
+        "title": "LAB 014.B · ¿HISTORIAL VACÍO SIGNIFICA CONTENIDO INACCESIBLE?",
+        "goal": "Probar manualmente que Win+V y el portapapeles ACTUAL no son lo mismo, sin alterar preferencias para fabricar un resultado.",
+        "steps": [
+          "Dejá el marcador inventado como contenido actual copiándolo desde Bloc de notas.",
+          "Abrí Win+V. Registrá si el historial está desactivado, vacío o si contiene el marcador. No actives ni desactives funciones solo por esta prueba.",
+          "En otra terminal local ejecutá la comparación de igualdad que aparece debajo. El programa solo escribe VERIFICADO o NO COINCIDE.",
+          "Copiá EVO-CLIP-OTRO-015. Volvé a comparar y, si el historial está disponible, observá si el primer marcador continúa visible."
+        ],
+        "code": "# Ejecutar SOLO después de copiar el marcador ficticio.\n$marker = 'EVO-CLIP-LAB-014'\n$actual = Get-Clipboard -Raw\nif ($actual -eq $marker) {\n  'VERIFICADO: el contenido actual coincide'\n} else {\n  'NO COINCIDE: contenido distinto, vacío o formato diferente'\n}\nRemove-Variable actual -ErrorAction SilentlyContinue",
+        "expected": "Podés comprobar coincidencia incluso cuando Win+V está desactivado. Al copiar otro marcador, el contenido actual cambia; el historial, si existe, puede retener entradas anteriores.",
+        "limitation": "Esta consulta puntual no informa sobre lecturas previas, otros procesos, datos sincronizados ni persistencia fuera de Win+V."
+      },
+      {
+        "title": "LAB 014.C · AUDITORÍA DE SUPERFICIES SIN LEER SECRETOS",
+        "goal": "Identificar configuraciones que agrandan o reducen el ámbito de exposición, sin extraer el contenido de ningún portapapeles.",
+        "steps": [
+          "Abrí Configuración > Sistema > Portapapeles y anotá el estado de historial y sincronización si esas opciones existen.",
+          "Anotá si utilizás aplicaciones que conservan fragmentos copiados o sincronizan el portapapeles; buscá sus propias preferencias de retención.",
+          "Si utilizás Escritorio remoto por necesidad real, comprobá en esa sesión autorizada si está habilitada la redirección del portapapeles; no crees conexiones nuevas.",
+          "Marcá cada casillero como SÍ, NO o DESCONOCIDO. No copies ni fotografíes contenido real y no exportes el historial."
+        ],
+        "code": "",
+        "expected": "Una matriz de riesgos por función. Una opción habilitada representa capacidad, no prueba de transferencia; una opción desactivada no bloquea necesariamente accesos por otras capas.",
+        "limitation": "Revisión de configuración, no análisis de tráfico ni prueba de que un secreto se haya filtrado."
+      }
+    ],
+    "evidenceMatrix": [
+      {
+        "question": "¿Puede mi proceso de prueba leer el contenido actual?",
+        "proof": "Observador de marcador ficticio + ventana y momento",
+        "limit": "No demuestra lecturas por desconocidos"
+      },
+      {
+        "question": "¿El historial Win+V conserva el marcador?",
+        "proof": "Visualización manual con Win+V, solo datos ficticios",
+        "limit": "No representa gestores de terceros"
+      },
+      {
+        "question": "¿Está permitida la sincronización?",
+        "proof": "Configuración > Sistema > Portapapeles",
+        "limit": "Habilitación no demuestra transferencia"
+      },
+      {
+        "question": "¿El portapapeles puede pasar a una sesión RDP?",
+        "proof": "Configuración/política y prueba autorizada con texto inventado",
+        "limit": "Redirección permitida no implica utilizada"
+      },
+      {
+        "question": "¿Se copió alguna vez una contraseña real?",
+        "proof": "No hay prueba general posible con Win+V ni Get-Clipboard",
+        "limit": "No inventar atribuciones ni reconstrucciones retrospectivas"
+      }
+    ],
+    "deliverables": [
+      "Tabla completa de cinco hipótesis con evidencia y limitación, apta para compartir sin divulgar datos.",
+      "Diferenciación comprobada entre estado actual, historial, sincronización, RDP y software de terceros.",
+      "Una demostración reproducible de lectura por otra ventana dentro de la propia sesión.",
+      "Recomendaciones concretas basadas en contexto de uso, no promesas de limpieza total.",
+      "Guion para video: mostrar Win+V desactivado y el detector que reconoce únicamente un marcador ficticio."
     ]
   },
   {
