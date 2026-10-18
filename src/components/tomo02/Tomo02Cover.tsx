@@ -162,7 +162,16 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
 
             {/* Action Buttons: 1 Dominant Action + max 2 Secondary Actions */}
             <div className="pt-2 flex flex-wrap items-center gap-3">
-              {/* ACCIÓN PRINCIPAL DOMINANTE: SECTOR 01 ANTES DEL LOGO */}
+              {/* Magazine estrella: puerta de entrada para lectores principiantes. */}
+              <button
+                id="btn-magazine-estrella-tomo02"
+                type="button"
+                onClick={onOpenMagazine}
+                className="inline-flex items-center gap-3 px-7 py-4 rounded-xl font-mono-tech font-black text-xs sm:text-sm tracking-wider uppercase bg-cyan-400 hover:bg-cyan-300 text-zinc-950 transition-colors cursor-pointer shadow-lg shadow-cyan-400/20"
+              >
+                <span>MAGAZINE ESTRELLA · 200 INVESTIGACIONES →</span>
+              </button>
+              {/* LECTOR CANÓNICO: SECTOR 01 ANTES DEL LOGO */}
               <button
                 id="btn-abrir-sector01-tomo02"
                 type="button"
