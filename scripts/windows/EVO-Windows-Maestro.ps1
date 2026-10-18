@@ -60,17 +60,17 @@ $disks = @($logical | ForEach-Object {
     Volume=$_.DeviceID
     CapacityGB=[math]::Round($_.Size / 1GB,2)
     FreeGB=[math]::Round($_.FreeSpace / 1GB,2)
-    FreePercent=if($_.Size -gt 0){[math]::Round(100 * $_.FreeSpace / $_.Size,1)}else{0}
+    FreePercent=$(if($_.Size -gt 0){[math]::Round(100 * $_.FreeSpace / $_.Size,1)}else{0})
   }
 })
 
 $info = [pscustomobject]@{
   Moment=$time.ToString('yyyy-MM-dd HH:mm:ss')
-  Version=if($os){$os.Caption}else{'No disponible'}
-  Build=if($os){$os.BuildNumber}else{'No disponible'}
+  Version=$(if($os){$os.Caption}else{'No disponible'})
+  Build=$(if($os){$os.BuildNumber}else{'No disponible'})
   LogicalProcessors=$cores
-  RAMTotalGB=if($os){[math]::Round($os.TotalVisibleMemorySize / 1MB,2)}else{0}
-  RAMAvailableGB=if($os){[math]::Round($os.FreePhysicalMemory / 1MB,2)}else{0}
+  RAMTotalGB=$(if($os){[math]::Round($os.TotalVisibleMemorySize / 1MB,2)}else{0})
+  RAMAvailableGB=$(if($os){[math]::Round($os.FreePhysicalMemory / 1MB,2)}else{0})
   TotalProcesses=@(Get-Process -ErrorAction SilentlyContinue).Count
   RunningServices=@($service | Where-Object {$_.State -eq 'Running'}).Count
   SampleSeconds=[math]::Round($elapsed,2)
