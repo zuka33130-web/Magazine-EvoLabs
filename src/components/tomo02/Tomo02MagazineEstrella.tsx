@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { EVO_MAGAZINE_200_TITLES, EVO_MAGAZINE_GROUPS } from '../../data/tomo02Magazine200';
+import { EVO_MAGAZINE_FIRST_BATCH } from '../../data/tomo02MagazineFirstBatch';
 
 type Step = { title: string; why: string; code?: string; expect: string };
 type Article = { id: number; goal: string; basics: string; steps: Step[]; tip: string; warning: string; challenge: string };
-const ARTICLES: Article[] = [
+const ORIGINAL_ARTICLES: Article[] = [
  { id:52, goal:'Investigar qué hace Windows mientras no usás el equipo.',
    basics:'Un proceso es un programa en ejecución. Que aparezca en una lista no lo convierte en espía. CPU acumulada no es lo mismo que porcentaje instantáneo.',
    steps:[
@@ -66,14 +67,31 @@ const ARTICLES: Article[] = [
    warning:'Nunca borres manualmente System32, WinSxS o DriverStore.',
    challenge:'Explicá la diferencia entre archivos temporales, caché y componentes del sistema.' }
 ];
+const ARTICLES: Article[] = [...ORIGINAL_ARTICLES, ...EVO_MAGAZINE_FIRST_BATCH].sort((a, b) => a.id - b.id);
 const dictionary = new Map(ARTICLES.map(a => [a.id,a]));
 const number = (n:number) => String(n).padStart(3,'0');
 
 export function Tomo02MagazineEstrella({ onBack, onOpenInteractive }:{onBack:()=>void;onOpenInteractive:()=>void}) {
-  const [current, setCurrent] = useState(52);
+  const [current, setCurrent] = useState(1);
+  const [reviewed, setReviewed] = useState<Record<number, boolean>>(() => {
+    try { return JSON.parse(localStorage.getItem('evo_magazine02_reviewed_v1') || '{}'); }
+    catch { return {}; }
+  });
   const [query, setQuery] = useState('');
   const [section, setSection] = useState(0);
   const selected = dictionary.get(current) || ARTICLES[0];
+  const reviewedCount = ARTICLES.filter(a => reviewed[a.id]).length;
+  const markReviewed = () => {
+    const updated = { ...reviewed, [selected.id]: !reviewed[selected.id] };
+    setReviewed(updated);
+    try { localStorage.setItem('evo_magazine02_reviewed_v1', JSON.stringify(updated)); }
+    catch { /* Offline/blocked storage: keep session state. */ }
+  };
+  const nextArticle = ARTICLES[(ARTICLES.findIndex(a => a.id === selected.id) + 1) % ARTICLES.length];
+  const jumpToGuide = (id: number) => {
+    setCurrent(id);
+    document.getElementById('magazine-guide')?.scrollIntoView({ behavior: 'smooth' });
+  };
   const visible = EVO_MAGAZINE_200_TITLES.map((title,i)=>({ title, id:i+1 })).filter(item=>{
     if (query && !item.title.toLocaleLowerCase('es').includes(query.toLocaleLowerCase('es'))) return false;
     if (!section) return true;
@@ -107,7 +125,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive }:{onBack:()=
   );
   return (
     <div className="evo-magazine-star min-h-screen bg-[#10151b] text-zinc-100">
-      <style>{'@page{size:A4;margin:14mm 12mm;}@media print{html,body,.evo-magazine-star{background:white!important;color:black!important;} .evo-no-print{display:none!important;} .evo-print-only{display:block!important;} .evo-cover{page-break-after:always;} .evo-index-print{columns:2;column-gap:8mm;font-size:9pt;} .evo-index-print p{break-inside:avoid;margin:0 0 3mm;} .evo-index-section{break-after:page;} .evo-guide{break-before:page;border:0!important;padding:0!important;} .evo-step{break-inside:avoid;} .evo-command{overflow-wrap:anywhere;white-space:pre-wrap!important;}}'}</style>
+      <style>{'@page{size:A4;margin:14mm 12mm;}@media print{html,body,.evo-magazine-star{background:white!important;color:black!important;} .evo-no-print{display:none!important;} .evo-print-only{display:block!important;} .evo-cover{page-break-after:always;} .evo-index-print{columns:2;column-gap:8mm;font-size:9pt;} .evo-index-print p{break-inside:avoid;margin:0 0 3mm;} .evo-index-section{break-after:page;} .evo-guide{break-before:page;border:0!important;padding:0!important;} .evo-step{break-inside:avoid;} .evo-command{overflow-wrap:anywhere;white-space:pre-wrap!important;} .evo-cover .text-zinc-300,.evo-cover .text-zinc-400{color:#333!important;} .evo-cover .text-cyan-300{color:#076284!important;} .evo-guide p,.evo-guide h2,.evo-guide h3{orphans:3;widows:3;} }'}</style>
       <nav className="evo-no-print sticky top-0 z-50 bg-[#0b1118] border-b border-zinc-700 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
         <button onClick={onBack} className="rounded-md border border-zinc-600 px-3 py-2 text-sm">← Tomo 02</button>
         <strong className="text-sm">EVO LABS · MAGAZINE ESTRELLA</strong>
@@ -123,7 +141,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive }:{onBack:()=
           <p className="mt-6 text-xl sm:text-2xl text-zinc-300 max-w-3xl">200 secretos de Windows para descubrir, investigar y comprobar en tu propia computadora.</p>
           <p className="mt-8 max-w-3xl text-sm">Procesos · Privacidad · Telemetría · Puertos · Regedit · RAM · Limpieza · Gaming · Reparación · PowerShell</p>
           <p className="mt-10 font-black text-cyan-300">NO LO CREAS. COMPROBALO.</p>
-          <p className="mt-6 text-xs text-zinc-400">Catálogo de 200 títulos + {ARTICLES.length} guías prácticas desarrolladas en esta primera entrega editorial. Los otros títulos todavía requieren desarrollo y validación.</p>
+          <p className="mt-6 text-xs text-zinc-400">Catálogo de 200 títulos + {ARTICLES.length} guías prácticas desarrolladas. Los capítulos restantes siguen en elaboración y verificación. Los otros títulos todavía requieren desarrollo y validación.</p>
         </header>
         <section className="evo-index-section py-10">
           <h2 className="text-2xl font-black mb-3">ÍNDICE MAESTRO · 200 INVESTIGACIONES</h2>
@@ -138,8 +156,8 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive }:{onBack:()=
           <div className="evo-no-print grid sm:grid-cols-2 gap-2">
             {visible.map(item=>{
               const ready=dictionary.has(item.id);
-              return <button type="button" disabled={!ready} onClick={()=>{setCurrent(item.id);document.getElementById('magazine-guide')?.scrollIntoView({behavior:'smooth'});}} key={item.id} className={'p-3 border rounded-lg flex gap-3 text-left text-sm '+(ready?'bg-[#16303b] border-cyan-600 hover:border-cyan-300':'bg-zinc-900 border-zinc-700 opacity-75')}>
-                <span className="font-mono text-cyan-300">{number(item.id)}</span><span className="flex-1">{item.title}</span><span className="text-[10px]">{ready?'LEER':'ÍNDICE'}</span>
+              return <button type="button" disabled={!ready} onClick={()=>jumpToGuide(item.id)} key={item.id} className={'p-3 border rounded-lg flex gap-3 text-left text-sm '+(ready?'bg-[#16303b] border-cyan-600 hover:border-cyan-300':'bg-zinc-900 border-zinc-700 opacity-75')}>
+                <span className="font-mono text-cyan-300">{number(item.id)}</span><span className="flex-1">{item.title}</span><span className="text-[10px]">{ready?(reviewed[item.id]?'REVISADA':'LEER'):'ÍNDICE'}</span>
               </button>
             })}
           </div>
@@ -148,9 +166,18 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive }:{onBack:()=
           </div>
         </section>
         <section id="magazine-guide" className="evo-no-print py-6">
-          <h2 className="text-2xl font-black mb-6">TU LABORATORIO, DESDE CERO</h2>
+          <h2 className="text-2xl font-black mb-3">TU LABORATORIO, DESDE CERO</h2>
+          <p className="text-sm text-zinc-300 mb-5">Tu registro local de lectura: <strong>{reviewedCount} de {ARTICLES.length}</strong> guías marcadas como revisadas. Esto no sustituye una evaluación técnica.</p>
           {renderGuide(selected)}
-          <p className="text-sm text-zinc-300">Podés imprimir la edición con el índice de 200 títulos y las seis guías publicadas desde el botón «Guardar PDF A4».</p>
+          <div className="flex flex-wrap gap-3 mb-7">
+            <button type="button" onClick={markReviewed} className="px-4 py-3 bg-emerald-700 hover:bg-emerald-600 rounded-lg font-bold text-sm">
+              {reviewed[selected.id] ? '✓ Revisada · Desmarcar' : '✓ Marcar práctica como revisada'}
+            </button>
+            <button type="button" onClick={()=>jumpToGuide(nextArticle.id)} className="px-4 py-3 border border-cyan-500 rounded-lg font-bold text-sm">
+              Siguiente investigación disponible →
+            </button>
+          </div>
+          <p className="text-sm text-zinc-300">Podés imprimir la edición con el índice de 200 títulos y las {ARTICLES.length} guías actualmente desarrolladas desde el botón «Guardar PDF A4».</p>
         </section>
         <section className="evo-print-only hidden">
           <h2 className="text-2xl font-black text-zinc-900">Guías completas de esta primera entrega</h2>
