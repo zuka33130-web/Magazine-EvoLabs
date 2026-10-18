@@ -261,7 +261,7 @@ export const EVO_MAGAZINE_GAMING_A: EvoMagazineArticle[] = [
       {
         "title": "Calculá la cantidad de píxeles",
         "why": "Compará tres resoluciones habituales sin cambiar la pantalla.",
-        "code": "@(@(800,600),@(1280,720),@(1920,1080)) | ForEach-Object { [pscustomobject]@{Resolucion=\"$($_[0])x$($_[1])\";Pixeles=$_[0]*$_[1]} }",
+        "code": "'800x600','1280x720','1920x1080' | ForEach-Object { $w,$h=$_ -split 'x'; [pscustomobject]@{Resolucion=$_;Pixeles=([int]$w*[int]$h)} }",
         "expect": "Vas a ver 480000, 921600 y 2073600 píxeles; no son FPS."
       },
       {
