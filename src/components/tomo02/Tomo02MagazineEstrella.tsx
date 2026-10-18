@@ -139,11 +139,11 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
     const handle=window.setTimeout(()=>{document.title='EVO-LABS-TOMO-02-MAGAZINE-ESTRELLA';window.print();},900);
     return ()=>window.clearTimeout(handle);
   },[]);
-  const renderGuide=(a:Article)=>{
+  const renderGuide=(a:Article, printOnly = false)=>{
     const direction=magazineArtDirection(a.id);
     return (
     <article key={a.id} className="evo-guide evo-mag-article bg-[#f9f7f3] text-zinc-900 rounded-[26px] mb-7 border border-zinc-300 overflow-hidden shadow-xl shadow-black/10">
-      <MagazineArticleHero id={a.id} title={EVO_MAGAZINE_200_TITLES[a.id-1]}/>
+      {!printOnly && <MagazineArticleHero id={a.id} title={EVO_MAGAZINE_200_TITLES[a.id-1]}/>}
       <header className="evo-print-only hidden">
         <p className="text-xs font-black text-cyan-800 uppercase tracking-widest">Investigación {number(a.id)} · EVO LABS</p>
         <h2 className="text-2xl font-black mt-2">{EVO_MAGAZINE_200_TITLES[a.id-1]}</h2>
@@ -267,8 +267,13 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
           <div className="evo-no-print grid sm:grid-cols-2 gap-2">
             {visible.map(item=>{
               const ready=dictionary.has(item.id);
-              return <button type="button" disabled={!ready} onClick={()=>jumpToGuide(item.id)} key={item.id} className={'p-3 border rounded-lg flex gap-3 text-left text-sm '+(ready?'bg-[#16303b] border-cyan-600 hover:border-cyan-300':'bg-zinc-900 border-zinc-700 opacity-75')}>
-                <span className="font-mono text-cyan-300">{number(item.id)}</span><span className="flex-1">{item.title}</span><span className="text-[10px]">{ready?(reviewed[item.id]?'REVISADA':'LEER'):'ÍNDICE'}</span>
+              const art=magazineArtDirection(item.id);
+              return <button type="button" disabled={!ready} onClick={()=>jumpToGuide(item.id)} key={item.id}
+                className={'group relative overflow-hidden p-4 border rounded-xl flex gap-3 text-left text-sm transition-colors '+(ready?'bg-[#17212b] border-[#3c5161] hover:border-white hover:bg-[#20303e]':'bg-zinc-900 border-zinc-700 opacity-75')}>
+                <span className="absolute left-0 top-0 bottom-0 w-[3px]" style={{backgroundColor:art.accent}}/>
+                <span className="font-mono font-black text-lg" style={{color:art.secondary}}>{number(item.id)}</span>
+                <span className="flex-1 min-w-0"><span className="block text-[10px] font-black tracking-wider opacity-60 uppercase mb-1">{art.category}</span><span className="font-bold leading-snug">{item.title}</span></span>
+                <span className="shrink-0 self-center text-[10px] font-black border border-white/20 rounded-md px-2 py-1 text-white/70">{ready?(reviewed[item.id]?'✓':'ABRIR ↗'):'ÍNDICE'}</span>
               </button>
             })}
           </div>
@@ -301,7 +306,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
         </section>
         <section className="evo-print-only hidden">
           <h2 className="text-2xl font-black text-zinc-900">Guías completas de esta primera entrega</h2>
-          {ARTICLES.map(renderGuide)}
+          {ARTICLES.map(a => renderGuide(a, true))}
         </section>
         <section aria-labelledby="bibliavirtual-index" className="py-10 border-t border-zinc-700">
           <h2 id="bibliavirtual-index" className="text-2xl font-black mb-2">Índice original completo de la Biblia Virtual</h2>
