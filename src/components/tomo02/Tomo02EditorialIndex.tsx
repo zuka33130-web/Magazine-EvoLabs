@@ -31,6 +31,7 @@ import {
 import { getAdvancedSector } from '../../data/tomo02AdvancedContent';
 import { getSectorInvestigations } from '../../data/tomo02Investigations';
 import { Tomo02MasterExpedienteModal } from './Tomo02MasterExpedienteModal';
+import { Tomo02VisualAtlas } from './Tomo02VisualAtlas';
 
 export interface ModuleProgressStatus {
   [moduleId: string]: 'not_started' | 'in_progress' | 'completed';
@@ -319,6 +320,13 @@ export const Tomo02EditorialIndex: React.FC<Tomo02EditorialIndexProps> = ({
           </div>
         </div>
       </header>
+
+      {/* Índice visual fotográfico: la selección aplica el mismo filtro de niveles existente. */}
+      <Tomo02VisualAtlas
+        variant="index"
+        activeLevel={selectedGroup}
+        onSelectLevel={setSelectedGroup}
+      />
 
       {onStartFinalExam && (
         <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-5 rounded-xl bg-[#101923] border border-sky-500/30" aria-label="Evaluación final del Tomo 02">
