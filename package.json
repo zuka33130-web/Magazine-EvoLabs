@@ -10,11 +10,12 @@
     "start": "node server.ts",
     "clean": "rm -rf dist build server.js",
     "lint": "tsc --noEmit",
-    "evo:regression": "node scripts/evo-structural-regression.mjs && node scripts/evo-magazine-regression.mjs",
+    "evo:regression": "node scripts/evo-tomo02-syntax-check.mjs && node scripts/evo-structural-regression.mjs && node scripts/evo-magazine-regression.mjs",
     "admin:create-owner": "node scripts/admin/create-owner.mjs",
     "evo:observability": "node --import tsx --test scripts/evo-observability.test.ts",
     "evo:observability:browser": "node scripts/evo-observability-browser.mjs",
-    "evo:magazine:check": "node scripts/evo-magazine-regression.mjs"
+    "evo:magazine:check": "node scripts/evo-tomo02-syntax-check.mjs && node scripts/evo-magazine-regression.mjs",
+    "evo:tomo02:syntax": "node scripts/evo-tomo02-syntax-check.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
