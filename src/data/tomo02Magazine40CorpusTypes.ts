@@ -17,6 +17,28 @@ export type EvoWindowsResearch = {
   challenge: string;
   video: string;
   sources: readonly {name:string; url:string}[];
+  /** Artifacts and case studies are optional until each manuscript passes editorial audit. */
+  caseStudy?: {
+    title: string;
+    classification: string;
+    scenario: string;
+    evidence: string;
+    verdict: string;
+  };
+  extraLabs?: readonly {
+    title: string;
+    goal: string;
+    steps: readonly string[];
+    code: string;
+    expected: string;
+    limitation: string;
+  }[];
+  evidenceMatrix?: readonly {
+    question: string;
+    proof: string;
+    limit: string;
+  }[];
+  deliverables?: readonly string[];
 };
 const titles = ['EL MISTERIO','ARQUITECTURA INVISIBLE','FALSAS PISTAS','PRUEBA REPRODUCIBLE','LECTURA DE RESULTADOS','VEREDICTO EVO'] as const;
 const visuals: NonNullable<Windows40Page['visual']>[] = ['flow','flow','verdict','experiment','cpu','verdict'];
