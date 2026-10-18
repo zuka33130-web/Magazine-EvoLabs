@@ -61,7 +61,7 @@ const Schematic: React.FC<{ kind: WindowsArtKind; tint: string }> = ({ kind, tin
     case 'cpu':
       return <g>
         <rect x="87" y="37" width="626" height="229" rx="14" fill="#031629" stroke="#188FCE" strokeWidth="2"/>
-        <g stroke="#12557F" strokeWidth="1">{[0,1,2,3].map(i=><path key={i} d={'M110 '+(80+i*41)+' H695' />)}</g>
+        <g stroke="#12557F" strokeWidth="1">{[0,1,2,3].map(i=><path key={i} d={'M110 '+(80+i*41)+' H695'} />)}</g>
         <g stroke="#15577D" strokeWidth="1">{[0,1,2,3,4,5,6,7].map(i=><path key={i} d={'M'+(131+i*76)+' 58 V240'}/>)}</g>
         <path d="M110 212 L159 210 L210 196 L260 190 L312 164 L358 173 L408 112 L458 139 L510 123 L567 78 L627 96 L691 60" fill="none" stroke={tint} strokeWidth="3"/>
         <path d="M110 212 L159 210 L210 196 L260 190 L312 164 L358 173 L408 112 L458 139 L510 123 L567 78 L627 96 L691 60 L691 238 H110 Z" fill={tint} fillOpacity=".10"/>
