@@ -81,6 +81,25 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
     catch { return {}; }
   });
   const [query, setQuery] = useState('');
+  const [copiedFeedback, setCopiedFeedback] = useState('');
+  const [notes, setNotes] = useState<Record<number, string>>(() => {
+    try { return JSON.parse(localStorage.getItem('evo_magazine02_notes_v1') || '{}'); }
+    catch { return {}; }
+  });
+  const saveNote = (id: number, value: string) => {
+    const nextNotes = { ...notes, [id]: value };
+    setNotes(nextNotes);
+    try { localStorage.setItem('evo_magazine02_notes_v1', JSON.stringify(nextNotes)); }
+    catch { /* Keep notes for this browser session. */ }
+  };
+  const copyCode = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedFeedback('Comando copiado. Revisá cada línea antes de ejecutarlo.');
+    } catch {
+      setCopiedFeedback('No se pudo copiar automáticamente. Seleccioná el texto del comando.');
+    }
+  };
   const [section, setSection] = useState(0);
   const selected = dictionary.get(current) || ARTICLES[0];
   const reviewedCount = ARTICLES.filter(a => reviewed[a.id]).length;
@@ -116,7 +135,12 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
         <section className="evo-step mt-6" key={i}>
           <h3 className="font-bold text-lg">{i+1}. {step.title}</h3>
           <p className="mt-1 text-sm leading-relaxed">{step.why}</p>
-          {step.code && <pre className="evo-command select-text bg-zinc-900 text-cyan-100 text-xs p-4 mt-2 rounded-md whitespace-pre-wrap break-words print:bg-zinc-100 print:text-black print:border">{step.code}</pre>}
+          {step.code && <div className="mt-2">
+            <button type="button" onClick={()=>copyCode(step.code!)}
+              className="evo-no-print text-xs px-3 py-1.5 bg-cyan-800 hover:bg-cyan-700 text-white rounded-t-md"
+              aria-label={'Copiar comando del paso ' + (i+1)}>Copiar comando</button>
+            <pre className="evo-command select-text bg-zinc-900 text-cyan-100 text-xs p-4 rounded-md whitespace-pre-wrap break-words print:bg-zinc-100 print:text-black print:border">{step.code}</pre>
+          </div>}
           <p className="mt-2 text-sm"><b>Qué debería suceder:</b> {step.expect}</p>
         </section>
       ))}
@@ -191,6 +215,15 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
           <h2 className="text-2xl font-black mb-3">TU LABORATORIO, DESDE CERO</h2>
           <p className="text-sm text-zinc-300 mb-5">Tu registro local de lectura: <strong>{reviewedCount} de {ARTICLES.length}</strong> guías marcadas como revisadas. Esto no sustituye una evaluación técnica.</p>
           {renderGuide(selected)}
+          <div className="border border-zinc-600 rounded-lg p-4 mb-5">
+            <label htmlFor="evo-lab-note" className="font-bold text-sm block mb-2">Tu cuaderno de laboratorio · Investigación {number(selected.id)}</label>
+            <textarea id="evo-lab-note" key={selected.id} rows={5}
+              defaultValue={notes[selected.id] || ''} onBlur={e=>saveNote(selected.id,e.target.value)}
+              placeholder="Anotá: qué ejecutaste, qué apareció, qué entendiste y qué tenés que investigar."
+              className="w-full rounded-md border border-zinc-600 bg-zinc-900 text-white p-3 text-sm"/>
+            <p className="mt-2 text-xs text-zinc-400">Las notas se guardan al salir del campo en el almacenamiento local de este navegador. Evitá incluir contraseñas, IP privadas u otros datos sensibles.</p>
+          </div>
+          <p className="text-sm text-cyan-300 mb-4" aria-live="polite">{copiedFeedback}</p>
           <div className="flex flex-wrap gap-3 mb-7">
             <button type="button" onClick={markReviewed} className="px-4 py-3 bg-emerald-700 hover:bg-emerald-600 rounded-lg font-bold text-sm">
               {reviewed[selected.id] ? '✓ Revisada · Desmarcar' : '✓ Marcar práctica como revisada'}
