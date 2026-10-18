@@ -13,6 +13,8 @@ import { EVO_MAGAZINE_NETWORK_A } from '../../data/tomo02MagazineNetworkA';
 import { EVO_MAGAZINE_NETWORK_B } from '../../data/tomo02MagazineNetworkB';
 import { EVO_MAGAZINE_GAMING_A } from '../../data/tomo02MagazineGamingA';
 import { EVO_MAGAZINE_GAMING_B } from '../../data/tomo02MagazineGamingB';
+import { EVO_MAGAZINE_REPAIR_A } from '../../data/tomo02MagazineRepairA';
+import { EVO_MAGAZINE_REPAIR_B } from '../../data/tomo02MagazineRepairB';
 import { EVO_MAGAZINE_RELATED_SECTORS } from '../../data/tomo02MagazineSectorBridge';
 import { TOMO_02_MASTER_SECTORS } from '../../data/tomo02MasterSectors';
 
@@ -81,7 +83,7 @@ const ORIGINAL_ARTICLES: Article[] = [
    warning:'Nunca borres manualmente System32, WinSxS o DriverStore.',
    challenge:'Explicá la diferencia entre archivos temporales, caché y componentes del sistema.' }
 ];
-const ARTICLES: Article[] = [...ORIGINAL_ARTICLES, ...EVO_MAGAZINE_FIRST_BATCH, ...EVO_MAGAZINE_SECOND_BATCH, ...EVO_MAGAZINE_THIRD_BATCH, ...EVO_MAGAZINE_PRIVACY_A, ...EVO_MAGAZINE_PRIVACY_B, ...EVO_MAGAZINE_SECURITY_A, ...EVO_MAGAZINE_SECURITY_B, ...EVO_MAGAZINE_WINDOWS_A, ...EVO_MAGAZINE_WINDOWS_B, ...EVO_MAGAZINE_NETWORK_A, ...EVO_MAGAZINE_NETWORK_B, ...EVO_MAGAZINE_GAMING_A, ...EVO_MAGAZINE_GAMING_B].sort((a, b) => a.id - b.id);
+const ARTICLES: Article[] = [...ORIGINAL_ARTICLES, ...EVO_MAGAZINE_FIRST_BATCH, ...EVO_MAGAZINE_SECOND_BATCH, ...EVO_MAGAZINE_THIRD_BATCH, ...EVO_MAGAZINE_PRIVACY_A, ...EVO_MAGAZINE_PRIVACY_B, ...EVO_MAGAZINE_SECURITY_A, ...EVO_MAGAZINE_SECURITY_B, ...EVO_MAGAZINE_WINDOWS_A, ...EVO_MAGAZINE_WINDOWS_B, ...EVO_MAGAZINE_NETWORK_A, ...EVO_MAGAZINE_NETWORK_B, ...EVO_MAGAZINE_GAMING_A, ...EVO_MAGAZINE_GAMING_B, ...EVO_MAGAZINE_REPAIR_A, ...EVO_MAGAZINE_REPAIR_B].sort((a, b) => a.id - b.id);
 const dictionary = new Map(ARTICLES.map(a => [a.id,a]));
 const number = (n:number) => String(n).padStart(3,'0');
 
