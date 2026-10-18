@@ -151,7 +151,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
     const direction=magazineArtDirection(a.id);
     return (
     <article key={a.id} className="evo-guide evo-mag-article mb-7 overflow-hidden">
-      {!printOnly && <MagazineArticleHero id={a.id} title={EVO_MAGAZINE_200_TITLES[a.id-1]}/>}
+      {!printOnly && <MagazineArticleHero id={a.id} title={EVO_MAGAZINE_200_TITLES[a.id-1]} steps={a.steps.map(step=>step.title)}/>}
       <header className="evo-print-only hidden">
         <p className="text-xs font-black text-cyan-800 uppercase tracking-widest">Investigación {number(a.id)} · EVO LABS</p>
         <h2 className="text-2xl font-black mt-2">{EVO_MAGAZINE_200_TITLES[a.id-1]}</h2>
