@@ -57,6 +57,8 @@ for (const article of [...first, ...second]) {
 assert(view.includes('...EVO_MAGAZINE_FIRST_BATCH') && view.includes('...EVO_MAGAZINE_SECOND_BATCH'), 'El lector importa los dos bloques');
 assert(view.includes('ARTICLES.map(renderGuide)') && view.includes('@page{size:A4'), 'La impresión A4 incluye todas las guías');
 assert(view.includes('reviewedCount') && view.includes('evo_magazine02_reviewed_v1'), 'Existe seguimiento local explícitamente no certificado');
+assert(view.includes('evo_magazine02_notes_v1') && view.includes('onBlur={e=>saveNote'), 'Cada guía ofrece notas locales para registrar resultados');
+assert(view.includes('navigator.clipboard.writeText') && view.includes('Copiar comando'), 'Los comandos pueden copiarse desde el lector');
 assert(wrapper.includes("subView === 'pdf_magazine' || subView === 'a4_magazine'"), 'Las rutas de PDF y A4 van al mismo magazine');
 assert(cover.includes('btn-magazine-estrella-tomo02'), 'El magazine es accesible desde portada');
 assert(wrapper.includes("if (subView === 'index')"), 'Se conserva el acceso a la Biblia Virtual');
