@@ -6,7 +6,7 @@ import { EVO_WINDOWS40_001, EVO_WINDOWS40_001_REFERENCES, type Windows40Page } f
 import kernelImage from '../../assets/images/cap_05_kernel_1789531884339.jpg';
 import workbenchImage from '../../assets/images/cap_06_workshop_1789531894578.jpg';
 import siliconImage from '../../assets/images/cap_01_silicon_1789531835511.jpg';
-import { TOMO_02_COVER } from '../../data/tomoCoversData';
+
 
 const TOTAL_PAGES = 5 + EVO_WINDOWS40_001.length; // 1 portada + 1 editorial + 2 sumarios + 8 investigación + 1 cierre
 const pageId = (page: number) => `evo-w40-page-${String(page).padStart(2, '0')}`;
@@ -158,9 +158,9 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
       <div id="evo-magazine40-document" className="mx-auto max-w-[820px]">
         <Page number={1} title="PORTADA" cover>
           <div className="relative flex h-full flex-col overflow-hidden bg-[#020713]">
-            <img src={TOMO_02_COVER} alt="Portada oficial de La Biblia Negra de Windows, volumen 02" className="absolute inset-0 h-full w-full object-cover opacity-[0.34]" />
             <img src={kernelImage} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover opacity-45 mix-blend-screen" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#030811]/75 via-[#031329]/50 to-[#02040A]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#030811]/70 via-[#031329]/55 to-[#02040A]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_60%_42%,rgba(0,210,255,0.24),transparent_55%)]" />
             <div className="relative z-10 flex h-full flex-col justify-between p-10">
               <div>
                 <div className="flex items-center justify-between border-b border-[#00D2FF]/45 pb-4 font-mono-tech text-xs font-black uppercase tracking-[0.22em] text-[#9DDDFF]"><span>EVO <span className="text-white">LABS</span></span><span>TOMO 02 · WINDOWS</span></div>
