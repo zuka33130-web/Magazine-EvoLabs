@@ -18,6 +18,8 @@ const batches = [
 const view = file('src/components/tomo02/Tomo02MagazineEstrella.tsx');
 const wrapper = file('src/components/tomo02/Tomo02MagazineView.tsx');
 const cover = file('src/components/tomo02/Tomo02Cover.tsx');
+const bridge = file('src/data/tomo02MagazineSectorBridge.ts');
+const canon = file('src/data/tomo02MasterSectors.ts');
 const passed = [];
 const assert = (truth, message) => {
   if (!truth) throw new Error('FAIL: ' + message);
@@ -58,5 +60,15 @@ assert(view.includes('reviewedCount') && view.includes('evo_magazine02_reviewed_
 assert(wrapper.includes("subView === 'pdf_magazine' || subView === 'a4_magazine'"), 'Las rutas de PDF y A4 van al mismo magazine');
 assert(cover.includes('btn-magazine-estrella-tomo02'), 'El magazine es accesible desde portada');
 assert(wrapper.includes("if (subView === 'index')"), 'Se conserva el acceso a la Biblia Virtual');
+const sectorMap = readJSON(bridge, /EVO_MAGAZINE_RELATED_SECTORS: Record<number, readonly string\[\]> = ([\s\S]*);\s*$/, 'Puentes al índice canónico');
+const canonicalNums = [...canon.matchAll(/sectorNumber:\s*'(\d\d)'/g)].map(m => m[1]);
+const canonicalSubids = [...canon.matchAll(/\{\s*id:\s*'(\d\d\.\d\d)'/g)].map(m => m[1]);
+const canonicalCounts = [...canon.matchAll(/investigationsCount:\s*(\d+)/g)].map(m => Number(m[1]));
+assert(canonicalNums.length === 40 && new Set(canonicalNums).size === 40, 'El índice virtual tiene 40 sectores únicos');
+assert(canonicalSubids.length >= 700 && new Set(canonicalSubids).size === canonicalSubids.length, 'El subíndice canónico conserva sus identificadores únicos');
+assert(canonicalCounts.reduce((a,b)=>a+b,0) === canonicalSubids.length, 'El total canónico concuerda con la suma de investigaciones');
+assert(all.every(item=>Array.isArray(sectorMap[item.id]) && sectorMap[item.id].length && sectorMap[item.id].every(s=>canonicalNums.includes(s))), 'Las 46 guías tienen puentes válidos a la Biblia Virtual');
+assert(view.includes('TOMO_02_MASTER_SECTORS.map') && view.includes('evo-canonical-sector'), 'El PDF A4 contiene apéndice del índice canónico');
+assert(wrapper.includes('onOpenSector={handleOpenOriginalSector}'), 'Los enlaces de investigación abren el sector técnico correspondiente');
 
 process.stdout.write('EVO MAGAZINE: ' + passed.length + ' verificaciones OK; 200 títulos, 46 guías, 7 bloques.\n');
