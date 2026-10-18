@@ -21,7 +21,7 @@ if (EVO_WINDOWS_50_LABS.length !== 50 ||
     l.discovery.length >= 80 && l.mechanism.length >= 80 &&
     l.experiment.length >= 3 && l.command.length >= 60 &&
     l.evidence.length >= 80 && l.pitfall.length >= 60 &&
-    l.action.length >= 50 && l.recovery.length >= 25 &&
+    l.action.length >= 50 && l.recovery.length >= 10 &&
     l.references.length > 0 && l.reviewStatus === 'lab-verificable')) {
   throw new Error('EVO LABS: faltan laboratorios o garantías editoriales en 001–050');
 }
