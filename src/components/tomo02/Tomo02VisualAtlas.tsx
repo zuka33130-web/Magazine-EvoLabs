@@ -131,7 +131,7 @@ export const Tomo02VisualAtlas: React.FC<Tomo02VisualAtlasProps> = ({
             <button
               key={item.id}
               type="button"
-              onClick={() => onSelectLevel(active ? 'all' : item.id)}
+              onClick={() => onSelectLevel?.(active ? 'all' : item.id)}
               aria-pressed={active}
               aria-label={`Ver sectores ${item.range}: ${item.title}`}
               className={`${className} cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60CDFF]`}
