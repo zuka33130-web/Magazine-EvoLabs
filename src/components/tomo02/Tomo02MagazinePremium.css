@@ -387,3 +387,72 @@
  .evo-magazine-star .evo-index-section h2{font:900 20pt/1.15 Arial,sans-serif!important;color:#111!important;}
  .evo-magazine-star .evo-mag-layout{width:100%!important;max-width:100%!important;padding:0!important;}
 }
+
+
+/* Every one of the 190 later chapters gets a diagram derived from its
+   actual laboratory headings. No decorative pseudo-FPS or fake telemetry. */
+.evo-magazine-star .evo-generic-visual{
+  display:grid;grid-template-columns:minmax(0,.74fr) minmax(0,1.26fr);
+  gap:15px;width:100%;min-height:255px;
+}
+.evo-magazine-star .evo-generic-emblem{
+  position:relative;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:20px 18px;min-height:255px;overflow:hidden;
+  border:1px solid #49778e;
+  background:linear-gradient(145deg,#16425b,#0d273a);
+}
+.evo-magazine-star .evo-emblem-illustration{
+  position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);
+  width:100px;height:100px;display:grid;place-items:center;
+}
+.evo-magazine-star .evo-emblem-outer{
+  display:grid;place-items:center;width:86px;height:86px;border:1px solid #8cdff2;
+  background:#1e5875;color:#c4f1ff;box-shadow:0 0 25px #348cbb45;
+  transform:rotate(-7deg);
+}
+.evo-magazine-star .evo-emblem-orbit{
+  position:absolute;border-radius:50%;border:1px dashed #80c9dd6e;
+  pointer-events:none;
+}
+.evo-magazine-star .orbit-a{inset:-13px;}
+.evo-magazine-star .orbit-b{inset:-34px;opacity:.45;}
+.evo-magazine-star .evo-generic-emblem > span,
+.evo-magazine-star .evo-generic-emblem > small{
+  position:relative;color:#afd5e4;font:750 9px/1.4 var(--ev-mono);letter-spacing:.07em;
+}
+.evo-magazine-star .evo-generic-emblem > strong{
+  position:relative;margin:6px 0 9px;color:#f4fdff;font:900 clamp(16px,1.5vw,22px)/1.15 var(--ev-display);letter-spacing:-.045em;
+}
+.evo-magazine-star .evo-generic-path{
+  padding:18px;display:flex;flex-direction:column;gap:9px;
+  border:1px solid #46657a;background:#162e41;
+}
+.evo-magazine-star .evo-path-heading{
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:1px;
+  color:#a1e4f3;font:850 10px/1.3 var(--ev-mono);letter-spacing:.09em;
+}
+.evo-magazine-star .evo-path-heading span:last-child{color:#abc7d7;}
+.evo-magazine-star .evo-path-item{
+  display:grid;grid-template-columns:32px minmax(0,1fr) 18px;gap:12px;
+  align-items:center;min-height:47px;padding:10px 13px;
+  background:#1e4158;border:1px solid #50778d;border-left:3px solid #8ccde0;
+}
+.evo-magazine-star .evo-path-count{font:950 16px/1 var(--ev-mono);color:#98eaf5;}
+.evo-magazine-star .evo-path-label{font:750 12px/1.4 var(--ev-text);color:#f0f8fc;}
+.evo-magazine-star .evo-path-arrow{color:#a5dce9;}
+.evo-magazine-star .evo-generic-path > p{font-size:10px;color:#acc9d8;line-height:1.5;margin-top:auto;}
+@media(max-width:1150px){
+ .evo-magazine-star .evo-generic-visual{grid-template-columns:minmax(0,1fr);}
+ .evo-magazine-star .evo-generic-emblem{min-height:145px;justify-content:flex-end;padding:16px 17px 16px 150px;}
+ .evo-magazine-star .evo-emblem-illustration{left:70px;top:50%;width:80px;height:80px;}
+ .evo-magazine-star .evo-emblem-outer{width:64px;height:64px;}
+ .evo-magazine-star .evo-emblem-outer svg{height:35px;width:35px;}
+ .evo-magazine-star .evo-generic-path{padding:14px;}
+}
+@media(max-width:620px){
+ .evo-magazine-star .evo-generic-emblem{padding-left:113px;min-height:130px;}
+ .evo-magazine-star .evo-emblem-illustration{left:53px;}
+ .evo-magazine-star .evo-generic-emblem > strong{font-size:16px;}
+ .evo-magazine-star .evo-path-item{padding:9px;gap:8px;grid-template-columns:28px minmax(0,1fr) 17px;}
+ .evo-magazine-star .evo-path-label{font-size:11px;}
+}
