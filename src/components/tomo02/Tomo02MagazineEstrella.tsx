@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { EVO_MAGAZINE_200_TITLES, EVO_MAGAZINE_GROUPS } from '../../data/tomo02Magazine200';
 import { EVO_MAGAZINE_FIRST_BATCH } from '../../data/tomo02MagazineFirstBatch';
 import { EVO_MAGAZINE_SECOND_BATCH } from '../../data/tomo02MagazineSecondBatch';
+import { EVO_MAGAZINE_RELATED_SECTORS } from '../../data/tomo02MagazineSectorBridge';
+import { TOMO_02_MASTER_SECTORS } from '../../data/tomo02MasterSectors';
 
 type Step = { title: string; why: string; code?: string; expect: string };
 type Article = { id: number; goal: string; basics: string; steps: Step[]; tip: string; warning: string; challenge: string };
@@ -72,7 +74,7 @@ const ARTICLES: Article[] = [...ORIGINAL_ARTICLES, ...EVO_MAGAZINE_FIRST_BATCH, 
 const dictionary = new Map(ARTICLES.map(a => [a.id,a]));
 const number = (n:number) => String(n).padStart(3,'0');
 
-export function Tomo02MagazineEstrella({ onBack, onOpenInteractive }:{onBack:()=>void;onOpenInteractive:()=>void}) {
+export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector }:{onBack:()=>void;onOpenInteractive:()=>void;onOpenSector?:(sectorNumber:string)=>void}) {
   const [current, setCurrent] = useState(1);
   const [reviewed, setReviewed] = useState<Record<number, boolean>>(() => {
     try { return JSON.parse(localStorage.getItem('evo_magazine02_reviewed_v1') || '{}'); }
@@ -121,12 +123,31 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive }:{onBack:()=
       <p className="mt-6 border-l-4 border-emerald-600 pl-3 text-sm"><b>TRUCO EVO.</b> {a.tip}</p>
       <p className="mt-4 border-l-4 border-amber-500 pl-3 text-sm"><b>ANTES DE TOCAR NADA.</b> {a.warning}</p>
       <div className="mt-5 p-4 rounded-lg border border-zinc-400 text-sm"><b>DESAFÍO DEL ALUMNO.</b> {a.challenge}<div className="mt-6 border-b border-dashed border-zinc-400"/><div className="mt-6 border-b border-dashed border-zinc-400"/></div>
-      <p className="mt-5 pt-3 border-t text-xs text-zinc-600">No se ejecuta código desde el PDF. Los comandos de estas primeras guías son consultas o abren herramientas nativas. La Biblia Virtual conserva el estudio avanzado.</p>
+      <div className="mt-5 pt-4 border-t border-cyan-200">
+        <p className="font-bold text-sm mb-2">El mismo tema, explicado en profundidad en la Biblia Virtual:</p>
+        <div className="flex flex-wrap gap-2">
+          {(EVO_MAGAZINE_RELATED_SECTORS[a.id] || []).map(number => {
+            const sector = TOMO_02_MASTER_SECTORS.find(s => s.sectorNumber === number);
+            if (!sector) return null;
+            return <button key={number} type="button" onClick={() => onOpenSector ? onOpenSector(number) : onOpenInteractive()}
+              className="evo-no-print border border-cyan-800 text-cyan-900 px-3 py-2 rounded-md text-xs font-bold hover:bg-cyan-50">
+              Sector {number} · {sector.title} →
+            </button>;
+          })}
+        </div>
+        <p className="text-xs text-zinc-600 mt-2">
+          {(EVO_MAGAZINE_RELATED_SECTORS[a.id] || []).map(number => {
+            const sector = TOMO_02_MASTER_SECTORS.find(s => s.sectorNumber === number);
+            return sector ? 'Sector ' + number + ': ' + sector.title : '';
+          }).filter(Boolean).join(' · ')}
+        </p>
+      </div>
+      <p className="mt-5 pt-3 border-t text-xs text-zinc-600">No se ejecuta código desde el PDF. Los comandos de estas guías son consultas o abren herramientas nativas. La Biblia Virtual conserva el estudio avanzado.</p>
     </article>
   );
   return (
     <div className="evo-magazine-star min-h-screen bg-[#10151b] text-zinc-100">
-      <style>{'@page{size:A4;margin:14mm 12mm;}@media print{html,body,.evo-magazine-star{background:white!important;color:black!important;} .evo-no-print{display:none!important;} .evo-print-only{display:block!important;} .evo-cover{page-break-after:always;} .evo-index-print{columns:2;column-gap:8mm;font-size:9pt;} .evo-index-print p{break-inside:avoid;margin:0 0 3mm;} .evo-index-section{break-after:page;} .evo-guide{break-before:page;border:0!important;padding:0!important;} .evo-step{break-inside:avoid;} .evo-command{overflow-wrap:anywhere;white-space:pre-wrap!important;} .evo-cover .text-zinc-300,.evo-cover .text-zinc-400{color:#333!important;} .evo-cover .text-cyan-300{color:#076284!important;} .evo-guide p,.evo-guide h2,.evo-guide h3{orphans:3;widows:3;} }'}</style>
+      <style>{'@page{size:A4;margin:14mm 12mm;}@media print{html,body,.evo-magazine-star{background:white!important;color:black!important;} .evo-no-print{display:none!important;} .evo-print-only{display:block!important;} .evo-cover{page-break-after:always;} .evo-index-print{columns:2;column-gap:8mm;font-size:9pt;} .evo-index-print p{break-inside:avoid;margin:0 0 3mm;} .evo-index-section{break-after:page;} .evo-guide{break-before:page;border:0!important;padding:0!important;} .evo-step{break-inside:avoid;} .evo-command{overflow-wrap:anywhere;white-space:pre-wrap!important;} .evo-cover .text-zinc-300,.evo-cover .text-zinc-400{color:#333!important;} .evo-cover .text-cyan-300{color:#076284!important;} .evo-guide p,.evo-guide h2,.evo-guide h3{orphans:3;widows:3;} .evo-canonical-sector{break-inside:auto;} .evo-canonical-sector h3,.evo-can-entry{break-inside:avoid;} .evo-magazine-star a{color:#075985!important;} }'}</style>
       <nav className="evo-no-print sticky top-0 z-50 bg-[#0b1118] border-b border-zinc-700 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
         <button onClick={onBack} className="rounded-md border border-zinc-600 px-3 py-2 text-sm">← Tomo 02</button>
         <strong className="text-sm">EVO LABS · MAGAZINE ESTRELLA</strong>
@@ -183,6 +204,37 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive }:{onBack:()=
         <section className="evo-print-only hidden">
           <h2 className="text-2xl font-black text-zinc-900">Guías completas de esta primera entrega</h2>
           {ARTICLES.map(renderGuide)}
+        </section>
+        <section aria-labelledby="bibliavirtual-index" className="py-10 border-t border-zinc-700">
+          <h2 id="bibliavirtual-index" className="text-2xl font-black mb-2">Índice original completo de la Biblia Virtual</h2>
+          <p className="mb-5 text-sm text-zinc-300">Se conserva la numeración original de {TOMO_02_MASTER_SECTORS.length} sectores y {TOMO_02_MASTER_SECTORS.reduce((sum,s)=>sum+s.investigationsList.length,0)} subtemas. Este apéndice es un mapa de estudio, no una afirmación de que todos ellos ya estén desarrollados en el Magazine.</p>
+          <div className="evo-no-print space-y-2">
+            {TOMO_02_MASTER_SECTORS.map(sector => (
+              <details key={sector.sectorId} className="border border-zinc-700 rounded-lg bg-zinc-900 px-4 py-3">
+                <summary className="cursor-pointer font-bold text-sm">
+                  SECTOR {sector.sectorNumber} · {sector.title} · {sector.investigationsList.length} investigaciones
+                </summary>
+                <ol className="pl-4 mt-3 space-y-1 text-sm text-zinc-300">
+                  {sector.investigationsList.map(inv => <li key={inv.id}><span className="font-mono text-cyan-400">{inv.id}</span> · {inv.title}</li>)}
+                </ol>
+                <button type="button" onClick={()=>onOpenSector ? onOpenSector(sector.sectorNumber) : onOpenInteractive()}
+                  className="mt-3 px-3 py-2 text-xs border border-cyan-600 rounded-lg text-cyan-300">
+                  Abrir este sector de la Biblia →
+                </button>
+              </details>
+            ))}
+          </div>
+          <div className="evo-print-only hidden">
+            {TOMO_02_MASTER_SECTORS.map(sector => (
+              <section key={sector.sectorId} className="evo-canonical-sector mb-7 text-zinc-900">
+                <h3 className="font-bold text-base">SECTOR {sector.sectorNumber} · {sector.title}</h3>
+                <p className="text-xs italic mb-2">{sector.subtitle}</p>
+                <ul className="text-xs grid grid-cols-2 gap-x-6 gap-y-1">
+                  {sector.investigationsList.map(inv=><li className="evo-can-entry" key={inv.id}><strong>{inv.id}</strong> · {inv.title}</li>)}
+                </ul>
+              </section>
+            ))}
+          </div>
         </section>
         <aside aria-label="Fuentes técnicas oficiales" className="border-t border-zinc-700 py-8">
           <h2 className="text-lg font-black mb-2">Fuentes oficiales para contrastar tus pruebas</h2>
