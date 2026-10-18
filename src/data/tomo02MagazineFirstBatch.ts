@@ -334,8 +334,9 @@ export const EVO_MAGAZINE_FIRST_BATCH: EvoMagazineArticle[] = [
       },
       {
         "title": "Tomá mediciones comparables",
-        "why": "Compará Memoria comprimida antes y después de abrir una aplicación exigente, sin modificar la configuración.",
-        "expect": "Es posible que Windows cambie cuánto comprime según la presión de memoria."
+        "why": "Compará la memoria libre y total desde CIM antes y después de una carga habitual; son valores físicos y no expresan por sí solos la cantidad comprimida.",
+        "expect": "Podrás ver cifras en KiB que cambian con el uso. La compresión se observa en Administrador de tareas.",
+        "code": "Get-CimInstance Win32_OperatingSystem | Select-Object FreePhysicalMemory,TotalVisibleMemorySize"
       }
     ],
     "tip": "Compresión no es 'memoria gratis': intercambia cierta actividad de CPU por menor presión física.",
@@ -387,8 +388,9 @@ export const EVO_MAGAZINE_FIRST_BATCH: EvoMagazineArticle[] = [
       },
       {
         "title": "Comprobá el comportamiento",
-        "why": "Usá la aplicación de manera normal y repetí mediciones equivalentes.",
-        "expect": "La memoria puede aumentar por caché, trabajo o ventanas; subir no demuestra una fuga."
+        "why": "Registrá la memoria libre general junto con la medida del proceso; esto ayuda a contextualizar los cambios, pero no demuestra por sí solo una fuga.",
+        "expect": "Obtendrás una cifra del sistema en KiB que puede variar sin que exista una fuga.",
+        "code": "Get-CimInstance Win32_OperatingSystem | Select-Object FreePhysicalMemory"
       }
     ],
     "tip": "Una investigación más seria controla Private Bytes, handles, tareas realizadas y si el uso baja después de cerrarlas.",
