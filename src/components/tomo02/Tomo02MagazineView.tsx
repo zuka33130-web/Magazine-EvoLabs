@@ -36,6 +36,7 @@ import {
   TOMO_02_GLOSSARY,
 } from '../../data/tomo02Data';
 import { Tomo02Cover } from './Tomo02Cover';
+import { Tomo02Magazine40 } from './Tomo02Magazine40';
 import { TOMO_02_COVER } from '../../data/tomoCoversData';
 import { Tomo02EditorialIndex, ModuleProgressStatus } from './Tomo02EditorialIndex';
 import {
@@ -195,7 +196,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     } catch {
       // ignore
     }
-    return initialSubView === 'pdf_magazine' || initialSubView === 'a4_magazine' ? 'index' : (initialSubView || 'cover');
+    return initialSubView === 'pdf_magazine' ? 'index' : (initialSubView || 'cover');
   });
 
   const [selectedSectorNumber, setSelectedSectorNumber] = useState(getAdvancedSector(initialSectorNumber || safeStorage.getItem('evo_tomo02_last_sector') || '')?.number || '11');
@@ -768,6 +769,10 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               setSubView('index');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
+            onOpenMagazine={() => {
+              setSubView('a4_magazine');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             onOpenLab={() => {
               if (onOpenLab) {
                 onOpenLab();
@@ -781,6 +786,13 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         </div>
       </div>
     );
+  }
+
+  if (subView === 'a4_magazine') {
+    return <Tomo02Magazine40
+      onBack={() => { setSubView('cover'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+      onOpenBiblia={() => { setSubView('index'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+    />;
   }
 
   if (subView === 'index') {
