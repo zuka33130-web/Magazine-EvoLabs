@@ -104,7 +104,7 @@ assert(view.includes('ARTICLES.map(a => renderGuide(a, true))') && view.includes
 assert(view.includes('<MagazineArticleHero id={a.id}') && view.includes('magazineArtDirection(item.id)'), 'El lector integra diagramas interiores y tarjetas editoriales tematizadas');
 assert(['Visual001','Visual002','Visual003','Visual004','Visual005','Visual006','Visual007','Visual008','Visual009','Visual010'].every(name => visual.includes('function '+name+'()')), 'Las diez primeras investigaciones tienen diez diagramas originales independientes');
 assert(visual.includes('if(id===10)return <Visual010/>') && visual.includes('return <div className="relative grid'), 'El catálogo restante conserva un diseño visual adaptativo');
-assert(visual.includes('Visual conceptual · sin datos del equipo') && visual.includes('no representan mediciones reales'), 'La escenografía didáctica se distingue de la telemetría real');
+assert(visual.includes('Visual conceptual · sin datos del equipo') && view.includes('no representan mediciones de tu PC'), 'La escenografía didáctica se distingue de la telemetría real');
 assert(view.includes('!printOnly && <MagazineArticleHero'), 'La exportación evita renderizar 200 diagramas complejos');
 assert(view.includes('reviewedCount') && view.includes('evo_magazine02_reviewed_v1'), 'Existe seguimiento local explícitamente no certificado');
 assert(view.includes('evo_magazine02_notes_v1') && view.includes('onBlur={e=>saveNote'), 'Cada guía ofrece notas locales para registrar resultados');
