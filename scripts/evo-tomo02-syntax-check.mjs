@@ -9,6 +9,14 @@ import { resolve } from 'node:path';
 
 const paths = [
   'src/components/tomo02/Tomo02WindowsEditorialArt.tsx',
+  'src/components/tomo02/Tomo02MagazineDraftPreview.tsx',
+  'src/data/tomo02Magazine40Corpus.ts',
+  'src/data/tomo02Magazine40CorpusTypes.ts',
+  'src/data/tomo02Magazine40CorpusA.ts',
+  'src/data/tomo02Magazine40CorpusB.ts',
+  'src/data/tomo02Magazine40CorpusC.ts',
+  'src/data/tomo02Magazine40CorpusD.ts',
+  'src/data/tomo02Magazine40CorpusE.ts',
   'src/components/tomo02/Tomo02VisualAtlas.tsx',
   'src/components/tomo02/Tomo02Magazine40.tsx',
   'src/components/tomo02/Tomo02Cover.tsx',
