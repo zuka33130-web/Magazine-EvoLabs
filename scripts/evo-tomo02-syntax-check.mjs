@@ -9,6 +9,15 @@ import { resolve } from 'node:path';
 
 const paths = [
   'src/components/tomo02/Tomo02WindowsEditorialArt.tsx',
+  'src/components/tomo02/Tomo02Windows50LabReader.tsx',
+  'src/data/tomo02Windows50.ts',
+  'src/data/tomo02Windows50LabTypes.ts',
+  'src/data/tomo02Windows50Labs.ts',
+  'src/data/tomo02Windows50LabsA.ts',
+  'src/data/tomo02Windows50LabsB.ts',
+  'src/data/tomo02Windows50LabsC.ts',
+  'src/data/tomo02Windows50LabsD.ts',
+  'src/data/tomo02Windows50LabsE.ts',
   'src/components/tomo02/Tomo02MagazineDraftPreview.tsx',
   'src/data/tomo02Magazine40Corpus.ts',
   'src/data/tomo02Magazine40CorpusTypes.ts',
