@@ -184,8 +184,18 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive }:{onBack:()=
           <h2 className="text-2xl font-black text-zinc-900">Guías completas de esta primera entrega</h2>
           {ARTICLES.map(renderGuide)}
         </section>
+        <aside aria-label="Fuentes técnicas oficiales" className="border-t border-zinc-700 py-8">
+          <h2 className="text-lg font-black mb-2">Fuentes oficiales para contrastar tus pruebas</h2>
+          <p className="text-sm text-zinc-300 mb-4">Cada resultado puede cambiar según versión, controlador, permisos y configuración. Documentá tus mediciones y consultá las referencias técnicas originales.</p>
+          <ul className="text-sm grid sm:grid-cols-2 gap-2">
+            <li><a className="underline text-cyan-300" href="https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns" target="_blank" rel="noopener noreferrer">Microsoft Sysinternals · Autoruns y ubicaciones de inicio</a></li>
+            <li><a className="underline text-cyan-300" href="https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys" target="_blank" rel="noopener noreferrer">Microsoft · Run y RunOnce en el Registro</a></li>
+            <li><a className="underline text-cyan-300" href="https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/introduction-to-the-page-file" target="_blank" rel="noopener noreferrer">Microsoft · Archivo de paginación y memoria comprometida</a></li>
+            <li><a className="underline text-cyan-300" href="https://learn.microsoft.com/es-es/windows-hardware/manufacture/desktop/dism-operating-system-package-servicing-command-line-options?view=windows-11" target="_blank" rel="noopener noreferrer">Microsoft · Comprobaciones de DISM y WinSxS</a></li>
+          </ul>
+        </aside>
         <footer className="border-t border-zinc-700 pt-6 text-xs text-zinc-400">
-          EVO LABS · Edición inicial en desarrollo. No se anuncian 200 capítulos terminados. Experimentos solo sobre equipos propios o autorizados.
+          EVO LABS · Edición de desarrollo con {ARTICLES.length} guías completas en formato inicial y 200 títulos en catálogo. Antes de realizar una práctica, revisá riesgos, permisos y recuperación. La Biblia Virtual conserva su contenido técnico.
         </footer>
       </main>
     </div>
