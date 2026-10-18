@@ -456,3 +456,40 @@
  .evo-magazine-star .evo-path-item{padding:9px;gap:8px;grid-template-columns:28px minmax(0,1fr) 17px;}
  .evo-magazine-star .evo-path-label{font-size:11px;}
 }
+
+/* Back matter: sources and canonical index complete the magazine treatment. */
+.evo-magazine-star .evo-mag-sources{
+  margin-top:35px!important;padding:30px 0 35px!important;
+  border-top:1px solid #3c5b70!important;
+}
+.evo-magazine-star .evo-mag-sources h2{
+  font:900 clamp(22px,2.3vw,32px)/1.17 var(--ev-display)!important;
+  letter-spacing:-.04em;color:#ecf7ff;
+}
+.evo-magazine-star .evo-mag-sources > p{
+  max-width:850px;margin:12px 0 22px;font-size:14px;color:#aec7d7;line-height:1.7;
+}
+.evo-magazine-star .evo-sources-grid {gap:12px!important;}
+.evo-magazine-star .evo-sources-grid li {list-style:none;min-width:0;}
+.evo-magazine-star .evo-sources-grid a {
+  display:flex;align-items:center;justify-content:space-between;gap:15px;
+  min-height:82px;padding:18px!important;
+  border:1px solid #39576b;background:#122333;
+  color:#d7f2fa!important;text-decoration:none!important;
+  font-size:14px;line-height:1.45;font-weight:750;
+  transition:border-color .15s,background .15s;
+}
+.evo-magazine-star .evo-sources-grid a:after {content:"↗";color:#92dcec;font:900 20px/1 var(--ev-display);flex-shrink:0;}
+.evo-magazine-star .evo-sources-grid a:hover{border-color:#76c8e1;background:#1d3a50;}
+.evo-magazine-star .evo-mag-footer{
+  border-top:1px solid #3e5b71!important;margin-top:14px;
+  padding:23px 0 34px!important;color:#9bb5c7!important;
+  max-width:100%;font:650 12px/1.65 var(--ev-text);
+}
+@media print{
+ .evo-magazine-star .evo-mag-sources,.evo-magazine-star .evo-mag-footer{color:#222!important;}
+ .evo-magazine-star .evo-mag-sources h2{font:900 16pt Arial,sans-serif!important;color:#111!important;}
+ .evo-magazine-star .evo-mag-sources > p{color:#333!important;}
+ .evo-magazine-star .evo-sources-grid a{color:#111!important;background:white!important;border:1px solid #ccc!important;min-height:0;padding:3mm!important;}
+ .evo-magazine-star .evo-sources-grid a:after{display:none!important;}
+}
