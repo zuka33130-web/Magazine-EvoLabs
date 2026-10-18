@@ -18,6 +18,7 @@ import { EVO_MAGAZINE_REPAIR_B } from '../../data/tomo02MagazineRepairB';
 import { EVO_MAGAZINE_RELATED_SECTORS } from '../../data/tomo02MagazineSectorBridge';
 import { TOMO_02_MASTER_SECTORS } from '../../data/tomo02MasterSectors';
 import './Tomo02MagazineEditorial.css';
+import './Tomo02MagazinePremium.css';
 import { MagazineArticleHero, magazineArtDirection } from './MagazineArticleHero';
 
 type Step = { title: string; why: string; code?: string; expect: string };
@@ -116,7 +117,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
     }
   };
   const [section, setSection] = useState(0);
-  const [indexExpanded, setIndexExpanded] = useState(false);
+  const [mobileLibraryOpen, setMobileLibraryOpen] = useState(false);
   const selected = dictionary.get(current) || ARTICLES[0];
   const reviewedCount = ARTICLES.filter(a => reviewed[a.id]).length;
   const markReviewed = () => {
@@ -128,7 +129,9 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
   const nextArticle = ARTICLES[(ARTICLES.findIndex(a => a.id === selected.id) + 1) % ARTICLES.length];
   const jumpToGuide = (id: number) => {
     setCurrent(id);
-    document.getElementById('magazine-guide')?.scrollIntoView({ behavior: 'smooth' });
+    setMobileLibraryOpen(false);
+    setCopiedFeedback('');
+    requestAnimationFrame(() => document.getElementById('magazine-guide')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
   const visible = EVO_MAGAZINE_200_TITLES.map((title,i)=>({ title, id:i+1 })).filter(item=>{
     if (query && !item.title.toLocaleLowerCase('es').includes(query.toLocaleLowerCase('es'))) return false;
@@ -136,7 +139,9 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
     const g=EVO_MAGAZINE_GROUPS[section-1];
     return item.id>=g.start && item.id<=g.end;
   });
-  const indexEntries = (indexExpanded || query.trim() || section !== 0) ? visible : visible.slice(0,12);
+  const previousArticle = ARTICLES[(ARTICLES.findIndex(a => a.id === selected.id) - 1 + ARTICLES.length) % ARTICLES.length];
+  const currentGroup = EVO_MAGAZINE_GROUPS.find(g => selected.id >= g.start && selected.id <= g.end);
+  const progressPercent = Math.round((reviewedCount / ARTICLES.length) * 100);
   useEffect(()=>{
     if(new URLSearchParams(window.location.search).get('print')!=='true') return;
     const handle=window.setTimeout(()=>{document.title='EVO-LABS-TOMO-02-MAGAZINE-ESTRELLA';window.print();},900);
@@ -240,76 +245,127 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
   return (
     <div className="evo-magazine-star min-h-screen">
       <style>{'@page{size:A4;margin:14mm 12mm;}@media print{html,body,.evo-magazine-star{background:white!important;color:black!important;} .evo-no-print{display:none!important;} .evo-print-only{display:block!important;} .evo-cover{page-break-after:always;} .evo-index-print{columns:2;column-gap:8mm;font-size:9pt;} .evo-index-print p{break-inside:avoid;margin:0 0 3mm;} .evo-index-section{break-after:page;} .evo-guide{break-before:page;border:0!important;padding:0!important;} .evo-step{break-inside:avoid;} .evo-command{overflow-wrap:anywhere;white-space:pre-wrap!important;} .evo-cover .text-zinc-300,.evo-cover .text-zinc-400{color:#333!important;} .evo-cover .text-cyan-300{color:#076284!important;} .evo-guide p,.evo-guide h2,.evo-guide h3{orphans:3;widows:3;} .evo-canonical-sector{break-inside:auto;} .evo-canonical-sector h3,.evo-can-entry{break-inside:avoid;} .evo-magazine-star a{color:#075985!important;} }'}</style>
-      <nav className="evo-mag-topnav evo-no-print sticky top-0 z-50 bg-[#0b1118] border-b border-zinc-700 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
-        <button onClick={onBack} className="rounded-md border border-zinc-600 px-3 py-2 text-sm">← Tomo 02</button>
-        <strong className="text-sm">EVO LABS · MAGAZINE ESTRELLA</strong>
-        <div className="flex gap-2">
-          <button onClick={onOpenInteractive} className="rounded-md border border-zinc-600 px-3 py-2 text-xs">Biblia Virtual</button>
-          <button onClick={()=>window.print()} className="rounded-md bg-cyan-400 text-black font-bold px-3 py-2 text-xs">Guardar PDF A4</button>
+      <nav className="evo-mag-topnav evo-no-print sticky top-0 z-50 border-b px-4 py-3">
+        <button type="button" onClick={onBack} className="evo-nav-back" aria-label="Volver al Tomo 02">← <span className="hidden sm:inline">Volver</span></button>
+        <div className="evo-brand-lockup" aria-label="EVO LABS Magazine Estrella">
+          <span className="evo-brand-mark">E<span>V</span>O</span>
+          <span className="evo-brand-line" aria-hidden="true"/>
+          <span className="evo-brand-description"><strong>MAGAZINE ESTRELLA</strong><small>EDICIÓN 02 / WINDOWS</small></span>
+        </div>
+        <div className="evo-nav-actions">
+          <button type="button" onClick={onOpenInteractive} className="evo-nav-secondary">Biblia Virtual ↗</button>
+          <button type="button" onClick={()=>window.print()} className="evo-nav-primary">↓ <span className="hidden sm:inline">Guardar</span> PDF A4</button>
         </div>
       </nav>
-      <main className="evo-mag-layout max-w-6xl mx-auto px-4 sm:px-7 pb-20">
-        <header className="evo-cover py-16 sm:py-24 border-b border-zinc-700">
-          <p className="evo-cover-kicker font-mono text-xs text-cyan-300 tracking-widest">TOMO 02 · LA BIBLIA NEGRA DE WINDOWS</p>
-          <h1 className="mt-6 text-4xl sm:text-6xl font-black leading-tight max-w-4xl">¿QUÉ HACE TU PC CUANDO NO ESTÁS?</h1>
-          <p className="mt-6 text-xl sm:text-2xl text-zinc-300 max-w-3xl">200 secretos de Windows para descubrir, investigar y comprobar en tu propia computadora.</p>
-          <p className="mt-8 max-w-3xl text-sm">Procesos · Privacidad · Telemetría · Puertos · Regedit · RAM · Limpieza · Gaming · Reparación · PowerShell</p>
-          <p className="mt-10 font-black text-cyan-300">NO LO CREAS. COMPROBALO.</p>
-          <div className="evo-cover-stats evo-no-print"><span><b>200</b> investigaciones</span><span><b>07</b> universos temáticos</span><span><b>40</b> sectores técnicos</span></div><p className="mt-5 text-xs text-zinc-400">Primera edición práctica en desarrollo. Las observaciones son ejercicios para comprobar en tu equipo; no son lecturas automáticas de tu PC.</p>
+      <main className="evo-mag-layout mx-auto pb-20">
+        <header className="evo-cover">
+          <div className="evo-cover-editorial">
+            <div className="evo-cover-topline"><span><span className="evo-pulse" aria-hidden="true"/> EDICIÓN ESPECIAL · Nº 02</span><span>WINDOWS / AUDITORÍA / LABORATORIO</span></div>
+            <p className="evo-cover-kicker">EVO LABS · INVESTIGACIÓN APLICADA</p>
+            <h1>¿QUÉ HACE TU PC <em>CUANDO NO ESTÁS?</em></h1>
+            <p className="evo-cover-deck">200 misterios de Windows. Explicaciones claras, pruebas reales y experimentos para descubrir lo que pasa detrás de la pantalla.</p>
+            <div className="evo-cover-bottom">
+              <strong>NO LO CREAS. <span>COMPROBALO.</span></strong>
+              <span>OBSERVAR / MEDIR / COMPARAR / CONCLUIR</span>
+            </div>
+          </div>
+          <div className="evo-cover-system evo-no-print" aria-label="Diagrama editorial conceptual del sistema">
+            <span className="evo-system-caption">MAPA INTERIOR / SISTEMA OPERATIVO</span>
+            <div className="evo-system-core">
+              <span>NT</span><small>WINDOWS</small>
+              <i className="evo-system-ring ring-one"/><i className="evo-system-ring ring-two"/>
+            </div>
+            <div className="evo-system-elements">
+              <span>CPU <b>PROCESOS</b></span><span>RAM <b>MEMORIA</b></span>
+              <span>NET <b>CONEXIONES</b></span><span>SYS <b>SERVICIOS</b></span>
+            </div>
+            <small className="evo-system-legend">Esquema de aprendizaje · no es telemetría del equipo</small>
+          </div>
+          <div className="evo-cover-stats evo-no-print">
+            <span><b>200</b> INVESTIGACIONES</span>
+            <span><b>07</b> ÁREAS TÉCNICAS</span>
+            <span><b>40</b> SECTORES DE LA BIBLIA</span>
+          </div>
         </header>
-        <section id="magazine-guide" className="evo-no-print py-6">
-          <div className="evo-section-kicker mb-2">MODO INVESTIGACIÓN / APRENDER HACIENDO</div><h2 className="evo-section-heading text-2xl font-black mb-3">Tu laboratorio de Windows</h2>
-          <p className="text-sm text-zinc-300 mb-5">Tu registro local de lectura: <strong>{reviewedCount} de {ARTICLES.length}</strong> guías marcadas como revisadas. Esto no sustituye una evaluación técnica.</p>
-          {renderGuide(selected)}
-          <div className="evo-mag-notes border border-zinc-600 rounded-lg p-4 mb-5">
-            <label htmlFor="evo-lab-note" className="font-bold text-sm block mb-2">Tu cuaderno de laboratorio · Investigación {number(selected.id)}</label>
-            <textarea id="evo-lab-note" key={selected.id} rows={5}
-              defaultValue={notes[selected.id] || ''} onBlur={e=>saveNote(selected.id,e.target.value)}
-              placeholder="Anotá: qué ejecutaste, qué apareció, qué entendiste y qué tenés que investigar."
-              className="w-full rounded-md border border-zinc-600 bg-zinc-900 text-white p-3 text-sm"/>
-            <p className="mt-2 text-xs text-zinc-400">Las notas se guardan al salir del campo en el almacenamiento local de este navegador. Evitá incluir contraseñas, IP privadas u otros datos sensibles.</p>
-          </div>
-          <p className="text-sm text-cyan-300 mb-4" aria-live="polite">{copiedFeedback}</p>
-          <div className="flex flex-wrap gap-3 mb-7">
-            <button type="button" onClick={markReviewed} className="px-4 py-3 bg-emerald-700 hover:bg-emerald-600 rounded-lg font-bold text-sm">
-              {reviewed[selected.id] ? '✓ Revisada · Desmarcar' : '✓ Marcar práctica como revisada'}
-            </button>
-            <button type="button" onClick={()=>jumpToGuide(nextArticle.id)} className="px-4 py-3 border border-cyan-500 rounded-lg font-bold text-sm">
-              Siguiente investigación disponible →
-            </button>
-          </div>
-          <p className="text-sm text-zinc-300">Podés imprimir la edición con el índice de 200 títulos y las {ARTICLES.length} guías actualmente desarrolladas desde el botón «Guardar PDF A4».</p>
-        </section>
-        <section className="evo-index-section py-10">
-          <div className="evo-section-kicker mb-2">CATÁLOGO DE INVESTIGACIONES / TOMO 02</div><h2 className="evo-section-heading text-2xl font-black mb-3">200 historias para descubrir Windows</h2>
-          <p className="text-base text-zinc-300 mb-6 max-w-4xl">Elegí un expediente, investigá sus pistas y comprobá cada afirmación. Las 200 primeras guías están disponibles; la Biblia Virtual conserva su propia estructura técnica.</p>
-          <div className="evo-no-print flex flex-col sm:flex-row gap-3 mb-6">
-            <input type="search" aria-label="Buscar artículos" placeholder="Buscá por tema: RAM, telemetría, gaming..." value={query} onChange={e=>setQuery(e.target.value)} className="flex-1 rounded-md bg-zinc-900 border border-zinc-600 px-3 py-3"/>
-            <select aria-label="Filtrar categoría" value={section} onChange={e=>setSection(Number(e.target.value))} className="rounded-md bg-zinc-900 border border-zinc-600 px-3 py-3">
-              <option value={0}>Todas las categorías</option>
-              {EVO_MAGAZINE_GROUPS.map((g,i)=><option key={g.name} value={i+1}>{g.name}</option>)}
-            </select>
-          </div>
-          <div className="evo-index-grid evo-no-print grid sm:grid-cols-2 gap-2">
-            {indexEntries.map(item=>{
-              const ready=dictionary.has(item.id);
-              const art=magazineArtDirection(item.id);
-              return <button type="button" disabled={!ready} onClick={()=>jumpToGuide(item.id)} key={item.id}
-                className={'evo-index-card group relative overflow-hidden p-4 border rounded-xl flex gap-3 text-left text-sm transition-colors '+(ready?'bg-[#17212b] border-[#3c5161] hover:border-white hover:bg-[#20303e]':'bg-zinc-900 border-zinc-700 opacity-75')}
-                style={{'--theme-accent':art.accent} as React.CSSProperties}>
-                <span className="absolute left-0 top-0 bottom-0 w-[3px]" style={{backgroundColor:art.accent}}/>
-                <span className="evo-index-no font-mono font-black text-lg" style={{color:art.secondary}}>{number(item.id)}</span>
-                <span className="flex-1 min-w-0"><span className="evo-index-tag block text-[10px] font-black tracking-wider opacity-60 uppercase mb-1">{art.category}</span><span className="evo-index-title font-bold leading-snug">{item.title}</span></span>
-                <span className="shrink-0 self-center text-[10px] font-black border border-white/20 rounded-md px-2 py-1 text-white/70">{ready?(reviewed[item.id]?'✓':'ABRIR ↗'):'ÍNDICE'}</span>
+
+        <div className="evo-mag-workspace evo-no-print">
+          <aside className="evo-mag-sidebar" data-mobile-open={mobileLibraryOpen} aria-label="Biblioteca de investigaciones">
+            <div className="evo-mag-sidebar-head">
+              <div><span className="evo-rail-eyebrow">BIBLIOTECA / VOLUMEN 02</span><strong>Índice de investigación</strong></div>
+              <button type="button" className="evo-rail-toggle" onClick={()=>setMobileLibraryOpen(v=>!v)} aria-expanded={mobileLibraryOpen} aria-controls="evo-mag-sidebar-body">
+                {mobileLibraryOpen ? 'Ocultar −' : 'Explorar +'}
               </button>
-            })}
-          </div>
-          {!query.trim() && section===0 && <div className="evo-no-print flex justify-center">
-            <button type="button" className="evo-index-more" onClick={()=>setIndexExpanded(v=>!v)} aria-expanded={indexExpanded}>
-              {indexExpanded ? 'MOSTRAR SOLO 12 INVESTIGACIONES ↑' : 'EXPLORAR LOS 200 TÍTULOS ↓'}
-            </button>
-          </div>}
-          <div className="evo-print-only hidden evo-index-print text-zinc-900">
+            </div>
+            <div className="evo-mag-sidebar-body" id="evo-mag-sidebar-body">
+              <div className="evo-mag-progress">
+                <div><span>LECTURAS REVISADAS</span><strong>{reviewedCount} <small>/ 200</small></strong></div>
+                <div className="evo-mag-progress-track" role="progressbar" aria-label="Investigaciones revisadas" aria-valuenow={reviewedCount} aria-valuemin={0} aria-valuemax={200}>
+                  <span style={{width:progressPercent+'%'}}/>
+                </div>
+                <small>Registro personal, no certificado.</small>
+              </div>
+              <label className="evo-rail-field-label" htmlFor="evo-rail-search">BUSCAR INVESTIGACIÓN</label>
+              <input id="evo-rail-search" type="search" autoComplete="off" placeholder="Ej.: RAM, svchost, gaming…" value={query} onChange={e=>setQuery(e.target.value)} className="evo-rail-search"/>
+              <label className="evo-rail-field-label" htmlFor="evo-rail-filter">ÁREA TEMÁTICA</label>
+              <select id="evo-rail-filter" value={section} onChange={e=>setSection(Number(e.target.value))} className="evo-rail-filter">
+                <option value={0}>Todas las áreas · 200</option>
+                {EVO_MAGAZINE_GROUPS.map((g,i)=><option key={g.name} value={i+1}>{g.name} · {g.end-g.start+1}</option>)}
+              </select>
+              <div className="evo-rail-results"><span>{visible.length} investigaciones</span><span>SELECCIONÁ UNA ↓</span></div>
+              <div className="evo-mag-rail-list" role="group" aria-label="Investigaciones disponibles">
+                {visible.map(item=>{
+                  const art=magazineArtDirection(item.id);
+                  return <button type="button" onClick={()=>jumpToGuide(item.id)} key={item.id}
+                    aria-current={item.id===selected.id?'page':undefined}
+                    className={'evo-rail-item'+(item.id===selected.id?' is-active':'')}
+                    style={{'--theme-accent':art.accent} as React.CSSProperties}>
+                    <span className="evo-rail-number">{number(item.id)}</span>
+                    <span className="evo-rail-item-text">{item.title}</span>
+                    <span className="evo-rail-item-state">{reviewed[item.id]?'✓':item.id===selected.id?'●':'›'}</span>
+                  </button>;
+                })}
+                {visible.length===0&&<p className="evo-rail-empty">No hay coincidencias. Probá con otro término o categoría.</p>}
+              </div>
+              <button type="button" className="evo-rail-bible" onClick={onOpenInteractive}>ABRIR BIBLIA VIRTUAL <span>↗</span></button>
+            </div>
+          </aside>
+
+          <section id="magazine-guide" className="evo-mag-reader">
+            <div className="evo-reader-heading">
+              <div className="evo-reader-breadcrumb"><span>TOMO 02</span><span aria-hidden="true">/</span><span>{currentGroup?.name || 'INVESTIGACIÓN'}</span></div>
+              <div className="evo-reader-pager" aria-label="Navegación entre investigaciones">
+                <button type="button" onClick={()=>jumpToGuide(previousArticle.id)} aria-label="Investigación anterior">← <span>Anterior</span></button>
+                <span className="evo-pager-count">{number(selected.id)} <small>/ 200</small></span>
+                <button type="button" onClick={()=>jumpToGuide(nextArticle.id)} aria-label="Investigación siguiente"><span>Siguiente</span> →</button>
+              </div>
+            </div>
+            {renderGuide(selected)}
+            <div className="evo-reader-bottom-grid">
+              <section className="evo-mag-notes">
+                <div className="evo-note-heading"><span>CUADERNO DE CAMPO</span><strong>EXPEDIENTE {number(selected.id)}</strong></div>
+                <label htmlFor="evo-lab-note">Tus observaciones y conclusiones</label>
+                <textarea id="evo-lab-note" key={selected.id} rows={5}
+                  defaultValue={notes[selected.id] || ''} onBlur={e=>saveNote(selected.id,e.target.value)}
+                  placeholder="¿Qué observaste? ¿Qué mediste? ¿Qué evidencia respalda la conclusión?"/>
+                <p>Se guarda al salir del campo, sólo en este navegador. No ingreses contraseñas ni datos sensibles.</p>
+              </section>
+              <section className="evo-reader-completion">
+                <span>REGISTRO DE APRENDIZAJE</span>
+                <strong>Una investigación más cerca de entender tu PC.</strong>
+                <p>Hacé las pruebas, anotá resultados y marcá esta guía como revisada.</p>
+                <button type="button" onClick={markReviewed} aria-pressed={Boolean(reviewed[selected.id])} className="evo-mark-read">
+                  {reviewed[selected.id] ? '✓ REVISADA · DESMARCAR' : '✓ MARCAR COMO REVISADA'}
+                </button>
+                <button type="button" onClick={()=>jumpToGuide(nextArticle.id)} className="evo-next-large">IR A LA INVESTIGACIÓN {number(nextArticle.id)} →</button>
+              </section>
+            </div>
+            <p className="evo-copy-status" role="status" aria-live="polite">{copiedFeedback}</p>
+          </section>
+        </div>
+
+        <section className="evo-index-section evo-print-only hidden">
+          <h2>ÍNDICE MAESTRO · 200 INVESTIGACIONES</h2>
+          <div className="evo-index-print">
             {EVO_MAGAZINE_200_TITLES.map((t,i)=><p key={i}><b>{number(i+1)}.</b> {t}{dictionary.has(i+1)?' · GUÍA':''}</p>)}
           </div>
         </section>
