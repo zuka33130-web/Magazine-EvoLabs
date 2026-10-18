@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { EVO_MAGAZINE_200_TITLES, EVO_MAGAZINE_GROUPS } from '../../data/tomo02Magazine200';
 import { EVO_MAGAZINE_FIRST_BATCH } from '../../data/tomo02MagazineFirstBatch';
+import { EVO_MAGAZINE_SECOND_BATCH } from '../../data/tomo02MagazineSecondBatch';
 
 type Step = { title: string; why: string; code?: string; expect: string };
 type Article = { id: number; goal: string; basics: string; steps: Step[]; tip: string; warning: string; challenge: string };
@@ -67,7 +68,7 @@ const ORIGINAL_ARTICLES: Article[] = [
    warning:'Nunca borres manualmente System32, WinSxS o DriverStore.',
    challenge:'Explicá la diferencia entre archivos temporales, caché y componentes del sistema.' }
 ];
-const ARTICLES: Article[] = [...ORIGINAL_ARTICLES, ...EVO_MAGAZINE_FIRST_BATCH].sort((a, b) => a.id - b.id);
+const ARTICLES: Article[] = [...ORIGINAL_ARTICLES, ...EVO_MAGAZINE_FIRST_BATCH, ...EVO_MAGAZINE_SECOND_BATCH].sort((a, b) => a.id - b.id);
 const dictionary = new Map(ARTICLES.map(a => [a.id,a]));
 const number = (n:number) => String(n).padStart(3,'0');
 
