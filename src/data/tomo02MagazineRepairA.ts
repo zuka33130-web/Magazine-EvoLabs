@@ -261,7 +261,7 @@ export const EVO_MAGAZINE_REPAIR_A: EvoMagazineArticle[] = [
       {
         "title": "Consultá carpetas especiales sin abrirlas",
         "why": "Comprobá existencia de dos almacenes esenciales.",
-        "code": "[pscustomobject]@{WinSxS=Test-Path (Join-Path $env:windir 'WinSxS');DriverStore=Test-Path (Join-Path $env:windir 'System32\\DriverStore')}",
+        "code": "[pscustomobject]@{WinSxS=(Test-Path (Join-Path $env:windir 'WinSxS'));DriverStore=(Test-Path (Join-Path $env:windir 'System32\\DriverStore'))}",
         "expect": "Es frecuente obtener True para ambas; su presencia es normal."
       },
       {
