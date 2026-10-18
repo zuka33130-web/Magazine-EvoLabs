@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, FileText, Printer, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, FileText, Printer, ShieldCheck, FlaskConical } from 'lucide-react';
 import { Tomo02MasterPage } from './Tomo02MasterPage';
 import './Tomo02Magazine40.css';
 import { EVO_WINDOWS_40_ARTICLES, EVO_WINDOWS_40_SECTIONS } from '../../data/tomo02Magazine40';
@@ -7,6 +7,7 @@ import { EVO_WINDOWS40_001, EVO_WINDOWS40_001_REFERENCES, type Windows40Page } f
 import { Tomo02WindowsEditorialArt, type WindowsArtKind } from './Tomo02WindowsEditorialArt';
 import { TOMO_02_COVER } from '../../data/tomoCoversData';
 import { Tomo02MagazineDraftPreview } from './Tomo02MagazineDraftPreview';
+import { Tomo02Windows50LabReader } from './Tomo02Windows50LabReader';
 
 
 const TOTAL_PAGES = 5 + EVO_WINDOWS40_001.length * 2; // portada + manifiesto + 2 sumarios + 16 páginas del expediente 001 + cierre
@@ -122,6 +123,7 @@ const ChapterPage: React.FC<{data: Windows40Page; index: number; part: 0 | 1}> =
 
 export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
   const [showManuscripts, setShowManuscripts] = React.useState(false);
+  const [showFieldLabs, setShowFieldLabs] = React.useState(false);
   const goTo = (n: number) => document.getElementById(pageId(n))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const printPdf = () => {
     const currentTitle = document.title;
@@ -130,6 +132,7 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
     document.title = currentTitle;
   };
 
+  if (showFieldLabs) return <Tomo02Windows50LabReader onBack={() => setShowFieldLabs(false)} />;
   if (showManuscripts) return <Tomo02MagazineDraftPreview onReturnToMagazine={() => setShowManuscripts(false)} />;
 
   return (
@@ -157,6 +160,7 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
           <button type="button" onClick={() => goTo(3)} className="flex items-center gap-2 rounded-lg border border-[#60CDFF]/45 px-3 py-2 font-mono-tech text-xs font-bold text-[#9DDDFF] hover:bg-[#103453]"><BookOpen className="h-4 w-4" /> ÍNDICE</button>
           <button type="button" onClick={onOpenBiblia} className="rounded-lg border border-[#60CDFF]/45 px-3 py-2 font-mono-tech text-xs font-bold text-[#9DDDFF] hover:bg-[#103453]">BIBLIA VIRTUAL</button>
           <button type="button" onClick={() => setShowManuscripts(true)} className="flex items-center gap-2 rounded-lg border border-[#91EAFF] bg-[#0078D4] px-3 py-2 font-mono-tech text-xs font-black text-white shadow-[0_0_17px_rgba(0,210,255,.28)] hover:bg-[#00A5D9]"><BookOpen className="h-4 w-4"/> LEER BORRADORES 002–040</button>
+          <button type="button" onClick={() => setShowFieldLabs(true)} className="flex items-center gap-2 rounded-lg border border-[#B1F2FF] bg-gradient-to-r from-[#0271C7] to-[#00A1D8] px-3 py-2 font-mono-tech text-xs font-black text-white shadow-[0_0_22px_rgba(0,210,255,.35)] hover:from-[#0096DC] hover:to-[#00D2FF]"><FlaskConical className="h-4 w-4"/> 50 LABORATORIOS REALES</button>
           <button type="button" onClick={printPdf} className="flex items-center gap-2 rounded-lg border border-[#80E3FF] bg-gradient-to-r from-[#0068BD] to-[#00A4EF] px-4 py-2 font-mono-tech text-xs font-black text-white shadow-[0_0_18px_rgba(0,164,239,0.22)] hover:to-[#60CDFF]"><Printer className="h-4 w-4" /> GUARDAR AVANCE PDF A4</button>
         </div>
       </nav>
@@ -269,6 +273,7 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
         <button type="button" onClick={() => goTo(1)} className="rounded-xl border border-[#00D2FF]/40 px-5 py-3 font-mono-tech text-xs font-black text-white hover:bg-[#123D5A]">↑ VOLVER A LA PORTADA</button>
         <button type="button" onClick={() => goTo(5)} className="flex items-center gap-2 rounded-xl border border-[#00D2FF]/40 px-5 py-3 font-mono-tech text-xs font-black text-white hover:bg-[#123D5A]">LEER EXPEDIENTE 001 <ArrowRight className="h-4 w-4" /></button>
         <button type="button" onClick={() => setShowManuscripts(true)} className="flex items-center gap-2 rounded-xl border border-[#8EEFFF] bg-[#006EBD] px-5 py-3 font-mono-tech text-xs font-black text-white hover:bg-[#078CD5]">REVISAR MANUSCRITOS 002–040 <BookOpen className="h-4 w-4" /></button>
+        <button type="button" onClick={() => setShowFieldLabs(true)} className="flex items-center gap-2 rounded-xl border border-[#B2F6FF] bg-gradient-to-r from-[#046BBF] to-[#03B4E4] px-5 py-3 font-mono-tech text-xs font-black text-white hover:to-[#00D2FF]">VER 50 LABORATORIOS PRÁCTICOS <FlaskConical className="h-4 w-4" /></button>
       </div>
     </div>
   );
