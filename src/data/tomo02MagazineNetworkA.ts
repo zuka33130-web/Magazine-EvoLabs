@@ -244,9 +244,9 @@ export const EVO_MAGAZINE_NETWORK_A: EvoMagazineArticle[] = [
       },
       {
         "title": "Realizá mil muestras con cadencia normal",
-        "why": "Solo sobre tu propio gateway, en un momento controlado, podés ampliar a mil solicitudes. Aproximadamente una por segundo y con duración prolongada.",
-        "code": "ping -n 1000 192.168.1.1",
-        "expect": "REEMPLAZÁ 192.168.1.1 por la IP de tu propio router. Al terminar, Windows informa paquetes enviados, recibidos y perdidos."
+        "why": "En tu propia red, podés ampliar a mil solicitudes ICMP con la cadencia normal de ping; el destino se obtiene automáticamente de tu gateway. Esta prueba puede durar más de quince minutos. Interrumpila con Ctrl+C si necesitás.",
+        "code": "$gw=(Get-NetIPConfiguration | Where-Object IPv4DefaultGateway | Select-Object -First 1).IPv4DefaultGateway.NextHop; ping.exe -n 1000 $gw",
+        "expect": "Después de mil intentos o de interrumpir, Windows muestra el resumen de paquetes enviados, recibidos y perdidos, si el router responde a ICMP."
       }
     ],
     "tip": "Truco EVO: medí por separado Wi-Fi y Ethernet cuando sea posible; no son resultados comparables si cambiás de interfaz a mitad del ensayo.",
