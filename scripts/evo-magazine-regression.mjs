@@ -17,6 +17,8 @@ const batches = [
   file('src/data/tomo02MagazineThirdBatch.ts'),
   file('src/data/tomo02MagazinePrivacyA.ts'),
   file('src/data/tomo02MagazinePrivacyB.ts'),
+  file('src/data/tomo02MagazineSecurityA.ts'),
+  file('src/data/tomo02MagazineSecurityB.ts'),
 ];
 const view = file('src/components/tomo02/Tomo02MagazineEstrella.tsx');
 const wrapper = file('src/components/tomo02/Tomo02MagazineView.tsx');
@@ -40,9 +42,11 @@ const second = readJSON(batches[1], /EVO_MAGAZINE_SECOND_BATCH: EvoMagazineArtic
 const third = readJSON(batches[2], /EVO_MAGAZINE_THIRD_BATCH: EvoMagazineArticle\[\]\s*=\s*([\s\S]*);\s*$/, 'Tercera tanda');
 const privacyA = readJSON(batches[3], /EVO_MAGAZINE_PRIVACY_A: EvoMagazineArticle\[\]\s*=\s*([\s\S]*);\s*$/, 'Privacidad A');
 const privacyB = readJSON(batches[4], /EVO_MAGAZINE_PRIVACY_B: EvoMagazineArticle\[\]\s*=\s*([\s\S]*);\s*$/, 'Privacidad B');
+const securityA = readJSON(batches[5], /EVO_MAGAZINE_SECURITY_A: EvoMagazineArticle\[\]\s*=\s*([\s\S]*);\s*$/, 'Seguridad A');
+const securityB = readJSON(batches[6], /EVO_MAGAZINE_SECURITY_B: EvoMagazineArticle\[\]\s*=\s*([\s\S]*);\s*$/, 'Seguridad B');
 const before = view.split('const ORIGINAL_ARTICLES: Article[] = [')[1]?.split('const ARTICLES: Article[] =')[0] || '';
 const legacyIDs = [...before.matchAll(/\{\s*id:(\d+),\s*goal:/g)].map(match => Number(match[1]));
-const written = [...first, ...second, ...third, ...privacyA, ...privacyB];
+const written = [...first, ...second, ...third, ...privacyA, ...privacyB, ...securityA, ...securityB];
 const all = [...written, ...legacyIDs.map(id => ({ id }))];
 
 assert(titles.length === 200 && new Set(titles).size === 200, 'Hay exactamente 200 titulares únicos');
@@ -54,7 +58,9 @@ assert(legacyIDs.length === 6, 'Se conservan seis artículos originales destacad
 assert(third.length === 10 && third.every((v, i) => v.id === i + 41), 'Investigaciones 041–050 desarrolladas');
 assert(privacyA.length === 11 && privacyA.every((v,i) => v.id === [53,55,56,57,58,59,60,61,62,63,64][i]), 'Privacidad 053 y 055–064 desarrollada');
 assert(privacyB.length === 11 && privacyB.every((v,i) => v.id === i + 65), 'Privacidad 065–075 desarrollada');
-assert(all.length === 78 && new Set(all.map(x => x.id)).size === 78, 'Hay 78 investigaciones disponibles sin números repetidos');
+assert(securityA.length === 12 && securityA.every((v,i)=>v.id === i + 76), 'Seguridad 076–087 desarrollada');
+assert(securityB.length === 13 && securityB.every((v,i)=>v.id === i + 88), 'Seguridad 088–100 desarrollada');
+assert(all.length === 103 && new Set(all.map(x => x.id)).size === 103, 'Hay 103 investigaciones disponibles sin números repetidos');
 
 const forbidden = /\b(?:Remove-Item|Stop-Service|Set-Service|Stop-Process|Clear-Tpm|Format-Volume|Disable-NetAdapter|Set-MpPreference|Set-ItemProperty|Restart-Computer)\b|(?:bcdedit\s*\/(?:set|delete|import))|(?:reg\s+delete)/i;
 for (const article of written) {
@@ -64,7 +70,7 @@ for (const article of written) {
   assert(article.steps.filter(s => s.code?.trim()).length >= 2, 'Comandos demostrables: ' + article.id);
   assert(article.steps.every(s => !s.code || !forbidden.test(s.code)), 'Sin comandos de cambio destructivo: ' + article.id);
 }
-assert(['...EVO_MAGAZINE_FIRST_BATCH','...EVO_MAGAZINE_SECOND_BATCH','...EVO_MAGAZINE_THIRD_BATCH','...EVO_MAGAZINE_PRIVACY_A','...EVO_MAGAZINE_PRIVACY_B'].every(term=>view.includes(term)), 'El lector importa los cinco bloques');
+assert(['...EVO_MAGAZINE_FIRST_BATCH','...EVO_MAGAZINE_SECOND_BATCH','...EVO_MAGAZINE_THIRD_BATCH','...EVO_MAGAZINE_PRIVACY_A','...EVO_MAGAZINE_PRIVACY_B','...EVO_MAGAZINE_SECURITY_A','...EVO_MAGAZINE_SECURITY_B'].every(term=>view.includes(term)), 'El lector importa los siete bloques de guías');
 assert(view.includes('ARTICLES.map(renderGuide)') && view.includes('@page{size:A4'), 'La impresión A4 incluye todas las guías');
 assert(view.includes('reviewedCount') && view.includes('evo_magazine02_reviewed_v1'), 'Existe seguimiento local explícitamente no certificado');
 assert(view.includes('evo_magazine02_notes_v1') && view.includes('onBlur={e=>saveNote'), 'Cada guía ofrece notas locales para registrar resultados');
@@ -79,8 +85,8 @@ const canonicalCounts = [...canon.matchAll(/investigationsCount:\s*(\d+)/g)].map
 assert(canonicalNums.length === 40 && new Set(canonicalNums).size === 40, 'El índice virtual tiene 40 sectores únicos');
 assert(canonicalSubids.length >= 700 && new Set(canonicalSubids).size === canonicalSubids.length, 'El subíndice canónico conserva sus identificadores únicos');
 assert(canonicalCounts.reduce((a,b)=>a+b,0) === canonicalSubids.length, 'El total canónico concuerda con la suma de investigaciones');
-assert(all.every(item=>Array.isArray(sectorMap[item.id]) && sectorMap[item.id].length && sectorMap[item.id].every(s=>canonicalNums.includes(s))), 'Las 78 guías tienen puentes válidos a la Biblia Virtual');
+assert(all.every(item=>Array.isArray(sectorMap[item.id]) && sectorMap[item.id].length && sectorMap[item.id].every(s=>canonicalNums.includes(s))), 'Las 103 guías tienen puentes válidos a la Biblia Virtual');
 assert(view.includes('TOMO_02_MASTER_SECTORS.map') && view.includes('evo-canonical-sector'), 'El PDF A4 contiene apéndice del índice canónico');
 assert(wrapper.includes('onOpenSector={handleOpenOriginalSector}'), 'Los enlaces de investigación abren el sector técnico correspondiente');
 
-process.stdout.write('EVO MAGAZINE: ' + passed.length + ' verificaciones OK; 200 títulos, 78 guías, 7 bloques.\n');
+process.stdout.write('EVO MAGAZINE: ' + passed.length + ' verificaciones OK; 200 títulos, 103 guías, 7 bloques.\n');
