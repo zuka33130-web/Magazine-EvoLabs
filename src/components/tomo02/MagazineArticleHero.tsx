@@ -125,7 +125,7 @@ function Visual010(){
   return <div className="grid grid-cols-2 gap-3 h-full">{[['CPU',Cpu,'Procesos'],['MEMORIA',Database,'Páginas'],['DISCO',HardDrive,'Lectura y escritura'],['RED',Network,'Conexiones']].map(([label,Icon,note],i)=>{const I=Icon as IconType;return <div key={label as string} className="rounded-xl bg-white/10 border border-white/15 p-4 flex flex-col justify-between"><div className="flex items-center justify-between"><span className="text-xs font-black">{label as string}</span><I size={23}/></div><div className="flex gap-1 items-end h-8">{[3,5,2,7,4,6,3,5].map((n,j)=><span key={j} className="flex-1 rounded-t-sm bg-[#9ee4ff]" style={{height: (n*10+(i*7)%15)+'%'}}/>)}</div><span className="text-[10px] text-white/60">{note as string} · esquema conceptual</span></div>})}</div>;
 }
 
-function ConceptScene({id,direction,title}:{id:number;direction:ArtDirection;title:string}){
+function ConceptScene({id,direction,title,steps}:{id:number;direction:ArtDirection;title:string;steps:readonly string[]}){
   if(id===1)return <Visual001/>;
   if(id===2)return <Visual002/>;
   if(id===3)return <Visual003/>;
@@ -137,22 +137,32 @@ function ConceptScene({id,direction,title}:{id:number;direction:ArtDirection;tit
   if(id===9)return <Visual009/>;
   if(id===10)return <Visual010/>;
   const Icon=direction.icon;
-  const variant=id%4;
-  return <div className="relative grid grid-cols-[.8fr_1.2fr] gap-3 h-full">
-    <div className="rounded-xl bg-white/10 border border-white/20 p-4 flex flex-col justify-between">
-      <Icon className="h-10 w-10"/><span className="text-xs font-mono tracking-widest text-white/60">EXPEDIENTE {String(id).padStart(3,'0')}</span><span className="font-black text-xl leading-tight">{direction.subject}</span>
+  return <div className="evo-generic-visual" aria-label={'Mapa conceptual de investigación '+id}>
+    <div className="evo-generic-emblem">
+      <div className="evo-emblem-illustration" aria-hidden="true">
+        <div className="evo-emblem-outer"><Icon className="h-14 w-14" strokeWidth={1.25}/></div>
+        <span className="evo-emblem-orbit orbit-a"/><span className="evo-emblem-orbit orbit-b"/>
+      </div>
+      <span>ÁREA DE ESTUDIO / {direction.category}</span>
+      <strong>{direction.subject}</strong>
+      <small>EXPEDIENTE TÉCNICO {String(id).padStart(3,'0')}</small>
     </div>
-    <div className="rounded-xl border border-white/20 bg-white/[.06] p-4 flex flex-col justify-between gap-4">
-      {variant===0?<><div className="flex items-center justify-between"><ScanLine size={26}/><span className="font-black text-sm">RADAR DE INVESTIGACIÓN</span></div><div className="relative w-32 h-32 mx-auto rounded-full border-[3px] border-white/40 flex items-center justify-center"><div className="absolute w-[70%] h-[70%] rounded-full border border-dashed border-white/50"/><Icon size={42}/></div></>:
-      variant===1?<><b className="text-xs">MAPA DE VERIFICACIÓN</b>{direction.keywords.slice(0,3).map((k,i)=><div key={k} className="border-b border-white/20 flex justify-between items-center py-1 font-black text-xs"><span>0{i+1} · {k}</span><ArrowRight size={15}/></div>)}</>:
-      variant===2?<><b className="text-xs">MEDICIÓN Y EVIDENCIA</b><div className="h-28 flex items-end gap-2">{[22,48,35,69,44,79,53,62].map((n,i)=><div key={i} className="bg-white/45 flex-1 rounded-t-sm" style={{height:n+'%'}}/>)}</div><p className="text-xs opacity-65">Visual conceptual · sin datos del equipo</p></>:
-      <><b className="text-xs">RUTA DE APRENDIZAJE</b>{['OBSERVAR','COMPROBAR','CONCLUIR'].map((t,i)=><div key={t} className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 flex items-center gap-3"><span className="text-lg font-black">0{i+1}</span><span className="text-xs font-black">{t}</span></div>)}</>}
-      <span className="sr-only">Ilustración temática de {title}; no representa mediciones reales.</span>
+    <div className="evo-generic-path">
+      <div className="evo-path-heading"><span>MAPA DE ESTA INVESTIGACIÓN</span><span>03 / ETAPAS</span></div>
+      {(steps.length?steps:['Observar','Comprobar','Concluir']).slice(0,3).map((step,i)=>
+        <div className="evo-path-item" key={i}>
+          <span className="evo-path-count">{String(i+1).padStart(2,'0')}</span>
+          <span className="evo-path-label">{step}</span>
+          <ArrowRight className="evo-path-arrow" size={17}/>
+        </div>
+      )}
+      <p>Ruta real del contenido de esta guía; las observaciones se obtienen al hacer los ejercicios.</p>
+      <span className="sr-only">Esquema conceptual de {title}; no contiene mediciones del usuario.</span>
     </div>
   </div>;
 }
 
-export function MagazineArticleHero({id,title}:{id:number;title:string}){
+export function MagazineArticleHero({id,title,steps}:{id:number;title:string;steps:readonly string[]}){
   const direction=magazineArtDirection(id);
   const Icon=direction.icon;
   const issue=String(id).padStart(3,'0');
@@ -177,11 +187,11 @@ export function MagazineArticleHero({id,title}:{id:number;title:string}){
       </div>
     </div>
     <div className="evo-hero-diagram grid gap-3 p-4 sm:p-6 min-h-[245px]" style={{background:'linear-gradient(135deg, rgba(0,0,0,.23),rgba(255,255,255,.035))'}}>
-      <ConceptScene id={id} direction={direction} title={title}/>
+      <ConceptScene id={id} direction={direction} title={title} steps={steps}/>
     </div>
     <div className="flex items-center justify-between gap-4 px-5 py-3 sm:px-7 border-t border-white/15 text-[10px] uppercase font-bold tracking-[.12em] text-white/70">
       <span className="inline-flex items-center gap-2"><Sparkles size={14}/> NO LO CREAS. COMPROBALO.</span>
-      <span className="inline-flex items-center gap-1">01 / 03 · INVESTIGAR <ArrowRight size={14}/></span>
+      <span className="inline-flex items-center gap-1">{String(steps.length).padStart(2,"0")} PASOS · INVESTIGAR <ArrowRight size={14}/></span>
     </div>
   </header>;
 }
