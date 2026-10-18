@@ -493,3 +493,13 @@
  .evo-magazine-star .evo-sources-grid a{color:#111!important;background:white!important;border:1px solid #ccc!important;min-height:0;padding:3mm!important;}
  .evo-magazine-star .evo-sources-grid a:after{display:none!important;}
 }
+@media print {
+ .evo-magazine-star .evo-mag-article .evo-lesson-intro:first-child,
+ .evo-magazine-star .evo-mag-article .evo-lesson-intro:nth-child(2) {
+   background:#fff!important;color:#111!important;border-color:#bbb!important;
+ }
+ .evo-magazine-star .evo-mag-article .evo-lesson-intro:first-child p,
+ .evo-magazine-star .evo-mag-article .evo-lesson-intro:nth-child(2) p {
+   color:#111!important;
+ }
+}
