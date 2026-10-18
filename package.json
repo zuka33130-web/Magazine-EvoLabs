@@ -13,7 +13,8 @@
     "evo:regression": "node scripts/evo-structural-regression.mjs",
     "admin:create-owner": "node scripts/admin/create-owner.mjs",
     "evo:observability": "node --import tsx --test scripts/evo-observability.test.ts",
-    "evo:observability:browser": "node scripts/evo-observability-browser.mjs"
+    "evo:observability:browser": "node scripts/evo-observability-browser.mjs",
+    "evo:magazine:check": "node scripts/evo-magazine-regression.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
