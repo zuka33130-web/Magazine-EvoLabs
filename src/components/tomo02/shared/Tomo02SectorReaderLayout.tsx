@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Award, BookOpen, Lightbulb, Search, Sparkles, Terminal } from 'lucide-react';
 import type { WindowsInvestigation } from '../../../data/tomo02Investigations';
+import { Tomo02SectorVisualHero } from '../Tomo02VisualAtlas';
 export type ReaderTab = 'reader' | 'mission' | 'test';
 interface Props {
   number: string; title: string; subtitle: string; investigations: WindowsInvestigation[];
@@ -33,7 +34,7 @@ export const Tomo02SectorReaderLayout: React.FC<Props> = ({number,title,subtitle
       </div>
     </header>
     <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
-      <p className="text-xs text-[#60CDFF] font-mono mb-4">{subtitle}</p>
+      <Tomo02SectorVisualHero number={number} title={title} subtitle={subtitle} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <aside className="lg:col-span-4 space-y-3 bg-[#080B10] p-3 rounded-2xl border border-sky-500/20 shadow-xl" aria-label="Investigaciones del sector">
           <div className="flex items-center justify-between px-2 py-1 text-xs font-mono text-zinc-400"><span className="font-bold text-[#60CDFF] uppercase">INVESTIGACIONES ({investigations.length})</span><span className="text-white font-bold" data-investigation-progress>{completedIds.size} / {investigations.length}</span></div>
