@@ -55,7 +55,7 @@ import {
 import { Tomo02ComoUsarElTomo } from './Tomo02ComoUsarElTomo';
 import { EvoTomo02FinalExam } from './EvoTomo02FinalExam';
 import { EvoTomo02CompletionScreen } from './EvoTomo02CompletionScreen';
-import { Tomo02OfficialPdfMagazine } from './Tomo02OfficialPdfMagazine';
+import { Tomo02MagazineEstrella } from './Tomo02MagazineEstrella';
 import { Tomo02Sector00View } from './sector00/Tomo02Sector00View';
 import { Tomo02Sector01View } from './sector01/Tomo02Sector01View';
 import { Tomo02Sector02View } from './sector02/Tomo02Sector02View';
@@ -347,8 +347,9 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     };
   }, []);
 
-  // Listen for direct URL print parameter (?print=true or ?pdf=true) to auto-invoke native print
+  // The new edition owns its own print flow; do not invoke the legacy print dialog.
   useEffect(() => {
+    if (subView === 'pdf_magazine' || subView === 'a4_magazine') return;
     try {
       const params = new URLSearchParams(window.location.search);
       if (params.get('print') === 'true' || params.get('pdf') === 'true') {
@@ -831,24 +832,14 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     );
   }
 
-  if (subView === 'pdf_magazine') {
-    return (
-      <Tomo02OfficialPdfMagazine
-        onBackToCover={() => {
-          setSubView('cover');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        onOpenInteractive={() => {
-          setSubView('index');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        onOpenA4Magazine={() => {
-          setSubView('a4_magazine');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        onOpenLab={onOpenLab}
-      />
-    );
+  // Magazine Estrella: PDF A4 y lector editorial comparten un único
+  // contenido para principiantes. La Biblia Virtual y sus 40 sectores
+  // permanecen intactos. El PDF histórico no se elimina del repositorio.
+  if (subView === 'pdf_magazine' || subView === 'a4_magazine') {
+    return <Tomo02MagazineEstrella
+      onBack={() => { setSubView('cover'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+      onOpenInteractive={() => { setSubView('index'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+    />;
   }
 
   if (subView === 'index') {
