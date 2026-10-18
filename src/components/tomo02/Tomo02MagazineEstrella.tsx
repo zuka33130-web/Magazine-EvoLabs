@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { EVO_MAGAZINE_200_TITLES, EVO_MAGAZINE_GROUPS } from '../../data/tomo02Magazine200';
 import { EVO_MAGAZINE_FIRST_BATCH } from '../../data/tomo02MagazineFirstBatch';
 import { EVO_MAGAZINE_SECOND_BATCH } from '../../data/tomo02MagazineSecondBatch';
+import { EVO_MAGAZINE_THIRD_BATCH } from '../../data/tomo02MagazineThirdBatch';
+import { EVO_MAGAZINE_PRIVACY_A } from '../../data/tomo02MagazinePrivacyA';
+import { EVO_MAGAZINE_PRIVACY_B } from '../../data/tomo02MagazinePrivacyB';
 import { EVO_MAGAZINE_RELATED_SECTORS } from '../../data/tomo02MagazineSectorBridge';
 import { TOMO_02_MASTER_SECTORS } from '../../data/tomo02MasterSectors';
 
@@ -70,7 +73,7 @@ const ORIGINAL_ARTICLES: Article[] = [
    warning:'Nunca borres manualmente System32, WinSxS o DriverStore.',
    challenge:'Explicá la diferencia entre archivos temporales, caché y componentes del sistema.' }
 ];
-const ARTICLES: Article[] = [...ORIGINAL_ARTICLES, ...EVO_MAGAZINE_FIRST_BATCH, ...EVO_MAGAZINE_SECOND_BATCH].sort((a, b) => a.id - b.id);
+const ARTICLES: Article[] = [...ORIGINAL_ARTICLES, ...EVO_MAGAZINE_FIRST_BATCH, ...EVO_MAGAZINE_SECOND_BATCH, ...EVO_MAGAZINE_THIRD_BATCH, ...EVO_MAGAZINE_PRIVACY_A, ...EVO_MAGAZINE_PRIVACY_B].sort((a, b) => a.id - b.id);
 const dictionary = new Map(ARTICLES.map(a => [a.id,a]));
 const number = (n:number) => String(n).padStart(3,'0');
 
