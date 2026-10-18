@@ -136,6 +136,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
     const g=EVO_MAGAZINE_GROUPS[section-1];
     return item.id>=g.start && item.id<=g.end;
   });
+  const indexEntries = (indexExpanded || query.trim() || section !== 0) ? visible : visible.slice(0,12);
   useEffect(()=>{
     if(new URLSearchParams(window.location.search).get('print')!=='true') return;
     const handle=window.setTimeout(()=>{document.title='EVO-LABS-TOMO-02-MAGAZINE-ESTRELLA';window.print();},900);
@@ -256,34 +257,6 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
           <p className="mt-10 font-black text-cyan-300">NO LO CREAS. COMPROBALO.</p>
           <div className="evo-cover-stats evo-no-print"><span><b>200</b> investigaciones</span><span><b>07</b> universos temáticos</span><span><b>40</b> sectores técnicos</span></div><p className="mt-5 text-xs text-zinc-400">Primera edición práctica en desarrollo. Las observaciones son ejercicios para comprobar en tu equipo; no son lecturas automáticas de tu PC.</p>
         </header>
-        <section className="evo-index-section py-10">
-          <div className="evo-section-kicker mb-2">CATÁLOGO DE INVESTIGACIONES / TOMO 02</div><h2 className="evo-section-heading text-2xl font-black mb-3">200 historias para descubrir Windows</h2>
-          <p className="text-base text-zinc-300 mb-6 max-w-4xl">Elegí un expediente, investigá sus pistas y comprobá cada afirmación. Las 200 primeras guías están disponibles; la Biblia Virtual conserva su propia estructura técnica.</p>
-          <div className="evo-no-print flex flex-col sm:flex-row gap-3 mb-6">
-            <input type="search" aria-label="Buscar artículos" placeholder="Buscá por tema: RAM, telemetría, gaming..." value={query} onChange={e=>setQuery(e.target.value)} className="flex-1 rounded-md bg-zinc-900 border border-zinc-600 px-3 py-3"/>
-            <select aria-label="Filtrar categoría" value={section} onChange={e=>setSection(Number(e.target.value))} className="rounded-md bg-zinc-900 border border-zinc-600 px-3 py-3">
-              <option value={0}>Todas las categorías</option>
-              {EVO_MAGAZINE_GROUPS.map((g,i)=><option key={g.name} value={i+1}>{g.name}</option>)}
-            </select>
-          </div>
-          <div className="evo-index-grid evo-no-print grid sm:grid-cols-2 gap-2">
-            {visible.map(item=>{
-              const ready=dictionary.has(item.id);
-              const art=magazineArtDirection(item.id);
-              return <button type="button" disabled={!ready} onClick={()=>jumpToGuide(item.id)} key={item.id}
-                className={'evo-index-card group relative overflow-hidden p-4 border rounded-xl flex gap-3 text-left text-sm transition-colors '+(ready?'bg-[#17212b] border-[#3c5161] hover:border-white hover:bg-[#20303e]':'bg-zinc-900 border-zinc-700 opacity-75')}
-                style={{'--theme-accent':art.accent} as React.CSSProperties}>
-                <span className="absolute left-0 top-0 bottom-0 w-[3px]" style={{backgroundColor:art.accent}}/>
-                <span className="evo-index-no font-mono font-black text-lg" style={{color:art.secondary}}>{number(item.id)}</span>
-                <span className="flex-1 min-w-0"><span className="evo-index-tag block text-[10px] font-black tracking-wider opacity-60 uppercase mb-1">{art.category}</span><span className="evo-index-title font-bold leading-snug">{item.title}</span></span>
-                <span className="shrink-0 self-center text-[10px] font-black border border-white/20 rounded-md px-2 py-1 text-white/70">{ready?(reviewed[item.id]?'✓':'ABRIR ↗'):'ÍNDICE'}</span>
-              </button>
-            })}
-          </div>
-          <div className="evo-print-only hidden evo-index-print text-zinc-900">
-            {EVO_MAGAZINE_200_TITLES.map((t,i)=><p key={i}><b>{number(i+1)}.</b> {t}{dictionary.has(i+1)?' · GUÍA':''}</p>)}
-          </div>
-        </section>
         <section id="magazine-guide" className="evo-no-print py-6">
           <div className="evo-section-kicker mb-2">MODO INVESTIGACIÓN / APRENDER HACIENDO</div><h2 className="evo-section-heading text-2xl font-black mb-3">Tu laboratorio de Windows</h2>
           <p className="text-sm text-zinc-300 mb-5">Tu registro local de lectura: <strong>{reviewedCount} de {ARTICLES.length}</strong> guías marcadas como revisadas. Esto no sustituye una evaluación técnica.</p>
@@ -306,6 +279,39 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
             </button>
           </div>
           <p className="text-sm text-zinc-300">Podés imprimir la edición con el índice de 200 títulos y las {ARTICLES.length} guías actualmente desarrolladas desde el botón «Guardar PDF A4».</p>
+        </section>
+        <section className="evo-index-section py-10">
+          <div className="evo-section-kicker mb-2">CATÁLOGO DE INVESTIGACIONES / TOMO 02</div><h2 className="evo-section-heading text-2xl font-black mb-3">200 historias para descubrir Windows</h2>
+          <p className="text-base text-zinc-300 mb-6 max-w-4xl">Elegí un expediente, investigá sus pistas y comprobá cada afirmación. Las 200 primeras guías están disponibles; la Biblia Virtual conserva su propia estructura técnica.</p>
+          <div className="evo-no-print flex flex-col sm:flex-row gap-3 mb-6">
+            <input type="search" aria-label="Buscar artículos" placeholder="Buscá por tema: RAM, telemetría, gaming..." value={query} onChange={e=>setQuery(e.target.value)} className="flex-1 rounded-md bg-zinc-900 border border-zinc-600 px-3 py-3"/>
+            <select aria-label="Filtrar categoría" value={section} onChange={e=>setSection(Number(e.target.value))} className="rounded-md bg-zinc-900 border border-zinc-600 px-3 py-3">
+              <option value={0}>Todas las categorías</option>
+              {EVO_MAGAZINE_GROUPS.map((g,i)=><option key={g.name} value={i+1}>{g.name}</option>)}
+            </select>
+          </div>
+          <div className="evo-index-grid evo-no-print grid sm:grid-cols-2 gap-2">
+            {indexEntries.map(item=>{
+              const ready=dictionary.has(item.id);
+              const art=magazineArtDirection(item.id);
+              return <button type="button" disabled={!ready} onClick={()=>jumpToGuide(item.id)} key={item.id}
+                className={'evo-index-card group relative overflow-hidden p-4 border rounded-xl flex gap-3 text-left text-sm transition-colors '+(ready?'bg-[#17212b] border-[#3c5161] hover:border-white hover:bg-[#20303e]':'bg-zinc-900 border-zinc-700 opacity-75')}
+                style={{'--theme-accent':art.accent} as React.CSSProperties}>
+                <span className="absolute left-0 top-0 bottom-0 w-[3px]" style={{backgroundColor:art.accent}}/>
+                <span className="evo-index-no font-mono font-black text-lg" style={{color:art.secondary}}>{number(item.id)}</span>
+                <span className="flex-1 min-w-0"><span className="evo-index-tag block text-[10px] font-black tracking-wider opacity-60 uppercase mb-1">{art.category}</span><span className="evo-index-title font-bold leading-snug">{item.title}</span></span>
+                <span className="shrink-0 self-center text-[10px] font-black border border-white/20 rounded-md px-2 py-1 text-white/70">{ready?(reviewed[item.id]?'✓':'ABRIR ↗'):'ÍNDICE'}</span>
+              </button>
+            })}
+          </div>
+          {!query.trim() && section===0 && <div className="evo-no-print flex justify-center">
+            <button type="button" className="evo-index-more" onClick={()=>setIndexExpanded(v=>!v)} aria-expanded={indexExpanded}>
+              {indexExpanded ? 'MOSTRAR SOLO 12 INVESTIGACIONES ↑' : 'EXPLORAR LOS 200 TÍTULOS ↓'}
+            </button>
+          </div>}
+          <div className="evo-print-only hidden evo-index-print text-zinc-900">
+            {EVO_MAGAZINE_200_TITLES.map((t,i)=><p key={i}><b>{number(i+1)}.</b> {t}{dictionary.has(i+1)?' · GUÍA':''}</p>)}
+          </div>
         </section>
         <section className="evo-print-only hidden">
           <h2 className="text-2xl font-black text-zinc-900">Guías completas de esta primera entrega</h2>
