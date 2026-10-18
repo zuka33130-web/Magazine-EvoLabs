@@ -30,6 +30,7 @@ const batches = [
 ];
 const view = file('src/components/tomo02/Tomo02MagazineEstrella.tsx');
 const visual = file('src/components/tomo02/MagazineArticleHero.tsx');
+const editorialCSS = file('src/components/tomo02/Tomo02MagazineEditorial.css');
 const wrapper = file('src/components/tomo02/Tomo02MagazineView.tsx');
 const cover = file('src/components/tomo02/Tomo02Cover.tsx');
 const bridge = file('src/data/tomo02MagazineSectorBridge.ts');
@@ -106,6 +107,13 @@ assert(['Visual001','Visual002','Visual003','Visual004','Visual005','Visual006',
 assert(visual.includes('if(id===10)return <Visual010/>') && visual.includes('return <div className="relative grid'), 'El catálogo restante conserva un diseño visual adaptativo');
 assert(visual.includes('Visual conceptual · sin datos del equipo') && view.includes('no representan mediciones de tu PC'), 'La escenografía didáctica se distingue de la telemetría real');
 assert(view.includes('!printOnly && <MagazineArticleHero'), 'La exportación evita renderizar 200 diagramas complejos');
+assert(view.includes("import './Tomo02MagazineEditorial.css'"), 'La revista usa la nueva hoja de estilo editorial');
+assert(editorialCSS.includes('.evo-magazine-star .evo-mag-article') && editorialCSS.includes('background:#101b28!important'), 'Las páginas interiores tienen fondo oscuro por defecto');
+assert(editorialCSS.includes('@media print') && editorialCSS.includes('background:#fff!important'), 'El PDF mantiene impresión legible sobre fondo blanco');
+assert(view.indexOf('<section id="magazine-guide"') < view.indexOf('<section className="evo-index-section'), 'La investigación abre antes del catálogo');
+assert(view.includes('visible.slice(0,12)') && view.includes('EXPLORAR LOS 200 TÍTULOS'), 'El índice empieza compacto sin bloquear la búsqueda de 200 guías');
+assert(view.includes('evo-code-toolbar') && view.includes('evo-result') && view.includes('evo-tip') && view.includes('evo-warning'), 'Los componentes didácticos emplean jerarquía visual de alto contraste');
+
 assert(view.includes('reviewedCount') && view.includes('evo_magazine02_reviewed_v1'), 'Existe seguimiento local explícitamente no certificado');
 assert(view.includes('evo_magazine02_notes_v1') && view.includes('onBlur={e=>saveNote'), 'Cada guía ofrece notas locales para registrar resultados');
 assert(view.includes('navigator.clipboard.writeText') && view.includes('Copiar comando'), 'Los comandos pueden copiarse desde el lector');
