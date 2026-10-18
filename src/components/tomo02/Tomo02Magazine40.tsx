@@ -3,13 +3,11 @@ import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, FileText, Printer, Shiel
 import { Tomo02MasterPage } from './Tomo02MasterPage';
 import { EVO_WINDOWS_40_ARTICLES, EVO_WINDOWS_40_SECTIONS } from '../../data/tomo02Magazine40';
 import { EVO_WINDOWS40_001, EVO_WINDOWS40_001_REFERENCES, type Windows40Page } from '../../data/tomo02Magazine40Chapter001';
-import kernelImage from '../../assets/images/cap_05_kernel_1789531884339.jpg';
-import workbenchImage from '../../assets/images/cap_06_workshop_1789531894578.jpg';
-import siliconImage from '../../assets/images/cap_01_silicon_1789531835511.jpg';
+import { Tomo02WindowsEditorialArt, type WindowsArtKind } from './Tomo02WindowsEditorialArt';
 import { TOMO_02_COVER } from '../../data/tomoCoversData';
 
 
-const TOTAL_PAGES = 5 + EVO_WINDOWS40_001.length; // 1 portada + 1 editorial + 2 sumarios + 8 investigación + 1 cierre
+const TOTAL_PAGES = 5 + EVO_WINDOWS40_001.length * 2; // portada + manifiesto + 2 sumarios + 16 páginas del expediente 001 + cierre
 const pageId = (page: number) => `evo-w40-page-${String(page).padStart(2, '0')}`;
 const pad = (n: number) => String(n).padStart(3, '0');
 
@@ -63,53 +61,57 @@ const Diagram: React.FC<{ mode: NonNullable<Windows40Page['visual']> }> = ({mode
   );
 };
 
-const ChapterPage: React.FC<{ data: Windows40Page; index: number }> = ({ data, index }) => {
-  const first = index === 0;
+/**
+ * Maquetación real: cada sección del manuscrito se distribuye en DOS páginas A4.
+ * Primera página: apertura tipográfica, imagen exclusiva Windows, texto de contexto.
+ * Segunda página: desarrollo restante, esquema técnico, laboratorio y conclusión.
+ * Nunca se descarta ni resume un párrafo del manuscrito.
+ */
+const CHAPTER_ART: readonly WindowsArtKind[] = [
+  'night', 'kernel', 'cpu', 'experiment', 'tasks', 'network', 'verdict', 'security'
+];
+
+const ChapterPage: React.FC<{data: Windows40Page; index: number; part: 0 | 1}> = ({data,index,part}) => {
+  const art = CHAPTER_ART[index];
+  const split = data.paragraphs.length >= 5 ? 3 : 2;
+  const paras = part === 0 ? data.paragraphs.slice(0,split) : data.paragraphs.slice(split);
+  const number = 5 + index * 2 + part;
+  const isOpener = part === 0;
   return (
-    <Page number={index + 5} title="INVESTIGACIÓN 001 · WINDOWS INVISIBLE">
-      <div className="flex min-h-0 flex-1 flex-col">
-        <div className="mb-3 shrink-0 border-b border-[#00D2FF]/30 pb-2">
-          <div className="flex items-center justify-between gap-2 font-mono-tech text-[10px] font-bold tracking-widest text-[#60CDFF]">
-            <span>{data.eyebrow}</span>
-            <span>{index + 1} / {EVO_WINDOWS40_001.length}</span>
+    <Page number={number} title={'INVESTIGACIÓN 001 · '+data.eyebrow.split('/').pop()?.trim()}>
+      <div className={'evo-w40-chapter evo-w40-chapter--'+(isOpener?'opening':'continuation')}>
+        <header className="evo-w40-chapter__heading">
+          <div className="evo-w40-chapter__metadata">
+            <span>INVESTIGACIÓN 001 / {data.eyebrow.split('/').pop()?.trim()}</span>
+            <span className="evo-w40-chapter__number">{String(index+1).padStart(2,'0')} · {isOpener?'APERTURA':'DESARROLLO'}</span>
           </div>
-          <h2 className="mt-1 font-display text-[25px] font-black uppercase leading-[1.03] tracking-tight text-white">{data.title}</h2>
-          <p className="mt-2 text-[12px] leading-relaxed text-[#C9E9F8]">{data.subtitle}</p>
+          <h2>{data.title}</h2>
+          <p>{data.subtitle}</p>
+        </header>
+        {isOpener && <Tomo02WindowsEditorialArt kind={art} variant="hero" />}
+        <div className="evo-w40-chapter__columns">
+          {paras.map((paragraph,i)=><p key={i} className={isOpener&&i===0?'evo-w40-dropcap':''}>{paragraph}</p>)}
         </div>
-
-        {first && (
-          <figure className="relative mb-3 h-[152px] shrink-0 overflow-hidden rounded-xl border border-[#00D2FF]/40">
-            <img src={kernelImage} alt="Ilustración editorial conceptual de la arquitectura de Windows y sus procesos" className="h-full w-full object-cover" loading="lazy" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#030A17]/85 via-[#030A17]/30 to-transparent" />
-            <figcaption className="absolute bottom-3 left-4 max-w-[70%] font-mono-tech text-[10px] font-bold uppercase tracking-widest text-white">
-              DETRÁS DEL ESCRITORIO · KERNEL / SERVICIOS / TAREAS
-            </figcaption>
-          </figure>
-        )}
-
-        <div className="space-y-2 font-sans-editorial text-[11.5px] leading-[1.44] text-[#E1EAF1]">
-          {data.paragraphs.map((text, i) => <p key={i}>{text}</p>)}
-        </div>
-
-        {data.visual && !first && <Diagram mode={data.visual} />}
-
-        {data.laboratory && (
-          <section className="mt-2 shrink-0 overflow-hidden rounded-xl border border-[#1182C6]/50 bg-[#050F1B]">
-            <div className="border-b border-[#1179BC]/45 bg-gradient-to-r from-[#064374] to-[#0B2038] px-3 py-2">
-              <h3 className="font-mono-tech text-[10px] font-black uppercase tracking-widest text-white">{data.laboratory.title}</h3>
-              <p className="mt-1 text-[10px] leading-snug text-[#BFDFF2]">{data.laboratory.why}</p>
-            </div>
-            <pre className="max-h-[220px] overflow-auto whitespace-pre-wrap break-words px-3 py-2 font-mono text-[9.3px] leading-[1.38] text-[#8BE6FF]">{data.laboratory.code}</pre>
-            <p className="border-t border-[#1179BC]/30 px-3 py-2 text-[10px] leading-snug text-[#BBD6E8]">{data.laboratory.readout}</p>
-          </section>
-        )}
-
-        <div className="mt-auto shrink-0 space-y-2 pt-3">
-          <aside className="rounded-xl border-l-[3px] border-[#00D2FF] bg-[#0B304A] px-3 py-2.5">
-            <div className="mb-1 font-mono-tech text-[10px] font-black uppercase tracking-widest text-[#6BDFFF]">{data.focus.label}</div>
-            <p className="font-sans-editorial text-[11px] leading-[1.37] text-white">{data.focus.text}</p>
-          </aside>
-          <p className="font-mono-tech text-[9px] leading-[1.3] text-[#AEC4D4]">{data.footnote}</p>
+        {!isOpener && <Diagram mode={data.visual || art === 'security'?'verdict':'flow'} />}
+        {!isOpener && data.laboratory && <section className="evo-w40-lab">
+          <div className="evo-w40-lab__top">
+            <span className="evo-w40-lab__label">{data.laboratory.title}</span>
+            <span className="evo-w40-lab__readonly">CONSULTA · SIN CAMBIOS</span>
+          </div>
+          <p className="evo-w40-lab__intro">{data.laboratory.why}</p>
+          <pre className="evo-w40-lab__code"><code>{data.laboratory.code}</code></pre>
+          <p className="evo-w40-lab__readout">{data.laboratory.readout}</p>
+        </section>}
+        <div className="evo-w40-chapter__closing">
+          {isOpener ? <div className="evo-w40-next">
+            <span>EN LA SIGUIENTE PÁGINA</span>
+            <strong>COMPROBAR ANTES DE CONCLUIR</strong>
+            <ArrowRight className="h-5 w-5" />
+          </div> : <aside className="evo-w40-focus">
+            <strong>{data.focus.label}</strong>
+            <p>{data.focus.text}</p>
+          </aside>}
+          {!isOpener && <p className="evo-w40-footnote">{data.footnote}</p>}
         </div>
       </div>
     </Page>
@@ -175,10 +177,7 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
               <p className="font-mono-tech text-[10px] font-black tracking-[0.2em] text-[#60CDFF]">MANIFIESTO EDITORIAL · EVO LABS</p>
               <h2 className="mt-2 font-display text-[38px] font-black uppercase leading-tight text-white">UNA PROMESA:<br/><span className="text-[#60CDFF]">MOSTRAR LAS PRUEBAS</span></h2>
             </div>
-            <figure className="relative h-60 overflow-hidden rounded-xl border border-[#00D2FF]/45">
-              <img src={workbenchImage} className="h-full w-full object-cover" alt="Banco técnico de diagnóstico, ilustración editorial" />
-              <figcaption className="absolute bottom-3 left-4 rounded bg-[#020A16]/80 px-3 py-2 font-mono-tech text-[10px] font-semibold text-[#D0EDFF]">FIGURA EDITORIAL · INVESTIGACIÓN, MEDICIÓN Y REPRODUCIBILIDAD</figcaption>
-            </figure>
+            <Tomo02WindowsEditorialArt kind="night" variant="wide" caption="WINDOWS EN SEGUNDO PLANO · SERVICIOS, PROCESOS Y TAREAS" />
             <div className="grid grid-cols-2 gap-5 font-sans-editorial text-[13px] leading-relaxed text-[#E2ECF4]">
               <div className="space-y-3">
                 <p>El título tiene que despertar curiosidad; el capítulo debe entregar todavía más. Una revista tecnológica que promete descubrir el interior de Windows no puede limitarse a tres comandos y una conclusión apresurada.</p>
@@ -231,7 +230,10 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
           </Page>;
         })}
 
-        {EVO_WINDOWS40_001.map((data, i) => <ChapterPage key={i} data={data} index={i}/>)}
+        {EVO_WINDOWS40_001.flatMap((data, i) => [
+          <ChapterPage key={i+'-opener'} data={data} index={i} part={0}/>,
+          <ChapterPage key={i+'-continuation'} data={data} index={i} part={1}/>
+        ])}
 
         <Page number={TOTAL_PAGES} title="CIERRE EDITORIAL" final>
           <div className="flex h-full flex-col gap-5">
@@ -239,11 +241,7 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
               <p className="font-mono-tech text-[11px] font-black tracking-wider text-[#60CDFF]">CIERRE · EXPEDIENTE 001</p>
               <h2 className="mt-2 font-display text-[40px] font-black uppercase leading-tight text-white">EL PRÓXIMO<br/><span className="text-[#60CDFF]">MISTERIO TE ESPERA</span></h2>
             </div>
-            <figure className="relative h-64 overflow-hidden rounded-xl border border-[#00D2FF]/40">
-              <img src={siliconImage} alt="Ilustración técnica editorial de circuito y silicio" className="h-full w-full object-cover" loading="lazy" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#041122] to-transparent" />
-              <figcaption className="absolute bottom-4 left-4 font-mono-tech text-[11px] font-black text-white">SIGUIENTE EXPEDIENTE · PROCESOS INVISIBLES</figcaption>
-            </figure>
+            <Tomo02WindowsEditorialArt kind="security" variant="wide" caption="PRÓXIMO EXPEDIENTE · PROCESOS Y PRIVILEGIOS DE WINDOWS" />
             <div className="rounded-2xl border border-[#00D2FF]/40 bg-[#0B2844] p-5">
               <h3 className="font-display text-2xl font-black text-white">002 · TU PC EJECUTA DECENAS DE PROCESOS</h3>
               <p className="mt-2 text-[13px] leading-relaxed text-[#D9ECF9]">¿Qué está haciendo realmente cada uno? El próximo expediente deberá desmontar errores de interpretación de CPU, RAM, hilos, servicios y procesos de usuario; documentará procedimientos que cualquiera pueda reproducir sin romper Windows.</p>
