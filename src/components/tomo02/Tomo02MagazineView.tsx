@@ -839,6 +839,7 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
     return <Tomo02MagazineEstrella
       onBack={() => { setSubView('cover'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
       onOpenInteractive={() => { setSubView('index'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+      onOpenSector={handleOpenOriginalSector}
     />;
   }
 
