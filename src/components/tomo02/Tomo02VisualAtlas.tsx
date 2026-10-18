@@ -153,3 +153,44 @@ export const Tomo02VisualAtlas: React.FC<Tomo02VisualAtlasProps> = ({
     </section>
   );
 };
+
+/**
+ * Apertura fotográfica común para los sectores avanzados de la Biblia Virtual.
+ * El sector mantiene su título y contenido original; solo se añade contexto visual.
+ */
+export const Tomo02SectorVisualHero: React.FC<{
+  number: string;
+  title: string;
+  subtitle: string;
+}> = ({ number, title, subtitle }) => {
+  const n = Number(number);
+  const level = WINDOWS_ATLAS[Math.max(0, Math.min(4, Math.floor((Number.isFinite(n) ? n : 0) / 8)))];
+
+  return (
+    <figure className="relative isolate mb-5 min-h-48 overflow-hidden rounded-[22px] border border-[#00D2FF]/40 bg-[#051321] shadow-[0_18px_45px_rgba(0,0,0,0.45)] sm:min-h-56">
+      <img
+        src={level.image}
+        alt={level.alt}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover saturate-[0.75]"
+      />
+      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-[#030912] via-[#041324]/95 to-[#041324]/40" />
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#0078D4] via-[#00D2FF] to-[#60CDFF]" />
+      <div className="relative z-10 flex min-h-48 max-w-2xl flex-col justify-between p-5 sm:min-h-56 sm:p-7">
+        <div className="flex flex-wrap items-center gap-2 font-mono-tech text-[10px] font-black uppercase tracking-[0.13em] text-[#8CDEFF]">
+          <span className="rounded border border-[#60CDFF]/45 bg-[#0067C0]/35 px-2 py-1">SECTOR {number}</span>
+          <span>NIVEL {level.number} · {level.range}</span>
+          <span className="text-zinc-400">EVO LABS // BIBLIA VIRTUAL</span>
+        </div>
+        <div className="space-y-2">
+          <h2 className="font-display text-2xl font-black uppercase leading-tight tracking-tight text-white sm:text-3xl">{title}</h2>
+          <p className="max-w-xl font-sans-editorial text-xs leading-relaxed text-[#D7E9F5] sm:text-sm">{subtitle}</p>
+          <figcaption className="pt-1 font-mono-tech text-[9px] uppercase tracking-wide text-[#95B5C8]">
+            Imagen editorial conceptual · No corresponde a una medición ni a una captura del equipo
+          </figcaption>
+        </div>
+      </div>
+    </figure>
+  );
+};
