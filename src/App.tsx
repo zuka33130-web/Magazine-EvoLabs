@@ -915,7 +915,7 @@ function AppContent({
           activityType: 'lectura',
           whatIs: 'Tomo 02: La Biblia Negra de Windows. El lado oscuro del sistema operativo.',
           whatFor: 'Comprender el kernel, registros, telemetría, servicios ocultos y auditoría de Windows.',
-          currentAction: 'Explorá el Magazine Estrella con 200 títulos y guías prácticas en desarrollo continuo, o continuá a los sectores de la Biblia Virtual.',
+          currentAction: 'Ingresá a la Biblia Virtual del Tomo 02 y explorá sus 40 sectores, del 00 al 39.',
           whyItMatters: 'Dominar Windows a nivel pericial te permite detectar cuellos de botella y fallas invisibles.',
           nextStep: 'Accedé al Laboratorio Virtual Guiado de Windows (Matrix Lab).',
         });
