@@ -29,6 +29,7 @@ const batches = [
   file('src/data/tomo02MagazineRepairB.ts'),
 ];
 const view = file('src/components/tomo02/Tomo02MagazineEstrella.tsx');
+const visual = file('src/components/tomo02/MagazineArticleHero.tsx');
 const wrapper = file('src/components/tomo02/Tomo02MagazineView.tsx');
 const cover = file('src/components/tomo02/Tomo02Cover.tsx');
 const bridge = file('src/data/tomo02MagazineSectorBridge.ts');
@@ -99,7 +100,12 @@ for (const article of written) {
   assert(article.steps.every(s => !s.code || !forbidden.test(s.code)), 'Sin comandos de cambio destructivo: ' + article.id);
 }
 assert(['...EVO_MAGAZINE_FIRST_BATCH','...EVO_MAGAZINE_SECOND_BATCH','...EVO_MAGAZINE_THIRD_BATCH','...EVO_MAGAZINE_PRIVACY_A','...EVO_MAGAZINE_PRIVACY_B','...EVO_MAGAZINE_SECURITY_A','...EVO_MAGAZINE_SECURITY_B','...EVO_MAGAZINE_WINDOWS_A','...EVO_MAGAZINE_WINDOWS_B','...EVO_MAGAZINE_NETWORK_A','...EVO_MAGAZINE_NETWORK_B','...EVO_MAGAZINE_GAMING_A','...EVO_MAGAZINE_GAMING_B','...EVO_MAGAZINE_REPAIR_A','...EVO_MAGAZINE_REPAIR_B'].every(term=>view.includes(term)), 'El lector importa los quince bloques de guías');
-assert(view.includes('ARTICLES.map(renderGuide)') && view.includes('@page{size:A4'), 'La impresión A4 incluye todas las guías');
+assert(view.includes('ARTICLES.map(a => renderGuide(a, true))') && view.includes('@page{size:A4'), 'La impresión A4 incluye todas las guías sin cargar los gráficos interactivos');
+assert(view.includes('<MagazineArticleHero id={a.id}') && view.includes('magazineArtDirection(item.id)'), 'El lector integra diagramas interiores y tarjetas editoriales tematizadas');
+assert(['Visual001','Visual002','Visual003','Visual004','Visual005','Visual006','Visual007','Visual008','Visual009','Visual010'].every(name => visual.includes('function '+name+'()')), 'Las diez primeras investigaciones tienen diez diagramas originales independientes');
+assert(visual.includes('if(id===10)return <Visual010/>') && visual.includes('return <div className="relative grid'), 'El catálogo restante conserva un diseño visual adaptativo');
+assert(visual.includes('Visual conceptual · sin datos del equipo') && visual.includes('no representan mediciones reales'), 'La escenografía didáctica se distingue de la telemetría real');
+assert(view.includes('!printOnly && <MagazineArticleHero'), 'La exportación evita renderizar 200 diagramas complejos');
 assert(view.includes('reviewedCount') && view.includes('evo_magazine02_reviewed_v1'), 'Existe seguimiento local explícitamente no certificado');
 assert(view.includes('evo_magazine02_notes_v1') && view.includes('onBlur={e=>saveNote'), 'Cada guía ofrece notas locales para registrar resultados');
 assert(view.includes('navigator.clipboard.writeText') && view.includes('Copiar comando'), 'Los comandos pueden copiarse desde el lector');
