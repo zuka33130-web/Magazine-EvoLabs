@@ -279,6 +279,8 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
             <li><a className="underline text-cyan-300" href="https://learn.microsoft.com/en-us/sysinternals/downloads/autoruns" target="_blank" rel="noopener noreferrer">Microsoft Sysinternals · Autoruns y ubicaciones de inicio</a></li>
             <li><a className="underline text-cyan-300" href="https://learn.microsoft.com/en-us/windows/win32/setupapi/run-and-runonce-registry-keys" target="_blank" rel="noopener noreferrer">Microsoft · Run y RunOnce en el Registro</a></li>
             <li><a className="underline text-cyan-300" href="https://learn.microsoft.com/en-us/troubleshoot/windows-client/performance/introduction-to-the-page-file" target="_blank" rel="noopener noreferrer">Microsoft · Archivo de paginación y memoria comprometida</a></li>
+            <li><a className="underline text-cyan-300" href="https://support.microsoft.com/es-es/windows/privacy/diagnostics-feedback-and-privacy-in-windows" target="_blank" rel="noopener noreferrer">Microsoft · Qué datos diagnósticos recopila Windows</a></li>
+            <li><a className="underline text-cyan-300" href="https://support.microsoft.com/en-us/windows/privacy/windows-camera-microphone-and-privacy" target="_blank" rel="noopener noreferrer">Microsoft · Permisos de cámara y micrófono</a></li>
             <li><a className="underline text-cyan-300" href="https://learn.microsoft.com/es-es/windows-hardware/manufacture/desktop/dism-operating-system-package-servicing-command-line-options?view=windows-11" target="_blank" rel="noopener noreferrer">Microsoft · Comprobaciones de DISM y WinSxS</a></li>
           </ul>
         </aside>
