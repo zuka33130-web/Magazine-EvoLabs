@@ -10,12 +10,8 @@ import { VolumeItem } from '../../types';
 import { HorizontalCollection } from '../HorizontalCollection';
 
 interface Tomo02CoverProps {
-  onOpenMagazine: () => void;
   onOpenInteractive: () => void;
-  onOpenSector00?: () => void;
-  onOpenSector01?: () => void;
   onOpenLab: () => void;
-  onOpenA4WebVersion?: () => void;
   onBackToApp?: () => void;
   onNavigateTomo?: (tomo: '01' | '02' | '03' | '04' | '08') => void;
   completedModulesCount?: number;
@@ -23,12 +19,8 @@ interface Tomo02CoverProps {
 }
 
 export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
-  onOpenMagazine,
   onOpenInteractive,
-  onOpenSector00,
-  onOpenSector01,
   onOpenLab,
-  onOpenA4WebVersion,
   onBackToApp,
   onNavigateTomo,
   completedModulesCount = 0,
@@ -160,46 +152,16 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
               </div>
             </div>
 
-            {/* Action Buttons: 1 Dominant Action + max 2 Secondary Actions */}
+            {/* Una sola entrada a los 40 sectores de la Biblia Virtual (00–39). */}
             <div className="pt-2 flex flex-wrap items-center gap-3">
-              {/* Magazine estrella: puerta de entrada para lectores principiantes. */}
               <button
-                id="btn-magazine-estrella-tomo02"
-                type="button"
-                onClick={onOpenMagazine}
-                className="inline-flex items-center gap-3 px-7 py-4 rounded-xl font-mono-tech font-black text-xs sm:text-sm tracking-wider uppercase bg-cyan-400 hover:bg-cyan-300 text-zinc-950 transition-colors cursor-pointer shadow-lg shadow-cyan-400/20"
-              >
-                <span>MAGAZINE ESTRELLA · 200 INVESTIGACIONES →</span>
-              </button>
-              {/* LECTOR CANÓNICO: SECTOR 01 ANTES DEL LOGO */}
-              <button
-                id="btn-abrir-sector01-tomo02"
-                type="button"
-                onClick={onOpenSector01 || onOpenInteractive}
-                className="inline-flex items-center gap-3 px-7 py-4 rounded-xl font-mono-tech font-bold text-xs sm:text-sm tracking-wider uppercase bg-gradient-to-r from-[#0078D4] to-[#00A4EF] hover:from-[#0067C0] hover:to-[#60CDFF] text-white transition-all duration-200 cursor-pointer shadow-[0_0_24px_rgba(0,164,239,0.30)] hover:shadow-[0_0_30px_rgba(0,164,239,0.45)] group"
-              >
-                <span>SECTOR 01 // ANTES DEL LOGO (ACTIVO)</span>
-                <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
-              </button>
-
-              {/* ACCIÓN SECTOR 00 */}
-              <button
-                id="btn-abrir-sector00-tomo02"
-                type="button"
-                onClick={onOpenSector00 || onOpenInteractive}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-[#11161D] hover:bg-[#151B23] text-[#60CDFF] border border-[#00A4EF]/40 transition-all duration-200 cursor-pointer shadow-md"
-              >
-                <span>SECTOR 00 // DÍA CERO</span>
-              </button>
-
-              {/* ACCIÓN: ÍNDICE MAESTRO CANÓNICO 00-39 */}
-              <button
-                id="btn-abrir-tomo-interactivo-tomo02"
+                id="btn-abrir-biblia-virtual-tomo02"
                 type="button"
                 onClick={onOpenInteractive}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-[#080B10] hover:bg-[#11161D] text-zinc-300 hover:text-white border border-sky-500/20 transition-all duration-200 cursor-pointer"
+                className="inline-flex items-center gap-3 px-7 py-4 rounded-xl font-mono-tech font-black text-xs sm:text-sm tracking-wider uppercase bg-gradient-to-r from-[#0078D4] to-[#00A4EF] hover:from-[#0067C0] hover:to-[#60CDFF] text-white transition-all duration-200 cursor-pointer shadow-[0_0_24px_rgba(0,164,239,0.30)] group"
               >
-                <span>ÍNDICE CANÓNICO 00–39</span>
+                <span>ENTRAR A LA BIBLIA VIRTUAL · SECTORES 00–39</span>
+                <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>
