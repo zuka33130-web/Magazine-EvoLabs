@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, FileText, Printer, ShieldCheck } from 'lucide-react';
 import { Tomo02MasterPage } from './Tomo02MasterPage';
+import './Tomo02Magazine40.css';
 import { EVO_WINDOWS_40_ARTICLES, EVO_WINDOWS_40_SECTIONS } from '../../data/tomo02Magazine40';
 import { EVO_WINDOWS40_001, EVO_WINDOWS40_001_REFERENCES, type Windows40Page } from '../../data/tomo02Magazine40Chapter001';
 import { Tomo02WindowsEditorialArt, type WindowsArtKind } from './Tomo02WindowsEditorialArt';
@@ -92,7 +93,7 @@ const ChapterPage: React.FC<{data: Windows40Page; index: number; part: 0 | 1}> =
         <div className="evo-w40-chapter__columns">
           {paras.map((paragraph,i)=><p key={i} className={isOpener&&i===0?'evo-w40-dropcap':''}>{paragraph}</p>)}
         </div>
-        {!isOpener && <Diagram mode={data.visual || art === 'security'?'verdict':'flow'} />}
+        {!isOpener && <Diagram mode={data.visual ?? 'flow'} />}
         {!isOpener && data.laboratory && <section className="evo-w40-lab">
           <div className="evo-w40-lab__top">
             <span className="evo-w40-lab__label">{data.laboratory.title}</span>
