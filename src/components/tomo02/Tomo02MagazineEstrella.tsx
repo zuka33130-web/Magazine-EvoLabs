@@ -118,6 +118,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
   };
   const [section, setSection] = useState(0);
   const [mobileLibraryOpen, setMobileLibraryOpen] = useState(false);
+  const [printReady, setPrintReady] = useState(false);
   const selected = dictionary.get(current) || ARTICLES[0];
   const reviewedCount = ARTICLES.filter(a => reviewed[a.id]).length;
   const markReviewed = () => {
@@ -143,10 +144,24 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
   const currentGroup = EVO_MAGAZINE_GROUPS.find(g => selected.id >= g.start && selected.id <= g.end);
   const progressPercent = Math.round((reviewedCount / ARTICLES.length) * 100);
   useEffect(()=>{
-    if(new URLSearchParams(window.location.search).get('print')!=='true') return;
-    const handle=window.setTimeout(()=>{document.title='EVO-LABS-TOMO-02-MAGAZINE-ESTRELLA';window.print();},900);
-    return ()=>window.clearTimeout(handle);
+    if(new URLSearchParams(window.location.search).get('print')==='true') setPrintReady(true);
   },[]);
+  useEffect(()=>{
+    if(!printReady) return;
+    const oldTitle=document.title;
+    const afterPrint=()=>setPrintReady(false);
+    window.addEventListener('afterprint',afterPrint);
+    // Let React finish mounting all 200 print-only articles before invoking print.
+    const timer=window.setTimeout(()=>{
+      document.title='EVO-LABS-TOMO-02-MAGAZINE-ESTRELLA';
+      window.print();
+    },900);
+    return ()=>{
+      window.clearTimeout(timer);
+      document.title=oldTitle;
+      window.removeEventListener('afterprint',afterPrint);
+    };
+  },[printReady]);
   const renderGuide=(a:Article, printOnly = false)=>{
     const direction=magazineArtDirection(a.id);
     return (
@@ -254,7 +269,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
         </div>
         <div className="evo-nav-actions">
           <button type="button" onClick={onOpenInteractive} className="evo-nav-secondary">Biblia Virtual ↗</button>
-          <button type="button" onClick={()=>window.print()} className="evo-nav-primary">↓ <span className="hidden sm:inline">Guardar</span> PDF A4</button>
+          <button type="button" onClick={()=>printReady ? window.print() : setPrintReady(true)} className="evo-nav-primary">↓ <span className="hidden sm:inline">{printReady ? "Imprimir" : "Guardar"}</span> PDF A4</button>
         </div>
       </nav>
       <main className="evo-mag-layout mx-auto pb-20">
@@ -371,7 +386,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
         </section>
         <section className="evo-print-only hidden">
           <h2 className="text-2xl font-black text-zinc-900">Guías completas de esta primera entrega</h2>
-          {ARTICLES.map(a => renderGuide(a, true))}
+          {printReady && ARTICLES.map(a => renderGuide(a, true))}
         </section>
         <section aria-labelledby="bibliavirtual-index" className="py-10 border-t border-zinc-700">
           <h2 id="bibliavirtual-index" className="text-2xl font-black mb-2">Índice original completo de la Biblia Virtual</h2>
