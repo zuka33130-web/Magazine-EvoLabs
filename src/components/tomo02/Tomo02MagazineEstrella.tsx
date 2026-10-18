@@ -117,6 +117,21 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
     }
   };
   const [section, setSection] = useState(0);
+  const [readingFilter, setReadingFilter] = useState<'all'|'unread'|'reviewed'>('all');
+  // Marks that a step has been read/reviewed; no code is run from these buttons.
+  const [reviewedSteps, setReviewedSteps] = useState<Record<string, boolean>>(() => {
+    try { return JSON.parse(localStorage.getItem('evo_magazine02_steps_v1') || '{}'); }
+    catch { return {}; }
+  });
+  const toggleReviewedStep = (articleId:number, stepIndex:number) => {
+    const key = articleId + ':' + stepIndex;
+    setReviewedSteps(previous => {
+      const next = { ...previous, [key]: !previous[key] };
+      try { localStorage.setItem('evo_magazine02_steps_v1', JSON.stringify(next)); }
+      catch { /* Remains available during this browser session. */ }
+      return next;
+    });
+  };
   const [mobileLibraryOpen, setMobileLibraryOpen] = useState(false);
   const [printReady, setPrintReady] = useState(false);
   const selected = dictionary.get(current) || ARTICLES[0];
@@ -136,6 +151,8 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
   };
   const visible = EVO_MAGAZINE_200_TITLES.map((title,i)=>({ title, id:i+1 })).filter(item=>{
     if (query && !item.title.toLocaleLowerCase('es').includes(query.toLocaleLowerCase('es'))) return false;
+    if (readingFilter === 'reviewed' && !reviewed[item.id]) return false;
+    if (readingFilter === 'unread' && reviewed[item.id]) return false;
     if (!section) return true;
     const g=EVO_MAGAZINE_GROUPS[section-1];
     return item.id>=g.start && item.id<=g.end;
@@ -164,15 +181,20 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
   },[printReady]);
   const renderGuide=(a:Article, printOnly = false)=>{
     const direction=magazineArtDirection(a.id);
+    const stepCount = a.steps.filter((_,i) => reviewedSteps[a.id+':'+i]).length;
     return (
-    <article key={a.id} className="evo-guide evo-mag-article mb-7 overflow-hidden">
+    <article key={a.id} className="evo-guide evo-mag-article mb-7 overflow-hidden" style={{'--ev-topic': direction.accent, '--ev-topic-soft': direction.secondary} as React.CSSProperties}>
       {!printOnly && <MagazineArticleHero id={a.id} title={EVO_MAGAZINE_200_TITLES[a.id-1]} steps={a.steps.map(step=>step.title)}/>}
       <header className="evo-print-only hidden">
         <p className="text-xs font-black text-cyan-800 uppercase tracking-widest">Investigación {number(a.id)} · EVO LABS</p>
         <h2 className="text-2xl font-black mt-2">{EVO_MAGAZINE_200_TITLES[a.id-1]}</h2>
       </header>
       <div className="evo-mag-body px-5 sm:px-8 py-6 sm:py-8">
-        <div className="grid lg:grid-cols-[1.05fr_.95fr] gap-3 items-stretch">
+        {!printOnly && <div className="evo-storyline" aria-label="Recorrido de la investigación">
+          <div className="evo-storyline-overview"><span className="evo-storyline-eyebrow">DOSSIER {number(a.id)} / MÉTODO EVO</span><strong>De la pregunta a la evidencia</strong></div>
+          <div className="evo-storyline-method"><span>01. ENTENDER</span><span>02. EXPERIMENTAR</span><span>03. CONCLUIR</span></div>
+        </div>}
+        <div className="evo-opening-columns grid lg:grid-cols-[1.05fr_.95fr] gap-3 items-stretch">
           <section className="evo-lesson-intro p-5 sm:p-6 rounded-2xl bg-white border border-zinc-200">
             <div className="evo-mag-label flex items-center gap-2 text-[11px] font-black tracking-[.18em] uppercase mb-3" style={{color:direction.accent}}>
               <span className="inline-block h-2 w-2 rounded-full" style={{background:direction.accent}}/>
@@ -188,16 +210,29 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
         <div className="evo-lab-heading mt-7 flex items-center gap-4 border-b-[3px] border-zinc-900 pb-3">
           <span className="evo-lab-stamp bg-zinc-900 text-white rounded-md px-3 py-2 font-black text-sm">LAB</span>
           <h3 className="font-black text-xl sm:text-2xl tracking-tight">Probalo en tu computadora</h3>
-          <span className="ml-auto hidden sm:block uppercase text-[10px] tracking-widest text-zinc-500 font-bold">Pasos comprobables</span>
+          <span className="evo-lab-heading-meta ml-auto hidden sm:block uppercase text-[10px] tracking-widest text-zinc-500 font-bold">{a.steps.length} ETAPAS · LECTURA GUIADA</span>
         </div>
-        <div className="mt-4 space-y-3">
+        {!printOnly && <div className="evo-step-journey">
+          <div className="evo-journey-status"><span>RECORRIDO DE LABORATORIO</span><strong>{stepCount} / {a.steps.length} pasos revisados</strong></div>
+          <div className="evo-journey-track" role="progressbar" aria-label="Pasos revisados de esta investigación" aria-valuenow={stepCount} aria-valuemin={0} aria-valuemax={a.steps.length}><span style={{width:(stepCount/a.steps.length*100)+'%'}}/></div>
+          <nav aria-label="Ir a una etapa" className="evo-journey-links">
+            {a.steps.map((step,i)=><button type="button" key={i} onClick={()=>document.getElementById('evo-step-'+a.id+'-'+i)?.scrollIntoView({behavior:'smooth',block:'start'})} className={'evo-journey-link'+(reviewedSteps[a.id+':'+i]?' is-reviewed':'')}>
+              <span>{String(i+1).padStart(2,'0')}</span>{step.title}
+            </button>)}
+          </nav>
+        </div>}
+        <div className="evo-step-series mt-4 space-y-3">
           {a.steps.map((step,i)=>(
-            <section className="evo-step relative grid sm:grid-cols-[48px_minmax(0,1fr)] gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl border border-zinc-200 bg-white" key={i}>
+            <section id={'evo-step-'+a.id+'-'+i} className={'evo-step relative grid sm:grid-cols-[48px_minmax(0,1fr)] gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl border border-zinc-200 bg-white'+(reviewedSteps[a.id+':'+i]&&!printOnly?' is-reviewed':'')} key={i}>
               <div className="flex items-start">
                 <span className="evo-step-number inline-flex h-11 w-11 shrink-0 rounded-xl items-center justify-center text-xl font-black text-white" style={{background:direction.dark}}>{String(i+1).padStart(2,'0')}</span>
               </div>
               <div className="min-w-0">
-                <h4 className="font-black text-[17px] sm:text-lg leading-snug">{step.title}</h4>
+                <div className="evo-step-title-row"><h4 className="font-black text-[17px] sm:text-lg leading-snug">{step.title}</h4>
+                  {!printOnly && <button type="button" aria-pressed={Boolean(reviewedSteps[a.id+':'+i])} onClick={()=>toggleReviewedStep(a.id,i)} className="evo-step-review">
+                    {reviewedSteps[a.id+':'+i] ? '✓ REVISADO' : 'MARCAR REVISADO'}
+                  </button>}
+                </div>
                 <p className="evo-step-explain mt-2 text-[14px] leading-relaxed text-zinc-700">{step.why}</p>
                 {step.code && <div className="mt-4 rounded-xl overflow-hidden border border-[#26394a]">
                   <div className="evo-code-toolbar evo-no-print bg-[#1d2a38] px-4 py-2 text-[#d1deeb] flex items-center justify-between gap-3">
@@ -215,7 +250,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
             </section>
           ))}
         </div>
-        <div className="mt-5 grid md:grid-cols-2 gap-3">
+        <div className="evo-editorial-asides mt-5 grid md:grid-cols-2 gap-3">
           <aside className="evo-tip rounded-2xl border border-[#b9e8d6] bg-[#edf9f2] p-5">
             <p className="text-[11px] font-black uppercase tracking-wider text-emerald-800 mb-2">✦ TRUCO EVO · PARA INVESTIGAR MEJOR</p>
             <p className="text-[14px] leading-relaxed">{a.tip}</p>
@@ -226,6 +261,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
           </aside>
         </div>
         <section className="evo-challenge mt-4 rounded-2xl p-5 sm:p-6 text-white" style={{backgroundColor:direction.dark}}>
+          <span className="evo-challenge-watermark" aria-hidden="true">?</span>
           <div className="flex flex-wrap justify-between gap-2 mb-3">
             <span className="text-[11px] uppercase font-black tracking-[.17em]" style={{color:direction.secondary}}>03 · DESAFÍO DEL INVESTIGADOR</span>
             <span className="text-[10px] font-mono text-white/65">EVIDENCIA → CONCLUSIÓN</span>
@@ -312,6 +348,11 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
               </button>
             </div>
             <div className="evo-mag-sidebar-body" id="evo-mag-sidebar-body">
+              <div className="evo-rail-view-filters" role="group" aria-label="Filtrar por lectura">
+                <button type="button" className={readingFilter==='all'?'is-active':''} aria-pressed={readingFilter==='all'} onClick={()=>setReadingFilter('all')}>TODAS</button>
+                <button type="button" className={readingFilter==='unread'?'is-active':''} aria-pressed={readingFilter==='unread'} onClick={()=>setReadingFilter('unread')}>PENDIENTES</button>
+                <button type="button" className={readingFilter==='reviewed'?'is-active':''} aria-pressed={readingFilter==='reviewed'} onClick={()=>setReadingFilter('reviewed')}>REVISADAS</button>
+              </div>
               <div className="evo-mag-progress">
                 <div><span>LECTURAS REVISADAS</span><strong>{reviewedCount} <small>/ 200</small></strong></div>
                 <div className="evo-mag-progress-track" role="progressbar" aria-label="Investigaciones revisadas" aria-valuenow={reviewedCount} aria-valuemin={0} aria-valuemax={200}>
@@ -432,7 +473,7 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
           </ul>
         </aside>
         <footer className="evo-mag-footer border-t border-zinc-700 pt-6 text-xs text-zinc-400">
-          EVO LABS · Edición de desarrollo con {ARTICLES.length} guías completas en formato inicial y 200 títulos en catálogo. Antes de realizar una práctica, revisá riesgos, permisos y recuperación. La Biblia Virtual conserva su contenido técnico.
+          EVO LABS · Edición de desarrollo: {ARTICLES.length} guías prácticas introductorias de 200 títulos. Cada resultado debe verificarse en el equipo real. La Biblia Virtual mantiene sus sectores técnicos originales.
         </footer>
       </main>
     </div>
