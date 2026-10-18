@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * EVO LABS Magazine Estrella: content + routing regression.
+ * EVO LABS: archivo de 200 investigaciones + retirada del lector publico.
  * Run: node scripts/evo-magazine-regression.mjs
  *
  * Checks educational publishing criteria without executing PowerShell,
@@ -132,8 +132,8 @@ assert(premiumCSS.includes('.evo-generic-path') && premiumCSS.includes('.evo-rai
 assert(view.includes('reviewedCount') && view.includes('evo_magazine02_reviewed_v1'), 'Existe seguimiento local explícitamente no certificado');
 assert(view.includes('evo_magazine02_notes_v1') && view.includes('onBlur={e=>saveNote'), 'Cada guía ofrece notas locales para registrar resultados');
 assert(view.includes('navigator.clipboard.writeText') && view.includes('Copiar comando'), 'Los comandos pueden copiarse desde el lector');
-assert(wrapper.includes("subView === 'pdf_magazine' || subView === 'a4_magazine'"), 'Las rutas de PDF y A4 van al mismo magazine');
-assert(cover.includes('btn-magazine-estrella-tomo02'), 'El magazine es accesible desde portada');
+assert(!wrapper.includes("from './Tomo02MagazineEstrella'") && !wrapper.includes("subView === 'pdf_magazine' || subView === 'a4_magazine'"), 'El magazine anterior ya no se monta en la vista del Tomo 02');
+assert(cover.includes('btn-abrir-biblia-virtual-tomo02') && !cover.includes('btn-magazine-estrella-tomo02') && !cover.includes('btn-abrir-sector00-tomo02') && !cover.includes('btn-abrir-sector01-tomo02'), 'Una sola entrada pública a la Biblia Virtual desde la portada');
 assert(wrapper.includes("if (subView === 'index')"), 'Se conserva el acceso a la Biblia Virtual');
 const sectorMap = readJSON(bridge, /EVO_MAGAZINE_RELATED_SECTORS: Record<number, readonly string\[\]> = ([\s\S]*);\s*$/, 'Puentes al índice canónico');
 const canonicalNums = [...canon.matchAll(/sectorNumber:\s*'(\d\d)'/g)].map(m => m[1]);
@@ -144,6 +144,6 @@ assert(canonicalSubids.length >= 700 && new Set(canonicalSubids).size === canoni
 assert(canonicalCounts.reduce((a,b)=>a+b,0) === canonicalSubids.length, 'El total canónico concuerda con la suma de investigaciones');
 assert(all.every(item=>Array.isArray(sectorMap[item.id]) && sectorMap[item.id].length && sectorMap[item.id].every(s=>canonicalNums.includes(s))), 'Las 200 guías tienen puentes válidos a la Biblia Virtual');
 assert(view.includes('TOMO_02_MASTER_SECTORS.map') && view.includes('evo-canonical-sector'), 'El PDF A4 contiene apéndice del índice canónico');
-assert(wrapper.includes('onOpenSector={handleOpenOriginalSector}'), 'Los enlaces de investigación abren el sector técnico correspondiente');
+assert(!wrapper.includes('onOpenSector={handleOpenOriginalSector}') && wrapper.includes("return 'index';"), 'Enlaces antiguos del magazine redirigen al índice de la Biblia Virtual');
 
 process.stdout.write('EVO MAGAZINE: ' + passed.length + ' verificaciones OK; 200 títulos, 200 guías, 7 bloques.\n');
