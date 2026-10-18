@@ -1,0 +1,296 @@
+/**
+ * EVO LABS / MAGAZINE ESTRELLA — ESTUDIO EDITORIAL v2
+ * Screen-first magazine art direction. Scoped to Tomo 02 only.
+ * Respects original Bible content, safe labs, and white-ink A4 export.
+ */
+.evo-magazine-star {
+  --ev-studio-night:#080e15;
+  --ev-studio-paper:#111b25;
+  --ev-studio-rule:#3b5464;
+  --ev-studio-mist:#cbdbe5;
+  --ev-studio-focus:#a1e2ee;
+  font-kerning:normal;
+  text-rendering:optimizeLegibility;
+  background:
+    radial-gradient(ellipse at 75% 0%,rgba(27,65,86,.27),transparent 54%),
+    linear-gradient(90deg,transparent calc(50% - .5px),rgba(140,198,220,.04) 50%,transparent calc(50% + .5px)),
+    #080e15;
+}
+.evo-magazine-star .evo-mag-layout {width:min(100%,1810px)!important;max-width:1810px!important;}
+.evo-magazine-star .evo-cover {
+  box-shadow:0 25px 64px #0008!important;
+  border-color:#355366!important;
+}
+.evo-magazine-star .evo-cover-editorial {
+  background:linear-gradient(119deg,#132839 0%,#0d1925 68%,#0a1420 100%)!important;
+}
+.evo-magazine-star .evo-cover .evo-cover-topline {
+  color:#d2e1eb;
+  font-size:11px;
+}
+.evo-magazine-star .evo-cover h1 {
+  font-size:clamp(39px,3.9vw,71px)!important;
+  letter-spacing:-.055em!important;
+  line-height:1.035!important;
+  max-width:1050px!important;
+}
+.evo-magazine-star .evo-cover-deck{font-size:clamp(16px,1.24vw,19px)!important;}
+.evo-magazine-star .evo-cover-system{background:
+  radial-gradient(circle at 50% 37%,#23627eaa 0%,transparent 55%),
+  repeating-linear-gradient(0deg,transparent 0,transparent 19px,#c6faff0b 20px),
+  repeating-linear-gradient(90deg,transparent 0,transparent 19px,#c6faff0b 20px),
+  #091825!important;
+}
+.evo-magazine-star .evo-cover-system .evo-system-core{
+  box-shadow:0 0 0 11px #73d5f008,0 0 54px #3db7d24d,inset 0 0 25px #11334b!important;
+}
+.evo-magazine-star .evo-mag-workspace{grid-template-columns:minmax(275px,345px) minmax(0,1fr)!important;gap:clamp(18px,2.3vw,38px)!important;}
+.evo-magazine-star .evo-mag-sidebar{border:1px solid #38586c!important;border-top:3px solid #9bcfdd!important;background:#0f1c28!important;max-height:calc(100vh - 95px)!important;}
+.evo-magazine-star .evo-mag-sidebar-head{background:#142635;padding:19px 20px!important;}
+.evo-magazine-star .evo-mag-sidebar-head strong{font-size:21px!important;line-height:1.18;}
+.evo-magazine-star .evo-rail-view-filters{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;
+  margin-bottom:14px;border:1px solid #355165;padding:3px;background:#0c1722;
+}
+.evo-magazine-star .evo-rail-view-filters button{
+  min-height:37px;color:#acc4d4;border:1px solid transparent;
+  background:transparent;letter-spacing:.035em;font:850 10px/1.3 var(--ev-mono);
+}
+.evo-magazine-star .evo-rail-view-filters button.is-active{
+  color:#09212e;background:#a8d9e4;border-color:#afddeb;
+}
+.evo-magazine-star .evo-rail-view-filters button:hover:not(.is-active){background:#1c3546;color:#edf9ff;}
+.evo-magazine-star .evo-rail-item{grid-template-columns:40px minmax(0,1fr) 18px;gap:12px;padding:15px 10px 15px 13px!important;}
+.evo-magazine-star .evo-rail-item:hover{background:#1a3549!important;}
+.evo-magazine-star .evo-rail-item.is-active{
+  background:linear-gradient(100deg,color-mix(in srgb,var(--theme-accent,#80cadf) 16%,#0f2637),#182a39)!important;
+  border-left-width:4px!important;
+}
+.evo-magazine-star .evo-rail-item-text{font-size:13px!important;line-height:1.52!important;letter-spacing:.003em;}
+.evo-magazine-star .evo-rail-number{font-size:16px!important;color:#a9deed!important;}
+.evo-magazine-star .evo-rail-search,.evo-magazine-star .evo-rail-filter{font-size:14px!important;min-height:47px!important;}
+.evo-magazine-star .evo-mag-reader{min-width:0;}
+.evo-magazine-star .evo-reader-heading{padding:8px 0 16px!important;border-bottom:1px solid #456073!important;}
+.evo-magazine-star .evo-reader-breadcrumb{font-size:11px!important;}
+.evo-magazine-star .evo-reader-pager button{min-height:42px!important;font-size:13px!important;}
+.evo-magazine-star .evo-mag-article{
+  background:#101a25!important;
+  border:1px solid #385467!important;
+  box-shadow:0 20px 60px #0008!important;
+  border-radius:3px!important;
+  overflow:hidden;
+}
+.evo-magazine-star .evo-mag-article .evo-article-hero{
+  border-radius:0!important;
+  border-bottom:1px solid #3d6076;
+  box-shadow:inset 0 -5px 0 0 color-mix(in srgb,var(--ev-topic,#69c2d6) 55%,transparent);
+}
+.evo-magazine-star .evo-mag-article .evo-article-hero > div:first-child{
+  padding:clamp(25px,3.25vw,55px)!important;
+  background:
+    linear-gradient(110deg,color-mix(in srgb,var(--ev-topic,#66bedb) 11%,transparent),transparent 55%),
+    repeating-linear-gradient(110deg,transparent 0,transparent 50px,#ffffff05 52px);
+}
+.evo-magazine-star .evo-mag-article .evo-article-hero h2{
+  font-size:clamp(33px,3.15vw,55px)!important;
+  line-height:1.08!important;
+  font-weight:950!important;
+  letter-spacing:-.05em!important;
+  max-width:1080px!important;
+}
+.evo-magazine-star .evo-mag-article .evo-article-hero .evo-hero-diagram{
+  background:linear-gradient(120deg,#0b1926,#11283b)!important;
+  border-top:1px solid #39586b;
+  padding:clamp(19px,2.8vw,34px)!important;
+}
+.evo-magazine-star .evo-mag-body {
+  background:#0f1924!important;
+  padding:clamp(22px,3.2vw,48px)!important;
+}
+.evo-magazine-star .evo-storyline{
+  display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;
+  gap:15px 25px;border-bottom:1px solid #426176;
+  padding-bottom:20px;margin-bottom:23px;
+}
+.evo-magazine-star .evo-storyline-overview{display:flex;flex-direction:column;gap:4px;}
+.evo-magazine-star .evo-storyline-eyebrow{
+  font:850 10px/1.4 var(--ev-mono);letter-spacing:.19em;
+  color:var(--ev-topic-soft,#9cdcf4);
+}
+.evo-magazine-star .evo-storyline-overview strong{
+  font:900 clamp(20px,2vw,29px)/1.19 var(--ev-display);
+  letter-spacing:-.045em;color:#f5faff;
+}
+.evo-magazine-star .evo-storyline-method{
+  display:flex;gap:8px;flex-wrap:wrap;
+  font:800 10px/1.3 var(--ev-mono);letter-spacing:.07em;color:#a9c9d9;
+}
+.evo-magazine-star .evo-storyline-method span{border:1px solid #395970;padding:7px 9px;background:#152636;}
+.evo-magazine-star .evo-opening-columns{
+  display:grid;
+  grid-template-columns:minmax(0,1.28fr) minmax(0,.72fr);
+  gap:0!important;
+  border:1px solid #49677a;
+  background:#172938;
+}
+.evo-magazine-star .evo-lesson-intro,
+.evo-magazine-star .evo-lesson-intro:first-child,
+.evo-magazine-star .evo-lesson-intro:nth-child(2){
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  min-height:0!important;
+  padding:clamp(23px,2.7vw,41px)!important;
+}
+.evo-magazine-star .evo-lesson-intro:first-child{
+  background:linear-gradient(125deg,color-mix(in srgb,var(--ev-topic,#68bdd7) 13%,#1a3041),#152838)!important;
+  border-left:5px solid var(--ev-topic,#70c8de)!important;
+}
+.evo-magazine-star .evo-lesson-intro:nth-child(2){
+  border-left:1px solid #405e74!important;
+  background:#142432!important;
+}
+.evo-magazine-star .evo-lesson-intro .evo-mag-label{font-size:11px!important;color:var(--ev-topic-soft,#94e5f5)!important;letter-spacing:.12em!important;}
+.evo-magazine-star .evo-lesson-intro:nth-child(2) .evo-mag-label{color:#afc8da!important;}
+.evo-magazine-star .evo-lesson-intro:first-child p{font:850 clamp(20px,1.64vw,27px)/1.46 var(--ev-text)!important;letter-spacing:-.025em;}
+.evo-magazine-star .evo-lesson-intro:nth-child(2) p{font-size:16px!important;line-height:1.78!important;}
+.evo-magazine-star .evo-lab-heading{gap:18px!important;margin-top:34px!important;}
+.evo-magazine-star .evo-lab-heading h3{font-size:clamp(26px,2.4vw,37px)!important;}
+.evo-magazine-star .evo-lab-heading-meta{color:#a4c0d2!important;font:750 11px/1.3 var(--ev-mono)!important;}
+.evo-magazine-star .evo-lab-stamp{background:var(--ev-topic,#74cbdc)!important;color:#071a27!important;font-size:13px!important;border:0!important;padding:10px 14px!important;}
+.evo-magazine-star .evo-step-journey{
+  padding:18px 20px 20px;background:#122331;
+  border:1px solid #3b596e;margin-top:13px;margin-bottom:24px;
+}
+.evo-magazine-star .evo-journey-status{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:10px;}
+.evo-magazine-star .evo-journey-status span{color:#a7c5d6;font:800 11px/1.3 var(--ev-mono);letter-spacing:.11em;}
+.evo-magazine-star .evo-journey-status strong{font:850 12px/1.4 var(--ev-text);color:#e9faff;}
+.evo-magazine-star .evo-journey-track{width:100%;height:5px;background:#335267;overflow:hidden;margin:13px 0 17px;}
+.evo-magazine-star .evo-journey-track>span{display:block;height:100%;background:var(--ev-topic,#72d0d9);transition:width .2s ease;}
+.evo-magazine-star .evo-journey-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:7px;}
+.evo-magazine-star .evo-journey-link{
+  min-width:0;display:flex;align-items:center;gap:10px;text-align:left;
+  border:1px solid #3b596d;color:#d0e2ed;background:#192d3e;
+  font:700 12px/1.4 var(--ev-text);padding:10px 12px;min-height:49px;
+}
+.evo-magazine-star .evo-journey-link span{flex:none;font:900 17px/1.3 var(--ev-mono);color:#98e0e9;}
+.evo-magazine-star .evo-journey-link:hover,.evo-magazine-star .evo-journey-link.is-reviewed{border-color:var(--ev-topic,#79d9e8);background:#203a4c;}
+.evo-magazine-star .evo-step-series{position:relative;margin-top:0;}
+.evo-magazine-star .evo-step-series:before{
+  content:"";position:absolute;top:28px;bottom:32px;left:52px;width:1px;
+  background:linear-gradient(#64c9de 0%,#47687d 70%,transparent);pointer-events:none;
+}
+.evo-magazine-star .evo-step{
+  margin-bottom:15px;background:#152635!important;border:1px solid #3d596b!important;
+  border-radius:0!important;overflow:hidden;scroll-margin-top:105px;
+  padding:clamp(22px,2.2vw,35px)!important;
+}
+.evo-magazine-star .evo-step::before{background:var(--ev-topic,#70cbd9)!important;top:0!important;bottom:0;width:3px!important;height:100%!important;}
+.evo-magazine-star .evo-step.is-reviewed{border-color:color-mix(in srgb,var(--ev-topic,#73cfde) 72%,#334d5c)!important;}
+.evo-magazine-star .evo-step-number{
+  width:54px!important;height:54px!important;font:900 22px/1 var(--ev-mono)!important;
+  border:1px solid var(--ev-topic,#92d1eb)!important;background:#213e54!important;
+  color:#d9f5ff!important;
+}
+.evo-magazine-star .evo-step-title-row{display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:10px 18px;}
+.evo-magazine-star .evo-step h4{font-size:clamp(21px,1.7vw,27px)!important;line-height:1.23;max-width:720px;}
+.evo-magazine-star .evo-step-review{
+  flex:none;border:1px solid #54758a;color:#d8eaf5;background:#263e51;
+  font:850 10px/1.2 var(--ev-mono);letter-spacing:.05em;
+  padding:9px 11px;min-height:38px;
+}
+.evo-magazine-star .evo-step-review[aria-pressed="true"]{background:#1f4d44;color:#aaf4d8;border-color:#5cbd9c;}
+.evo-magazine-star .evo-step-review:hover{filter:brightness(1.14);}
+.evo-magazine-star .evo-step .evo-step-explain{font-size:16px!important;line-height:1.75!important;color:#cedfea!important;}
+.evo-magazine-star .evo-code-toolbar{background:#223d50!important;min-height:49px;border-bottom-color:#3d6479!important;}
+.evo-magazine-star .evo-code-toolbar>span{font-size:11px!important;letter-spacing:.09em;}
+.evo-magazine-star .evo-code-copy{font-size:12px!important;padding:10px 16px!important;min-height:39px;}
+.evo-magazine-star .evo-command{
+  font:550 14px/1.8 var(--ev-mono)!important;background:#0b161f!important;
+  color:#afefd9!important;padding:21px 23px!important;border:0!important;
+}
+.evo-magazine-star .evo-result{
+  padding:19px 21px!important;font-size:16px!important;line-height:1.7!important;
+  border:1px solid #32686f!important;border-left:4px solid #72d6c1!important;
+  background:#102d34!important;color:#d5f2ed!important;
+}
+.evo-magazine-star .evo-result strong{font-size:11px!important;color:#93ebcf!important;letter-spacing:.1em;}
+.evo-magazine-star .evo-editorial-asides{gap:15px!important;}
+.evo-magazine-star .evo-tip,.evo-magazine-star .evo-warning{
+  padding:clamp(21px,2.15vw,31px)!important;border-radius:0!important;font-size:16px!important;line-height:1.75!important;
+}
+.evo-magazine-star .evo-tip{background:#102d2c!important;border:1px solid #39786d!important;}
+.evo-magazine-star .evo-warning{background:#31271d!important;border:1px solid #92754c!important;}
+.evo-magazine-star .evo-challenge{
+  position:relative;overflow:hidden;padding:clamp(25px,2.6vw,38px)!important;
+  border-color:var(--ev-topic,#5ca5d2)!important;
+  background:linear-gradient(115deg,#183348,#112231)!important;
+}
+.evo-magazine-star .evo-challenge-watermark{
+  position:absolute;right:26px;top:-85px;font:950 280px/1 var(--ev-display);
+  letter-spacing:-.13em;color:#ffffff08;pointer-events:none;user-select:none;
+}
+.evo-magazine-star .evo-challenge>p{position:relative;max-width:920px;font-size:clamp(17px,1.28vw,20px)!important;line-height:1.7;}
+.evo-magazine-star .evo-bible-box{border-left:4px solid var(--ev-topic,#75d0df)!important;background:#162a38!important;color:#eff7fa!important;padding:clamp(21px,2vw,30px)!important;}
+.evo-magazine-star .evo-bible-box p:first-child{font-size:15px!important;letter-spacing:.02em;}
+.evo-magazine-star .evo-bible-box button{padding:10px 14px!important;min-height:44px;color:#e6f5ff!important;}
+.evo-magazine-star .evo-data-note{font-size:12px!important;color:#b6cad7!important;line-height:1.6!important;}
+.evo-magazine-star .evo-mag-notes{border-left:3px solid #73c9dd!important;background:#132738!important;}
+.evo-magazine-star .evo-reader-completion{background:linear-gradient(130deg,#213b50,#102638)!important;border:1px solid #486b82!important;}
+.evo-magazine-star .evo-reader-completion>strong{font-size:23px!important;}
+.evo-magazine-star #bibliavirtual-index{padding:36px 0!important;}
+.evo-magazine-star #bibliavirtual-index h2{font-size:clamp(28px,2.8vw,39px)!important;}
+.evo-magazine-star #bibliavirtual-index details summary{font-size:15px!important;}
+.evo-magazine-star .evo-article-hero .evo-generic-visual{gap:18px!important;}
+.evo-magazine-star .evo-article-hero .evo-generic-emblem{
+  background:linear-gradient(140deg,color-mix(in srgb,var(--ev-topic,#6bafca) 29%,#0d2535),#102535)!important;
+}
+.evo-magazine-star .evo-article-hero .evo-generic-path{background:#132b3c!important;}
+.evo-magazine-star .evo-article-hero .evo-path-item{background:#193b4e!important;min-height:52px;}
+@media(max-width:1200px){
+  .evo-magazine-star .evo-mag-workspace{grid-template-columns:minmax(255px,290px) minmax(0,1fr)!important;}
+  .evo-magazine-star .evo-opening-columns{grid-template-columns:1fr;}
+  .evo-magazine-star .evo-lesson-intro:nth-child(2){border-left:0!important;border-top:1px solid #405e74!important;}
+}
+@media(max-width:850px){
+  .evo-magazine-star .evo-mag-workspace{grid-template-columns:1fr!important;}
+  .evo-magazine-star .evo-mag-sidebar{max-height:none!important;}
+  .evo-magazine-star .evo-rail-view-filters button{font-size:11px;}
+  .evo-magazine-star .evo-mag-sidebar-body{display:none;}
+  .evo-magazine-star .evo-mag-sidebar[data-mobile-open="true"] .evo-mag-sidebar-body{display:flex;}
+}
+@media(max-width:620px){
+  .evo-magazine-star .evo-mag-body{padding:17px!important;}
+  .evo-magazine-star .evo-cover h1{font-size:clamp(32px,8.2vw,48px)!important;}
+  .evo-magazine-star .evo-storyline-method{width:100%;}
+  .evo-magazine-star .evo-storyline-method span{flex:1;text-align:center;font-size:8px;padding:8px 5px;}
+  .evo-magazine-star .evo-journey-links{grid-template-columns:1fr;}
+  .evo-magazine-star .evo-step-series::before{display:none;}
+  .evo-magazine-star .evo-step-title-row{display:block;}
+  .evo-magazine-star .evo-step-review{margin-top:15px;}
+  .evo-magazine-star .evo-step h4{font-size:21px!important;}
+  .evo-magazine-star .evo-step .evo-step-explain{font-size:15px!important;}
+  .evo-magazine-star .evo-command{font-size:12px!important;padding:15px!important;}
+  .evo-magazine-star .evo-opening-columns{display:block;}
+  .evo-magazine-star .evo-lesson-intro{padding:22px!important;}
+}
+@media(prefers-reduced-motion:reduce){
+  .evo-magazine-star .evo-journey-track>span,.evo-magazine-star .evo-step-review{transition:none!important;}
+}
+@media print{
+  .evo-magazine-star .evo-mag-article{background:#fff!important;color:#111!important;box-shadow:none!important;border:0!important;}
+  .evo-magazine-star .evo-mag-body{background:#fff!important;padding:0!important;color:#111!important;}
+  .evo-magazine-star .evo-opening-columns{display:grid!important;grid-template-columns:1fr 1fr!important;border:0!important;}
+  .evo-magazine-star .evo-lesson-intro,.evo-magazine-star .evo-lesson-intro:first-child,.evo-magazine-star .evo-lesson-intro:nth-child(2) {border:1px solid #aaa!important;background:#fff!important;color:#111!important;padding:3mm!important;}
+  .evo-magazine-star .evo-lesson-intro p,.evo-magazine-star .evo-lesson-intro:first-child p,.evo-magazine-star .evo-lesson-intro:nth-child(2) p{font:400 10pt/1.45 Arial,sans-serif!important;color:#111!important;}
+  .evo-magazine-star .evo-step{border:1px solid #bbb!important;background:#fff!important;color:#111!important;scroll-margin-top:0!important;padding:3mm!important;}
+  .evo-magazine-star .evo-step h4{font:700 12pt/1.3 Arial,sans-serif!important;color:#111!important;}
+  .evo-magazine-star .evo-step .evo-step-explain{font:400 10pt/1.45 Arial,sans-serif!important;color:#111!important;}
+  .evo-magazine-star .evo-step-series:before,.evo-magazine-star .evo-step:before{display:none!important;}
+  .evo-magazine-star .evo-command{background:#f7f7f7!important;color:#111!important;padding:3mm!important;font-size:9pt!important;}
+  .evo-magazine-star .evo-result,.evo-magazine-star .evo-tip,.evo-magazine-star .evo-warning,.evo-magazine-star .evo-challenge,.evo-magazine-star .evo-bible-box{background:white!important;color:#111!important;border:1px solid #bbb!important;min-height:0!important;padding:3mm!important;}
+  .evo-magazine-star .evo-challenge p,.evo-magazine-star .evo-tip p,.evo-magazine-star .evo-warning p,.evo-magazine-star .evo-bible-box p{color:#111!important;font-size:10pt!important;}
+  .evo-magazine-star .evo-challenge-watermark{display:none!important;}
+  .evo-magazine-star .evo-step-review,.evo-magazine-star .evo-step-journey{display:none!important;}
+  .evo-magazine-star .evo-lab-stamp,.evo-magazine-star .evo-step-number{background:#eee!important;color:#111!important;border:1px solid #bbb!important;}
+}
