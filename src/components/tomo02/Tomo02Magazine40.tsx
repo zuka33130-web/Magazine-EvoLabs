@@ -6,6 +6,7 @@ import { EVO_WINDOWS_40_ARTICLES, EVO_WINDOWS_40_SECTIONS } from '../../data/tom
 import { EVO_WINDOWS40_001, EVO_WINDOWS40_001_REFERENCES, type Windows40Page } from '../../data/tomo02Magazine40Chapter001';
 import { Tomo02WindowsEditorialArt, type WindowsArtKind } from './Tomo02WindowsEditorialArt';
 import { TOMO_02_COVER } from '../../data/tomoCoversData';
+import { Tomo02MagazineDraftPreview } from './Tomo02MagazineDraftPreview';
 
 
 const TOTAL_PAGES = 5 + EVO_WINDOWS40_001.length * 2; // portada + manifiesto + 2 sumarios + 16 páginas del expediente 001 + cierre
@@ -120,6 +121,7 @@ const ChapterPage: React.FC<{data: Windows40Page; index: number; part: 0 | 1}> =
 };
 
 export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
+  const [showManuscripts, setShowManuscripts] = React.useState(false);
   const goTo = (n: number) => document.getElementById(pageId(n))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const printPdf = () => {
     const currentTitle = document.title;
@@ -127,6 +129,8 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
     window.print();
     document.title = currentTitle;
   };
+
+  if (showManuscripts) return <Tomo02MagazineDraftPreview onReturnToMagazine={() => setShowManuscripts(false)} />;
 
   return (
     <div id="evo-magazine40-root" className="evo-magazine40 min-h-screen bg-[#04070E] pb-16 font-sans-editorial text-white">
@@ -152,11 +156,12 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
         <div className="flex flex-wrap items-center gap-2">
           <button type="button" onClick={() => goTo(3)} className="flex items-center gap-2 rounded-lg border border-[#60CDFF]/45 px-3 py-2 font-mono-tech text-xs font-bold text-[#9DDDFF] hover:bg-[#103453]"><BookOpen className="h-4 w-4" /> ÍNDICE</button>
           <button type="button" onClick={onOpenBiblia} className="rounded-lg border border-[#60CDFF]/45 px-3 py-2 font-mono-tech text-xs font-bold text-[#9DDDFF] hover:bg-[#103453]">BIBLIA VIRTUAL</button>
+          <button type="button" onClick={() => setShowManuscripts(true)} className="flex items-center gap-2 rounded-lg border border-[#91EAFF] bg-[#0078D4] px-3 py-2 font-mono-tech text-xs font-black text-white shadow-[0_0_17px_rgba(0,210,255,.28)] hover:bg-[#00A5D9]"><BookOpen className="h-4 w-4"/> LEER BORRADORES 002–040</button>
           <button type="button" onClick={printPdf} className="flex items-center gap-2 rounded-lg border border-[#80E3FF] bg-gradient-to-r from-[#0068BD] to-[#00A4EF] px-4 py-2 font-mono-tech text-xs font-black text-white shadow-[0_0_18px_rgba(0,164,239,0.22)] hover:to-[#60CDFF]"><Printer className="h-4 w-4" /> GUARDAR AVANCE PDF A4</button>
         </div>
       </nav>
       <p className="mx-auto mb-5 max-w-[820px] px-4 text-center text-xs text-[#B6D6E9]">
-        <strong>Edición en desarrollo:</strong> 40 investigaciones seleccionadas; expediente 001 desarrollado y documentado. Las otras 39 no se muestran como terminadas.
+        <strong>Edición en desarrollo:</strong> 40 investigaciones seleccionadas; expediente 001 desarrollado y documentado. Las otras 39 no se muestran como terminadas. Los 39 manuscritos preliminares ya pueden leerse desde «LEER BORRADORES 002–040»; todavía no forman parte del PDF A4.
       </p>
 
       <div id="evo-magazine40-document" className="mx-auto max-w-[820px]">
@@ -203,7 +208,7 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
               <div className="border-b border-[#00D2FF]/30 pb-3">
                 <p className="font-mono-tech text-[10px] font-black uppercase tracking-widest text-[#60CDFF]">EVO LABS · 40 TÍTULOS EDITORIALES</p>
                 <h2 className="mt-1 font-display text-[32px] font-black uppercase text-white">MAPA DE INVESTIGACIONES <span className="text-[#60CDFF]">{part+1}/2</span></h2>
-                <p className="mt-1 text-[11px] text-[#C9DEEC]">Un índice es una promesa editorial, no una certificación de capítulos terminados. La investigación 001 está desarrollada; las restantes están en preparación.</p>
+                <p className="mt-1 text-[11px] text-[#C9DEEC]">Un índice es una promesa editorial, no una certificación de capítulos terminados. El expediente 001 está maquetado; los manuscritos 002–040 se encuentran disponibles para revisión fuera del PDF A4.</p>
               </div>
               {groups.map((g,gi) => {
                 const items=EVO_WINDOWS_40_ARTICLES.slice(g.range[0],g.range[1]);
@@ -219,7 +224,7 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
                     {items.map((a) => <div key={a.number} className="flex items-start gap-3 px-3 py-[6px]">
                       <span className="shrink-0 font-mono-tech text-[10px] font-black text-[#60CDFF]">{pad(a.number)}</span>
                       <span className="flex-1 text-[11px] font-semibold leading-tight text-[#EDF6FC]">{a.title}</span>
-                      <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono-tech text-[8px] font-black ${a.published?'border-emerald-400/45 text-emerald-300':'border-[#60CDFF]/25 text-[#91AFC6]'}`}>{a.published?'DESARROLLADO':'EN EDICIÓN'}</span>
+                      <span className={`shrink-0 rounded border px-1.5 py-0.5 font-mono-tech text-[8px] font-black ${a.published?'border-emerald-400/45 text-emerald-300':'border-[#60CDFF]/25 text-[#91AFC6]'}`}>{a.published?'DESARROLLADO':'BORRADOR'}</span>
                     </div>)}
                   </div>
                 </section>;
@@ -263,6 +268,7 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
       <div className="mx-auto mt-8 flex max-w-[820px] flex-wrap justify-center gap-3 px-4 print:hidden">
         <button type="button" onClick={() => goTo(1)} className="rounded-xl border border-[#00D2FF]/40 px-5 py-3 font-mono-tech text-xs font-black text-white hover:bg-[#123D5A]">↑ VOLVER A LA PORTADA</button>
         <button type="button" onClick={() => goTo(5)} className="flex items-center gap-2 rounded-xl border border-[#00D2FF]/40 px-5 py-3 font-mono-tech text-xs font-black text-white hover:bg-[#123D5A]">LEER EXPEDIENTE 001 <ArrowRight className="h-4 w-4" /></button>
+        <button type="button" onClick={() => setShowManuscripts(true)} className="flex items-center gap-2 rounded-xl border border-[#8EEFFF] bg-[#006EBD] px-5 py-3 font-mono-tech text-xs font-black text-white hover:bg-[#078CD5]">REVISAR MANUSCRITOS 002–040 <BookOpen className="h-4 w-4" /></button>
       </div>
     </div>
   );
