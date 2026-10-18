@@ -138,13 +138,13 @@ const Schematic: React.FC<{ kind: WindowsArtKind; tint: string }> = ({ kind, tin
 
 export const Tomo02WindowsEditorialArt: React.FC<{
   kind: WindowsArtKind;
-  variant?: 'hero' | 'card' | 'wide';
+  variant?: 'hero' | 'card' | 'wide' | 'background';
   caption?: string;
 }> = ({kind,variant='hero',caption}) => {
   const t=themes[kind];
   return (
-    <figure className={'evo-windows-art evo-windows-art--'+variant} data-windows-art={kind}>
-      <svg viewBox="0 0 1120 475" role="img" aria-label={t.heading+': '+t.detail} preserveAspectRatio="xMidYMid slice">
+    <figure className={'evo-windows-art evo-windows-art--'+variant+(variant === 'background' ? ' pointer-events-none absolute inset-0 block h-full w-full overflow-hidden [&>svg]:block [&>svg]:h-full [&>svg]:w-full' : '')} data-windows-art={kind}>
+      <svg viewBox={variant === 'background' ? '190 35 690 290' : '0 0 1120 475'} role="img" aria-label={t.heading+': '+t.detail} preserveAspectRatio="xMidYMid slice">
         <defs>
           <linearGradient id={'bg-'+kind} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#010613"/><stop offset="48%" stopColor="#09284A"/><stop offset="100%" stopColor="#010817"/></linearGradient>
           <linearGradient id={'glow-'+kind} x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#0078D4"/><stop offset="60%" stopColor={t.tint}/><stop offset="100%" stopColor="#BDEFFF"/></linearGradient>
@@ -164,9 +164,9 @@ export const Tomo02WindowsEditorialArt: React.FC<{
         <text x="46" y="442" fontFamily="Arial, sans-serif" fontSize="14" fill="#C1E6FB">{t.detail}</text>
         <text x="1070" y="47" textAnchor="end" fontFamily="monospace" fontSize="14" fontWeight="bold" fill={t.tint}>EVO LABS / {t.id}</text>
       </svg>
-      <figcaption className="evo-windows-art__caption">
+      {variant !== 'background' && <figcaption className="evo-windows-art__caption">
         {caption ?? t.label} · ILUSTRACIÓN VECTORIAL ORIGINAL · MODELO DIDÁCTICO, NO TELEMETRÍA DEL LECTOR
-      </figcaption>
+      </figcaption>}
     </figure>
   );
 };
