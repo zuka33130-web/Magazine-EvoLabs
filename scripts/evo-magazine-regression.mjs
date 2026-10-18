@@ -106,7 +106,7 @@ assert(view.includes('ARTICLES.map(a => renderGuide(a, true))') && view.includes
 assert(view.includes('<MagazineArticleHero id={a.id}') && view.includes('magazineArtDirection(item.id)'), 'El lector integra diagramas interiores y tarjetas editoriales tematizadas');
 assert(['Visual001','Visual002','Visual003','Visual004','Visual005','Visual006','Visual007','Visual008','Visual009','Visual010'].every(name => visual.includes('function '+name+'()')), 'Las diez primeras investigaciones tienen diez diagramas originales independientes');
 assert(visual.includes('if(id===10)return <Visual010/>') && visual.includes('evo-generic-visual') && visual.includes('evo-path-item'), 'Las investigaciones restantes usan mapas técnicos adaptativos');
-assert(visual.includes('Visual conceptual · sin datos del equipo') && view.includes('no representan mediciones de tu PC'), 'La escenografía didáctica se distingue de la telemetría real');
+assert(visual.includes('no contiene mediciones del usuario') && view.includes('no representan mediciones de tu PC'), 'La escenografía didáctica se distingue de la telemetría real');
 assert(view.includes('!printOnly && <MagazineArticleHero'), 'La exportación evita renderizar 200 diagramas complejos');
 assert(view.includes("import './Tomo02MagazineEditorial.css'"), 'La revista usa la nueva hoja de estilo editorial');
 assert(editorialCSS.includes('.evo-magazine-star .evo-mag-article') && editorialCSS.includes('background:#101b28!important'), 'Las páginas interiores tienen fondo oscuro por defecto');
@@ -121,6 +121,9 @@ assert(view.includes('data-mobile-open={mobileLibraryOpen}') && premiumCSS.inclu
 assert(view.includes('evo-mag-notes') && view.includes('evo-reader-completion') && view.includes('aria-pressed={Boolean(reviewed[selected.id])}'), 'Cuaderno y revisión integrados en el artículo');
 assert(premiumCSS.includes('font-family:var(--ev-display)') && premiumCSS.includes('--ev-text:'), 'Tipografías editoriales reutilizan la identidad de EVO LABS');
 assert(premiumCSS.includes('@media print') && premiumCSS.includes('background:white!important'), 'La edición PDF impresa conserva papel blanco y texto legible');
+assert(view.includes('printReady && ARTICLES.map(a => renderGuide(a, true))'), 'La impresión monta los 200 artículos sólo cuando es necesaria');
+assert(view.includes("window.addEventListener('afterprint',afterPrint)") && view.includes("setPrintReady(false)"), 'La impresión limpia su documento auxiliar al terminar');
+
 assert(view.includes('evo-cover-system') && view.includes('Esquema de aprendizaje · no es telemetría del equipo'), 'La portada usa ilustración técnica explícitamente conceptual');
 assert(view.includes('steps={a.steps.map(step=>step.title)}') && visual.includes('(steps.length?steps:'), 'El mapa visual usa los pasos reales de cada artículo');
 assert(premiumCSS.includes('.evo-generic-path') && premiumCSS.includes('.evo-rail-item.is-active'), 'Las guías y el índice tienen identidades visuales consistentes');
