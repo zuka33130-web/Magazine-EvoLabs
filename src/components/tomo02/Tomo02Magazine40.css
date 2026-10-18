@@ -1,0 +1,203 @@
+/* EVO LABS // Tomo 02 // Magazine 40
+   Diseño editorial propio. Referencia estructural: Tomo 01;
+   ilustraciones exclusivas de Windows, sin reutilizar fotografías del Tomo 01. */
+.evo-magazine40 {
+  --w40-blue: #0078d4;
+  --w40-electric: #00d2ff;
+  --w40-ice: #60cdff;
+  --w40-ink: #040b17;
+  --w40-white: #f2fbff;
+  --w40-text: #d9ecf6;
+  color: var(--w40-white);
+  background: radial-gradient(ellipse at top, rgba(0, 103, 208, .16), transparent 48%), #02050b;
+}
+.evo-magazine40 .a4-magazine-page {
+  box-shadow: 0 20px 55px rgba(0, 0, 0, .7), 0 0 0 1px rgba(0, 210, 255, .24);
+  isolation: isolate;
+  background: linear-gradient(155deg,#080f1c 0%,#06101e 53%,#050911 100%);
+}
+.evo-magazine40 .a4-magazine-page:not([data-page-id="evo-w40-page-01"])::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: 0;
+  background: radial-gradient(ellipse at 95% 20%, rgba(0, 210, 255, .075), transparent 50%);
+}
+/* Ilustraciones A4: ancho completo de la mancha editorial; figuras siempre visibles al imprimir. */
+.evo-windows-art {
+  flex: 0 0 auto;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  margin: 0;
+  background: #040d1c;
+  border-radius: 13px;
+  border: 1px solid rgba(96, 205, 255, .56);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .36), 0 0 23px rgba(0, 120, 212, .19);
+}
+.evo-windows-art svg { display:block; width:100%; height:100%; }
+.evo-windows-art--hero { height: 312px; }
+.evo-windows-art--wide { height: 255px; }
+.evo-windows-art--card { height: 154px; }
+.evo-windows-art__caption {
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+  z-index: 3;
+  max-width: 70%;
+  color: #b7e6ff;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: right;
+  font-size: 7px;
+  letter-spacing: .045em;
+  line-height: 1.2;
+  opacity: .85;
+  pointer-events: none;
+}
+.evo-w40-chapter {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  gap: 16px;
+}
+.evo-w40-chapter__heading {
+  flex: 0 0 auto;
+  border-bottom: 2px solid rgba(0, 210, 255, .7);
+  padding-bottom: 13px;
+}
+.evo-w40-chapter__metadata {
+  display: flex; justify-content: space-between; gap: 18px;
+  align-items: center; color: #8de9ff;
+  font-size: 9px; font-weight: 900; letter-spacing: .13em;
+  font-family: 'JetBrains Mono',monospace;
+  text-transform: uppercase;
+}
+.evo-w40-chapter__number { white-space: nowrap; color:#c9e7fa; }
+.evo-w40-chapter__heading h2 {
+  font-family: 'Epilogue',sans-serif;
+  font-weight: 900;
+  font-size: 32px;
+  line-height: 1.05;
+  letter-spacing: -.035em;
+  text-transform: uppercase;
+  color: white;
+  margin-top: 10px;
+  text-wrap: balance;
+  text-shadow: 0 5px 32px rgba(0, 165, 225, .12);
+}
+.evo-w40-chapter__heading > p {
+  margin-top: 9px;
+  color: #99e4ff;
+  font-family: 'Plus Jakarta Sans',sans-serif;
+  font-size: 12px;
+  line-height: 1.48;
+  font-weight: 700;
+}
+.evo-w40-chapter__columns {
+  columns: 2;
+  column-gap: 23px;
+  column-rule: 1px solid rgba(96, 205, 255, .28);
+  text-align: left;
+  font-family: 'Plus Jakarta Sans',sans-serif;
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 1.58;
+  color: #e6f0f8;
+}
+.evo-w40-chapter__columns > p { margin: 0 0 12px; break-inside: avoid; hyphens: auto; }
+.evo-w40-dropcap::first-letter {
+  float: left;
+  padding: 4px 8px 1px 0;
+  color: #18dcff;
+  font-family: 'Epilogue',sans-serif;
+  font-size: 43px;
+  font-weight: 900;
+  line-height: .81;
+}
+.evo-w40-chapter__closing { margin-top: auto; display: grid; gap: 9px; }
+.evo-w40-next {
+  display: flex; align-items:center; gap:12px;
+  padding: 14px 16px; border: 1px solid rgba(96,205,255,.38);
+  border-left: 4px solid #00d2ff; background: linear-gradient(92deg,#06365f,#0c1729);
+  color:#d4f2ff; font-family:'JetBrains Mono',monospace; font-size:10px;
+}
+.evo-w40-next span {color:#71dfff; letter-spacing:.07em;}
+.evo-w40-next strong {font-weight:900; flex:1;}
+.evo-w40-focus {
+  border-radius: 12px;
+  border: 1px solid rgba(0, 210, 255, .44);
+  border-left: 5px solid #00d2ff;
+  background: linear-gradient(100deg,#0c3c65,#0b2340 68%,#071526);
+  padding: 13px 17px;
+  box-shadow: 0 9px 25px rgba(0,120,212,.15);
+}
+.evo-w40-focus strong {
+  color: #4fe9ff; display:block;
+  font: 900 11px 'JetBrains Mono',monospace;
+  letter-spacing: .09em;
+  margin-bottom: 5px;
+}
+.evo-w40-focus p { color:#eefaff; font-size:12px; font-family:'Plus Jakarta Sans',sans-serif; line-height:1.48; }
+.evo-w40-footnote {
+  color: #b4cddd; font: 9px/1.4 'JetBrains Mono',monospace;
+  border-top: 1px solid rgba(96,205,255,.20);
+  padding-top:6px;
+}
+.evo-w40-lab {
+  min-height: 0;
+  border: 1px solid rgba(0, 210, 255, .48);
+  border-radius: 13px;
+  background: #020a16;
+  box-shadow: 0 9px 30px rgba(0, 164, 239, .16);
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+.evo-w40-lab__top {
+  display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; align-items:center;
+  padding: 8px 13px;
+  background: linear-gradient(94deg,#0056a3 0%,#0078d4 60%,#00a4ef 100%);
+  border-bottom: 1px solid #49dfff;
+}
+.evo-w40-lab__label {color:white;font:900 10px 'JetBrains Mono',monospace;letter-spacing:.04em;}
+.evo-w40-lab__readonly {border:1px solid #cbf3ff99;padding:2px 6px;border-radius:3px;color:#f1ffff;font:800 9px 'JetBrains Mono',monospace;}
+.evo-w40-lab__intro {color:#cfe8f9;font:11px/1.45 'Plus Jakarta Sans',sans-serif;padding:9px 13px 5px;}
+.evo-w40-lab__code {
+  display:block; overflow-wrap:anywhere; white-space:pre-wrap; word-break:break-word;
+  overflow:visible; max-height:none; margin:0 11px 8px;
+  padding: 10px 12px; border:1px solid #14507d;border-left:3px solid #06d6ff;
+  background: #01050c; color:#7febff;
+  font:9.4px/1.52 'JetBrains Mono',Consolas,monospace;
+}
+.evo-w40-lab__code code { white-space:pre-wrap;word-break:break-word; }
+.evo-w40-lab__readout {padding:8px 13px 10px;color:#cbeafa;font:10px/1.42 'Plus Jakarta Sans',sans-serif;border-top:1px solid #14517f;}
+.evo-magazine40 #evo-magazine40-toolbar {
+  background: linear-gradient(100deg,#05295a 0%,#0367b8 55%,#063a72 100%);
+  border-bottom: 2px solid #52e7ff;
+  box-shadow: 0 12px 36px rgba(0,120,212,.35);
+}
+.evo-magazine40 #evo-magazine40-toolbar button {
+  background: linear-gradient(145deg,#074d86,#098ac5);
+  border: 1px solid #7cdfff;
+  color: white;
+  font-weight: 900;
+  box-shadow: inset 0 1px rgba(255,255,255,.24),0 4px 16px rgba(0,8,35,.35);
+  transition: background .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.evo-magazine40 #evo-magazine40-toolbar button:hover,
+.evo-magazine40 #evo-magazine40-toolbar button:focus-visible {
+  transform: translateY(-2px);
+  background: linear-gradient(145deg,#0078d4,#00d2ff);
+  box-shadow: 0 0 22px rgba(0,210,255,.46);
+}
+.evo-magazine40 #evo-magazine40-toolbar button:last-child { background:linear-gradient(120deg,#0075e5,#00aef0); }
+.evo-magazine40 #evo-magazine40-toolbar button:focus-visible { outline:3px solid white;outline-offset:3px; }
+@media print {
+  .evo-w40-chapter {gap:12px!important;}
+  .evo-w40-chapter__columns { font-size: 11.5px!important;line-height:1.52!important; }
+  .evo-w40-lab__code {font-size:9px!important;line-height:1.38!important;}
+  .evo-windows-art {box-shadow:none!important;}
+  .evo-w40-chapter__heading h2 {font-size:30px!important;}
+  .evo-magazine40 #evo-magazine40-toolbar{display:none!important;}
+}
