@@ -16,6 +16,13 @@
   isolation: isolate;
   background: linear-gradient(155deg,#080f1c 0%,#06101e 53%,#050911 100%);
 }
+/* Cover MasterPage uses inline 'height:auto'; override to guarantee a physical A4 sheet. */
+.evo-magazine40 #evo-w40-page-01 {
+  width: min(100%, 820px) !important;
+  height: 1160px !important;
+  min-height: 1160px !important;
+  max-height: 1160px !important;
+}
 .evo-magazine40 .a4-magazine-page:not([data-page-id="evo-w40-page-01"])::before {
   content: "";
   position: absolute;
@@ -37,9 +44,10 @@
   box-shadow: 0 12px 28px rgba(0, 0, 0, .36), 0 0 23px rgba(0, 120, 212, .19);
 }
 .evo-windows-art svg { display:block; width:100%; height:100%; }
-.evo-windows-art--hero { height: 312px; }
+.evo-windows-art--hero { height: 390px; }
 .evo-windows-art--wide { height: 255px; }
 .evo-windows-art--card { height: 154px; }
+.evo-windows-art--background {width:100%;height:100%;border:0;box-shadow:none;border-radius:0;}
 .evo-windows-art__caption {
   position: absolute;
   bottom: 5px;
@@ -194,6 +202,7 @@
 .evo-magazine40 #evo-magazine40-toolbar button:last-child { background:linear-gradient(120deg,#0075e5,#00aef0); }
 .evo-magazine40 #evo-magazine40-toolbar button:focus-visible { outline:3px solid white;outline-offset:3px; }
 @media print {
+  .evo-magazine40 #evo-w40-page-01 {width:210mm!important; min-width:210mm!important; height:297mm!important; min-height:297mm!important; max-height:297mm!important;}
   .evo-w40-chapter {gap:12px!important;}
   .evo-w40-chapter__columns { font-size: 11.5px!important;line-height:1.52!important; }
   .evo-w40-lab__code {font-size:9px!important;line-height:1.38!important;}
