@@ -12,6 +12,7 @@ import { Tomo02VisualAtlas } from './Tomo02VisualAtlas';
 
 interface Tomo02CoverProps {
   onOpenInteractive: () => void;
+  onOpenMagazine: () => void;
   onOpenLab: () => void;
   onBackToApp?: () => void;
   onNavigateTomo?: (tomo: '01' | '02' | '03' | '04' | '08') => void;
@@ -21,6 +22,7 @@ interface Tomo02CoverProps {
 
 export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
   onOpenInteractive,
+  onOpenMagazine,
   onOpenLab,
   onBackToApp,
   onNavigateTomo,
@@ -165,6 +167,22 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
                 <span className="relative z-10 flex flex-col gap-1">
                   <span className="text-[13px] font-black sm:text-sm">ENTRAR A LA BIBLIA VIRTUAL</span>
                   <span className="text-[10px] font-semibold tracking-[0.14em] text-white/85">40 SECTORES · DEL 00 AL 39 · WINDOWS</span>
+                </span>
+                <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/40 bg-white/15 shadow-inner transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-white/25">
+                  <ArrowRight className="h-5 w-5 text-white" />
+                </span>
+              </button>
+
+              {/* Edición editorial A4 independiente; no reutiliza el magazine antiguo. */}
+              <button
+                id="btn-magazine40-a4-tomo02"
+                type="button"
+                onClick={onOpenMagazine}
+                className="group relative isolate inline-flex min-h-14 w-full items-center justify-between gap-5 overflow-hidden rounded-2xl border border-[#7DDFFF]/75 bg-gradient-to-r from-[#052C54] via-[#075A98] to-[#0078D4] px-5 py-4 text-left font-mono-tech text-sm font-black uppercase tracking-wider text-white shadow-[0_12px_34px_rgba(0,120,212,0.28),inset_0_1px_0_rgba(255,255,255,0.20)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white hover:via-[#0078D4] hover:to-[#00D2FF] hover:shadow-[0_18px_48px_rgba(0,210,255,0.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#60CDFF] sm:w-auto"
+              >
+                <span className="relative z-10 flex flex-col gap-1">
+                  <span className="text-[13px] font-black sm:text-sm">MAGAZINE A4 · 40 INVESTIGACIONES</span>
+                  <span className="text-[10px] font-semibold tracking-[0.12em] text-white/85">EDICIÓN EN DESARROLLO · VISTA PREVIA PDF</span>
                 </span>
                 <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/40 bg-white/15 shadow-inner transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-white/25">
                   <ArrowRight className="h-5 w-5 text-white" />
