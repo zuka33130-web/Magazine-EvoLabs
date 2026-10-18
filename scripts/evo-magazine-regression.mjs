@@ -31,6 +31,7 @@ const batches = [
 const view = file('src/components/tomo02/Tomo02MagazineEstrella.tsx');
 const visual = file('src/components/tomo02/MagazineArticleHero.tsx');
 const editorialCSS = file('src/components/tomo02/Tomo02MagazineEditorial.css');
+const premiumCSS = file('src/components/tomo02/Tomo02MagazinePremium.css');
 const wrapper = file('src/components/tomo02/Tomo02MagazineView.tsx');
 const cover = file('src/components/tomo02/Tomo02Cover.tsx');
 const bridge = file('src/data/tomo02MagazineSectorBridge.ts');
@@ -111,8 +112,16 @@ assert(view.includes("import './Tomo02MagazineEditorial.css'"), 'La revista usa 
 assert(editorialCSS.includes('.evo-magazine-star .evo-mag-article') && editorialCSS.includes('background:#101b28!important'), 'Las páginas interiores tienen fondo oscuro por defecto');
 assert(editorialCSS.includes('@media print') && editorialCSS.includes('background:#fff!important'), 'El PDF mantiene impresión legible sobre fondo blanco');
 assert(view.indexOf('<section id="magazine-guide"') < view.indexOf('<section className="evo-index-section'), 'La investigación abre antes del catálogo');
-assert(view.includes('visible.slice(0,12)') && view.includes('EXPLORAR LOS 200 TÍTULOS'), 'El índice empieza compacto sin bloquear la búsqueda de 200 guías');
+assert(view.includes('visible.map(item=>{') && view.includes('evo-rail-search') && view.includes('evo-rail-filter'), 'La biblioteca lateral permite navegar, buscar y filtrar las 200 investigaciones');
 assert(view.includes('evo-code-toolbar') && view.includes('evo-result') && view.includes('evo-tip') && view.includes('evo-warning'), 'Los componentes didácticos emplean jerarquía visual de alto contraste');
+assert(view.includes("import './Tomo02MagazinePremium.css'"), 'La edición profesional activa su hoja de diseño');
+assert(view.includes('evo-mag-workspace') && view.includes('evo-mag-sidebar') && view.includes('evo-mag-reader'), 'Lectura a dos columnas con navegación lateral');
+assert(view.includes('evo-reader-pager') && view.includes('previousArticle') && view.includes('nextArticle'), 'Navegación anterior/siguiente desde el propio artículo');
+assert(view.includes('data-mobile-open={mobileLibraryOpen}') && premiumCSS.includes('@media(max-width:850px)'), 'La biblioteca se despliega en móviles sin ocultar el lector');
+assert(view.includes('evo-mag-notes') && view.includes('evo-reader-completion') && view.includes('aria-pressed={Boolean(reviewed[selected.id])}'), 'Cuaderno y revisión integrados en el artículo');
+assert(premiumCSS.includes('font-family:var(--ev-display)') && premiumCSS.includes('--ev-text:'), 'Tipografías editoriales reutilizan la identidad de EVO LABS');
+assert(premiumCSS.includes('@media print') && premiumCSS.includes('background:white!important'), 'La edición PDF impresa conserva papel blanco y texto legible');
+assert(view.includes('evo-cover-system') && view.includes('Esquema de aprendizaje · no es telemetría del equipo'), 'La portada usa ilustración técnica explícitamente conceptual');
 
 assert(view.includes('reviewedCount') && view.includes('evo_magazine02_reviewed_v1'), 'Existe seguimiento local explícitamente no certificado');
 assert(view.includes('evo_magazine02_notes_v1') && view.includes('onBlur={e=>saveNote'), 'Cada guía ofrece notas locales para registrar resultados');
