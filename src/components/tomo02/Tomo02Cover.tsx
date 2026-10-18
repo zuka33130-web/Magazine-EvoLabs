@@ -8,6 +8,7 @@ import { TOMO_02_COVER as coverHeroImg } from '../../data/tomoCoversData';
 import { VOLUMES_COLLECTION } from '../../data/collections';
 import { VolumeItem } from '../../types';
 import { HorizontalCollection } from '../HorizontalCollection';
+import { Tomo02VisualAtlas } from './Tomo02VisualAtlas';
 
 interface Tomo02CoverProps {
   onOpenInteractive: () => void;
@@ -158,10 +159,16 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
                 id="btn-abrir-biblia-virtual-tomo02"
                 type="button"
                 onClick={onOpenInteractive}
-                className="inline-flex items-center gap-3 px-7 py-4 rounded-xl font-mono-tech font-black text-xs sm:text-sm tracking-wider uppercase bg-gradient-to-r from-[#0078D4] to-[#00A4EF] hover:from-[#0067C0] hover:to-[#60CDFF] text-white transition-all duration-200 cursor-pointer shadow-[0_0_24px_rgba(0,164,239,0.30)] group"
+                className="group relative isolate inline-flex min-h-14 w-full items-center justify-between gap-5 overflow-hidden rounded-2xl border border-[#80E3FF]/80 bg-gradient-to-r from-[#0059C8] via-[#0078D4] to-[#00D2FF] px-5 py-4 text-left font-mono-tech text-sm font-black uppercase tracking-wider text-white shadow-[0_12px_34px_rgba(0,120,212,0.38),inset_0_1px_0_rgba(255,255,255,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white hover:from-[#0078D4] hover:via-[#009CEB] hover:to-[#60CDFF] hover:shadow-[0_18px_48px_rgba(0,210,255,0.40)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#60CDFF] sm:w-auto"
               >
-                <span>ENTRAR A LA BIBLIA VIRTUAL · SECTORES 00–39</span>
-                <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+                <span aria-hidden="true" className="pointer-events-none absolute -left-20 top-0 h-full w-14 -skew-x-12 bg-white/25 blur-md transition-transform duration-700 group-hover:translate-x-[460px]" />
+                <span className="relative z-10 flex flex-col gap-1">
+                  <span className="text-[13px] font-black sm:text-sm">ENTRAR A LA BIBLIA VIRTUAL</span>
+                  <span className="text-[10px] font-semibold tracking-[0.14em] text-white/85">40 SECTORES · DEL 00 AL 39 · WINDOWS</span>
+                </span>
+                <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/40 bg-white/15 shadow-inner transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-white/25">
+                  <ArrowRight className="h-5 w-5 text-white" />
+                </span>
               </button>
             </div>
           </div>
@@ -180,6 +187,9 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
             </p>
           </div>
         </div>
+
+        {/* Misma gramática visual del índice ilustrado del Tomo 01, adaptada a Windows. */}
+        <Tomo02VisualAtlas variant="cover" />
       </section>
 
       {/* ========================================================
