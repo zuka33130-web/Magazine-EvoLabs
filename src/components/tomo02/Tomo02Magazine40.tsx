@@ -6,6 +6,7 @@ import { EVO_WINDOWS40_001, EVO_WINDOWS40_001_REFERENCES, type Windows40Page } f
 import kernelImage from '../../assets/images/cap_05_kernel_1789531884339.jpg';
 import workbenchImage from '../../assets/images/cap_06_workshop_1789531894578.jpg';
 import siliconImage from '../../assets/images/cap_01_silicon_1789531835511.jpg';
+import { TOMO_02_COVER } from '../../data/tomoCoversData';
 
 
 const TOTAL_PAGES = 5 + EVO_WINDOWS40_001.length; // 1 portada + 1 editorial + 2 sumarios + 8 investigación + 1 cierre
@@ -157,26 +158,14 @@ export const Tomo02Magazine40: React.FC<Props> = ({ onBack, onOpenBiblia }) => {
 
       <div id="evo-magazine40-document" className="mx-auto max-w-[820px]">
         <Page number={1} title="PORTADA" cover>
-          <div className="relative flex h-full flex-col overflow-hidden bg-[#020713]">
-            <img src={kernelImage} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover opacity-45 mix-blend-screen" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#030811]/70 via-[#031329]/55 to-[#02040A]" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_60%_42%,rgba(0,210,255,0.24),transparent_55%)]" />
-            <div className="relative z-10 flex h-full flex-col justify-between p-10">
-              <div>
-                <div className="flex items-center justify-between border-b border-[#00D2FF]/45 pb-4 font-mono-tech text-xs font-black uppercase tracking-[0.22em] text-[#9DDDFF]"><span>EVO <span className="text-white">LABS</span></span><span>TOMO 02 · WINDOWS</span></div>
-                <p className="mt-12 font-mono-tech text-[12px] font-bold tracking-[0.3em] text-[#55DFFF]">MAGAZINE ESTRELLA / EDICIÓN A4</p>
-                <h1 className="mt-4 font-display text-[59px] font-black uppercase leading-[0.91] tracking-tighter text-white">LA BIBLIA<br/>NEGRA <span className="text-[#60CDFF]">DE<br/>WINDOWS</span></h1>
-                <div className="mt-7 h-1.5 w-36 bg-gradient-to-r from-[#0078D4] to-[#00D2FF]"/>
-                <p className="mt-6 max-w-[490px] font-sans-editorial text-lg font-semibold leading-snug text-white">40 misterios del sistema operativo.<br/>Cero mitos. Evidencia y experimentos.</p>
-              </div>
-              <div>
-                <div className="grid grid-cols-3 gap-2.5">
-                  {['KERNEL NT','PRIVACIDAD','RENDIMIENTO'].map(x=><div key={x} className="border border-[#60CDFF]/50 bg-[#092239]/85 p-3 text-center font-mono-tech text-[11px] font-black tracking-wider text-[#BBECFF]">{x}</div>)}
-                </div>
-                <p className="mt-7 border-t border-[#00D2FF]/45 pt-4 font-mono-tech text-[14px] font-black tracking-[0.18em] text-white">NO LO CREAS. <span className="text-[#60CDFF]">COMPROBALO.</span></p>
-                <p className="mt-2 font-mono-tech text-[10px] text-[#C5DBED]">EDICIÓN PRELIMINAR · 1 INVESTIGACIÓN COMPLETA · 39 EN DESARROLLO</p>
-              </div>
-            </div>
+          {/* La misma portada oficial subida a GitHub; no recrear ni recortar la ilustración. */}
+          <div className="flex h-full min-h-0 w-full flex-1 items-center justify-center overflow-hidden bg-[#010309]">
+            <img
+              src={TOMO_02_COVER}
+              alt="Portada oficial de EVO LABS — Tomo 02: La Biblia Negra de Windows"
+              className="block h-full w-full object-contain"
+              decoding="async"
+            />
           </div>
         </Page>
 
