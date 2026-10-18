@@ -1,0 +1,389 @@
+/**
+ * EVO LABS / MAGAZINE ESTRELLA — EDICIÓN PROFESIONAL
+ * Sistema editorial 2026. Sólo afecta al lector del Tomo 02.
+ * Fondo oscuro de lectura; blanco exclusivamente para PDF y papel.
+ * Tipografía: Epilogue + Plus Jakarta Sans + JetBrains Mono (tipos del proyecto).
+ */
+.evo-magazine-star {
+  --ev-bg:#080f17;
+  --ev-surface:#111e2b;
+  --ev-surface-2:#192a39;
+  --ev-stroke:#345061;
+  --ev-ink:#f0f5f8;
+  --ev-secondary:#b8cbd9;
+  --ev-cyan:#75cee7;
+  --ev-hot:#ddad6f;
+  --ev-display:var(--font-display,"Epilogue","Arial",sans-serif);
+  --ev-text:var(--font-sans,"Plus Jakarta Sans","Segoe UI",sans-serif);
+  --ev-mono:var(--font-mono,"JetBrains Mono",Consolas,monospace);
+  background:#080f17;
+  color:var(--ev-ink);
+  font-family:var(--ev-text);
+  font-size:16px;
+  line-height:1.6;
+}
+.evo-magazine-star .evo-mag-layout {
+  width:min(100%,1792px)!important;
+  max-width:1792px!important;
+  margin-inline:auto;
+  padding-inline:clamp(14px,2.2vw,40px)!important;
+}
+.evo-magazine-star :focus-visible {
+  outline:2px solid #a8e9f7!important;
+  outline-offset:3px;
+}
+.evo-magazine-star .evo-mag-topnav {
+  display:grid;
+  grid-template-columns:minmax(90px,1fr) auto minmax(90px,1fr);
+  align-items:center;
+  min-height:72px;
+  padding:12px clamp(15px,2.4vw,44px)!important;
+  gap:18px;
+  background:rgba(7,15,24,.96)!important;
+  border-bottom:1px solid #385264!important;
+}
+.evo-magazine-star .evo-nav-back,
+.evo-magazine-star .evo-nav-secondary {
+  padding:10px 15px;
+  min-height:42px;
+  border:1px solid #40596a;
+  background:#13212f;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.01em;
+  color:#e8f5fa;
+  border-radius:3px;
+  transition:background .16s,border-color .16s;
+}
+.evo-magazine-star .evo-nav-back {justify-self:start;}
+.evo-magazine-star .evo-nav-actions{display:flex;gap:8px;align-items:center;justify-self:end;}
+.evo-magazine-star .evo-nav-secondary:hover,.evo-magazine-star .evo-nav-back:hover{border-color:#8ccedf;background:#243848;}
+.evo-magazine-star .evo-nav-primary {
+  min-height:42px;
+  border:1px solid #91def2;
+  background:#7bcfe8;
+  border-radius:3px;
+  padding:10px 15px;
+  color:#041c2b;
+  font-size:13px;
+  font-weight:950;
+  letter-spacing:.02em;
+}
+.evo-magazine-star .evo-nav-primary:hover {background:#afe9f5;}
+.evo-magazine-star .evo-brand-lockup{display:flex;align-items:center;gap:13px;white-space:nowrap;}
+.evo-magazine-star .evo-brand-mark{font-family:var(--ev-display);font-weight:950;letter-spacing:-.11em;font-size:29px;color:white;line-height:1;}
+.evo-magazine-star .evo-brand-mark span{color:#75cde7;}
+.evo-magazine-star .evo-brand-line{height:27px;width:1px;background:#5f8296;}
+.evo-magazine-star .evo-brand-description{display:flex;flex-direction:column;line-height:1.35;gap:2px;}
+.evo-magazine-star .evo-brand-description strong{font-weight:850;letter-spacing:.08em;font-size:12px;}
+.evo-magazine-star .evo-brand-description small{font-family:var(--ev-mono);font-size:9px;letter-spacing:.12em;color:#8ca9bd;}
+
+/* One compact, dramatic editorial opening — never a full-page empty hero. */
+.evo-magazine-star .evo-cover {
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(250px,.65fr);
+  padding:0!important;
+  min-height:330px!important;
+  gap:0;
+  border:1px solid #3e5a6b!important;
+  border-top:4px solid #80cce5!important;
+  border-bottom:1px solid #486478!important;
+  background:#101d2a!important;
+  margin:26px 0 22px!important;
+  isolation:isolate;
+  border-radius:3px;
+  box-shadow:0 22px 58px rgba(0,0,0,.25);
+}
+.evo-magazine-star .evo-cover:after{display:none!important;}
+.evo-magazine-star .evo-cover-editorial{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  padding:clamp(23px,3vw,48px);
+  position:relative;
+  background:
+    linear-gradient(90deg,#172b3c 0,#0e1a28 95%);
+}
+.evo-magazine-star .evo-cover-topline{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  border-bottom:1px solid #436071;
+  padding-bottom:13px;
+  margin-bottom:24px;
+  gap:10px 16px;
+  font:750 10px/1.4 var(--ev-mono);
+  letter-spacing:.1em;
+  color:#c7dce7;
+}
+.evo-magazine-star .evo-cover-topline span:last-child {opacity:.69;}
+.evo-magazine-star .evo-pulse{display:inline-block;height:7px;width:7px;background:#8ee4dc;margin-right:8px;border-radius:50%;box-shadow:0 0 0 4px #8ee4dc18;}
+.evo-magazine-star .evo-cover .evo-cover-kicker{
+  font:900 11px/1.4 var(--ev-mono);
+  color:#8dd4ed;
+  letter-spacing:.2em;
+}
+.evo-magazine-star .evo-cover h1 {
+  margin:10px 0 0;
+  max-width:950px!important;
+  font-family:var(--ev-display)!important;
+  font-size:clamp(33px,3.4vw,61px)!important;
+  font-weight:950;
+  line-height:1.04!important;
+  letter-spacing:-.06em!important;
+  text-transform:uppercase;
+  color:#f5faff;
+  text-shadow:none!important;
+}
+.evo-magazine-star .evo-cover h1 em{display:block;font-style:normal;color:#87d8ef;}
+.evo-magazine-star .evo-cover .evo-cover-deck{
+  max-width:710px!important;
+  margin:19px 0 25px;
+  color:#c7d9e5;
+  font-size:clamp(14px,1.18vw,18px);
+  line-height:1.57;
+}
+.evo-magazine-star .evo-cover-bottom{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px 20px;
+  margin-top:auto;
+  padding-top:15px;
+  border-top:1px solid #3d5c70;
+}
+.evo-magazine-star .evo-cover-bottom strong{font:900 12px/1.4 var(--ev-display);letter-spacing:.045em;}
+.evo-magazine-star .evo-cover-bottom strong span{color:#96e6f6;}
+.evo-magazine-star .evo-cover-bottom > span{font:700 9px/1.4 var(--ev-mono);letter-spacing:.05em;color:#a4bccd;}
+.evo-magazine-star .evo-cover-system{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-between;
+  min-width:0;
+  min-height:290px;
+  padding:25px 22px 20px;
+  background:
+    repeating-linear-gradient(0deg,transparent 0,transparent 23px,#86bfd30a 24px),
+    repeating-linear-gradient(90deg,transparent 0,transparent 23px,#86bfd30a 24px),
+    radial-gradient(circle at center,#22516b,#091522 72%);
+  border-left:1px solid #344e60;
+}
+.evo-magazine-star .evo-system-caption,
+.evo-magazine-star .evo-system-legend{font:750 9px/1.5 var(--ev-mono);letter-spacing:.11em;color:#b3d4e5;text-align:center;}
+.evo-magazine-star .evo-system-legend{color:#9fb8c5;letter-spacing:0;}
+.evo-magazine-star .evo-system-core{
+  width:114px;height:114px;border-radius:50%;position:relative;
+  border:2px solid #91dff0;display:flex;align-items:center;justify-content:center;flex-direction:column;
+  background:#152f42;box-shadow:0 0 25px #1d84aa4d, inset 0 0 24px #1f81b33d;
+  margin:25px 0 13px;
+}
+.evo-magazine-star .evo-system-core>span{font:950 49px/1 var(--ev-display);color:white;letter-spacing:-.07em;}
+.evo-magazine-star .evo-system-core small{font:700 10px/1.4 var(--ev-mono);letter-spacing:.18em;color:#95dbeb;}
+.evo-magazine-star .evo-system-ring{position:absolute;border:1px dashed #8fcdd787;border-radius:50%;pointer-events:none;}
+.evo-magazine-star .ring-one{inset:-18px;}
+.evo-magazine-star .ring-two{inset:-36px;opacity:.45;}
+.evo-magazine-star .evo-system-elements{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;width:100%;}
+.evo-magazine-star .evo-system-elements span{font:950 13px/1.25 var(--ev-mono);color:#8de0eb;background:#1a374b;border:1px solid #4b7990;padding:10px;text-align:center;}
+.evo-magazine-star .evo-system-elements b{display:block;font:650 8px/1.5 var(--ev-mono);color:#d5e5f0;letter-spacing:.075em;margin-top:5px;}
+.evo-magazine-star .evo-cover-stats{
+  grid-column:1 / -1;
+  display:flex;
+  justify-content:space-between;
+  margin:0!important;
+  padding:16px clamp(24px,3vw,48px)!important;
+  border-top:1px solid #3b5365!important;
+  gap:18px;
+  background:#0b1723;
+}
+.evo-magazine-star .evo-cover-stats span{display:flex;gap:10px;align-items:center;white-space:nowrap;color:#bdd0dc!important;font:800 10px/1.3 var(--ev-mono);letter-spacing:.09em;}
+.evo-magazine-star .evo-cover-stats b{font:950 24px/1 var(--ev-display)!important;color:#91dcf0!important;}
+
+/* Workspace behaves like a reading app, not a scroll of 200 enormous cards. */
+.evo-magazine-star .evo-mag-workspace{
+  display:grid;grid-template-columns:minmax(272px,320px) minmax(0,1fr);
+  align-items:start;gap:clamp(15px,2vw,30px);
+  padding-top:15px;
+}
+.evo-magazine-star .evo-mag-sidebar{
+  position:sticky;top:92px;
+  border:1px solid #365267;
+  border-top:3px solid #7dd6ef;
+  background:#0f1c29;
+  border-radius:4px;
+  overflow:hidden;
+  max-height:calc(100vh - 108px);
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 18px 45px #0004;
+}
+.evo-magazine-star .evo-mag-sidebar-head{display:flex;align-items:center;justify-content:space-between;padding:19px 19px 16px;border-bottom:1px solid #385368;gap:8px;}
+.evo-magazine-star .evo-mag-sidebar-head > div{display:flex;flex-direction:column;gap:3px;}
+.evo-magazine-star .evo-mag-sidebar-head strong{font:900 20px/1.18 var(--ev-display);letter-spacing:-.035em;color:#f2f9fd;}
+.evo-magazine-star .evo-rail-eyebrow,
+.evo-magazine-star .evo-rail-field-label{font:750 9px/1.5 var(--ev-mono);letter-spacing:.14em;color:#8ed7ed;}
+.evo-magazine-star .evo-rail-toggle{display:none;border:1px solid #527a91;border-radius:3px;padding:8px 10px;color:#c9e9f6;font-size:12px;}
+.evo-magazine-star .evo-mag-sidebar-body{display:flex;flex-direction:column;min-height:0;padding:14px 14px 17px;overflow:hidden;flex:1;}
+.evo-magazine-star .evo-mag-progress{padding:10px 12px 15px;margin-bottom:14px;border:1px solid #324f60;background:#162a39;}
+.evo-magazine-star .evo-mag-progress > div:first-child{display:flex;justify-content:space-between;align-items:baseline;gap:9px;}
+.evo-magazine-star .evo-mag-progress > div:first-child > span{font:750 9px/1.3 var(--ev-mono);letter-spacing:.05em;color:#a6c4d3;}
+.evo-magazine-star .evo-mag-progress strong{color:#d9f5ff;font:950 20px/1.1 var(--ev-display);}
+.evo-magazine-star .evo-mag-progress strong small{color:#86a2b3;font-size:11px;}
+.evo-magazine-star .evo-mag-progress-track{height:5px;background:#365263;overflow:hidden;margin:10px 0 6px;}
+.evo-magazine-star .evo-mag-progress-track span{height:100%;display:block;background:#7bd7ee;transition:width .25s;}
+.evo-magazine-star .evo-mag-progress > small{font-size:10px;color:#95b4c5;}
+.evo-magazine-star .evo-rail-field-label{margin:0 0 6px 1px;color:#9dbcd0;}
+.evo-magazine-star .evo-rail-search,.evo-magazine-star .evo-rail-filter{
+  background:#0b1520;color:#ecf4fa;border:1px solid #49647a;border-radius:3px;
+  padding:11px 12px;font-size:13px;width:100%;min-height:43px;margin-bottom:14px;
+}
+.evo-magazine-star .evo-rail-search::placeholder{color:#819db0;}
+.evo-magazine-star .evo-rail-results{display:flex;justify-content:space-between;gap:10px;color:#b2c9da;border-bottom:1px solid #39566a;padding:3px 2px 9px;text-transform:uppercase;font:750 9px/1.3 var(--ev-mono);letter-spacing:.07em;}
+.evo-magazine-star .evo-mag-rail-list{overflow:auto;overscroll-behavior:contain;min-height:130px;scrollbar-width:thin;scrollbar-color:#416c84 #111e2b;flex:1;}
+.evo-magazine-star .evo-rail-item{
+  display:grid;grid-template-columns:36px minmax(0,1fr) 15px;
+  gap:10px;align-items:start;text-align:left;width:100%;
+  padding:14px 8px 14px 10px;
+  color:#d7e5ed;background:transparent;
+  border:0;border-bottom:1px solid #263f4f;
+  border-left:3px solid transparent;
+  transition:background .14s,color .14s,border-color .14s;
+}
+.evo-magazine-star .evo-rail-item:hover{background:#1e3444;}
+.evo-magazine-star .evo-rail-item.is-active{background:#1d3548;border-left-color:var(--theme-accent,#79d7ed);color:#fff;}
+.evo-magazine-star .evo-rail-number{font:900 16px/1.35 var(--ev-mono);color:#82c8db;}
+.evo-magazine-star .evo-rail-item-text{font-size:12px;line-height:1.46;font-weight:700;}
+.evo-magazine-star .evo-rail-item-state{font:900 14px/1.35 var(--ev-mono);color:#8ddfeb;}
+.evo-magazine-star .evo-rail-empty{padding:20px 10px;color:#bed1e0;font-size:13px;}
+.evo-magazine-star .evo-rail-bible{font:800 11px/1.3 var(--ev-mono);letter-spacing:.06em;display:flex;justify-content:space-between;margin-top:13px;border:1px solid #50778a;padding:13px;color:#a9eaf9;background:#183246;border-radius:3px;}
+.evo-magazine-star .evo-rail-bible:hover{background:#25485d;}
+.evo-magazine-star .evo-mag-reader{min-width:0;scroll-margin-top:100px;padding-bottom:30px;}
+.evo-magazine-star .evo-reader-heading{display:flex;align-items:center;justify-content:space-between;gap:14px 22px;min-height:56px;margin-bottom:12px;flex-wrap:wrap;border-bottom:1px solid #345266;padding-bottom:13px;}
+.evo-magazine-star .evo-reader-breadcrumb{display:flex;flex-wrap:wrap;gap:10px;font:800 10px/1.5 var(--ev-mono);letter-spacing:.08em;color:#9bb9cc;}
+.evo-magazine-star .evo-reader-breadcrumb span:first-child{color:#8ddbf0;}
+.evo-magazine-star .evo-reader-pager{display:flex;align-items:center;gap:7px;}
+.evo-magazine-star .evo-reader-pager button{min-height:38px;padding:8px 12px;background:#142536;border:1px solid #4a6b7f;color:#e6f3fb;border-radius:3px;font-size:12px;font-weight:750;}
+.evo-magazine-star .evo-reader-pager button:hover{background:#244157;border-color:#7bd2ed;}
+.evo-magazine-star .evo-pager-count{font:900 14px/1.3 var(--ev-mono);color:#eff9fd;min-width:70px;text-align:center;}
+.evo-magazine-star .evo-pager-count small{font-size:10px;color:#a3b7c5;}
+.evo-magazine-star .evo-mag-article{margin:0 0 22px!important;box-shadow:0 17px 45px #0005!important;border:1px solid #3c576a!important;border-radius:4px!important;}
+.evo-magazine-star .evo-article-hero h2{
+  font-family:var(--ev-display)!important;
+  font-size:clamp(28px,3.15vw,49px)!important;
+  line-height:1.08!important;letter-spacing:-.065em!important;
+  font-weight:950!important;
+  text-transform:none!important;
+  text-wrap:balance;
+}
+.evo-magazine-star .evo-article-hero > div:first-child{padding:clamp(21px,2.6vw,36px)!important;}
+.evo-magazine-star .evo-article-hero .evo-hero-diagram{min-height:265px!important;padding:clamp(16px,2vw,27px)!important;background:linear-gradient(90deg,#0a1824,#142c3e)!important;}
+.evo-magazine-star .evo-mag-body{padding:clamp(20px,2.7vw,38px)!important;}
+.evo-magazine-star .evo-lesson-intro{min-height:0!important;border-radius:3px!important;padding:23px!important;background:#192b3b!important;}
+.evo-magazine-star .evo-lesson-intro:first-child{background:#1e3648!important;border-top:3px solid #91d8f0!important;}
+.evo-magazine-star .evo-lesson-intro p{font-size:15px!important;line-height:1.7!important;}
+.evo-magazine-star .evo-lesson-intro:first-child p{font-size:clamp(17px,1.35vw,21px)!important;line-height:1.48!important;}
+.evo-magazine-star .evo-lab-heading h3{font:950 clamp(24px,2vw,32px)/1.15 var(--ev-display)!important;letter-spacing:-.045em;}
+.evo-magazine-star .evo-step{padding:clamp(19px,2vw,28px)!important;border-radius:3px!important;}
+.evo-magazine-star .evo-step h4{font-size:clamp(18px,1.3vw,21px)!important;font-weight:850!important;}
+.evo-magazine-star .evo-step .evo-step-explain{font-size:15px!important;}
+.evo-magazine-star .evo-code-toolbar{flex-wrap:wrap;gap:9px;}
+.evo-magazine-star .evo-command{font:500 13px/1.75 var(--ev-mono)!important;overflow-x:auto;overflow-wrap:anywhere;white-space:pre-wrap;}
+.evo-magazine-star .evo-result{font-size:14px!important;}
+.evo-magazine-star .evo-tip,.evo-magazine-star .evo-warning{padding:19px!important;font-size:15px!important;}
+.evo-magazine-star .evo-bible-box{padding:20px!important;}
+.evo-magazine-star .evo-reader-bottom-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr);gap:14px;align-items:stretch;}
+.evo-magazine-star .evo-mag-notes{padding:21px!important;border-radius:3px!important;margin:0!important;background:#142637!important;}
+.evo-magazine-star .evo-note-heading{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid #3c5d74;padding-bottom:12px;margin-bottom:13px;}
+.evo-magazine-star .evo-note-heading span{font:800 11px/1.4 var(--ev-mono);color:#8ed7e8;letter-spacing:.1em;}
+.evo-magazine-star .evo-note-heading strong{font:750 10px/1.4 var(--ev-mono);color:#afcbd9;}
+.evo-magazine-star .evo-mag-notes label{font-size:17px!important;font-weight:850;}
+.evo-magazine-star .evo-mag-notes textarea{display:block;width:100%;margin-top:12px;border-radius:3px;min-height:139px;resize:vertical;font-size:14px!important;}
+.evo-magazine-star .evo-mag-notes p{margin-top:9px;font-size:11px;color:#a5c0d0;line-height:1.6;}
+.evo-magazine-star .evo-reader-completion{border:1px solid #43687e;background:linear-gradient(145deg,#1d3c51,#112636);padding:23px;display:flex;flex-direction:column;gap:13px;}
+.evo-magazine-star .evo-reader-completion>span{font:800 10px/1.5 var(--ev-mono);color:#98e4ed;letter-spacing:.08em;}
+.evo-magazine-star .evo-reader-completion>strong{font:900 20px/1.3 var(--ev-display);letter-spacing:-.03em;}
+.evo-magazine-star .evo-reader-completion p{font-size:13px;line-height:1.6;color:#c0d4e1;}
+.evo-magazine-star .evo-mark-read,.evo-magazine-star .evo-next-large{padding:12px 15px;border:1px solid #80d7d7;font-size:11px;font-weight:900;line-height:1.4;letter-spacing:.025em;text-align:center;min-height:44px;}
+.evo-magazine-star .evo-mark-read{margin-top:auto;background:#9ddbd6;color:#103132;}
+.evo-magazine-star .evo-mark-read[aria-pressed="true"]{background:#1c534c;color:#d4fff3;}
+.evo-magazine-star .evo-next-large{color:#effaff;background:#284c67;border-color:#5b91ad;}
+.evo-magazine-star .evo-mark-read:hover,.evo-magazine-star .evo-next-large:hover{filter:brightness(1.13);}
+.evo-magazine-star .evo-copy-status{color:#8ff2d7;font-size:13px;min-height:20px;margin-top:10px;}
+.evo-magazine-star #bibliavirtual-index{margin-top:45px;padding-top:30px!important;}
+.evo-magazine-star #bibliavirtual-index h2{font:900 clamp(23px,2.4vw,34px)/1.2 var(--ev-display);letter-spacing:-.045em;}
+.evo-magazine-star #bibliavirtual-index details{background:#11202e!important;border:1px solid #415b6e!important;border-radius:3px!important;padding:16px 18px!important;}
+.evo-magazine-star #bibliavirtual-index details[open]{border-color:#77bcd2!important;}
+.evo-magazine-star #bibliavirtual-index summary{font-size:14px!important;line-height:1.4;list-style-position:outside;}
+.evo-magazine-star #bibliavirtual-index details ol{color:#bed1de;}
+.evo-magazine-star .evo-mag-article .evo-data-note{font-size:11px!important;}
+
+/* Reduced motion / keyboard / phone ergonomics. */
+@media(max-width:1090px){
+ .evo-magazine-star .evo-mag-workspace{grid-template-columns:minmax(245px,285px) minmax(0,1fr);gap:16px;}
+ .evo-magazine-star .evo-mag-rail-list{max-height:calc(100vh - 470px);}
+ .evo-magazine-star .evo-brand-description small{display:none;}
+ .evo-magazine-star .evo-reader-bottom-grid{grid-template-columns:1fr;}
+}
+@media(max-width:850px){
+ .evo-magazine-star .evo-cover{grid-template-columns:1fr;}
+ .evo-magazine-star .evo-cover-system{display:none;}
+ .evo-magazine-star .evo-cover h1{font-size:clamp(30px,5vw,49px)!important;}
+ .evo-magazine-star .evo-mag-workspace{grid-template-columns:1fr;gap:16px;}
+ .evo-magazine-star .evo-mag-sidebar{position:static;max-height:none;}
+ .evo-magazine-star .evo-rail-toggle{display:inline-block;}
+ .evo-magazine-star .evo-mag-sidebar-body{display:none;}
+ .evo-magazine-star .evo-mag-sidebar[data-mobile-open="true"] .evo-mag-sidebar-body{display:flex;max-height:65vh;}
+ .evo-magazine-star .evo-mag-rail-list{max-height:44vh;}
+ .evo-magazine-star .evo-reader-bottom-grid{grid-template-columns:minmax(0,1fr) minmax(250px,.8fr);}
+ .evo-magazine-star .evo-mag-topnav{grid-template-columns:auto 1fr auto;}
+ .evo-magazine-star .evo-brand-lockup{justify-self:center;}
+}
+@media(max-width:620px){
+ .evo-magazine-star .evo-mag-topnav{gap:8px;min-height:60px;padding:9px 11px!important;}
+ .evo-magazine-star .evo-nav-secondary{display:none;}
+ .evo-magazine-star .evo-brand-mark{font-size:24px;}
+ .evo-magazine-star .evo-brand-description strong{font-size:9px;letter-spacing:.03em;}
+ .evo-magazine-star .evo-brand-line{height:20px;}
+ .evo-magazine-star .evo-nav-primary{font-size:12px;padding:8px 10px;}
+ .evo-magazine-star .evo-cover{margin:12px 0 16px!important;}
+ .evo-magazine-star .evo-cover-editorial{padding:24px 19px;}
+ .evo-magazine-star .evo-cover h1{font-size:clamp(31px,8.6vw,43px)!important;}
+ .evo-magazine-star .evo-cover-topline span:last-child{display:none;}
+ .evo-magazine-star .evo-cover-deck{font-size:14px;}
+ .evo-magazine-star .evo-cover-bottom > span{display:none;}
+ .evo-magazine-star .evo-cover-stats{padding:13px 18px!important;gap:12px;justify-content:start;}
+ .evo-magazine-star .evo-cover-stats span{font-size:9px!important;white-space:normal;}
+ .evo-magazine-star .evo-cover-stats b{font-size:20px!important;}
+ .evo-magazine-star .evo-reader-pager button span{display:none;}
+ .evo-magazine-star .evo-reader-pager button{font-size:16px;padding:7px 12px;}
+ .evo-magazine-star .evo-reader-breadcrumb{font-size:9px;max-width:100%;}
+ .evo-magazine-star .evo-article-hero h2{font-size:clamp(28px,8vw,42px)!important;}
+ .evo-magazine-star .evo-article-hero .evo-hero-diagram{min-height:220px!important;}
+ .evo-magazine-star .evo-mag-body{padding:15px!important;}
+ .evo-magazine-star .evo-reader-bottom-grid{grid-template-columns:1fr;}
+ .evo-magazine-star .evo-lesson-intro{padding:16px!important;}
+ .evo-magazine-star .evo-step{padding:17px!important;}
+ .evo-magazine-star .evo-command{font-size:12px!important;}
+}
+@media(prefers-reduced-motion:reduce){
+ .evo-magazine-star *, .evo-magazine-star *:before,.evo-magazine-star *:after{scroll-behavior:auto!important;transition-duration:0.01ms!important;animation-duration:0.01ms!important;}
+}
+@media print{
+ .evo-magazine-star{background:#fff!important;color:#111!important;font-family:Arial,sans-serif!important;}
+ .evo-magazine-star .evo-cover{display:block!important;background:white!important;border:0!important;box-shadow:none!important;margin:0!important;padding:0!important;min-height:0!important;}
+ .evo-magazine-star .evo-cover-editorial{display:block!important;background:white!important;padding:0!important;color:#111!important;}
+ .evo-magazine-star .evo-cover-topline{color:#111!important;border-color:#888;}
+ .evo-magazine-star .evo-cover-topline span{color:#111!important;}
+ .evo-magazine-star .evo-cover .evo-cover-kicker,.evo-magazine-star .evo-cover h1,.evo-magazine-star .evo-cover h1 em,.evo-magazine-star .evo-cover .evo-cover-deck,.evo-magazine-star .evo-cover-bottom strong,.evo-magazine-star .evo-cover-bottom strong span,.evo-magazine-star .evo-cover-bottom>span{color:#111!important;text-shadow:none!important;}
+ .evo-magazine-star .evo-cover h1{font-family:Arial,sans-serif!important;font-size:30pt!important;line-height:1.1!important;}
+ .evo-magazine-star .evo-cover-bottom{border-color:#aaa;}
+ .evo-magazine-star .evo-mag-article{box-shadow:none!important;border:0!important;border-radius:0!important;background:#fff!important;}
+ .evo-magazine-star .evo-mag-body{background:white!important;color:#111!important;padding:0!important;}
+ .evo-magazine-star .evo-lesson-intro,.evo-magazine-star .evo-step,.evo-magazine-star .evo-challenge,.evo-magazine-star .evo-result,.evo-magazine-star .evo-tip,.evo-magazine-star .evo-warning,.evo-magazine-star .evo-bible-box{background:white!important;color:#111!important;border-color:#bbb!important;box-shadow:none!important;}
+ .evo-magazine-star .evo-lesson-intro p,.evo-magazine-star .evo-step p,.evo-magazine-star .evo-step h4,.evo-magazine-star .evo-bible-box p,.evo-magazine-star .evo-result strong{color:#111!important;}
+ .evo-magazine-star .evo-mag-article .evo-lesson-intro{min-height:0!important;padding:3mm!important;}
+ .evo-magazine-star .evo-index-section{border:0!important;margin:0!important;padding:0!important;}
+ .evo-magazine-star .evo-index-section h2{font:900 20pt/1.15 Arial,sans-serif!important;color:#111!important;}
+ .evo-magazine-star .evo-mag-layout{width:100%!important;max-width:100%!important;padding:0!important;}
+}
