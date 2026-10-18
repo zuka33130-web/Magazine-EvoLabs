@@ -19,6 +19,7 @@ import { EVO_MAGAZINE_RELATED_SECTORS } from '../../data/tomo02MagazineSectorBri
 import { TOMO_02_MASTER_SECTORS } from '../../data/tomo02MasterSectors';
 import './Tomo02MagazineEditorial.css';
 import './Tomo02MagazinePremium.css';
+import './Tomo02MagazineStudio.css';
 import { MagazineArticleHero, magazineArtDirection } from './MagazineArticleHero';
 
 type Step = { title: string; why: string; code?: string; expect: string };
