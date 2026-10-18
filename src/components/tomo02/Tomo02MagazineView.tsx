@@ -55,7 +55,6 @@ import {
 import { Tomo02ComoUsarElTomo } from './Tomo02ComoUsarElTomo';
 import { EvoTomo02FinalExam } from './EvoTomo02FinalExam';
 import { EvoTomo02CompletionScreen } from './EvoTomo02CompletionScreen';
-import { Tomo02MagazineEstrella } from './Tomo02MagazineEstrella';
 import { Tomo02Sector00View } from './sector00/Tomo02Sector00View';
 import { Tomo02Sector01View } from './sector01/Tomo02Sector01View';
 import { Tomo02Sector02View } from './sector02/Tomo02Sector02View';
@@ -189,13 +188,14 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   const [subView, setSubView] = useState<Tomo02SubView>(() => {
     try {
       const p = new URLSearchParams(window.location.search);
-      if (p.get('mode') === 'magazine' || p.get('print') === 'true') {
-        return 'a4_magazine';
+      // Los enlaces antiguos del magazine redirigen a la Biblia Virtual.
+      if (p.get('mode') === 'magazine' || p.get('print') === 'true' || p.get('pdf') === 'true') {
+        return 'index';
       }
     } catch {
       // ignore
     }
-    return initialSubView || 'cover';
+    return initialSubView === 'pdf_magazine' || initialSubView === 'a4_magazine' ? 'index' : (initialSubView || 'cover');
   });
 
   const [selectedSectorNumber, setSelectedSectorNumber] = useState(getAdvancedSector(initialSectorNumber || safeStorage.getItem('evo_tomo02_last_sector') || '')?.number || '11');
@@ -349,7 +349,6 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
 
   // The new edition owns its own print flow; do not invoke the legacy print dialog.
   useEffect(() => {
-    if (subView === 'pdf_magazine' || subView === 'a4_magazine') return;
     try {
       const params = new URLSearchParams(window.location.search);
       if (params.get('print') === 'true' || params.get('pdf') === 'true') {
@@ -797,18 +796,6 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
       <div className="min-h-screen bg-[#07090e] text-zinc-100 flex flex-col font-sans-editorial">
         <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Tomo02Cover
-            onOpenSector00={() => {
-              setSubView('sector_00');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onOpenSector01={() => {
-              setSubView('sector_01');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onOpenMagazine={() => {
-              setSubView('a4_magazine');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
             onOpenInteractive={() => {
               setSubView('index');
               window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -818,10 +805,6 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                 onOpenLab();
               }
             }}
-            onOpenA4WebVersion={() => {
-              setSubView('a4_magazine');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
             onBackToApp={onBackToApp}
             onNavigateTomo={onNavigateTomo}
             completedModulesCount={completedCount}
@@ -830,17 +813,6 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
         </div>
       </div>
     );
-  }
-
-  // Magazine Estrella: PDF A4 y lector editorial comparten un único
-  // contenido para principiantes. La Biblia Virtual y sus 40 sectores
-  // permanecen intactos. El PDF histórico no se elimina del repositorio.
-  if (subView === 'pdf_magazine' || subView === 'a4_magazine') {
-    return <Tomo02MagazineEstrella
-      onBack={() => { setSubView('cover'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-      onOpenInteractive={() => { setSubView('index'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-      onOpenSector={handleOpenOriginalSector}
-    />;
   }
 
   if (subView === 'index') {
@@ -904,10 +876,6 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
               setSubView('sector_10');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            onOpenA4Magazine={() => {
-              setSubView('a4_magazine');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
             onSelectModule={handleSelectModule}
             onStartFinalExam={() => {
               setSubView('exam');
@@ -935,11 +903,6 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
           moduleIndex={selectedModuleIndex}
           onBackToIndex={() => {
             setSubView('index');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onOpenMagazine={(page?: number) => {
-            if (page) setCurrentPage(page);
-            setSubView('a4_magazine');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           onSelectModule={handleSelectModule}
@@ -995,10 +958,6 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
           onGoToCampusFormation={onBackToApp}
           onReviewExam={() => {
             setSubView('exam');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onOpenA4Magazine={() => {
-            setSubView('a4_magazine');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           score={examScore}
