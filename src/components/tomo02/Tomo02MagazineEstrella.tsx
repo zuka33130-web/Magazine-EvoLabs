@@ -17,6 +17,7 @@ import { EVO_MAGAZINE_REPAIR_A } from '../../data/tomo02MagazineRepairA';
 import { EVO_MAGAZINE_REPAIR_B } from '../../data/tomo02MagazineRepairB';
 import { EVO_MAGAZINE_RELATED_SECTORS } from '../../data/tomo02MagazineSectorBridge';
 import { TOMO_02_MASTER_SECTORS } from '../../data/tomo02MasterSectors';
+import { MagazineArticleHero, magazineArtDirection } from './MagazineArticleHero';
 
 type Step = { title: string; why: string; code?: string; expect: string };
 type Article = { id: number; goal: string; basics: string; steps: Step[]; tip: string; warning: string; challenge: string };
@@ -138,50 +139,101 @@ export function Tomo02MagazineEstrella({ onBack, onOpenInteractive, onOpenSector
     const handle=window.setTimeout(()=>{document.title='EVO-LABS-TOMO-02-MAGAZINE-ESTRELLA';window.print();},900);
     return ()=>window.clearTimeout(handle);
   },[]);
-  const renderGuide=(a:Article)=>(
-    <article key={a.id} className="evo-guide bg-white text-zinc-900 rounded-xl mb-7 border border-zinc-300 p-6 sm:p-9">
-      <p className="text-xs font-black text-cyan-800 uppercase tracking-widest">Investigación {number(a.id)} · Guía real</p>
-      <h2 className="text-3xl font-black tracking-tight mt-2">{EVO_MAGAZINE_200_TITLES[a.id-1]}</h2>
-      <p className="mt-4"><b>Lo que vas a aprender:</b> {a.goal}</p>
-      <p className="mt-3 leading-relaxed"><b>Desde cero:</b> {a.basics}</p>
-      {a.steps.map((step,i)=>(
-        <section className="evo-step mt-6" key={i}>
-          <h3 className="font-bold text-lg">{i+1}. {step.title}</h3>
-          <p className="mt-1 text-sm leading-relaxed">{step.why}</p>
-          {step.code && <div className="mt-2">
-            <button type="button" onClick={()=>copyCode(step.code!)}
-              className="evo-no-print text-xs px-3 py-1.5 bg-cyan-800 hover:bg-cyan-700 text-white rounded-t-md"
-              aria-label={'Copiar comando del paso ' + (i+1)}>Copiar comando</button>
-            <pre className="evo-command select-text bg-zinc-900 text-cyan-100 text-xs p-4 rounded-md whitespace-pre-wrap break-words print:bg-zinc-100 print:text-black print:border">{step.code}</pre>
-          </div>}
-          <p className="mt-2 text-sm"><b>Qué debería suceder:</b> {step.expect}</p>
-        </section>
-      ))}
-      <p className="mt-6 border-l-4 border-emerald-600 pl-3 text-sm"><b>TRUCO EVO.</b> {a.tip}</p>
-      <p className="mt-4 border-l-4 border-amber-500 pl-3 text-sm"><b>ANTES DE TOCAR NADA.</b> {a.warning}</p>
-      <div className="mt-5 p-4 rounded-lg border border-zinc-400 text-sm"><b>DESAFÍO DEL ALUMNO.</b> {a.challenge}<div className="mt-6 border-b border-dashed border-zinc-400"/><div className="mt-6 border-b border-dashed border-zinc-400"/></div>
-      <div className="mt-5 pt-4 border-t border-cyan-200">
-        <p className="font-bold text-sm mb-2">El mismo tema, explicado en profundidad en la Biblia Virtual:</p>
-        <div className="flex flex-wrap gap-2">
-          {(EVO_MAGAZINE_RELATED_SECTORS[a.id] || []).map(number => {
-            const sector = TOMO_02_MASTER_SECTORS.find(s => s.sectorNumber === number);
-            if (!sector) return null;
-            return <button key={number} type="button" onClick={() => onOpenSector ? onOpenSector(number) : onOpenInteractive()}
-              className="evo-no-print border border-cyan-800 text-cyan-900 px-3 py-2 rounded-md text-xs font-bold hover:bg-cyan-50">
-              Sector {number} · {sector.title} →
-            </button>;
-          })}
+  const renderGuide=(a:Article)=>{
+    const direction=magazineArtDirection(a.id);
+    return (
+    <article key={a.id} className="evo-guide evo-mag-article bg-[#f9f7f3] text-zinc-900 rounded-[26px] mb-7 border border-zinc-300 overflow-hidden shadow-xl shadow-black/10">
+      <MagazineArticleHero id={a.id} title={EVO_MAGAZINE_200_TITLES[a.id-1]}/>
+      <header className="evo-print-only hidden">
+        <p className="text-xs font-black text-cyan-800 uppercase tracking-widest">Investigación {number(a.id)} · EVO LABS</p>
+        <h2 className="text-2xl font-black mt-2">{EVO_MAGAZINE_200_TITLES[a.id-1]}</h2>
+      </header>
+      <div className="px-5 sm:px-8 py-6 sm:py-8">
+        <div className="grid lg:grid-cols-[1.05fr_.95fr] gap-3 items-stretch">
+          <section className="evo-lesson-intro p-5 sm:p-6 rounded-2xl bg-white border border-zinc-200">
+            <div className="flex items-center gap-2 text-[11px] font-black tracking-[.18em] uppercase mb-3" style={{color:direction.accent}}>
+              <span className="inline-block h-2 w-2 rounded-full" style={{background:direction.accent}}/>
+              01 · LO QUE VAS A DESCUBRIR
+            </div>
+            <p className="text-[16px] sm:text-lg font-bold leading-snug">{a.goal}</p>
+          </section>
+          <section className="evo-lesson-intro p-5 sm:p-6 rounded-2xl bg-[#eaeef0] border border-[#dbe3e7]">
+            <div className="text-[11px] font-black tracking-[.18em] text-slate-600 uppercase mb-3">ANTES DE EMPEZAR · EXPLICADO DESDE CERO</div>
+            <p className="text-[14px] leading-relaxed">{a.basics}</p>
+          </section>
         </div>
-        <p className="text-xs text-zinc-600 mt-2">
-          {(EVO_MAGAZINE_RELATED_SECTORS[a.id] || []).map(number => {
-            const sector = TOMO_02_MASTER_SECTORS.find(s => s.sectorNumber === number);
-            return sector ? 'Sector ' + number + ': ' + sector.title : '';
-          }).filter(Boolean).join(' · ')}
-        </p>
+        <div className="mt-7 flex items-center gap-4 border-b-[3px] border-zinc-900 pb-3">
+          <span className="bg-zinc-900 text-white rounded-md px-3 py-2 font-black text-sm">LAB</span>
+          <h3 className="font-black text-xl sm:text-2xl tracking-tight">Probalo en tu computadora</h3>
+          <span className="ml-auto hidden sm:block uppercase text-[10px] tracking-widest text-zinc-500 font-bold">Pasos comprobables</span>
+        </div>
+        <div className="mt-4 space-y-3">
+          {a.steps.map((step,i)=>(
+            <section className="evo-step relative grid sm:grid-cols-[48px_minmax(0,1fr)] gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl border border-zinc-200 bg-white" key={i}>
+              <div className="flex items-start">
+                <span className="inline-flex h-11 w-11 shrink-0 rounded-xl items-center justify-center text-xl font-black text-white" style={{background:direction.dark}}>{String(i+1).padStart(2,'0')}</span>
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-black text-[17px] sm:text-lg leading-snug">{step.title}</h4>
+                <p className="mt-2 text-[14px] leading-relaxed text-zinc-700">{step.why}</p>
+                {step.code && <div className="mt-4 rounded-xl overflow-hidden border border-[#26394a]">
+                  <div className="evo-no-print bg-[#1d2a38] px-4 py-2 text-[#d1deeb] flex items-center justify-between gap-3">
+                    <span className="text-[10px] font-bold tracking-wider uppercase flex items-center gap-2"><span className="text-cyan-400">●</span> PowerShell · consulta guiada</span>
+                    <button type="button" onClick={()=>copyCode(step.code!)}
+                      className="rounded-md border border-[#587080] bg-[#34485a] hover:bg-[#496476] text-[11px] font-bold px-3 py-1.5"
+                      aria-label={'Copiar comando del paso ' + (i+1)}>Copiar comando</button>
+                  </div>
+                  <pre className="evo-command select-text bg-[#101c27] text-[#c5f1e6] font-mono text-[12px] sm:text-[13px] leading-relaxed p-4 whitespace-pre-wrap break-words print:bg-zinc-100 print:text-black print:border">{step.code}</pre>
+                </div>}
+                <div className="mt-3 p-3 rounded-lg bg-[#f0f6f4] border-l-[3px] border-emerald-600 text-[13px] leading-relaxed">
+                  <strong className="block uppercase tracking-wider text-[10px] text-emerald-800 mb-1">Cómo interpretar el resultado</strong>{step.expect}
+                </div>
+              </div>
+            </section>
+          ))}
+        </div>
+        <div className="mt-5 grid md:grid-cols-2 gap-3">
+          <aside className="rounded-2xl border border-[#b9e8d6] bg-[#edf9f2] p-5">
+            <p className="text-[11px] font-black uppercase tracking-wider text-emerald-800 mb-2">✦ TRUCO EVO · PARA INVESTIGAR MEJOR</p>
+            <p className="text-[14px] leading-relaxed">{a.tip}</p>
+          </aside>
+          <aside className="rounded-2xl border border-[#f5d4ac] bg-[#fff5e4] p-5">
+            <p className="text-[11px] font-black uppercase tracking-wider text-amber-900 mb-2">! ANTES DE TOCAR NADA · PRECAUCIÓN</p>
+            <p className="text-[14px] leading-relaxed">{a.warning}</p>
+          </aside>
+        </div>
+        <section className="evo-challenge mt-4 rounded-2xl p-5 sm:p-6 text-white" style={{backgroundColor:direction.dark}}>
+          <div className="flex flex-wrap justify-between gap-2 mb-3">
+            <span className="text-[11px] uppercase font-black tracking-[.17em]" style={{color:direction.secondary}}>03 · DESAFÍO DEL INVESTIGADOR</span>
+            <span className="text-[10px] font-mono text-white/65">EVIDENCIA → CONCLUSIÓN</span>
+          </div>
+          <p className="text-[15px] sm:text-base leading-relaxed font-medium">{a.challenge}</p>
+          <div className="mt-5 border-b border-dashed border-white/45"/>
+          <div className="mt-5 border-b border-dashed border-white/45"/>
+        </section>
+        <div className="mt-5 rounded-2xl bg-[#eff2f3] border border-[#dce2e4] p-4 sm:p-5">
+          <p className="font-black text-sm mb-3">SEGUÍ PROFUNDIZANDO · BIBLIA VIRTUAL</p>
+          <div className="flex flex-wrap gap-2">
+            {(EVO_MAGAZINE_RELATED_SECTORS[a.id] || []).map(number => {
+              const sector = TOMO_02_MASTER_SECTORS.find(s => s.sectorNumber === number);
+              if (!sector) return null;
+              return <button key={number} type="button" onClick={() => onOpenSector ? onOpenSector(number) : onOpenInteractive()}
+                className="evo-no-print inline-flex border border-slate-400 hover:border-slate-900 hover:bg-white text-slate-900 px-3 py-2 rounded-lg text-xs font-bold">
+                SECTOR {number} · {sector.title} →
+              </button>;
+            })}
+          </div>
+          <p className="text-xs text-zinc-600 mt-3">
+            {(EVO_MAGAZINE_RELATED_SECTORS[a.id] || []).map(number => {
+              const sector = TOMO_02_MASTER_SECTORS.find(s => s.sectorNumber === number);
+              return sector ? 'Sector ' + number + ': ' + sector.title : '';
+            }).filter(Boolean).join(' · ')}
+          </p>
+        </div>
+        <p className="mt-5 pt-3 border-t border-zinc-300 text-[11px] text-zinc-600">Los gráficos y valores ilustrativos no representan mediciones de tu PC. No se ejecutan comandos desde el magazine ni el PDF. Verificá cada resultado antes de concluir.</p>
       </div>
-      <p className="mt-5 pt-3 border-t text-xs text-zinc-600">No se ejecuta código desde el PDF. Los comandos de estas guías son consultas o abren herramientas nativas. La Biblia Virtual conserva el estudio avanzado.</p>
     </article>
-  );
+  );};
   return (
     <div className="evo-magazine-star min-h-screen bg-[#10151b] text-zinc-100">
       <style>{'@page{size:A4;margin:14mm 12mm;}@media print{html,body,.evo-magazine-star{background:white!important;color:black!important;} .evo-no-print{display:none!important;} .evo-print-only{display:block!important;} .evo-cover{page-break-after:always;} .evo-index-print{columns:2;column-gap:8mm;font-size:9pt;} .evo-index-print p{break-inside:avoid;margin:0 0 3mm;} .evo-index-section{break-after:page;} .evo-guide{break-before:page;border:0!important;padding:0!important;} .evo-step{break-inside:avoid;} .evo-command{overflow-wrap:anywhere;white-space:pre-wrap!important;} .evo-cover .text-zinc-300,.evo-cover .text-zinc-400{color:#333!important;} .evo-cover .text-cyan-300{color:#076284!important;} .evo-guide p,.evo-guide h2,.evo-guide h3{orphans:3;widows:3;} .evo-canonical-sector{break-inside:auto;} .evo-canonical-sector h3,.evo-can-entry{break-inside:avoid;} .evo-magazine-star a{color:#075985!important;} }'}</style>
