@@ -1,17 +1,6 @@
 import React from 'react';
 import type { WindowsArtKind } from './Tomo02WindowsEditorialArt';
 
-const ariaLabels: Record<WindowsArtKind, string> = {
-  night: 'Ilustración conceptual del sistema Windows en actividad de fondo.',
-  kernel: 'Ilustración conceptual de las capas del sistema operativo y los hilos.',
-  cpu: 'Ilustración conceptual de CPU, energía y flujo de datos.',
-  experiment: 'Ilustración conceptual de almacenamiento y pruebas controladas.',
-  tasks: 'Ilustración conceptual de tareas, memoria y configuración.',
-  network: 'Ilustración conceptual de procesos y conexiones de red.',
-  verdict: 'Ilustración conceptual de evidencia, hipótesis y conclusión.',
-  security: 'Ilustración conceptual de registros y diagnóstico forense.',
-};
-
 /**
  * EVO LABS · Cinco ilustraciones de referencia para el Atlas Visual de Windows.
  * Original vector artwork; decorative imagery only, never a live measurement.
