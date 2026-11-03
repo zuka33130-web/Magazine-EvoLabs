@@ -112,27 +112,56 @@ export const Page18Chapter04MurosTermicos: React.FC = () => {
 
         </div>
 
-        {/* Airflow Section (Clean, spacious) */}
-        <div className="p-4 bg-[#0d0f17] border border-zinc-800 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-orange-500/10 rounded-lg text-orange-400">
-              <Wind className="w-5 h-5" />
+        {/* Matriz Pericial para Localizar el Cuello de Botella Real */}
+        <div className="p-3 bg-[#0f0c0a] border border-orange-500/40 rounded-xl space-y-2 text-xs font-mono-tech shadow-xl">
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-1.5">
+            <span className="text-orange-400 font-bold uppercase text-[11px] flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5" />
+              <span>MATRIZ PERICIAL: CÓMO LOCALIZAR EXACTAMENTE EL CUELLO DE BOTELLA</span>
+            </span>
+            <span className="text-[10px] text-zinc-500">TRIAGE POR TELEMETRÍA DURA</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[10px]">
+            {/* GPU Bound */}
+            <div className="p-2 bg-black/50 border border-zinc-800/80 rounded space-y-1">
+              <div className="flex justify-between items-baseline">
+                <span className="text-emerald-400 font-bold">1. CUELLO DE GPU (ÓPTIMO)</span>
+                <span className="text-zinc-500 text-[9px]">GPU: 97-100%</span>
+              </div>
+              <p className="text-zinc-300 font-sans-editorial leading-tight text-[10px]">
+                <strong>Síntoma:</strong> GPU al 99%, CPU holgada (40-60%). Es el estado ideal en juegos: la tarjeta entrega su potencial completo sin retenciones. Cambiar CPU no otorgará FPS extra.
+              </p>
             </div>
-            <div>
-              <h5 className="font-mono-tech font-bold text-xs sm:text-sm uppercase text-white">
-                FLUJO DE AIRE EQUILIBRADO EN EL GABINETE
-              </h5>
-              <p className="text-xs font-sans-editorial text-zinc-400 mt-0.5 max-w-2xl leading-relaxed">
-                Configurar una presión ligeramente positiva con entradas filtradas ayuda a mantener aire fresco continuo hacia el disipador de la CPU, las etapas VRM y las unidades M.2, reduciendo a la vez el ingreso pasivo de polvo por intersticios.
+
+            {/* CPU Bound */}
+            <div className="p-2 bg-black/50 border border-zinc-800/80 rounded space-y-1">
+              <div className="flex justify-between items-baseline">
+                <span className="text-amber-400 font-bold">2. CUELLO DE CPU (HILO ÚNICO)</span>
+                <span className="text-zinc-500 text-[9px]">GPU: &lt; 80%</span>
+              </div>
+              <p className="text-zinc-300 font-sans-editorial leading-tight text-[10px]">
+                <strong>La trampa:</strong> CPU Global al 45%, pero el <em>Render Thread</em> al 100%. La GPU trabaja a media máquina esperando draw calls. Bajar resolución gráfica no incrementará tus FPS.
+              </p>
+            </div>
+
+            {/* Thermal / VRM Bound */}
+            <div className="p-2 bg-black/50 border border-zinc-800/80 rounded space-y-1">
+              <div className="flex justify-between items-baseline">
+                <span className="text-rose-400 font-bold">3. CUELLO TÉRMICO / VRM</span>
+                <span className="text-zinc-500 text-[9px]">PROCHOT // CLOCK DROP</span>
+              </div>
+              <p className="text-zinc-300 font-sans-editorial leading-tight text-[10px]">
+                <strong>Diagnóstico:</strong> Tras 5 min de carga, la frecuencia de CPU o GPU cae abruptamente (ej. de 4.8 GHz a 1.4 GHz) con TjMax en 100°C o VRM ardiendo. Se requiere mantenimiento físico.
               </p>
             </div>
           </div>
         </div>
 
         {/* Bottom Rule */}
-        <div className="p-3 bg-[#140f0c] border-l-3 border-orange-500 rounded-r text-xs text-zinc-300 font-mono-tech flex items-center justify-between">
-          <span>
-            <strong className="text-orange-400 font-bold">REGLA TERMODINÁMICA:</strong> Cada componente tiene sus propios límites de ingeniería: el TjMax de la CPU no equivale a la temperatura de unión de la VRAM ni a los umbrales de las etapas VRM.
+        <div className="p-2.5 bg-[#140f0c] border-l-3 border-orange-500 rounded-r text-xs text-zinc-300 font-mono-tech flex items-center justify-between">
+          <span className="text-[11px]">
+            <strong className="text-orange-400 font-bold">REGLA TERMODINÁMICA EVO:</strong> Cada componente tiene sus propios límites de ingeniería: el TjMax de la CPU no equivale a la temperatura de unión de la VRAM ni a los umbrales de las etapas VRM.
           </span>
           <span className="text-zinc-500 text-[10px] uppercase hidden sm:inline shrink-0">
             SIGUIENTE: MITO 05 // VENTILADORES AL 100% →

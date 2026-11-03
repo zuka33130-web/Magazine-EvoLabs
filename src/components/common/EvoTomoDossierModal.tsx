@@ -1231,6 +1231,16 @@ export const EvoTomoDossierModal: React.FC<EvoTomoDossierModalProps> = ({
   if (!volume) return null;
 
   const handlePrintOrPdf = () => {
+    const tomoCleanNum = resolvedTomoId.replace('tomo-', '');
+    if (tomoCleanNum === '01' || tomoCleanNum === '1') {
+      const link = document.createElement('a');
+      link.href = '/api/pdf/tomo01';
+      link.setAttribute('download', 'EVO-LABS-TOMO-01-CONOCE-TU-PC.pdf');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
     window.print();
   };
 

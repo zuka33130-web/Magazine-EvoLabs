@@ -12,6 +12,7 @@ interface LabEvoCommandProps {
   queSignifica: string;
   outputSample?: string;
   tip?: string;
+  compact?: boolean;
 }
 
 export const LabEvoCommand: React.FC<LabEvoCommandProps> = ({
@@ -25,6 +26,7 @@ export const LabEvoCommand: React.FC<LabEvoCommandProps> = ({
   queSignifica,
   outputSample,
   tip,
+  compact = false,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -35,9 +37,9 @@ export const LabEvoCommand: React.FC<LabEvoCommandProps> = ({
   };
 
   return (
-    <div className="bg-[#0b0e15] border-2 border-yellow-400/40 rounded-xl p-4 sm:p-5 shadow-2xl relative overflow-hidden font-sans-editorial">
+    <div className={`bg-[#0b0e15] border-2 border-yellow-400/40 rounded-xl ${compact ? 'p-3 shadow-xl' : 'p-4 sm:p-5 shadow-2xl'} relative overflow-hidden font-sans-editorial`}>
       {/* Top Header Strip */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-3 mb-4">
+      <div className={`flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 ${compact ? 'pb-2 mb-2' : 'pb-3 mb-4'}`}>
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded bg-yellow-400/10 border border-yellow-400/40 flex items-center justify-center text-yellow-400">
             <Terminal className="w-4 h-4" />
@@ -77,56 +79,56 @@ export const LabEvoCommand: React.FC<LabEvoCommandProps> = ({
       </div>
 
       {/* Hero Command Line Display */}
-      <div className="bg-[#05070a] border border-zinc-700/80 rounded-lg p-3 sm:p-4 mb-4 relative shadow-inner">
-        <div className="flex items-center justify-between text-[10px] font-mono-tech text-zinc-500 mb-1.5 select-none">
+      <div className={`bg-[#05070a] border border-zinc-700/80 rounded-lg ${compact ? 'p-2 mb-2' : 'p-3 sm:p-4 mb-4'} relative shadow-inner`}>
+        <div className="flex items-center justify-between text-[10px] font-mono-tech text-zinc-500 mb-1 select-none">
           <span>PS C:\WINDOWS\SYSTEM32&gt;</span>
           <span className="text-zinc-600">EJECUTAR COMO ADMINISTRADOR</span>
         </div>
-        <pre className="font-mono-tech text-xs sm:text-sm text-emerald-400 whitespace-pre-wrap break-all select-all font-semibold leading-relaxed">
+        <pre className={`font-mono-tech ${compact ? 'text-xs' : 'text-xs sm:text-sm'} text-emerald-400 whitespace-pre-wrap break-all select-all font-semibold leading-relaxed`}>
           {command}
         </pre>
       </div>
 
       {/* 4 Analytical Inspection Dimensions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 text-xs">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${compact ? 'gap-2 mb-2' : 'gap-3 mb-3'} text-xs`}>
         {/* Qué hace */}
-        <div className="p-3 bg-[#11141e] border-l-2 border-yellow-400 rounded-r">
-          <span className="text-[10px] font-mono-tech font-bold uppercase tracking-wider text-yellow-400 block mb-1">
+        <div className={`${compact ? 'p-2' : 'p-3'} bg-[#11141e] border-l-2 border-yellow-400 rounded-r`}>
+          <span className="text-[10px] font-mono-tech font-bold uppercase tracking-wider text-yellow-400 block mb-0.5">
             1. ¿QUÉ HACE ESTE COMANDO?
           </span>
-          <p className="text-zinc-300 text-[11px] leading-relaxed">
+          <p className="text-zinc-300 text-[10.5px] leading-relaxed">
             {queHace}
           </p>
         </div>
 
         {/* Qué devuelve */}
-        <div className="p-3 bg-[#11141e] border-l-2 border-zinc-600 rounded-r">
-          <span className="text-[10px] font-mono-tech font-bold uppercase tracking-wider text-zinc-400 block mb-1">
+        <div className={`${compact ? 'p-2' : 'p-3'} bg-[#11141e] border-l-2 border-zinc-600 rounded-r`}>
+          <span className="text-[10px] font-mono-tech font-bold uppercase tracking-wider text-zinc-400 block mb-0.5">
             2. ¿QUÉ DEVUELVE LA CONSOLA?
           </span>
-          <p className="text-zinc-300 text-[11px] leading-relaxed">
+          <p className="text-zinc-300 text-[10.5px] leading-relaxed">
             {queDevuelve}
           </p>
         </div>
 
         {/* Qué dato mirar */}
-        <div className="p-3 bg-[#11141e] border-l-2 border-sky-400 rounded-r">
-          <div className="flex items-center gap-1.5 text-[10px] font-mono-tech font-bold uppercase tracking-wider text-sky-400 mb-1">
+        <div className={`${compact ? 'p-2' : 'p-3'} bg-[#11141e] border-l-2 border-sky-400 rounded-r`}>
+          <div className="flex items-center gap-1.5 text-[10px] font-mono-tech font-bold uppercase tracking-wider text-sky-400 mb-0.5">
             <Search className="w-3 h-3" />
             <span>3. ¿QUÉ DATO EXACTO DEBÉS MIRAR?</span>
           </div>
-          <p className="text-zinc-200 text-[11px] leading-relaxed font-mono-tech font-medium">
+          <p className="text-zinc-200 text-[10.5px] leading-relaxed font-mono-tech font-medium">
             {queDatoMirar}
           </p>
         </div>
 
         {/* Qué significa */}
-        <div className="p-3 bg-[#11141e] border-l-2 border-emerald-400 rounded-r">
-          <div className="flex items-center gap-1.5 text-[10px] font-mono-tech font-bold uppercase tracking-wider text-emerald-400 mb-1">
+        <div className={`${compact ? 'p-2' : 'p-3'} bg-[#11141e] border-l-2 border-emerald-400 rounded-r`}>
+          <div className="flex items-center gap-1.5 text-[10px] font-mono-tech font-bold uppercase tracking-wider text-emerald-400 mb-0.5">
             <Info className="w-3 h-3" />
             <span>4. ¿QUÉ SIGNIFICA EL RESULTADO?</span>
           </div>
-          <p className="text-zinc-300 text-[11px] leading-relaxed">
+          <p className="text-zinc-300 text-[10.5px] leading-relaxed">
             {queSignifica}
           </p>
         </div>
@@ -134,7 +136,7 @@ export const LabEvoCommand: React.FC<LabEvoCommandProps> = ({
 
       {/* Output Sample or Pro Tip */}
       {(outputSample || tip) && (
-        <div className="mt-3 pt-3 border-t border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[10px] font-mono-tech text-zinc-400">
+        <div className={`${compact ? 'mt-2 pt-1.5' : 'mt-3 pt-3'} border-t border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[10px] font-mono-tech text-zinc-400`}>
           {outputSample && (
             <div className="flex items-center gap-1.5">
               <span className="text-zinc-500">SALIDA EJEMPLO:</span>

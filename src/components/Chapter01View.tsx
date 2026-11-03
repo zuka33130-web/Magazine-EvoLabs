@@ -29,7 +29,13 @@ import {
   Eye,
   FileText,
   FileCode,
-  Radio
+  Radio,
+  Microscope,
+  Activity,
+  ShieldAlert,
+  GitBranch,
+  Zap,
+  Network
 } from 'lucide-react';
 import {
   UserPcSpec,
@@ -43,6 +49,7 @@ import {
 import { REQUIRED_C01_SECTIONS } from '../utils/tomo01Progress';
 import { EvoChapterNavigationFooter } from './tomo01/EvoChapterNavigationFooter';
 import { EvoChapterCheckSection } from './tomo01/EvoChapterCheckSection';
+import { Tomo01TechnicalDossier, DossierTab } from './tomo01/Tomo01TechnicalDossier';
 import { TutorChapterBanner } from './tutor/TutorChapterBanner';
 import { TutorConceptTrigger } from './tutor/TutorConceptTrigger';
 
@@ -193,6 +200,10 @@ export const Chapter01View: React.FC<Chapter01ViewProps> = ({
       return [];
     }
   });
+
+  // View Mode: Passport flow vs Magazine Technical Dossier
+  const [viewMode, setViewMode] = useState<'passport' | 'dossier'>('passport');
+  const [dossierTab, setDossierTab] = useState<DossierTab>('silicon');
 
   // Layer toggle states (Capa 02: Técnica / Profundizar) per section
   const [expandedTech, setExpandedTech] = useState<Record<string, boolean>>({});
@@ -713,57 +724,109 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
         whatToLookFor="El nombre exacto del fabricante, modelo y especificación que devuelve Windows."
       />
 
-      {/* Persistent Visual Navigation Bar: 01 CPU ... 08 TU PC */}
-      <div className="mb-10 p-3 sm:p-4 rounded-2xl bg-[#101115] border border-zinc-800/80 shadow-xl overflow-x-auto scrollbar-none">
-        <div className="flex items-center justify-between min-w-[700px] gap-2">
-          {SECTIONS_MAP.map((sec) => {
-            const isCompleted = completedSections.has(sec.id);
-            const isCurrent = activeSection === sec.id;
+      {/* MODE SELECTOR: PASSPORT VS MAGAZINE TECHNICAL DOSSIER */}
+      <div className="mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 bg-[#111318] rounded-2xl border-2 border-zinc-800 shadow-xl">
+        <div className="flex items-center gap-2.5 px-2 text-xs font-mono-tech text-zinc-400">
+          <span className="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse" />
+          <span className="uppercase tracking-widest font-bold text-white">MODALIDAD DE INVESTIGACIÓN:</span>
+        </div>
 
-            return (
-              <button
-                key={sec.id}
-                type="button"
-                onClick={() => setActiveSection(sec.id)}
-                className={`flex-1 py-2 px-3 rounded-xl text-left transition-all duration-200 cursor-pointer flex items-center justify-between gap-2 border ${
-                  isCurrent
-                    ? 'bg-yellow-400 text-black border-yellow-400 shadow-md font-bold'
-                    : isCompleted
-                    ? 'bg-zinc-900/90 text-zinc-200 border-zinc-700/80 hover:border-yellow-400/50'
-                    : 'bg-black/30 text-zinc-500 border-zinc-900 hover:text-zinc-400 hover:border-zinc-800'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className={`font-mono-tech text-[10px] ${isCurrent ? 'text-black' : 'text-zinc-500'}`}>
-                    {sec.number}
-                  </span>
-                  <span className="text-xs font-mono-tech uppercase tracking-tight truncate">
-                    {sec.label}
-                  </span>
-                </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setViewMode('passport')}
+            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-mono-tech text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 border ${
+              viewMode === 'passport'
+                ? 'bg-yellow-400 text-black border-yellow-400 shadow-md font-bold'
+                : 'bg-black/50 text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-700'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>01 // PASAPORTE DE MI PC (8 COMPONENTES)</span>
+          </button>
 
-                {/* State indicator: ✓ completado / ● actual / ○ pendiente */}
-                <span className="text-xs shrink-0 font-mono-tech">
-                  {isCompleted ? (
-                    <CheckCircle2 className={`w-3.5 h-3.5 ${isCurrent ? 'text-black' : 'text-yellow-400'}`} />
-                  ) : isCurrent ? (
-                    <span className="w-2 h-2 rounded-full bg-black animate-pulse inline-block" />
-                  ) : (
-                    <span className="w-2 h-2 rounded-full border border-zinc-600 inline-block" />
-                  )}
-                </span>
-              </button>
-            );
-          })}
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode('dossier');
+              setDossierTab('silicon');
+            }}
+            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-mono-tech text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 border ${
+              viewMode === 'dossier'
+                ? 'bg-yellow-400 text-black border-yellow-400 shadow-md font-bold'
+                : 'bg-black/50 text-yellow-400 border-yellow-400/50 hover:bg-yellow-400/10'
+            }`}
+          >
+            <Microscope className="w-3.5 h-3.5" />
+            <span>02 // DOSSIER MAGAZINE (SILICIO • TELEMETRÍA • FORENSE)</span>
+          </button>
         </div>
       </div>
 
+      {/* Persistent Visual Navigation Bar: 01 CPU ... 08 TU PC (Active in Passport Mode) */}
+      {viewMode === 'passport' && (
+        <div className="mb-10 p-3 sm:p-4 rounded-2xl bg-[#101115] border border-zinc-800/80 shadow-xl overflow-x-auto scrollbar-none animate-in fade-in duration-200">
+          <div className="flex items-center justify-between min-w-[700px] gap-2">
+            {SECTIONS_MAP.map((sec) => {
+              const isCompleted = completedSections.has(sec.id);
+              const isCurrent = activeSection === sec.id;
+
+              return (
+                <button
+                  key={sec.id}
+                  type="button"
+                  onClick={() => setActiveSection(sec.id)}
+                  className={`flex-1 py-2 px-3 rounded-xl text-left transition-all duration-200 cursor-pointer flex items-center justify-between gap-2 border ${
+                    isCurrent
+                      ? 'bg-yellow-400 text-black border-yellow-400 shadow-md font-bold'
+                      : isCompleted
+                      ? 'bg-zinc-900/90 text-zinc-200 border-zinc-700/80 hover:border-yellow-400/50'
+                      : 'bg-black/30 text-zinc-500 border-zinc-900 hover:text-zinc-400 hover:border-zinc-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={`font-mono-tech text-[10px] ${isCurrent ? 'text-black' : 'text-zinc-500'}`}>
+                      {sec.number}
+                    </span>
+                    <span className="text-xs font-mono-tech uppercase tracking-tight truncate">
+                      {sec.label}
+                    </span>
+                  </div>
+
+                  {/* State indicator: ✓ completado / ● actual / ○ pendiente */}
+                  <span className="text-xs shrink-0 font-mono-tech">
+                    {isCompleted ? (
+                      <CheckCircle2 className={`w-3.5 h-3.5 ${isCurrent ? 'text-black' : 'text-yellow-400'}`} />
+                    ) : isCurrent ? (
+                      <span className="w-2 h-2 rounded-full bg-black animate-pulse inline-block" />
+                    ) : (
+                      <span className="w-2 h-2 rounded-full border border-zinc-600 inline-block" />
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* MAIN CONTAINER / VIEWPORT */}
       <main className="max-w-4xl mx-auto">
-        {/* ======================================================== */}
-        {/* PORTADA DEL CAPÍTULO 01 (SI activeSection === 'cover')  */}
-        {/* ======================================================== */}
-        {activeSection === 'cover' && (
+        {/* DOSSIER VIEW */}
+        {viewMode === 'dossier' && (
+          <Tomo01TechnicalDossier
+            initialTab={dossierTab}
+            onJumpToPassport={() => setViewMode('passport')}
+          />
+        )}
+
+        {/* PASSPORT VIEW */}
+        {viewMode === 'passport' && (
+          <>
+            {/* ======================================================== */}
+            {/* PORTADA DEL CAPÍTULO 01 (SI activeSection === 'cover')  */}
+            {/* ======================================================== */}
+            {activeSection === 'cover' && (
           <div className="space-y-10 animate-in fade-in duration-300">
             {/* Header */}
             <div className="space-y-4 pb-6 border-b border-zinc-800/80">
@@ -935,6 +998,123 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
               </div>
             </div>
 
+            {/* SECCIÓN DETALLADA // ANÁLISIS TÉCNICO DE LA ARQUITECTURA DE SILICIO */}
+            <div className="p-6 sm:p-8 rounded-2xl bg-[#0f1116] border-2 border-zinc-800 space-y-6 shadow-xl">
+              <div className="border-b border-zinc-800 pb-3 flex flex-wrap items-baseline justify-between gap-2">
+                <div>
+                  <span className="text-xs font-mono-tech tracking-widest text-yellow-400 uppercase font-bold">
+                    INVESTIGACIÓN DE FONDO // FÍSICA DEL SILICIO
+                  </span>
+                  <h3 className="font-display font-black text-xl sm:text-2xl text-white uppercase tracking-tight mt-0.5">
+                    Análisis Técnico de la Arquitectura de Silicio
+                  </h3>
+                </div>
+                <span className="font-mono-tech text-[10px] text-zinc-400 bg-black px-2.5 py-1 rounded border border-zinc-800 uppercase">
+                  DENNARD SCALING • HETEROGENEIDAD • INTERCONEXIÓN
+                </span>
+              </div>
+
+              <div className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed space-y-3">
+                <p>
+                  Para diagnosticar cuellos de botella con rigor forense, es imprescindible comprender cómo se distribuyen físicamente las unidades de cálculo en la oblea de silicio y por qué los gigahertz brutos ya no son el indicador determinante del rendimiento.
+                </p>
+              </div>
+
+              {/* 3 Technical Deep-Dive Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Card 1 */}
+                <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-2.5 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-yellow-400 text-xs font-mono-tech font-bold uppercase">
+                      <Zap className="w-3.5 h-3.5" />
+                      <span>01. LÍMITES FÍSICOS & IPC</span>
+                    </div>
+                    <h4 className="font-display font-bold text-sm text-white uppercase">
+                      El Fin de Dennard Scaling
+                    </h4>
+                    <p className="font-sans-editorial text-xs text-zinc-300 leading-relaxed">
+                      Hasta 2005, reducir el tamaño de los transistores permitía aumentar la frecuencia sin disparar la densidad de potencia. Hoy, las corrientes de fuga cuántica impiden superar los 5.5-6.0 GHz sin refrigeración extrema. Por eso, el rendimiento moderno depende del <strong>IPC (Instrucciones Por Ciclo)</strong>: motores de ejecución fuera de orden (OoO) más anchos y predictores de saltos neuronales.
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-zinc-800/80 text-[10px] font-mono-tech text-yellow-400">
+                    Regla: Más GHz con arquitectura vieja &lt; Menos GHz con alto IPC.
+                  </div>
+                </div>
+
+                {/* Card 2 */}
+                <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-2.5 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-emerald-400 text-xs font-mono-tech font-bold uppercase">
+                      <Cpu className="w-3.5 h-3.5" />
+                      <span>02. HETEROGENEIDAD X86</span>
+                    </div>
+                    <h4 className="font-display font-bold text-sm text-white uppercase">
+                      P-Cores vs. E-Cores
+                    </h4>
+                    <p className="font-sans-editorial text-xs text-zinc-300 leading-relaxed">
+                      Los <strong>P-Cores</strong> tienen decodificadores anchos de 6 a 8 vías, cachés L1/L2 gigantes y Hyper-Threading para tareas de latencia crítica. Los <strong>E-Cores</strong> se agrupan en clusters de 4 compartiendo L2, sin SMT. El <strong>Intel Thread Director</strong> asiste al planificador de Windows para clasificar hilos; si un juego cae en un E-Core, el frametime sufre un colapso instantáneo.
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-zinc-800/80 text-[10px] font-mono-tech text-emerald-400">
+                    Riesgo forense: Mala asignación de hilos por Windows Core Parking.
+                  </div>
+                </div>
+
+                {/* Card 3 */}
+                <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-2.5 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-sky-400 text-xs font-mono-tech font-bold uppercase">
+                      <GitBranch className="w-3.5 h-3.5" />
+                      <span>03. BUSES INTERNOS</span>
+                    </div>
+                    <h4 className="font-display font-bold text-sm text-white uppercase">
+                      Ring Bus vs. Chiplets
+                    </h4>
+                    <p className="font-sans-editorial text-xs text-zinc-300 leading-relaxed">
+                      El <strong>Ring Bus</strong> en silicios monolíticos enlaza núcleos y caché L3 con latencia inferior a 20 ns, pero no escala a más de 10 núcleos sin colisiones. Los diseños por <strong>Chiplets (AMD CCD / Intel Tile)</strong> permiten 16 a 64 núcleos conectando dados con Infinity Fabric, a costa de una penalización de 12 a 18 ns al cruzar el dado de I/O externo.
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-zinc-800/80 text-[10px] font-mono-tech text-sky-400">
+                    Cálculo: Frecuencia de FCLK desacoplada (1:2) aumenta latencia en 9 ns.
+                  </div>
+                </div>
+              </div>
+
+              {/* Comparative Forensic Table */}
+              <div className="overflow-x-auto rounded-xl border border-zinc-800">
+                <table className="w-full text-left text-xs font-mono-tech">
+                  <thead className="bg-black/90 text-yellow-400 border-b border-zinc-800 text-[10px] uppercase">
+                    <tr>
+                      <th className="py-2.5 px-3">Parámetro Arquitectónico</th>
+                      <th className="py-2.5 px-3">P-Core (Performance Core)</th>
+                      <th className="py-2.5 px-3">E-Core (Efficiency Core)</th>
+                      <th className="py-2.5 px-3">Implicancia Pericial</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-900 bg-zinc-950/80">
+                    <tr className="hover:bg-zinc-900/40">
+                      <td className="py-2 px-3 font-bold text-white">Ancho de Decodificación</td>
+                      <td className="py-2 px-3 text-zinc-300">6 a 8 instrucciones / ciclo</td>
+                      <td className="py-2 px-3 text-zinc-400">3 a 4 instrucciones / ciclo</td>
+                      <td className="py-2 px-3 text-yellow-300 text-[11px]">Doble capacidad de procesamiento simultáneo</td>
+                    </tr>
+                    <tr className="hover:bg-zinc-900/40">
+                      <td className="py-2 px-3 font-bold text-white">Caché L2 Dedicada</td>
+                      <td className="py-2 px-3 text-zinc-300">1.25 MB - 2.0 MB por núcleo</td>
+                      <td className="py-2 px-3 text-zinc-400">2.0 - 4.0 MB compartida por 4 núcleos</td>
+                      <td className="py-2 px-3 text-emerald-300 text-[11px]">P-Core previene cache misses en código de juegos</td>
+                    </tr>
+                    <tr className="hover:bg-zinc-900/40">
+                      <td className="py-2 px-3 font-bold text-white">Multihilo (SMT / HT)</td>
+                      <td className="py-2 px-3 text-zinc-300">2 hilos lógicos por núcleo físico</td>
+                      <td className="py-2 px-3 text-zinc-400">1 hilo lógico (sin Hyper-Threading)</td>
+                      <td className="py-2 px-3 text-sky-300 text-[11px]">E-Cores maximizan eficiencia energética en segundo plano</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             {/* CÓMO ENCONTRAR CADA DATO (MÉTODO VISUAL PRIMERO) */}
             <div className="p-6 rounded-2xl bg-[#121318] border border-zinc-800 space-y-5">
               <div className="flex items-center justify-between">
@@ -1064,6 +1244,40 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                 <span>Dato ingresado manualmente queda como <strong>DECLARADO</strong> hasta ser contrastado con PowerShell en el Laboratorio.</span>
               </div>
             </div>
+
+            {/* DOSSIER MAESTRO // ARQUITECTURA DE SILICIO & MICROONDAS */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#121318] via-zinc-900 to-[#171822] border-2 border-yellow-400/40 shadow-xl space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-yellow-400 text-xs font-mono-tech font-bold uppercase">
+                  <Microscope className="w-4 h-4 text-yellow-400" />
+                  <span>DOSSIER DE SILICIO // TOPOLOGÍA DE DIE, CACHÉ L1/L2/L3 & 3D V-CACHE</span>
+                </div>
+                <span className="text-[10px] font-mono-tech text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded border border-yellow-400/30 font-bold">
+                  MAGAZINE MASTER CLASS
+                </span>
+              </div>
+
+              <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
+                ¿Sabías que acceder a la RAM externa tarda hasta <strong>70 veces más</strong> que acceder a la memoria caché L1 del silicio? En el Dossier Técnico analizamos la jerarquía de ciclos de reloj, la topología de chiplets (CCD/IOD) y cómo los buses internos determinan el rendimiento real en juegos y cómputo pesado.
+              </p>
+
+              <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
+                <span className="text-[11px] font-mono-tech text-zinc-400">
+                  Incluye tabla física de latencias (ns), ciclos y anchos de banda (GB/s).
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDossierTab('silicon');
+                    setViewMode('dossier');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-yellow-400 text-black font-mono-tech font-bold text-xs uppercase hover:bg-yellow-300 transition-colors flex items-center gap-2 cursor-pointer shadow"
+                >
+                  <span>ABRIR DOSSIER DE SILICIO</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1126,6 +1340,161 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                 <p className="font-mono-tech text-[11px] text-yellow-400/90 pt-1 italic">
                   → Lo investigaremos paso a paso y con protocolos de descarte físico en el Tomo 03: HACELO VOS MISMO.
                 </p>
+              </div>
+            </div>
+
+            {/* SECCIÓN DETALLADA // IMPACTO DEL DIRECCIONAMIENTO DE MEMORIA EN LA LATENCIA */}
+            <div className="p-6 sm:p-8 rounded-2xl bg-[#0f1116] border-2 border-zinc-800 space-y-6 shadow-xl">
+              <div className="border-b border-zinc-800 pb-3 flex flex-wrap items-baseline justify-between gap-2">
+                <div>
+                  <span className="text-xs font-mono-tech tracking-widest text-yellow-400 uppercase font-bold">
+                    INVESTIGACIÓN METROLÓGICA // DIRECCIONAMIENTO DE DRAM
+                  </span>
+                  <h3 className="font-display font-black text-xl sm:text-2xl text-white uppercase tracking-tight mt-0.5">
+                    Impacto del Direccionamiento de Memoria en la Latencia
+                  </h3>
+                </div>
+                <span className="font-mono-tech text-[10px] text-zinc-400 bg-black px-2.5 py-1 rounded border border-zinc-800 uppercase">
+                  RANKS • INTERLEAVING • SUB-TIMINGS • REFRESH
+                </span>
+              </div>
+
+              <div className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed space-y-3">
+                <p>
+                  Muchos usuarios creen que la memoria se resume en dos números: los megahertz y la latencia CAS (CL). Sin embargo, el tiempo de respuesta real que experimenta la CPU depende del modo en que el controlador de memoria (IMC) navega por la jerarquía física de direccionamiento:
+                </p>
+              </div>
+
+              {/* Memory Addressing Hierarchy Diagram / Flow */}
+              <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-3">
+                <span className="text-[10px] font-mono-tech uppercase tracking-widest text-yellow-400 font-bold block">
+                  JERARQUÍA FÍSICA DE DIRECCIONAMIENTO DEL SILICIO DRAM:
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs font-mono-tech">
+                  <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-700 text-white font-bold">
+                    CANAL (64-bit / 2x32-bit)
+                  </span>
+                  <span className="text-yellow-400 font-bold">→</span>
+                  <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-700 text-white font-bold">
+                    DIMM (Ranura)
+                  </span>
+                  <span className="text-yellow-400 font-bold">→</span>
+                  <span className="px-2.5 py-1 rounded bg-yellow-400/20 border border-yellow-400/50 text-yellow-300 font-bold">
+                    RANK (1R / 2R)
+                  </span>
+                  <span className="text-yellow-400 font-bold">→</span>
+                  <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-700 text-white font-bold">
+                    BANK GROUP
+                  </span>
+                  <span className="text-yellow-400 font-bold">→</span>
+                  <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-700 text-white font-bold">
+                    BANCO
+                  </span>
+                  <span className="text-yellow-400 font-bold">→</span>
+                  <span className="px-2.5 py-1 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold">
+                    FILA (Row) &amp; COLUMNA
+                  </span>
+                </div>
+              </div>
+
+              {/* 3 Technical Concept Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Concept 1: Ranks & Rank Interleaving */}
+                <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-2.5 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-yellow-400 text-xs font-mono-tech font-bold uppercase">
+                      <Layers className="w-3.5 h-3.5" />
+                      <span>01. RANKS &amp; INTERLEAVING</span>
+                    </div>
+                    <h4 className="font-display font-bold text-sm text-white uppercase">
+                      Single Rank vs. Dual Rank
+                    </h4>
+                    <p className="font-sans-editorial text-xs text-zinc-300 leading-relaxed">
+                      Un módulo <strong>Single Rank (1R)</strong> tiene un único bloque de chips de 64 bits. Un módulo <strong>Dual Rank (2R)</strong> integra dos bloques de 64 bits en el mismo circuito. El <strong>Rank Interleaving</strong> permite que el IMC envíe lecturas a un rango mientras el otro está cerrando filas o en precarga, otorgando un <strong>4% a 7% de FPS extra</strong> en juegos con cuello de botella en CPU.
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-zinc-800/80 text-[10px] font-mono-tech text-yellow-400">
+                    Trade-off: 4 módulos Dual Rank estresan al IMC y bajan el tope de MHz.
+                  </div>
+                </div>
+
+                {/* Concept 2: Row & Column Strobe */}
+                <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-2.5 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-emerald-400 text-xs font-mono-tech font-bold uppercase">
+                      <Zap className="w-3.5 h-3.5" />
+                      <span>02. CICLOS DE APERTURA</span>
+                    </div>
+                    <h4 className="font-display font-bold text-sm text-white uppercase">
+                      tRCD, tRP, tRAS &amp; tRC
+                    </h4>
+                    <p className="font-sans-editorial text-xs text-zinc-300 leading-relaxed">
+                      Para leer un bit, el IMC emite <strong className="text-white">tRCD</strong> (tiempo para activar la fila en los amplificadores de sentido) y luego <strong className="text-white">CL</strong> (latencia de columna). Para cambiar a otra fila en el mismo banco, debe esperar <strong className="text-white">tRAS</strong> y emitir <strong className="text-white">tRP</strong> (Row Precharge) para recargar las líneas de bits. Un cambio de fila fallido (<em className="text-yellow-400">Page Miss</em>) triplica la latencia de acceso.
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-zinc-800/80 text-[10px] font-mono-tech text-emerald-400">
+                    Fórmula de ciclo de fila: tRC = tRAS + tRP (mínimo requerido).
+                  </div>
+                </div>
+
+                {/* Concept 3: tRFC & Bank Groups in DDR5 */}
+                <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-2.5 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-sky-400 text-xs font-mono-tech font-bold uppercase">
+                      <Activity className="w-3.5 h-3.5" />
+                      <span>03. EL SECUESTRO DEL BUS</span>
+                    </div>
+                    <h4 className="font-display font-bold text-sm text-white uppercase">
+                      tRFC y Refresco Capacitivo
+                    </h4>
+                    <p className="font-sans-editorial text-xs text-zinc-300 leading-relaxed">
+                      Las celdas DRAM son condensadores microscópicos que se descargan por fuga térmica. Cada 7.8 µs (tREFI), el controlador debe ejecutar un comando de refresco. Durante el intervalo <strong className="text-white">tRFC</strong> (que en DDR5 tarda entre 280 y 450 ns), <strong>el bus de ese banco se bloquea por completo</strong>. Si tRFC es excesivamente alto, produce microtirones cíclicos imperceptibles en promedios.
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-zinc-800/80 text-[10px] font-mono-tech text-sky-400">
+                    Ventaja DDR5: 8 Bank Groups con subcanales independientes de 32-bit.
+                  </div>
+                </div>
+              </div>
+
+              {/* Sub-Timings Impact Table */}
+              <div className="overflow-x-auto rounded-xl border border-zinc-800">
+                <table className="w-full text-left text-xs font-mono-tech">
+                  <thead className="bg-black/90 text-yellow-400 border-b border-zinc-800 text-[10px] uppercase">
+                    <tr>
+                      <th className="py-2.5 px-3">Parámetro de Direccionamiento</th>
+                      <th className="py-2.5 px-3">Significado Físico en el Chip</th>
+                      <th className="py-2.5 px-3">Rango Típico (DDR4 / DDR5)</th>
+                      <th className="py-2.5 px-3">Impacto en Latencia &amp; Fluidez</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-900 bg-zinc-950/80">
+                    <tr className="hover:bg-zinc-900/40">
+                      <td className="py-2 px-3 font-bold text-white">CAS Latency (tCL)</td>
+                      <td className="py-2 px-3 text-zinc-300">Retardo desde strobe de columna hasta datos en bus</td>
+                      <td className="py-2 px-3 text-zinc-400">CL 14-18 (DDR4) / CL 30-40 (DDR5)</td>
+                      <td className="py-2 px-3 text-yellow-300 text-[11px]">Respuesta de primera palabra (First Word Latency)</td>
+                    </tr>
+                    <tr className="hover:bg-zinc-900/40">
+                      <td className="py-2 px-3 font-bold text-white">RAS to CAS (tRCD)</td>
+                      <td className="py-2 px-3 text-zinc-300">Tiempo de amplificación y apertura de la fila</td>
+                      <td className="py-2 px-3 text-zinc-400">14-22 ciclos / 32-44 ciclos</td>
+                      <td className="py-2 px-3 text-emerald-300 text-[11px]">Crucial cuando el código salta a otra fila (Page Miss)</td>
+                    </tr>
+                    <tr className="hover:bg-zinc-900/40">
+                      <td className="py-2 px-3 font-bold text-white">Row Precharge (tRP)</td>
+                      <td className="py-2 px-3 text-zinc-300">Tiempo para cerrar fila y recargar bitlines</td>
+                      <td className="py-2 px-3 text-zinc-400">14-22 ciclos / 32-44 ciclos</td>
+                      <td className="py-2 px-3 text-sky-300 text-[11px]">Define la penalización de cambio de contexto en memoria</td>
+                    </tr>
+                    <tr className="hover:bg-zinc-900/40">
+                      <td className="py-2 px-3 font-bold text-white">Refresh Recovery (tRFC)</td>
+                      <td className="py-2 px-3 text-zinc-300">Tiempo de bloqueo durante recarga capacitiva</td>
+                      <td className="py-2 px-3 text-zinc-400">280-600 ciclos / 400-900 ciclos</td>
+                      <td className="py-2 px-3 text-amber-300 text-[11px]">Impacta directamente la estabilidad de los 1% Low FPS</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
@@ -1252,6 +1621,40 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
 
               <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono-tech text-zinc-400 pt-1">
                 <span>Dato ingresado manualmente queda como <strong>DECLARADO</strong> hasta ser contrastado con PowerShell.</span>
+              </div>
+            </div>
+
+            {/* DOSSIER MAESTRO // TOPOLOGÍA DAISY-CHAIN A2/B2 & LATENCIA ABSOLUTA */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#121318] via-zinc-900 to-[#171822] border-2 border-yellow-400/40 shadow-xl space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-yellow-400 text-xs font-mono-tech font-bold uppercase">
+                  <Layers className="w-4 h-4 text-yellow-400" />
+                  <span>METROLOGÍA DE SEÑAL // TOPOLOGÍA DAISY-CHAIN A2/B2 & NANOSEGUNDOS</span>
+                </div>
+                <span className="text-[10px] font-mono-tech text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">
+                  CALCULADORA FÍSICA
+                </span>
+              </div>
+
+              <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
+                A frecuencias DDR4 de 3200+ MHz y DDR5 de 6000+ MHz, las pistas del PCB operan en régimen de microondas. Descubrí por qué instalar 2 módulos en los zócalos 1 y 3 genera rebote de onda electromagnética (Stub Reflection), y experimentá con la <strong>Calculadora Interactiva de Latencia Real</strong> en nanosegundos: <code className="font-mono-tech text-yellow-400">(CL × 2000) / MT/s</code>.
+              </p>
+
+              <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
+                <span className="text-[11px] font-mono-tech text-zinc-400">
+                  Comprobación de First Word Latency vs Ancho de Banda bruto (GB/s).
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDossierTab('silicon');
+                    setViewMode('dossier');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-yellow-400 text-black font-mono-tech font-bold text-xs uppercase hover:bg-yellow-300 transition-colors flex items-center gap-2 cursor-pointer shadow"
+                >
+                  <span>ABRIR CALCULADORA DE NANOSEGUNDOS</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
           </div>
@@ -1428,6 +1831,40 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                 <span>Dato ingresado manualmente queda como <strong>DECLARADO</strong> hasta ser contrastado con PowerShell.</span>
               </div>
             </div>
+
+            {/* DOSSIER MAESTRO // NEGOCIACIÓN DE BUS PCIE & DIAGNÓSTICO DE CARRILES */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#121318] via-zinc-900 to-[#171822] border-2 border-yellow-400/40 shadow-xl space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-yellow-400 text-xs font-mono-tech font-bold uppercase">
+                  <Monitor className="w-4 h-4 text-yellow-400" />
+                  <span>NEGOCIACIÓN PCIE // DEGRADACIÓN SILENCIOSA DE X16 A X4</span>
+                </div>
+                <span className="text-[10px] font-mono-tech text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-500/30 font-bold">
+                  PERITAJE FORENSE
+                </span>
+              </div>
+
+              <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
+                El pandeo mecánico por peso (GPU Sag) y los zócalos M.2 NVMe compartidos pueden forzar a tu placa de video a operar silenciosamente en <strong>PCIe x4 o x8</strong> en vez de <strong>x16</strong>, recortando un 15% del rendimiento sin que Windows emita ningún aviso. Conocé el protocolo de inspección de contactos dorados y soporte antisag.
+              </p>
+
+              <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
+                <span className="text-[11px] font-mono-tech text-zinc-400">
+                  Inspección pericial de pines PRSNT1# / PRSNT2# y autopsia de banco.
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDossierTab('forensics');
+                    setViewMode('dossier');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-yellow-400 text-black font-mono-tech font-bold text-xs uppercase hover:bg-yellow-300 transition-colors flex items-center gap-2 cursor-pointer shadow"
+                >
+                  <span>VER AUTOPSIA DE ENLACE PCIE</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1566,6 +2003,40 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
                 <span>Dato ingresado manualmente queda como <strong>DECLARADO</strong> hasta ser contrastado con PowerShell.</span>
               </div>
             </div>
+
+            {/* DOSSIER MAESTRO // LA TRAMPA DE LOS 7000 MB/S: SSDS DRAM-LESS & RANDOM QD1 */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#121318] via-zinc-900 to-[#171822] border-2 border-yellow-400/40 shadow-xl space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-yellow-400 text-xs font-mono-tech font-bold uppercase">
+                  <HardDrive className="w-4 h-4 text-yellow-400" />
+                  <span>LA TRAMPA DE LOS 7000 MB/S // SSDS DRAM-LESS Y MICRO-PAUSAS DE 1.4s</span>
+                </div>
+                <span className="text-[10px] font-mono-tech text-zinc-400 bg-black px-2 py-0.5 rounded border border-zinc-800 font-bold">
+                  AUTOPSIA DE NVM-E
+                </span>
+              </div>
+
+              <p className="text-xs font-sans-editorial text-zinc-300 leading-relaxed">
+                La velocidad secuencial de folleto (ej. 7400 MB/s) casi nunca se utiliza durante el uso normal o los juegos. Lo que determina la fluidez de Windows y la ausencia de tirones es el tiempo de acceso aleatorio 4K en colas cortas (QD1) y la presencia de <strong>DRAM dedicada</strong> en la controladora para almacenar la tabla de mapeo FTL.
+              </p>
+
+              <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
+                <span className="text-[11px] font-mono-tech text-zinc-400">
+                  Por qué las unidades económicas caen a 10 MB/s al llenar el 70% de su capacidad.
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDossierTab('forensics');
+                    setViewMode('dossier');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-yellow-400 text-black font-mono-tech font-bold text-xs uppercase hover:bg-yellow-300 transition-colors flex items-center gap-2 cursor-pointer shadow"
+                >
+                  <span>REVISAR EXPEDIENTE DE ALMACENAMIENTO</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1589,6 +2060,168 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
               <p className="font-sans-editorial text-base text-zinc-300 leading-relaxed max-w-2xl">
                 La placa madre (Motherboard) es el chasis de comunicación. Todos los componentes se enchufan en ella: maneja las líneas PCIe, los zócalos de memoria, la entrega de energía de la fuente (VRM) y la BIOS/UEFI.
               </p>
+            </div>
+
+            {/* SECCIÓN DETALLADA // JERARQUÍA DEL BUS DE DATOS: CPU DIRECT VS CHIPSET (PCH) */}
+            <div className="p-6 sm:p-8 rounded-2xl bg-[#0f1116] border-2 border-zinc-800 space-y-6 shadow-xl">
+              <div className="border-b border-zinc-800 pb-3 flex flex-wrap items-baseline justify-between gap-2">
+                <div>
+                  <span className="text-xs font-mono-tech tracking-widest text-yellow-400 uppercase font-bold">
+                    INVESTIGACIÓN ARQUITECTÓNICA // JERARQUÍA DE BUSES
+                  </span>
+                  <h3 className="font-display font-black text-xl sm:text-2xl text-white uppercase tracking-tight mt-0.5">
+                    Jerarquía del Bus de Datos: CPU Direct vs. Chipset (PCH)
+                  </h3>
+                </div>
+                <span className="font-mono-tech text-[10px] text-zinc-400 bg-black px-2.5 py-1 rounded border border-zinc-800 uppercase">
+                  DMI UPLINK • CARRILES DEDICADOS • CONTENCIÓN DE E/S
+                </span>
+              </div>
+
+              <div className="text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed space-y-3">
+                <p>
+                  No todos los puertos y ranuras de una computadora tienen el mismo acceso a la CPU. En cualquier plataforma moderna existe una estricta jerarquía de buses que separa los componentes que dialogan directamente con el procesador de aquellos que deben esperar su turno a través del puente Chipset (PCH):
+                </p>
+              </div>
+
+              {/* Visual Bus Architecture Flow Diagram */}
+              <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-3">
+                <span className="text-[10px] font-mono-tech uppercase tracking-widest text-yellow-400 font-bold block">
+                  TOPOLOGÍA Y DISTRIBUCIÓN DE LÍNEAS DE BUS:
+                </span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono-tech">
+                  {/* CPU Direct Block */}
+                  <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/40 space-y-1.5">
+                    <div className="flex items-center justify-between text-emerald-400 font-bold">
+                      <span>CARRIL DIRECTO DE CPU (DIRECT BUS)</span>
+                      <span className="text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded">LATENCIA &lt; 14 ns</span>
+                    </div>
+                    <ul className="text-zinc-300 text-[11px] space-y-1 list-disc pl-4 font-sans-editorial">
+                      <li><strong>Ranura PCIe x16 Principal:</strong> 16 carriles dedicados para la GPU sin intermediarios.</li>
+                      <li><strong>Primer Zócalo M.2 NVMe (M.2_1):</strong> 4 carriles PCIe dedicados directamente al controlador de la CPU.</li>
+                      <li><strong>Ventaja pericial:</strong> Ancho de banda garantizado, sin contención ni arbitraje compartido.</li>
+                    </ul>
+                  </div>
+
+                  {/* Chipset Multiplexed Block */}
+                  <div className="p-3 rounded-lg bg-amber-950/20 border border-amber-500/40 space-y-1.5">
+                    <div className="flex items-center justify-between text-amber-400 font-bold">
+                      <span>VÍA CHIPSET / PCH (MULTIPLEXED BUS)</span>
+                      <span className="text-[10px] bg-amber-500/20 px-2 py-0.5 rounded">LATENCIA ~35-45 ns</span>
+                    </div>
+                    <ul className="text-zinc-300 text-[11px] space-y-1 list-disc pl-4 font-sans-editorial">
+                      <li><strong>Enlace DMI / Uplink:</strong> Un único canal serial (ej. DMI 4.0 x8) entre CPU y Chipset.</li>
+                      <li><strong>Dispositivos compartidos:</strong> M.2 secundarios, puertos SATA, Ethernet 2.5G, WiFi, USB y Audio.</li>
+                      <li><strong>Riesgo forense:</strong> La saturación simultánea de red y disco genera colas de espera y microstutter.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3 Technical Detail Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Card 1: DMI Saturation */}
+                <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-2.5 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-yellow-400 text-xs font-mono-tech font-bold uppercase">
+                      <Network className="w-3.5 h-3.5" />
+                      <span>01. EL CUELLO DMI</span>
+                    </div>
+                    <h4 className="font-display font-bold text-sm text-white uppercase">
+                      Saturación del Enlace Uplink
+                    </h4>
+                    <p className="font-sans-editorial text-xs text-zinc-300 leading-relaxed">
+                      El bus DMI 4.0 x8 rinde un tope teórico de ~15.75 GB/s. Si conectás dos SSDs NVMe de 7000 MB/s en ranuras del chipset y copiás archivos entre ellos mientras descargás por red Ethernet a 2.5 Gbps, el enlace DMI se satura al 98%, bloqueando temporalmente los paquetes de los periféricos USB.
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-zinc-800/80 text-[10px] font-mono-tech text-yellow-400">
+                    Regla EVO: Instalá tu SSD principal con Windows SIEMPRE en M.2_1 (CPU Direct).
+                  </div>
+                </div>
+
+                {/* Card 2: Lane Bifurcation */}
+                <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-2.5 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-emerald-400 text-xs font-mono-tech font-bold uppercase">
+                      <GitBranch className="w-3.5 h-3.5" />
+                      <span>02. BIFURCACIÓN DE LÍNEAS</span>
+                    </div>
+                    <h4 className="font-display font-bold text-sm text-white uppercase">
+                      Lane Switching Silencioso
+                    </h4>
+                    <p className="font-sans-editorial text-xs text-zinc-300 leading-relaxed">
+                      En placas base con múltiples ranuras M.2 PCIe 5.0, activar la segunda ranura NVMe conmuta internamente el slot gráfico principal de <strong>x16 a x8</strong> mediante conmutadores de hardware (Multiplexers). Aunque una GPU moderna pierde poco ancho de banda a x8 4.0, a x8 3.0 el impacto en juegos con texturas pesadas supera el 7% de FPS.
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-zinc-800/80 text-[10px] font-mono-tech text-emerald-400">
+                    Inspección: Consultar el manual de la placa para verificar si M.2_2 comparte líneas con el slot PCIe_1.
+                  </div>
+                </div>
+
+                {/* Card 3: VRM and Bus Stability */}
+                <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-2.5 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-sky-400 text-xs font-mono-tech font-bold uppercase">
+                      <CircuitBoard className="w-3.5 h-3.5" />
+                      <span>03. RUIDO ELÉCTRICO EN BUS</span>
+                    </div>
+                    <h4 className="font-display font-bold text-sm text-white uppercase">
+                      Vdroop y Transitorios di/dt
+                    </h4>
+                    <p className="font-sans-editorial text-xs text-zinc-300 leading-relaxed">
+                      Las transiciones violentas de carga en la CPU (de reposo de 15W a carga total de 220W en nanosegundos) generan caídas transitorias de voltaje (Vdroop). Si los condensadores del VRM y las pistas de alimentación de la placa base no estabilizan el riel, se producen errores de paridad de bus PCIe y WHEA Errors en Windows.
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-zinc-800/80 text-[10px] font-mono-tech text-sky-400">
+                    Diagnóstico: Monitorear Vcore bajo Prime95 para verificar caída excesiva de voltaje.
+                  </div>
+                </div>
+              </div>
+
+              {/* Comparative Bus Generation Table */}
+              <div className="overflow-x-auto rounded-xl border border-zinc-800">
+                <table className="w-full text-left text-xs font-mono-tech">
+                  <thead className="bg-black/90 text-yellow-400 border-b border-zinc-800 text-[10px] uppercase">
+                    <tr>
+                      <th className="py-2.5 px-3">Tipo de Bus / Interfaz</th>
+                      <th className="py-2.5 px-3">Ancho de Carriles</th>
+                      <th className="py-2.5 px-3">Ancho de Banda Bruto</th>
+                      <th className="py-2.5 px-3">Latencia de Enlace</th>
+                      <th className="py-2.5 px-3">Conexión Física</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-900 bg-zinc-950/80">
+                    <tr className="hover:bg-zinc-900/40">
+                      <td className="py-2 px-3 font-bold text-white">PCIe 4.0 x16 (GPU Principal)</td>
+                      <td className="py-2 px-3 text-zinc-300">16 carriles dedicados</td>
+                      <td className="py-2 px-3 text-yellow-400 font-bold">31.50 GB/s</td>
+                      <td className="py-2 px-3 text-emerald-300 font-bold">~12 - 14 ns</td>
+                      <td className="py-2 px-3 text-zinc-300 text-[11px]">Directo a pines de CPU</td>
+                    </tr>
+                    <tr className="hover:bg-zinc-900/40">
+                      <td className="py-2 px-3 font-bold text-white">PCIe 4.0 x4 (M.2_1 Primario)</td>
+                      <td className="py-2 px-3 text-zinc-300">4 carriles dedicados</td>
+                      <td className="py-2 px-3 text-yellow-400 font-bold">7.88 GB/s</td>
+                      <td className="py-2 px-3 text-emerald-300 font-bold">~14 - 16 ns</td>
+                      <td className="py-2 px-3 text-zinc-300 text-[11px]">Directo a controlador de CPU</td>
+                    </tr>
+                    <tr className="hover:bg-zinc-900/40">
+                      <td className="py-2 px-3 font-bold text-white">DMI 4.0 x8 (Enlace Chipset)</td>
+                      <td className="py-2 px-3 text-zinc-300">8 carriles multiplexados</td>
+                      <td className="py-2 px-3 text-amber-400 font-bold">15.75 GB/s (Compartido)</td>
+                      <td className="py-2 px-3 text-amber-300 font-bold">~35 - 45 ns</td>
+                      <td className="py-2 px-3 text-zinc-300 text-[11px]">CPU a Chipset (PCH)</td>
+                    </tr>
+                    <tr className="hover:bg-zinc-900/40">
+                      <td className="py-2 px-3 font-bold text-white">Dispositivos PCH (M.2_2, SATA, USB)</td>
+                      <td className="py-2 px-3 text-zinc-300">Variables (x4, x2, x1)</td>
+                      <td className="py-2 px-3 text-zinc-400">Limitado por contención DMI</td>
+                      <td className="py-2 px-3 text-red-300 font-bold">&gt; 50 ns bajo carga</td>
+                      <td className="py-2 px-3 text-zinc-300 text-[11px]">Conectados a través de PCH</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* CÓMO ENCONTRARLA CON MSINFO32 O POWERSHELL */}
@@ -2656,6 +3289,54 @@ Test-Path $Archivo`;
               </ul>
             </div>
 
+            {/* DOSSIER MAESTRO // TELEMETRÍA DE PRECISIÓN & PROTOCOLO FORENSE */}
+            <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-yellow-400/10 via-[#13141b] to-black border-2 border-yellow-400/60 space-y-4 shadow-2xl">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-yellow-400 font-mono-tech text-xs font-bold uppercase">
+                  <Activity className="w-4 h-4 text-yellow-400" />
+                  <span>TELEMETRÍA REAL & PROTOCOLO FORENSE // EDICIÓN MAGAZINE</span>
+                </div>
+                <span className="px-3 py-0.5 rounded text-[10px] font-mono-tech uppercase font-bold bg-yellow-400 text-black">
+                  NIVEL PERICIAL RING 0
+                </span>
+              </div>
+
+              <div className="space-y-1.5">
+                <h4 className="font-display font-black text-xl sm:text-2xl text-white uppercase">
+                  Métricas Reales (1% Lows & DPC) vs. Promedios Mentirosos
+                </h4>
+                <p className="font-sans-editorial text-xs sm:text-sm text-zinc-200 leading-relaxed max-w-3xl">
+                  Completaste la ficha de tu hardware. Pero antes de dar por cerrada la investigación, comprobá cómo dialoga el kernel con tus componentes: experimentá con el <strong>Simulador de Frame Pacing</strong>, analizá los causantes de <strong>DPC Latency</strong> (<code className="font-mono-tech text-yellow-400">nvlddmkm.sys</code>, <code className="font-mono-tech text-yellow-400">ndis.sys</code>) y revisá los <strong>Expedientes Forenses</strong> (film plástico en coolers, pandeo PCIe y degradación de memorias).
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDossierTab('telemetry');
+                    setViewMode('dossier');
+                  }}
+                  className="px-5 py-3 rounded-xl bg-yellow-400 text-black font-mono-tech font-bold text-xs uppercase hover:bg-yellow-300 transition-colors cursor-pointer flex items-center gap-2 shadow-lg"
+                >
+                  <Activity className="w-4 h-4" />
+                  <span>SIMULADOR DE FRAMETIME & DPC LATENCY</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDossierTab('forensics');
+                    setViewMode('dossier');
+                  }}
+                  className="px-5 py-3 rounded-xl bg-black border border-yellow-400/60 text-yellow-300 font-mono-tech font-bold text-xs uppercase hover:bg-yellow-400/10 transition-colors cursor-pointer flex items-center gap-2 shadow-lg"
+                >
+                  <ShieldAlert className="w-4 h-4" />
+                  <span>EXPEDIENTES DE AUTOPSIA FORENSE</span>
+                </button>
+              </div>
+            </div>
+
             {/* ACTIVIDAD DE COMPROBACIÓN // COMPROBÁ LO QUE APRENDISTE */}
             <div id="evo-chapter-check">
               <EvoChapterCheckSection
@@ -2749,6 +3430,8 @@ Test-Path $Archivo`;
               isNextAvailable={Boolean(completedSections.has('tu-pc') || isChapter02Unlocked)}
             />
           </div>
+        )}
+          </>
         )}
       </main>
     </div>

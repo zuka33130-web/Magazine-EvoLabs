@@ -86,27 +86,51 @@ export const Page21Chapter05Kernel: React.FC = () => {
           </div>
         </div>
 
-        {/* DPC Latency Explainer */}
-        <div className="p-4 bg-[#0b0e15] border border-zinc-800 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-blue-500/10 rounded-lg text-blue-400">
-              <Activity className="w-5 h-5" />
+        {/* DPC Latency Explainer & Protocolo de Mantenimiento Preventivo */}
+        <div className="p-3 bg-[#080d17] border border-blue-500/40 rounded-xl space-y-2 text-xs font-mono-tech shadow-xl">
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-1.5">
+            <span className="text-blue-400 font-bold uppercase text-[11px] flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5" />
+              <span>DIAGNÓSTICO PREVENTIVO: PROTOCOLO LATENCYMON EN RING 0 (&lt; 500 µs)</span>
+            </span>
+            <span className="text-[10px] text-zinc-500">RESPLENDENCE LATENCYMON</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 text-[10px]">
+            <div className="p-2 bg-black/50 border border-zinc-800/80 rounded space-y-1">
+              <span className="text-emerald-400 font-bold block">1. nvlddmkm.sys (GPU)</span>
+              <p className="text-zinc-300 font-sans-editorial leading-tight text-[9.5px]">
+                Driver de video. Si excede 1.000 µs, causa micro-parones. Solución: instalación limpia de driver WHQL y desactivar audio HDMI no utilizado.
+              </p>
             </div>
-            <div>
-              <h5 className="font-mono-tech font-bold text-xs sm:text-sm uppercase text-white">
-                DPC LATENCY: EL ENEMIGO OCULTO DEL RENDIMIENTO (<strong className="text-emerald-400">&lt; 500 µs</strong>)
-              </h5>
-              <p className="text-xs font-sans-editorial text-zinc-300 mt-0.5 max-w-2xl leading-relaxed">
-                Cuando una placa Wi-Fi o tarjeta de sonido envía una interrupción (Deferred Procedure Call), si el driver tarda más de 1.000 microsegundos en responder, el procesador pospone el renderizado del fotograma siguiente. El usuario lo percibe como micro-cortes de audio o tirones inexplicables de 50 milisegundos en el juego.
+
+            <div className="p-2 bg-black/50 border border-zinc-800/80 rounded space-y-1">
+              <span className="text-sky-400 font-bold block">2. ndis.sys (RED/WIFI)</span>
+              <p className="text-zinc-300 font-sans-editorial leading-tight text-[9.5px]">
+                Pila de red. Interrupciones diferidas excesivas. Solución: desactivar Energy Efficient Ethernet y actualizar driver directo de Intel/Realtek.
+              </p>
+            </div>
+
+            <div className="p-2 bg-black/50 border border-zinc-800/80 rounded space-y-1">
+              <span className="text-amber-400 font-bold block">3. storahci.sys (DISCO)</span>
+              <p className="text-zinc-300 font-sans-editorial leading-tight text-[9.5px]">
+                Controladora de almacenamiento. Latencia por ahorro agresivo de energía. Solución: desactivar HIPM/DIPM en el plan de energía activo.
+              </p>
+            </div>
+
+            <div className="p-2 bg-black/50 border border-zinc-800/80 rounded space-y-1">
+              <span className="text-rose-400 font-bold block">4. wdf01000.sys (KMDF)</span>
+              <p className="text-zinc-300 font-sans-editorial leading-tight text-[9.5px]">
+                Framework del kernel. Aglutina fallas de puertos USB, controladores de iluminación RGB o hubs defectuosos conectados al equipo.
               </p>
             </div>
           </div>
         </div>
 
         {/* Bottom Rule */}
-        <div className="p-3 bg-[#0a101b] border-l-3 border-blue-500 rounded-r text-xs text-zinc-300 font-mono-tech flex items-center justify-between">
-          <span>
-            <strong className="text-blue-400 font-bold">HERRAMIENTA FORENSE:</strong> Descargá <strong className="text-white">LatencyMon</strong> (de Resplendence). Corré el diagnóstico durante 10 minutos. Si la barra verde se vuelve roja, tenés un driver en Ring 0 que está saboteando tus fotogramas.
+        <div className="p-2.5 bg-[#0a101b] border-l-3 border-blue-500 rounded-r text-xs text-zinc-300 font-mono-tech flex items-center justify-between">
+          <span className="text-[11px]">
+            <strong className="text-blue-400 font-bold">MANTENIMIENTO METÓDICO:</strong> Antes de culpar a Windows o aplicar 'tweaks' destructivos, ejecutá LatencyMon 10 minutos. Una DPC Latency menor a 500 µs garantiza que tu kernel procesa fotogramas y audio en tiempo real.
           </span>
           <span className="text-zinc-500 text-[10px] uppercase hidden sm:inline shrink-0">
             SIGUIENTE: MITO 06 // SCRIPTS DEBLOATER →

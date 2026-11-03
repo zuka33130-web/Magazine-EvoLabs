@@ -2549,9 +2549,23 @@ export default function App() {
   const [pendingPublicTarget, setPendingPublicTarget] = useState<PublicNavigationTarget | null>(null);
   const [publicSection, setPublicSection] = useState<'inicio' | 'catalogo' | 'laboratorios' | 'herramientas' | 'planes'>('inicio');
 
-  // Universal Auth Gate check: Verified authenticated users only
-  const canEnterPrivateApp = !loading && !!user && emailVerified === true;
-  const showPrivateApp = isAppMode && canEnterPrivateApp;
+  // Direct magazine/print mode for Tomo 01 is open and accessible for reading and PDF export
+  const isDirectMagazineOrPrint = (() => {
+    try {
+      const url = new URL(window.location.href);
+      return (
+        url.searchParams.get('mode') === 'magazine' ||
+        url.searchParams.get('print') === 'true' ||
+        url.searchParams.get('pdf') === 'true'
+      );
+    } catch {
+      return false;
+    }
+  })();
+
+  // Universal Auth Gate check: Verified authenticated users, or direct open magazine mode
+  const canEnterPrivateApp = isDirectMagazineOrPrint || (!loading && !!user && emailVerified === true);
+  const showPrivateApp = (isAppMode || isDirectMagazineOrPrint) && canEnterPrivateApp;
 
   // Si el usuario está registrado/logueado pero no verificado, mantener el modal en vista de verificación fija
   useEffect(() => {

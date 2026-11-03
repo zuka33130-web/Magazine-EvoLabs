@@ -1,6 +1,7 @@
 import express from 'express';
 import http from 'http';
 import path from 'path';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
@@ -55,6 +56,28 @@ async function startServer() {
 
   const app = express();
   app.use(express.json());
+
+  // Static serving for magazines directory with proper PDF headers
+  const magazinesDir = path.resolve(process.cwd(), 'public/magazines');
+  app.use('/magazines', express.static(magazinesDir, {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.pdf')) {
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="EVO-LABS-TOMO-01-CONOCE-TU-PC.pdf"');
+      }
+    }
+  }));
+
+  // Direct download endpoint for Tomo 01 PDF
+  app.get(['/api/pdf/tomo01', '/api/pdf/tomo-01', '/api/download/tomo01', '/api/download/tomo-01'], (req, res) => {
+    const pdfPath = path.resolve(process.cwd(), 'public/magazines/tomo01/EVO-LABS-TOMO-01-CONOCE-TU-PC.pdf');
+    if (fs.existsSync(pdfPath)) {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="EVO-LABS-TOMO-01-CONOCE-TU-PC.pdf"');
+      return res.sendFile(pdfPath);
+    }
+    return res.status(404).json({ error: 'PDF file not found' });
+  });
 
   // API: Create Checkout Order
   app.post('/api/checkout/create', async (req, res) => {
