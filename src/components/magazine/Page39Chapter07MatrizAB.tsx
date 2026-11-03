@@ -97,43 +97,9 @@ export const Page39Chapter07MatrizAB: React.FC = () => {
 
         </div>
 
-        {/* Matriz de Discriminación Pericial: Placebo vs Rendimiento Real */}
-        <div className="p-3 bg-[#061014] border border-cyan-500/40 rounded-xl space-y-2 text-xs font-mono-tech shadow-xl">
-          <div className="flex items-center justify-between border-b border-zinc-800 pb-1.5">
-            <span className="text-cyan-400 font-bold uppercase text-[11px] flex items-center gap-1.5">
-              <Beaker className="w-3.5 h-3.5" />
-              <span>MATRIZ DE DISCRIMINACIÓN ESTADÍSTICA: ¿MEJORA EMPÍRICA O PLACEBO?</span>
-            </span>
-            <span className="text-[10px] text-zinc-500">MÍNIMO 3 REPETICIONES</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[10px]">
-            <div className="p-2 bg-black/50 border border-zinc-800/80 rounded space-y-1">
-              <span className="text-rose-400 font-bold block">1. DELTA &lt; 2% // PLACEBO</span>
-              <p className="text-zinc-300 font-sans-editorial leading-tight text-[10px]">
-                <strong>Veredicto: Ruido de fondo.</strong> Variaciones de 1 a 2 FPS caen dentro del margen de error térmico y de planificación de hilos de Windows. No hubo optimización real.
-              </p>
-            </div>
-
-            <div className="p-2 bg-black/50 border border-zinc-800/80 rounded space-y-1">
-              <span className="text-amber-400 font-bold block">2. DELTA 2% - 5% // ZONA GRIS</span>
-              <p className="text-zinc-300 font-sans-editorial leading-tight text-[10px]">
-                <strong>Veredicto: Marginal no concluyente.</strong> Requiere 5 pasadas adicionales y verificar que la desviación estándar sea inferior al 1.5%. Si el 1% Low no varió, el juego se siente igual.
-              </p>
-            </div>
-
-            <div className="p-2 bg-black/50 border border-zinc-800/80 rounded space-y-1">
-              <span className="text-emerald-400 font-bold block">3. DELTA &gt; 5% EN 1% LOW // REAL</span>
-              <p className="text-zinc-300 font-sans-editorial leading-tight text-[10px]">
-                <strong>Veredicto: Mejora comprobada.</strong> Reducción neta del tiempo entre cuadros y aumento del percentil 99 más lento. Solo en este caso el tweak se incorpora al perfil definitivo.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Bottom Rule */}
-        <div className="p-2.5 bg-[#081418] border-l-3 border-cyan-400 rounded-r text-xs text-zinc-300 font-mono-tech flex items-center justify-between">
-          <span className="text-[11px]">
+        <div className="p-3 bg-[#081418] border-l-3 border-cyan-400 rounded-r text-xs text-zinc-300 font-mono-tech flex items-center justify-between">
+          <span>
             <strong className="text-cyan-400 font-bold">FILOSOFÍA EVO:</strong> "Si no podés medirlo con números precisos y reproducirlo tres veces seguidas, no es optimización: es fe religiosa."
           </span>
           <span className="text-zinc-500 text-[10px] uppercase hidden sm:inline shrink-0">

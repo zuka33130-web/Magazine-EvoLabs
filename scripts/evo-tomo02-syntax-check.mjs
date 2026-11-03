@@ -9,7 +9,6 @@ import { resolve } from 'node:path';
 
 const paths = [
   'src/components/tomo02/Tomo02WindowsEditorialArt.tsx',
-  'src/components/tomo02/Tomo02WindowsAtlasImage.tsx',
   'src/components/tomo02/Tomo02Windows50LabReader.tsx',
   'src/data/tomo02Windows50.ts',
   'src/data/tomo02Windows50LabTypes.ts',

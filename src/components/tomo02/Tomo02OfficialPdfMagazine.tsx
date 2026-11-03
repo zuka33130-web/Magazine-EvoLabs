@@ -1,453 +1,404 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
   Download,
-  Maximize2,
-  Minimize2,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
   FileText,
-  AlertCircle,
+  Printer,
   ExternalLink,
-  BookOpen,
-  Sparkles,
-  Layers,
   CheckCircle2,
+  Maximize2,
+  Sparkles,
+  BookOpen,
 } from 'lucide-react';
-import { TOMO_02_META } from '../../data/tomo02Data';
-import { TOMO_02_COVER } from '../../data/tomoCoversData';
+import {
+  BLOQUES_TOMO_02,
+  EXPEDIENTES_TOMO_02,
+  OFFICIAL_PDF_URL,
+  type ExpedienteTomo02,
+} from '../../data/tomo02BibliaNegra40Data';
 
 interface Tomo02OfficialPdfMagazineProps {
   onBackToCover: () => void;
-  onOpenInteractive?: () => void;
   onOpenA4Magazine?: () => void;
+  onOpenInteractive?: () => void;
   onOpenLab?: () => void;
-  initialPage?: number;
 }
 
 export const Tomo02OfficialPdfMagazine: React.FC<Tomo02OfficialPdfMagazineProps> = ({
   onBackToCover,
-  onOpenInteractive,
-  onOpenA4Magazine,
-  onOpenLab,
-  initialPage = 1,
 }) => {
-  const [currentPage, setCurrentPage] = useState<number>(initialPage);
-  const [zoomLevel, setZoomLevel] = useState<number>(100);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [pdfExists, setPdfExists] = useState<boolean | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<'reader' | 'pdf_native'>('reader');
 
-  const totalPages = 67;
-  const defaultPdfUrl = '/magazines/tomo02/EVO-LABS-TOMO-02-DOMINA-WINDOWS.pdf';
-  const alternativePdfUrl = '/magazines/tomo02/EVO-LABS-MAGAZINE-TOMO-02-DOMINA-WINDOWS-6(4).pdf';
-  const officialFilename = 'EVO-LABS-MAGAZINE-TOMO-02-DOMINA-WINDOWS-6(4).pdf';
-  const [activePdfUrl, setActivePdfUrl] = useState<string>(defaultPdfUrl);
-
-  // Check if PDF file exists in public directory under either name
-  useEffect(() => {
-    let isMounted = true;
-    fetch(defaultPdfUrl, { method: 'HEAD' })
-      .then((res) => {
-        if (!isMounted) return;
-        if (res.ok && res.status !== 404) {
-          setActivePdfUrl(defaultPdfUrl);
-          setPdfExists(true);
-        } else {
-          // Try alternative filename
-          fetch(alternativePdfUrl, { method: 'HEAD' })
-            .then((res2) => {
-              if (!isMounted) return;
-              if (res2.ok && res2.status !== 404) {
-                setActivePdfUrl(alternativePdfUrl);
-                setPdfExists(true);
-              } else {
-                setPdfExists(false);
-              }
-            })
-            .catch(() => {
-              if (isMounted) setPdfExists(false);
-            });
-        }
-      })
-      .catch(() => {
-        if (!isMounted) return;
-        fetch(alternativePdfUrl, { method: 'HEAD' })
-          .then((res2) => {
-            if (!isMounted) return;
-            if (res2.ok && res2.status !== 404) {
-              setActivePdfUrl(alternativePdfUrl);
-              setPdfExists(true);
-            } else {
-              setPdfExists(false);
-            }
-          })
-          .catch(() => {
-            if (isMounted) setPdfExists(false);
-          });
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, [defaultPdfUrl, alternativePdfUrl]);
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-        setCurrentPage((prev) => Math.min(totalPages, prev + 1));
-      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-        setCurrentPage((prev) => Math.max(1, prev - 1));
-      } else if (e.key === 'Home') {
-        setCurrentPage(1);
-      } else if (e.key === 'End') {
-        setCurrentPage(totalPages);
+  const scrollToExpediente = (numStr: string) => {
+    setActiveTab('reader');
+    setTimeout(() => {
+      const el = document.getElementById(`expediente-${numStr}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [totalPages]);
-
-  const handlePrevPage = () => setCurrentPage((p) => Math.max(1, p - 1));
-  const handleNextPage = () => setCurrentPage((p) => Math.min(totalPages, p + 1));
-
-  const handleZoomIn = () => setZoomLevel((z) => Math.min(200, z + 15));
-  const handleZoomOut = () => setZoomLevel((z) => Math.max(60, z - 15));
-  const handleResetZoom = () => setZoomLevel(100);
-
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      containerRef.current?.requestFullscreen().catch(() => {});
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen().catch(() => {});
-      setIsFullscreen(false);
-    }
+    }, 100);
   };
 
-  useEffect(() => {
-    const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener('fullscreenchange', onFsChange);
-    return () => document.removeEventListener('fullscreenchange', onFsChange);
-  }, []);
+  const handlePrintOrGenerate = () => {
+    window.print();
+  };
 
   return (
-    <div
-      ref={containerRef}
-      className="min-h-screen bg-[#05070B] text-zinc-100 flex flex-col font-sans-editorial select-none"
-    >
-      {/* ========================================================
-          TOP NAVIGATION & CONTROLS TOOLBAR
-      ======================================================== */}
-      <header className="sticky top-0 z-50 bg-[#07090F]/95 backdrop-blur-xl border-b border-cyan-950/80 px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono-tech">
-        {/* Left: Back & Title */}
+    <div className="min-h-screen bg-[#020204] text-zinc-100 flex flex-col font-sans-editorial selection:bg-rose-600 selection:text-white">
+      {/* Print CSS to ensure exact A4 page breaks and clean printout */}
+      <style>{`
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 12mm 15mm 15mm 15mm;
+          }
+          body {
+            background-color: #020204 !important;
+            color: #ffffff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+          .pdf-page-leaf {
+            page-break-after: always !important;
+            break-after: page !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+        }
+      `}</style>
+
+      {/* =========================================================================
+          TOP NAVIGATION BAR (no-print)
+      ========================================================================= */}
+      <header className="sticky top-0 z-50 bg-[#08080C]/95 backdrop-blur-xl border-b border-zinc-800/80 px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono-tech no-print shadow-xl">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onBackToCover}
-            className="px-3 py-1.5 rounded-lg bg-cyan-950/80 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer font-bold"
+            className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 hover:border-rose-500 hover:text-rose-300 text-zinc-300 transition-all flex items-center gap-1.5 cursor-pointer font-bold"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>← VOLVER AL TOMO 02</span>
           </button>
-
-          <div className="hidden md:flex items-center gap-2">
-            <span className="w-2.5 h-2.5 bg-cyan-400 inline-block shadow-[0_0_8px_#00D2FF]" />
-            <span className="font-extrabold text-white uppercase tracking-wider">
-              DOMINÁ WINDOWS
-            </span>
-            <span className="text-zinc-600">/</span>
-            <span className="text-cyan-400 text-[11px]">
-              PDF HISTÓRICO / ARCHIVO DE REFERENCIA ({totalPages} PÁGS)
-            </span>
+          <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-zinc-800 text-zinc-400">
+            <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_#f43f5e]" />
+            <span className="font-bold text-white uppercase tracking-wider">LA BIBLIA NEGRA DE WINDOWS</span>
+            <span>/</span>
+            <span className="text-zinc-400">40 EXPEDIENTES</span>
           </div>
         </div>
 
-        {/* Center: Page Controls */}
-        <div className="flex items-center gap-1.5 bg-zinc-950/90 p-1 rounded-xl border border-cyan-950">
-          <button
-            type="button"
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className="p-1.5 rounded bg-zinc-900 border border-zinc-800 disabled:opacity-30 hover:bg-cyan-950/60 hover:text-cyan-300 transition-all cursor-pointer"
-            title="Página anterior (←)"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          <div className="px-2 flex items-center gap-1 text-[11px]">
-            <span className="text-zinc-400">Pág.</span>
-            <select
-              value={currentPage}
-              onChange={(e) => setCurrentPage(Number(e.target.value))}
-              className="bg-black text-cyan-400 font-bold border border-cyan-900 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:border-cyan-400 cursor-pointer"
-            >
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <option key={p} value={p}>
-                  {String(p).padStart(2, '0')}
-                </option>
-              ))}
-            </select>
-            <span className="text-zinc-500">/ {totalPages}</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="p-1.5 rounded bg-zinc-900 border border-zinc-800 disabled:opacity-30 hover:bg-cyan-950/60 hover:text-cyan-300 transition-all cursor-pointer"
-            title="Página siguiente (→)"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Right: Zoom, Fullscreen & Download */}
-        <div className="flex items-center gap-2">
-          {/* Zoom Controls */}
-          <div className="hidden sm:flex items-center gap-1 bg-zinc-950/90 p-1 rounded-xl border border-cyan-950">
+        {/* Tab & Actions Switcher */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center rounded-lg bg-zinc-900 border border-zinc-800 p-0.5">
             <button
               type="button"
-              onClick={handleZoomOut}
-              disabled={zoomLevel <= 60}
-              className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 cursor-pointer"
-              title="Reducir zoom"
+              onClick={() => setActiveTab('reader')}
+              className={`px-3 py-1 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'reader'
+                  ? 'bg-rose-600 text-white shadow-[0_0_10px_rgba(244,63,94,0.4)]'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
             >
-              <ZoomOut className="w-3.5 h-3.5" />
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Edición Digital</span>
             </button>
             <button
               type="button"
-              onClick={handleResetZoom}
-              className="px-1.5 text-[10px] font-bold text-zinc-300 hover:text-cyan-300 cursor-pointer"
-              title="Restablecer zoom (100%)"
+              onClick={() => setActiveTab('pdf_native')}
+              className={`px-3 py-1 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'pdf_native'
+                  ? 'bg-rose-600 text-white shadow-[0_0_10px_rgba(244,63,94,0.4)]'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
             >
-              {zoomLevel}%
-            </button>
-            <button
-              type="button"
-              onClick={handleZoomIn}
-              disabled={zoomLevel >= 200}
-              className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 cursor-pointer"
-              title="Aumentar zoom"
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
+              <FileText className="w-3.5 h-3.5" />
+              <span>Visor PDF Original</span>
             </button>
           </div>
 
-          {/* Fullscreen Toggle */}
+          <a
+            href={OFFICIAL_PDF_URL}
+            download="Evolabs_Biblia_Negra_Windows_Tomo02.pdf"
+            className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 hover:border-zinc-500 text-zinc-200 text-xs font-bold transition-all flex items-center gap-1.5"
+            title="Descargar archivo PDF original de 43 páginas"
+          >
+            <Download className="w-3.5 h-3.5 text-rose-400" />
+            <span className="hidden sm:inline">Descargar PDF</span>
+          </a>
+
           <button
             type="button"
-            onClick={toggleFullscreen}
-            className="p-2 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-cyan-950 text-zinc-300 hover:text-white cursor-pointer hidden sm:block"
-            title={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+            onClick={handlePrintOrGenerate}
+            className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(244,63,94,0.3)]"
+            title="Imprimir / Guardar como PDF"
           >
-            {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+            <Printer className="w-3.5 h-3.5" />
+            <span>Imprimir</span>
           </button>
-
-          {/* Download / Print button */}
-          {pdfExists ? (
-            <a
-              href={activePdfUrl}
-              download="EVO-LABS-TOMO-02-LA-BIBLIA-NEGRA-DE-WINDOWS.pdf"
-              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-extrabold hover:brightness-110 transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,210,255,0.4)] cursor-pointer"
-              title={`Descargar archivo oficial: ${officialFilename}`}
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>DESCARGAR PDF HISTÓRICO (67 PÁGS)</span>
-            </a>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                if (onOpenA4Magazine) {
-                  onOpenA4Magazine();
-                } else {
-                  window.print();
-                }
-              }}
-              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-extrabold hover:brightness-110 transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,210,255,0.4)] cursor-pointer"
-              title="Abrir Revista A4 para exportar o guardar en PDF"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>DESCARGAR / IMPRIMIR PDF A4</span>
-            </button>
-          )}
         </div>
       </header>
 
-      {/* ========================================================
-          NOTIFICATION BAR: PHYSICAL PDF PATH STATUS
-      ======================================================== */}
-      {pdfExists === false && (
-        <div className="bg-cyan-950/40 border-b border-cyan-500/40 px-4 py-2 flex items-center justify-between text-xs font-mono-tech text-cyan-200">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span>
-              <strong>Edición Digital Activa:</strong> La edición web diagramada completa cuenta con 38 páginas consecutivas. (Referencia de archivo PDF histórico: 67 págs).
+      {/* =========================================================================
+          VIEW MODE 1: NATIVE EMBEDDED PDF VIEWER (Direct file rendering)
+      ========================================================================= */}
+      {activeTab === 'pdf_native' ? (
+        <div className="flex-1 w-full max-w-6xl mx-auto px-4 py-6 flex flex-col items-center">
+          <div className="w-full flex items-center justify-between pb-3 text-xs font-mono-tech text-zinc-400">
+            <span className="flex items-center gap-1.5 text-zinc-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              Documento Oficial PDF Cargado (43 páginas · 2.48 MB)
             </span>
-          </div>
-          {onOpenA4Magazine && (
-            <button
-              type="button"
-              onClick={onOpenA4Magazine}
-              className="px-3 py-1 rounded bg-cyan-400 text-black font-bold text-[10px] hover:bg-cyan-300 transition-colors cursor-pointer"
+            <a
+              href={OFFICIAL_PDF_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-rose-400 hover:text-rose-300 flex items-center gap-1 underline"
             >
-              VER EDICIÓN WEB (38 PÁGS) →
-            </button>
-          )}
+              <span>Abrir en ventana completa</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+
+          <div className="w-full h-[84vh] rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-950 shadow-2xl">
+            <iframe
+              src={`${OFFICIAL_PDF_URL}#toolbar=1&navpanes=1`}
+              title="PDF Magazine Tomo 02"
+              className="w-full h-full border-none"
+            />
+          </div>
         </div>
-      )}
-
-      {/* ========================================================
-          MAIN VIEWER AREA
-      ======================================================== */}
-      <main className="flex-1 flex flex-col items-center justify-start p-4 sm:p-6 overflow-y-auto">
-        <div
-          className="transition-transform duration-200 origin-top flex flex-col items-center max-w-full"
-          style={{ transform: `scale(${zoomLevel / 100})` }}
-        >
-          {/* If the physical PDF exists, embed it via iframe/object viewer */}
-          {pdfExists ? (
-            <div className="w-[210mm] max-w-full h-[297mm] min-h-[900px] bg-black rounded-2xl shadow-2xl border border-cyan-900/60 overflow-hidden">
-              <iframe
-                src={`${activePdfUrl}#page=${currentPage}&view=FitH`}
-                title={`Tomo 02 - Página ${currentPage}`}
-                className="w-full h-full border-none"
-              />
+      ) : (
+        /* =====================================================================
+            VIEW MODE 2: PIXEL-PERFECT DIGITAL RECREATION (Pages 1-43)
+        ===================================================================== */
+        <main className="flex-1 max-w-[210mm] mx-auto w-full px-3 sm:px-6 py-8 space-y-12">
+          
+          {/* ===================================================================
+              PAGES 1 - 3: TABLA DE EXPEDIENTES / ÍNDICE COMPLETO
+          =================================================================== */}
+          <section className="pdf-page-leaf rounded-2xl bg-[#030305] border border-zinc-800/80 p-6 sm:p-10 shadow-2xl">
+            {/* Header */}
+            <div className="border-b border-zinc-900 pb-4 mb-6">
+              <span className="text-rose-500 font-mono-tech text-[10px] tracking-[0.25em] uppercase font-black block mb-1">
+                TABLA DE EXPEDIENTES
+              </span>
+              <h1 className="text-3xl sm:text-4xl font-display font-black text-white tracking-tight">
+                Índice completo
+              </h1>
+              <p className="text-zinc-400 text-xs sm:text-sm mt-1">
+                40 expedientes, 5 bloques temáticos. Cada título es un capítulo completo y desarrollado, listo para leer o exportar.
+              </p>
             </div>
-          ) : (
-            /* Standalone / Fallback Cover & Reading Deck when physical PDF is waiting */
-            <div className={`w-[820px] max-w-full bg-[#03060B] border border-cyan-900/60 rounded-3xl shadow-2xl relative flex flex-col justify-between ${currentPage === 1 ? 'aspect-[210/297] overflow-hidden' : 'min-h-[1100px] p-6 sm:p-10'}`}>
-              {/* Atmospheric Background Tech Matrix */}
-              {currentPage !== 1 && (
-                <>
-                  <div className="absolute inset-0 pointer-events-none opacity-20 bg-tech-grid" />
-                  <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-cyan-500/10 rounded-full blur-[110px] pointer-events-none" />
-                </>
-              )}
 
-              {/* Page 1 Real Cover Display */}
-              {currentPage === 1 ? (
-                <img
-                  src={TOMO_02_COVER}
-                  alt="Portada definitiva de EVO LABS — Tomo 02: La Biblia Negra de Windows"
-                  className="block w-full h-full object-contain"
-                />
-              ) : (
-                /* Pages 2 through 67 preview card */
-                <div className="h-full flex flex-col justify-between space-y-4">
-                  <div className="border-b border-cyan-950 pb-3 flex items-center justify-between text-xs font-mono-tech text-cyan-400">
-                    <span>EVO LABS MAGAZINE // TOMO 02</span>
-                    <span className="text-zinc-500">PLIEGO EDITORIAL // PÁG. {String(currentPage).padStart(2, '0')} DE {totalPages}</span>
-                  </div>
-
-                  <div className="my-auto text-center space-y-4 max-w-lg mx-auto">
-                    <div className="w-16 h-16 rounded-2xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-400 mx-auto flex items-center justify-center">
-                      <BookOpen className="w-8 h-8 text-cyan-400" />
-                    </div>
-                    <h3 className="text-2xl font-display font-black text-white uppercase">
-                      EDICIÓN WEB COMPLETA // 38 PÁGINAS A4
-                    </h3>
-                    <p className="text-xs text-zinc-400 font-mono-tech">
-                      La edición web diagramada cuenta con 38 páginas reales consecutivas con navegación fluida, casos y laboratorios.
-                    </p>
-                    <div className="p-4 rounded-xl bg-black/60 border border-cyan-900/40 text-xs font-mono-tech text-left space-y-2 text-zinc-300">
-                      <div className="flex items-center gap-2 text-cyan-400 font-bold">
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>EDICIÓN DISPONIBLE: MAGAZINE WEB A4</span>
-                      </div>
-                      <p className="text-[11px] text-zinc-400">
-                        La edición facsimilar histórica en archivo PDF de 67 páginas se encuentra registrada como referencia de biblioteca. Para lectura directa e inmediata, utilizá la edición web diagramada.
-                      </p>
-                    </div>
-
-                    <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                      {onOpenA4Magazine && (
-                        <button
-                          type="button"
-                          onClick={onOpenA4Magazine}
-                          className="px-5 py-2.5 rounded-xl bg-cyan-400 text-black font-extrabold text-xs hover:bg-cyan-300 cursor-pointer shadow-lg shadow-cyan-400/25"
-                        >
-                          ABRIR MAGAZINE WEB (38 PÁGS) →
-                        </button>
-                      )}
-                      {onOpenInteractive && (
-                        <button
-                          type="button"
-                          onClick={onOpenInteractive}
-                          className="px-4 py-2.5 rounded-xl bg-zinc-900 border border-cyan-900 text-xs text-cyan-300 hover:text-white cursor-pointer"
-                        >
-                          ABRIR TOMO INTERACTIVO
-                        </button>
-                      )}
+            {/* Blocks & Titles Matrix */}
+            <div className="space-y-8">
+              {BLOQUES_TOMO_02.map((bloque) => (
+                <div key={bloque.id} className="space-y-3">
+                  {/* Block Header */}
+                  <div className="flex items-center gap-3 border-b border-zinc-900/90 pb-2">
+                    <span className="w-6 h-6 rounded bg-rose-950/80 border border-rose-500/40 text-rose-400 font-mono-tech font-bold text-xs flex items-center justify-center">
+                      {bloque.number}
+                    </span>
+                    <div>
+                      <h2 className="text-xs font-mono-tech font-bold uppercase tracking-wider text-white">
+                        {bloque.title}
+                      </h2>
+                      <span className="text-[10px] font-mono-tech text-zinc-400">
+                        {bloque.expedientesRange}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="border-t border-cyan-950 pt-3 flex items-center justify-between text-[10px] font-mono-tech text-zinc-500">
-                    <span>COLECCIÓN FORENSE EVO // 38 PÁGINAS A4 WEB</span>
-                    <span>PÁGINA {currentPage} / {totalPages}</span>
+                  {/* 2-Column List of Expedientes */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5">
+                    {EXPEDIENTES_TOMO_02.filter((exp) => exp.blockNumber === bloque.number).map((exp) => (
+                      <button
+                        key={exp.id}
+                        type="button"
+                        onClick={() => scrollToExpediente(exp.numberStr)}
+                        className="group flex items-start justify-between text-left p-1.5 rounded hover:bg-zinc-900/60 transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-baseline gap-2.5 pr-2">
+                          <span className="font-mono-tech text-xs text-zinc-400 group-hover:text-rose-400 font-semibold shrink-0">
+                            {exp.numberStr}
+                          </span>
+                          <span className="text-xs text-zinc-300 group-hover:text-white leading-snug line-clamp-2">
+                            {exp.title}
+                          </span>
+                        </div>
+                        <span className="font-mono-tech text-[10px] text-emerald-400 shrink-0 font-bold flex items-center gap-1">
+                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          LISTO
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
-              )}
+              ))}
             </div>
-          )}
-        </div>
-      </main>
+          </section>
 
-      {/* ========================================================
-          BOTTOM QUICK SWITCH DECK: 3 STAGES OF PRODUCT
-      ======================================================== */}
-      <footer className="border-t border-cyan-950/80 bg-[#07090F]/90 px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono-tech">
-        <div className="flex items-center gap-2 text-zinc-400">
-          <span className="w-2 h-2 rounded-full bg-cyan-400" />
-          <span>ETAPA 01: LEER & ENTENDER (MAGAZINE A4)</span>
-        </div>
+          {/* ===================================================================
+              PAGES 4 - 43: THE 40 EXPEDIENTES (Cards matched to PDF)
+          =================================================================== */}
+          {EXPEDIENTES_TOMO_02.map((exp, idx) => {
+            // Determine if this expediente starts a new block
+            const isFirstOfBlock =
+              idx === 0 || EXPEDIENTES_TOMO_02[idx - 1].blockNumber !== exp.blockNumber;
+            const currentBlock = BLOQUES_TOMO_02.find((b) => b.number === exp.blockNumber);
 
-        <div className="flex items-center gap-3">
+            return (
+              <React.Fragment key={exp.id}>
+                {/* Block Header Banner if first in block */}
+                {isFirstOfBlock && currentBlock && (
+                  <div className="pdf-page-leaf rounded-2xl bg-[#040407] border border-zinc-800 p-6 sm:p-8 text-center space-y-3">
+                    <div className="w-8 h-8 rounded-lg bg-rose-950 border border-rose-500/50 text-rose-400 font-mono-tech font-black text-sm flex items-center justify-center mx-auto">
+                      {currentBlock.number}
+                    </div>
+                    <span className="font-mono-tech text-[10px] uppercase tracking-[0.25em] text-rose-400 block font-bold">
+                      BLOQUE {currentBlock.number} · {currentBlock.expedientesRange}
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl font-display font-black text-white uppercase tracking-tight">
+                      {currentBlock.title}
+                    </h2>
+                    <span className="inline-block px-3 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-mono-tech text-zinc-400">
+                      {currentBlock.count} EXPEDIENTES
+                    </span>
+                    <p className="text-zinc-400 text-xs sm:text-sm max-w-lg mx-auto font-sans-editorial leading-relaxed">
+                      {currentBlock.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Individual Expediente Card (Matching exact screenshot styling) */}
+                <article
+                  id={`expediente-${exp.numberStr}`}
+                  className="pdf-page-leaf rounded-2xl bg-[#06070B] border border-zinc-800/90 p-6 sm:p-9 shadow-xl space-y-5 transition-all hover:border-zinc-700 relative"
+                >
+                  {/* Top Bar: Number, Block and Level Badge */}
+                  <div className="flex items-center justify-between font-mono-tech text-xs">
+                    <div className="flex items-center gap-3">
+                      <span className="text-rose-500 font-black text-sm">
+                        {exp.numberStr}
+                      </span>
+                      <span className="text-zinc-400 uppercase tracking-widest text-[10px]">
+                        BLOQUE {exp.blockNumber} · {exp.blockTitle}
+                      </span>
+                    </div>
+
+                    {/* Level Pill */}
+                    <div
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono-tech font-bold flex items-center gap-1.5 border ${
+                        exp.level === 'BÁSICO'
+                          ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-400'
+                          : exp.level === 'INTERMEDIO'
+                          ? 'bg-amber-950/60 border-amber-500/40 text-amber-400'
+                          : 'bg-rose-950/60 border-rose-500/40 text-rose-400'
+                      }`}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                      <span>{exp.level}</span>
+                    </div>
+                  </div>
+
+                  {/* Title & Viral Hook */}
+                  <div className="space-y-1.5 pt-1">
+                    <h2 className="text-xl sm:text-2xl font-display font-black text-white tracking-tight leading-snug">
+                      {exp.title}
+                    </h2>
+                    <p className="text-rose-400 font-sans-editorial text-xs sm:text-sm leading-relaxed italic">
+                      {exp.hook}
+                    </p>
+                  </div>
+
+                  {/* Body Paragraphs */}
+                  <div className="space-y-3 text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed">
+                    <p>{exp.paragraphs[0]}</p>
+                    <p>{exp.paragraphs[1]}</p>
+                  </div>
+
+                  {/* DATO VERIFICABLE Box (Red outline box exactly like in PDF) */}
+                  <div className="rounded-xl border border-rose-900/60 bg-rose-950/20 p-4 space-y-1.5">
+                    <span className="text-rose-500 font-mono-tech text-[10px] font-black tracking-widest uppercase block">
+                      DATO VERIFICABLE
+                    </span>
+                    <p className="text-xs sm:text-sm text-zinc-200 font-mono-tech leading-relaxed">
+                      {exp.verifiableData}
+                    </p>
+                  </div>
+                </article>
+              </React.Fragment>
+            );
+          })}
+
+          {/* ===================================================================
+              PAGE 43: FINAL CLOSING BANNER & CTA
+          =================================================================== */}
+          <section className="pdf-page-leaf rounded-2xl bg-[#050508] border-2 border-rose-600/40 p-8 sm:p-12 text-center space-y-6 shadow-2xl relative overflow-hidden">
+            <div className="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500/50 flex items-center justify-center mx-auto text-rose-400">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-2xl sm:text-3xl font-display font-black text-white uppercase tracking-tight">
+                EXPEDIENTE CERRADO. EL CONOCIMIENTO, ABIERTO.
+              </h2>
+              <p className="text-zinc-400 text-xs sm:text-sm max-w-lg mx-auto font-sans-editorial leading-relaxed">
+                Compartí esta edición con tu comunidad y convertí cada expediente en una nueva razón para que lectores y clientes elijan a Evolabs como su fuente de confianza en Windows.
+              </p>
+            </div>
+
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+              <button
+                type="button"
+                onClick={handlePrintOrGenerate}
+                className="px-8 py-3.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-mono-tech text-xs sm:text-sm font-black uppercase tracking-wider shadow-[0_0_25px_rgba(244,63,94,0.4)] transition-all cursor-pointer"
+              >
+                GENERAR PDF DEL MAGAZINE
+              </button>
+
+              <a
+                href={OFFICIAL_PDF_URL}
+                download="Evolabs_Biblia_Negra_Windows_Tomo02.pdf"
+                className="px-6 py-3.5 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-zinc-500 text-zinc-200 font-mono-tech text-xs sm:text-sm font-bold flex items-center gap-2 transition-all"
+              >
+                <Download className="w-4 h-4 text-rose-400" />
+                <span>DESCARGAR PDF ORIGINAL (2.48 MB)</span>
+              </a>
+            </div>
+          </section>
+
+        </main>
+      )}
+
+      {/* =========================================================================
+          FOOTER (no-print)
+      ========================================================================= */}
+      <footer className="border-t border-zinc-900 bg-[#040406] px-6 py-4 flex flex-wrap items-center justify-between gap-4 text-xs font-mono-tech text-zinc-400 no-print">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-rose-500" />
+          <span>EVO LABS // LA BIBLIA NEGRA DE WINDOWS (TOMO 02)</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={handlePrintOrGenerate}
+            className="text-rose-400 hover:text-white underline cursor-pointer"
+          >
+            Imprimir edición completa (Ctrl + P)
+          </button>
+          <span>·</span>
           <button
             type="button"
             onClick={onBackToCover}
-            className="px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold transition-all cursor-pointer flex items-center gap-1.5"
+            className="text-zinc-400 hover:text-rose-300 cursor-pointer"
           >
-            <ArrowLeft className="w-3.5 h-3.5 text-zinc-400" />
-            <span>← VOLVER AL TOMO 02</span>
+            Volver a Portada
           </button>
-
-          {onOpenA4Magazine && (
-            <button
-              type="button"
-              onClick={onOpenA4Magazine}
-              className="px-3.5 py-1.5 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 font-bold transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
-              <span>LEER REVISTA A4 WEB →</span>
-            </button>
-          )}
-
-          {onOpenInteractive && (
-            <button
-              type="button"
-              onClick={onOpenInteractive}
-              className="px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-cyan-900/60 hover:border-cyan-400 text-cyan-200 font-bold transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span>TOMO INTERACTIVO (27 MÓDULOS) →</span>
-            </button>
-          )}
-
-          {onOpenLab && (
-            <button
-              type="button"
-              onClick={onOpenLab}
-              className="px-3.5 py-1.5 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-600/60 text-cyan-300 font-bold transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <Layers className="w-3.5 h-3.5 text-cyan-400" />
-              <span>LABORATORIO →</span>
-            </button>
-          )}
         </div>
       </footer>
     </div>

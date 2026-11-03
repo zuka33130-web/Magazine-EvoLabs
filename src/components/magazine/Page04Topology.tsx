@@ -1,7 +1,6 @@
 import React from 'react';
 import { MagazineMasterPage } from './MagazineMasterPage';
 import { Cpu, Zap, HardDrive, ShieldCheck, ArrowRight } from 'lucide-react';
-import { MAGAZINE_IMAGES } from '../../data/magazineImages';
 
 export const Page04Topology: React.FC = () => {
   return (
@@ -9,35 +8,35 @@ export const Page04Topology: React.FC = () => {
       pageId="magazine-page-08"
       pageNumber={8}
       totalPages={46}
-      sectionTitle="0x02 ATLAS DE SILICIO"
-      subSlug="TOPOLOGÍA DE PISTAS & LÍNEAS DE TRANSMISIÓN"
+      sectionTitle="INFOGRAFÍA PERICIAL"
+      subSlug="TOPOLOGÍA DE SILICIO // RUTAS DE ALTA VELOCIDAD"
       accentColor="#EAB308"
     >
       {/* Article Header */}
-      <div className="mb-3 pb-2 border-b border-zinc-800/80 flex items-baseline justify-between">
+      <div className="mb-4 pb-2 border-b border-zinc-800/80 flex items-baseline justify-between">
         <div>
-          <span className="text-[10px] font-mono-tech tracking-widest text-yellow-400 uppercase font-bold">
-            0x02 // ATLAS DE ANATOMÍA DE SILICIO (FASCÍCULO PARTE 1)
+          <span className="text-xs font-mono-tech tracking-widest text-yellow-400 uppercase font-bold">
+            INFOGRAFÍA TÉCNICA // ARQUITECTURA DE LA PLACA MADRE
           </span>
-          <h2 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight mt-0.5">
-            Topología de Pistas, Buses y Física
+          <h2 className="font-display font-black text-3xl sm:text-4xl text-white uppercase tracking-tight mt-0.5">
+            Anatomía del Silicio
           </h2>
         </div>
         <span className="font-mono-tech text-[10px] text-zinc-500 uppercase tracking-wider hidden sm:inline">
-          IMPEDANCIA & MICROONDAS
+          ESQUEMA DE INTERCONEXIÓN DIRECTA
         </span>
       </div>
 
       {/* Main Narrative Introduction */}
-      <div className="mb-3 text-[11px] sm:text-xs text-zinc-300 font-sans-editorial leading-relaxed max-w-4xl">
+      <div className="mb-4 text-xs sm:text-sm text-zinc-300 font-sans-editorial leading-relaxed max-w-4xl">
         <p className="magazine-dropcap text-zinc-200">
-          La placa madre es una red compleja de autopistas donde las señales viajan a velocidades cercanas a la luz. Cada pista actúa como una línea de transmisión de microondas a 6000+ MT/s: cualquier imperfección en la impedancia o un stub sin terminar genera reflexiones destructivas. Por eso la colocación en zócalos A2 y B2 es una necesidad física ineludible para evitar el eco eléctrico en los extremos libres de las trazas.
+          Una placa madre no es simplemente una base de plástico donde atornillar componentes: es una compleja red de autopistas de cobre de impedancia controlada. La cercanía física al socket del procesador y el número de carriles PCIe dedicados determinan si un componente opera con latencia de nanosegundos o si debe hacer fila en el cuello de botella del chipset.
         </p>
       </div>
 
       {/* Main Architectural Schematic / Technical Cutaway */}
-      <div className="bg-[#0b0d13] border-2 border-zinc-800 rounded-xl p-3 sm:p-4 flex-1 flex flex-col justify-between shadow-2xl">
-        <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2 mb-2.5">
+      <div className="bg-[#0b0d13] border-2 border-zinc-800 rounded-xl p-4 sm:p-5 flex-1 flex flex-col justify-between shadow-2xl">
+        <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2 mb-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 bg-yellow-400 inline-block shadow-[0_0_8px_#facc15]" />
             <span className="text-xs font-mono-tech font-bold uppercase tracking-wider text-zinc-100">
@@ -50,10 +49,10 @@ export const Page04Topology: React.FC = () => {
         </div>
 
         {/* Visual Schematic Diagram with Generous Breathing Room */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch flex-1">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch flex-1">
           
           {/* Central CPU Block (Hero) */}
-          <div className="lg:col-span-5 bg-[#121622] border-2 border-yellow-400 rounded-lg p-3 flex flex-col justify-between shadow-lg">
+          <div className="lg:col-span-5 bg-[#121622] border-2 border-yellow-400 rounded-lg p-4 flex flex-col justify-between shadow-lg">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono-tech font-black text-black bg-yellow-400 px-2 py-0.5 rounded uppercase tracking-wider">
                 CORAZÓN // CPU DIE
@@ -61,24 +60,11 @@ export const Page04Topology: React.FC = () => {
               <span className="text-[10px] font-mono-tech text-yellow-300 font-semibold">IMC INTEGRADO</span>
             </div>
 
-            {/* Foto Pericial de Trazas Microondas */}
-            <div className="relative rounded overflow-hidden border border-yellow-400/40 my-1.5">
-              <img
-                src={MAGAZINE_IMAGES.daisyChainPcb}
-                alt="Trazas Daisy-Chain en PCB a 6000 MT/s"
-                className="w-full h-20 object-cover"
-              />
-              <div className="absolute bottom-0 inset-x-0 bg-black/85 px-2 py-0.5 text-[8px] font-mono-tech text-yellow-300 flex items-center justify-between">
-                <span>EVIDENCIA PCB // TOPOLOGÍA DAISY-CHAIN</span>
-                <span className="text-zinc-400">SLOTS A2 / B2</span>
-              </div>
-            </div>
-
-            <div className="my-1.5 space-y-0.5 text-center py-1.5 bg-black/40 rounded border border-yellow-400/20">
-              <h4 className="font-display font-black text-base text-white tracking-wide">
+            <div className="my-3 space-y-1 text-center py-2 bg-black/40 rounded border border-yellow-400/20">
+              <h4 className="font-display font-black text-lg text-white tracking-wide">
                 PROCESADOR CENTRAL
               </h4>
-              <p className="text-[9.5px] font-mono-tech text-zinc-300">
+              <p className="text-[10px] font-mono-tech text-zinc-300">
                 Núcleos + Caché L1/L2/L3 + Controlador de Memoria
               </p>
             </div>

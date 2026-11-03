@@ -16,14 +16,14 @@ export const DossierP11MicroTweaks: React.FC = () => {
       <div className="mb-2 pb-1.5 border-b border-zinc-800/80 flex items-baseline justify-between">
         <div>
           <span className="text-[10px] font-mono-tech tracking-widest text-yellow-400 uppercase font-bold">
-            0x05 // TRUCOS REALES PROBADOS (OPTIMIZACIÓN QUIRÚRGICA & METROLOGÍA)
+            DOSSIER CENTRAL // PERCEPCIÓN VS HARDWARE // PÁGINA 11 DE 12
           </span>
           <h2 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight mt-0.5">
             Micro-Tweaks: Respuesta Percibida vs Rendimiento Real
           </h2>
         </div>
         <span className="font-mono-tech text-[10px] text-zinc-500 uppercase tracking-wider hidden sm:inline">
-          POWER THROTTLING & HAGS
+          SEPARANDO AGILIDAD VISUAL DE FPS REALES
         </span>
       </div>
 

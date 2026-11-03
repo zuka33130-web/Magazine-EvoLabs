@@ -1,212 +1,608 @@
-/* EVO LABS // Tomo 02 // Magazine 40
-   Diseño editorial propio. Referencia estructural: Tomo 01;
-   ilustraciones exclusivas de Windows, sin reutilizar fotografías del Tomo 01. */
+/* ==========================================================================
+   EVO LABS // TOMO 02 // MAGAZINE EDITORIAL A4 & PDF
+   Alta dirección de arte editorial técnico tipo Hack x Crack.
+   Estándar: 210x297mm (A4 Portrait) · Tipografía Epilogue + Plus Jakarta Sans + JetBrains Mono
+   ========================================================================== */
+
 .evo-magazine40 {
-  --w40-blue: #0078d4;
   --w40-electric: #00d2ff;
-  --w40-ice: #60cdff;
-  --w40-ink: #040b17;
-  --w40-white: #f2fbff;
-  --w40-text: #d9ecf6;
-  color: var(--w40-white);
-  background: radial-gradient(ellipse at top, rgba(0, 103, 208, .16), transparent 48%), #02050b;
+  --w40-cyan: #60cdff;
+  --w40-blue: #0078d4;
+  --w40-navy: #051a33;
+  --w40-deep: #020713;
+  --w40-ink: #01040a;
+  --w40-surface: #071326;
+  --w40-border: rgba(0, 210, 255, 0.35);
+  --w40-border-hover: rgba(96, 205, 255, 0.65);
+  --w40-text-primary: #f2fbff;
+  --w40-text-secondary: #c7e3f5;
+  --w40-text-muted: #85adc8;
+
+  color: var(--w40-text-primary);
+  background: radial-gradient(ellipse at 50% 0%, rgba(0, 120, 212, 0.18), transparent 60%), #02050e;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* ==========================================================================
+   PLIEGOS EDITORIALES A4 (SCREEN VIEW)
+   ========================================================================== */
 .evo-magazine40 .a4-magazine-page {
-  box-shadow: 0 20px 55px rgba(0, 0, 0, .7), 0 0 0 1px rgba(0, 210, 255, .24);
+  position: relative;
+  width: min(100%, 820px);
+  max-width: 820px;
+  height: 1160px;
+  min-height: 1160px;
+  max-height: 1160px;
+  margin: 0 auto 36px auto;
+  border-radius: 14px;
+  overflow: hidden;
+  box-sizing: border-box;
   isolation: isolate;
-  background: linear-gradient(155deg,#080f1c 0%,#06101e 53%,#050911 100%);
+  background: linear-gradient(165deg, #061122 0%, #040c19 50%, #02060e 100%);
+  border: 1px solid rgba(0, 210, 255, 0.28);
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.82), 0 0 35px rgba(0, 120, 212, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
-/* Cover MasterPage uses inline 'height:auto'; override to guarantee a physical A4 sheet. */
+
+.evo-magazine40 .a4-magazine-page:hover {
+  border-color: rgba(96, 205, 255, 0.55);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.92), 0 0 45px rgba(0, 210, 255, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.evo-magazine40 [data-page-id] {
+  scroll-margin-top: 85px;
+}
+
+/* Page 01 Cover Sheet Overrides */
 .evo-magazine40 #evo-w40-page-01 {
   width: min(100%, 820px) !important;
+  max-width: 820px !important;
   height: 1160px !important;
   min-height: 1160px !important;
   max-height: 1160px !important;
 }
+
+/* Subtle Technical Ambient Glow on Editorial Pages */
 .evo-magazine40 .a4-magazine-page:not([data-page-id="evo-w40-page-01"])::before {
   content: "";
   position: absolute;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
-  inset: 0;
-  background: radial-gradient(ellipse at 95% 20%, rgba(0, 210, 255, .075), transparent 50%);
+  background: 
+    radial-gradient(circle at 90% 12%, rgba(0, 210, 255, 0.08), transparent 45%),
+    radial-gradient(circle at 10% 88%, rgba(0, 120, 212, 0.06), transparent 50%);
 }
-/* Ilustraciones A4: ancho completo de la mancha editorial; figuras siempre visibles al imprimir. */
+
+/* ==========================================================================
+   ILUSTRACIONES VECTORIALES Y ESQUEMAS TÉCNICOS
+   ========================================================================== */
 .evo-windows-art {
-  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
-  min-height: 0;
   margin: 0;
-  background: #040d1c;
-  border-radius: 13px;
-  border: 1px solid rgba(96, 205, 255, .56);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, .36), 0 0 23px rgba(0, 120, 212, .19);
+  background: #030a17;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 210, 255, 0.42);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 24px rgba(0, 120, 212, 0.16);
+  flex-shrink: 0;
 }
-.evo-windows-art svg { display:block; width:100%; height:100%; }
-.evo-windows-art--hero { height: 390px; }
-.evo-windows-art--wide { height: 255px; }
-.evo-windows-art--card { height: 154px; }
-.evo-windows-art--background {width:100%;height:100%;border:0;box-shadow:none;border-radius:0;}
+
+.evo-windows-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.evo-windows-art--hero svg {
+  max-height: 220px;
+}
+
+.evo-windows-art--wide svg {
+  max-height: 165px;
+}
+
+.evo-windows-art--card svg {
+  max-height: 115px;
+}
+
+.evo-windows-art--background {
+  width: 100%;
+  height: 100%;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
 .evo-windows-art__caption {
-  position: absolute;
-  bottom: 5px;
-  right: 10px;
-  z-index: 3;
-  max-width: 70%;
-  color: #b7e6ff;
+  flex-shrink: 0;
+  position: static;
+  background: #020713;
+  border-top: 1px solid rgba(0, 210, 255, 0.22);
+  padding: 6px 12px;
   font-family: 'JetBrains Mono', monospace;
-  text-align: right;
-  font-size: 7px;
-  letter-spacing: .045em;
-  line-height: 1.2;
-  opacity: .85;
-  pointer-events: none;
+  font-size: 8.5px;
+  line-height: 1.3;
 }
+
+/* ==========================================================================
+   MAQUETACIÓN DE CAPÍTULOS // EXPEDIENTE 001
+   ========================================================================== */
 .evo-w40-chapter {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  gap: 16px;
+  gap: 11px;
+  justify-content: space-between;
 }
+
 .evo-w40-chapter__heading {
-  flex: 0 0 auto;
-  border-bottom: 2px solid rgba(0, 210, 255, .7);
-  padding-bottom: 13px;
+  flex-shrink: 0;
+  border-bottom: 2px solid rgba(0, 210, 255, 0.65);
+  padding-bottom: 9px;
 }
+
 .evo-w40-chapter__metadata {
-  display: flex; justify-content: space-between; gap: 18px;
-  align-items: center; color: #8de9ff;
-  font-size: 9px; font-weight: 900; letter-spacing: .13em;
-  font-family: 'JetBrains Mono',monospace;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  color: #8dedff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.evo-w40-chapter__number { white-space: nowrap; color:#c9e7fa; }
-.evo-w40-chapter__heading h2 {
-  font-family: 'Epilogue',sans-serif;
+
+.evo-w40-chapter__number {
+  white-space: nowrap;
+  color: #c8e7fb;
   font-weight: 900;
-  font-size: 32px;
-  line-height: 1.05;
-  letter-spacing: -.035em;
-  text-transform: uppercase;
-  color: white;
-  margin-top: 10px;
-  text-wrap: balance;
-  text-shadow: 0 5px 32px rgba(0, 165, 225, .12);
 }
+
+.evo-w40-chapter__heading h2 {
+  font-family: 'Epilogue', sans-serif;
+  font-weight: 900;
+  font-size: 26px;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-top: 5px;
+  text-shadow: 0 4px 20px rgba(0, 164, 239, 0.2);
+}
+
 .evo-w40-chapter__heading > p {
-  margin-top: 9px;
-  color: #99e4ff;
-  font-family: 'Plus Jakarta Sans',sans-serif;
-  font-size: 12px;
-  line-height: 1.48;
+  margin-top: 5px;
+  color: #9fe6ff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11.5px;
+  line-height: 1.42;
   font-weight: 700;
 }
+
+/* Columnas de texto editorial */
 .evo-w40-chapter__columns {
   columns: 2;
-  column-gap: 23px;
-  column-rule: 1px solid rgba(96, 205, 255, .28);
+  column-gap: 20px;
+  column-rule: 1px solid rgba(0, 210, 255, 0.22);
   text-align: left;
-  font-family: 'Plus Jakarta Sans',sans-serif;
-  font-size: 12px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
   font-weight: 450;
-  line-height: 1.58;
-  color: #e6f0f8;
+  line-height: 1.54;
+  color: #e5f1f9;
 }
-.evo-w40-chapter__columns > p { margin: 0 0 12px; break-inside: avoid; hyphens: auto; }
+
+.evo-w40-chapter__columns > p {
+  margin: 0 0 9px;
+  break-inside: avoid;
+  hyphens: auto;
+}
+
 .evo-w40-dropcap::first-letter {
   float: left;
-  padding: 4px 8px 1px 0;
-  color: #18dcff;
-  font-family: 'Epilogue',sans-serif;
-  font-size: 43px;
+  padding: 3px 7px 1px 0;
+  color: #00d2ff;
+  font-family: 'Epilogue', sans-serif;
+  font-size: 38px;
   font-weight: 900;
-  line-height: .81;
+  line-height: 0.82;
+  text-shadow: 0 0 16px rgba(0, 210, 255, 0.5);
 }
-.evo-w40-chapter__closing { margin-top: auto; display: grid; gap: 9px; }
+
+.evo-w40-chapter__closing {
+  margin-top: auto;
+  display: grid;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Bloque transicional hacia la siguiente página */
 .evo-w40-next {
-  display: flex; align-items:center; gap:12px;
-  padding: 14px 16px; border: 1px solid rgba(96,205,255,.38);
-  border-left: 4px solid #00d2ff; background: linear-gradient(92deg,#06365f,#0c1729);
-  color:#d4f2ff; font-family:'JetBrains Mono',monospace; font-size:10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 9px;
+  border: 1px solid rgba(96, 205, 255, 0.4);
+  border-left: 4px solid #00d2ff;
+  background: linear-gradient(92deg, #072e52 0%, #06182c 100%);
+  color: #d6f3ff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
-.evo-w40-next span {color:#71dfff; letter-spacing:.07em;}
-.evo-w40-next strong {font-weight:900; flex:1;}
+
+.evo-w40-next span {
+  color: #72e0ff;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.evo-w40-next strong {
+  font-weight: 900;
+  color: #ffffff;
+}
+
+/* Ficha de enfoque y veredicto */
 .evo-w40-focus {
-  border-radius: 12px;
-  border: 1px solid rgba(0, 210, 255, .44);
-  border-left: 5px solid #00d2ff;
-  background: linear-gradient(100deg,#0c3c65,#0b2340 68%,#071526);
-  padding: 13px 17px;
-  box-shadow: 0 9px 25px rgba(0,120,212,.15);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 210, 255, 0.45);
+  border-left: 4px solid #00d2ff;
+  background: linear-gradient(110deg, #0a3359 0%, #07223d 60%, #041222 100%);
+  padding: 9px 13px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
+
 .evo-w40-focus strong {
-  color: #4fe9ff; display:block;
-  font: 900 11px 'JetBrains Mono',monospace;
-  letter-spacing: .09em;
-  margin-bottom: 5px;
+  color: #55ecff;
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
 }
-.evo-w40-focus p { color:#eefaff; font-size:12px; font-family:'Plus Jakarta Sans',sans-serif; line-height:1.48; }
+
+.evo-w40-focus p {
+  color: #edf7fe;
+  font-size: 10.5px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  line-height: 1.4;
+}
+
+/* Nota técnica al pie */
 .evo-w40-footnote {
-  color: #b4cddd; font: 9px/1.4 'JetBrains Mono',monospace;
-  border-top: 1px solid rgba(96,205,255,.20);
-  padding-top:6px;
+  color: #93b5cd;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  line-height: 1.35;
+  border-top: 1px solid rgba(0, 210, 255, 0.2);
+  padding-top: 4px;
 }
+
+/* ==========================================================================
+   MAQUETACIÓN TIPO HACK X CRACK // EXPEDIENTES 002 A 040
+   ========================================================================== */
+.evo-hxc-dossier {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.evo-hxc-header {
+  border-bottom: 2px solid rgba(0, 210, 255, 0.6);
+  padding-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.evo-hxc-banner {
+  border-radius: 10px;
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  background: linear-gradient(135deg, #052646 0%, #031427 100%);
+  padding: 8px 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.evo-hxc-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: #60cdff;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.evo-hxc-card {
+  border-radius: 10px;
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  background: #030d1b;
+  padding: 8px 11px;
+}
+
+.evo-hxc-traps {
+  border-radius: 10px;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(110deg, rgba(120, 53, 15, 0.25) 0%, #030d1b 100%);
+  padding: 8px 11px;
+}
+
+/* ==========================================================================
+   LABORATORIO PERICIAL / TERMINAL POWERSHELL
+   ========================================================================== */
 .evo-w40-lab {
   min-height: 0;
-  border: 1px solid rgba(0, 210, 255, .48);
-  border-radius: 13px;
-  background: #020a16;
-  box-shadow: 0 9px 30px rgba(0, 164, 239, .16);
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 210, 255, 0.45);
+  border-radius: 11px;
+  background: #020914;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 20px rgba(0, 120, 212, 0.12);
   overflow: hidden;
-  flex: 0 0 auto;
 }
+
 .evo-w40-lab__top {
-  display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; align-items:center;
-  padding: 8px 13px;
-  background: linear-gradient(94deg,#0056a3 0%,#0078d4 60%,#00a4ef 100%);
-  border-bottom: 1px solid #49dfff;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 12px;
+  background: linear-gradient(94deg, #053b6f 0%, #0060ad 55%, #0087ce 100%);
+  border-bottom: 1px solid rgba(96, 205, 255, 0.4);
 }
-.evo-w40-lab__label {color:white;font:900 10px 'JetBrains Mono',monospace;letter-spacing:.04em;}
-.evo-w40-lab__readonly {border:1px solid #cbf3ff99;padding:2px 6px;border-radius:3px;color:#f1ffff;font:800 9px 'JetBrains Mono',monospace;}
-.evo-w40-lab__intro {color:#cfe8f9;font:11px/1.45 'Plus Jakarta Sans',sans-serif;padding:9px 13px 5px;}
-.evo-w40-lab__code {
-  display:block; overflow-wrap:anywhere; white-space:pre-wrap; word-break:break-word;
-  overflow:visible; max-height:none; margin:0 11px 8px;
-  padding: 10px 12px; border:1px solid #14507d;border-left:3px solid #06d6ff;
-  background: #01050c; color:#7febff;
-  font:9.4px/1.52 'JetBrains Mono',Consolas,monospace;
-}
-.evo-w40-lab__code code { white-space:pre-wrap;word-break:break-word; }
-.evo-w40-lab__readout {padding:8px 13px 10px;color:#cbeafa;font:10px/1.42 'Plus Jakarta Sans',sans-serif;border-top:1px solid #14517f;}
-.evo-magazine40 #evo-magazine40-toolbar {
-  background: linear-gradient(100deg,#05295a 0%,#0367b8 55%,#063a72 100%);
-  border-bottom: 2px solid #52e7ff;
-  box-shadow: 0 12px 36px rgba(0,120,212,.35);
-}
-.evo-magazine40 #evo-magazine40-toolbar button {
-  background: linear-gradient(145deg,#074d86,#098ac5);
-  border: 1px solid #7cdfff;
-  color: white;
+
+.evo-w40-lab__label {
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
   font-weight: 900;
-  box-shadow: inset 0 1px rgba(255,255,255,.24),0 4px 16px rgba(0,8,35,.35);
-  transition: background .18s ease,transform .18s ease,box-shadow .18s ease;
+  letter-spacing: 0.05em;
 }
+
+.evo-w40-lab__readonly {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #f1ffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.evo-w40-lab__intro {
+  color: #c7e5f8;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10.5px;
+  line-height: 1.42;
+  padding: 7px 12px 4px;
+}
+
+.evo-w40-lab__code {
+  display: block;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0 10px 6px;
+  padding: 9px 11px;
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  border-left: 3px solid #00d2ff;
+  border-radius: 6px;
+  background: #01040a;
+  color: #7bebff;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 9px;
+  line-height: 1.48;
+}
+
+.evo-w40-lab__code code {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.evo-w40-lab__readout {
+  padding: 6px 12px 8px;
+  color: #bde4fa;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 9.5px;
+  line-height: 1.38;
+  border-top: 1px solid rgba(0, 210, 255, 0.2);
+  background: rgba(4, 18, 36, 0.4);
+}
+
+/* ==========================================================================
+   TOOLBAR SUPERIOR DE NAVEGACIÓN Y EXPORTACIÓN A4
+   ========================================================================== */
+.evo-magazine40 #evo-magazine40-toolbar {
+  background: linear-gradient(100deg, #03152c 0%, #052f5c 50%, #041b36 100%);
+  border-bottom: 2px solid #00d2ff;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 210, 255, 0.25);
+  backdrop-filter: blur(16px);
+}
+
+.evo-magazine40 #evo-magazine40-toolbar button,
+.evo-magazine40 #evo-magazine40-toolbar select {
+  background: linear-gradient(145deg, #083c6d, #0b598f);
+  border: 1px solid rgba(96, 205, 255, 0.45);
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 14px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .evo-magazine40 #evo-magazine40-toolbar button:hover,
-.evo-magazine40 #evo-magazine40-toolbar button:focus-visible {
-  transform: translateY(-2px);
-  background: linear-gradient(145deg,#0078d4,#00d2ff);
-  box-shadow: 0 0 22px rgba(0,210,255,.46);
+.evo-magazine40 #evo-magazine40-toolbar button:focus-visible,
+.evo-magazine40 #evo-magazine40-toolbar select:hover {
+  transform: translateY(-1.5px);
+  background: linear-gradient(145deg, #006ec7, #00a8ea);
+  border-color: #8de9ff;
+  box-shadow: 0 0 20px rgba(0, 210, 255, 0.45);
 }
-.evo-magazine40 #evo-magazine40-toolbar button:last-child { background:linear-gradient(120deg,#0075e5,#00aef0); }
-.evo-magazine40 #evo-magazine40-toolbar button:focus-visible { outline:3px solid white;outline-offset:3px; }
+
+/* ==========================================================================
+   REGLAS DE IMPRESIÓN Y EXPORTACIÓN A PDF EXACTO A4
+   ========================================================================== */
 @media print {
-  .evo-magazine40 #evo-w40-page-01 {width:210mm!important; min-width:210mm!important; height:297mm!important; min-height:297mm!important; max-height:297mm!important;}
-  .evo-w40-chapter {gap:12px!important;}
-  .evo-w40-chapter__columns { font-size: 11.5px!important;line-height:1.52!important; }
-  .evo-w40-lab__code {font-size:9px!important;line-height:1.38!important;}
-  .evo-windows-art {box-shadow:none!important;}
-  .evo-w40-chapter__heading h2 {font-size:30px!important;}
-  .evo-magazine40 #evo-magazine40-toolbar{display:none!important;}
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  body {
+    background: #000000 !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body:has(#evo-magazine40-root) * {
+    visibility: hidden !important;
+  }
+
+  #evo-magazine40-document,
+  #evo-magazine40-document * {
+    visibility: visible !important;
+  }
+
+  #evo-magazine40-document {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .evo-magazine40 .a4-magazine-page {
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    break-after: page !important;
+    page-break-after: always !important;
+  }
+
+  .evo-magazine40 .a4-magazine-page:last-child {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  .evo-magazine40 #evo-magazine40-toolbar {
+    display: none !important;
+  }
+
+  .evo-windows-art {
+    box-shadow: none !important;
+  }
+
+  .evo-w40-chapter {
+    gap: 10px !important;
+  }
+
+  .evo-w40-chapter__heading h2 {
+    font-size: 24px !important;
+  }
+
+  .evo-w40-chapter__columns {
+    font-size: 10.5px !important;
+    line-height: 1.48 !important;
+  }
+
+  .evo-w40-lab__code {
+    font-size: 8.5px !important;
+    line-height: 1.4 !important;
+  }
+
+  .a4-magazine-page.binding-gutter-left .tomo02-page-body,
+  .a4-magazine-page.binding-gutter-left header,
+  .a4-magazine-page.binding-gutter-left footer {
+    padding-left: 26mm !important;
+    padding-right: 14mm !important;
+  }
+
+  .a4-magazine-page.binding-gutter-right .tomo02-page-body,
+  .a4-magazine-page.binding-gutter-right header,
+  .a4-magazine-page.binding-gutter-right footer {
+    padding-left: 14mm !important;
+    padding-right: 26mm !important;
+  }
+}
+
+/* ==========================================================================
+   SISTEMA DE RETÍCULA DE 12 COLUMNAS EDITORIAL // TOMO 02
+   ========================================================================== */
+.t02-grid-12,
+.tomo02-grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 12px;
+  row-gap: 12px;
+  width: 100%;
+}
+
+.t02-col-12 { grid-column: span 12 / span 12; }
+.t02-col-11 { grid-column: span 11 / span 11; }
+.t02-col-10 { grid-column: span 10 / span 10; }
+.t02-col-9  { grid-column: span 9 / span 9; }
+.t02-col-8  { grid-column: span 8 / span 8; }
+.t02-col-7  { grid-column: span 7 / span 7; }
+.t02-col-6  { grid-column: span 6 / span 6; }
+.t02-col-5  { grid-column: span 5 / span 5; }
+.t02-col-4  { grid-column: span 4 / span 4; }
+.t02-col-3  { grid-column: span 3 / span 3; }
+.t02-col-2  { grid-column: span 2 / span 2; }
+.t02-col-1  { grid-column: span 1 / span 1; }
+
+@media (min-width: 640px) {
+  .sm\:t02-col-12 { grid-column: span 12 / span 12; }
+  .sm\:t02-col-8  { grid-column: span 8 / span 8; }
+  .sm\:t02-col-6  { grid-column: span 6 / span 6; }
+  .sm\:t02-col-4  { grid-column: span 4 / span 4; }
+  .sm\:t02-col-3  { grid-column: span 3 / span 3; }
+}
+
+@media (min-width: 768px) {
+  .md\:t02-col-12 { grid-column: span 12 / span 12; }
+  .md\:t02-col-8  { grid-column: span 8 / span 8; }
+  .md\:t02-col-7  { grid-column: span 7 / span 7; }
+  .md\:t02-col-6  { grid-column: span 6 / span 6; }
+  .md\:t02-col-5  { grid-column: span 5 / span 5; }
+  .md\:t02-col-4  { grid-column: span 4 / span 4; }
+  .md\:t02-col-3  { grid-column: span 3 / span 3; }
+}
+
+/* ==========================================================================
+   MÁRGENES DE ENCUADERNACIÓN / BINDING GUTTERS (RECTO & VERSO)
+   ========================================================================== */
+.a4-magazine-page.binding-gutter-left {
+  border-left-width: 3px;
+  border-left-color: rgba(0, 210, 255, 0.45);
+}
+
+.a4-magazine-page.binding-gutter-right {
+  border-right-width: 3px;
+  border-right-color: rgba(0, 210, 255, 0.45);
 }

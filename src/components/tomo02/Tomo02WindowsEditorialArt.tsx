@@ -157,16 +157,27 @@ export const Tomo02WindowsEditorialArt: React.FC<{
         <path d="M25 22 H1095 M25 453 H1095" stroke={'url(#glow-'+kind+')'} strokeWidth="2"/>
         <g transform="translate(160 35)"><Schematic kind={kind} tint={t.tint}/></g>
         <path d="M22 22 V60 M22 22 H60 M1098 22 H1060 M1098 22 V60 M22 453 V415 M22 453 H60 M1098 453 H1060 M1098 453 V415" fill="none" stroke={t.tint} strokeWidth="3"/>
-        <rect x="0" y="354" width="1120" height="121" fill="#010915" opacity=".89"/>
-        <path d="M32 356 H1088" stroke={t.tint} strokeWidth="1" strokeOpacity=".55"/>
-        <text x="47" y="383" fontFamily="monospace" fontSize="13" fontWeight="bold" letterSpacing="2" fill={t.tint}>{t.eyebrow}</text>
-        <text x="45" y="419" fontFamily="Arial, sans-serif" fontSize="28" fontWeight="900" letterSpacing=".6" fill="white">{t.heading}</text>
-        <text x="46" y="442" fontFamily="Arial, sans-serif" fontSize="14" fill="#C1E6FB">{t.detail}</text>
-        <text x="1070" y="47" textAnchor="end" fontFamily="monospace" fontSize="14" fontWeight="bold" fill={t.tint}>EVO LABS / {t.id}</text>
+        <rect x="0" y="354" width="1120" height="121" fill="#020814" opacity=".95"/>
+        <path d="M28 356 H1092" stroke={t.tint} strokeWidth="1.5" strokeOpacity=".6"/>
+        <text x="45" y="382" fontFamily="monospace" fontSize="12" fontWeight="bold" letterSpacing="2.5" fill={t.tint}>{t.eyebrow}</text>
+        <text x="45" y="416" fontFamily="system-ui, -apple-system, sans-serif" fontSize="26" fontWeight="900" letterSpacing=".5" fill="#FFFFFF">{t.heading}</text>
+        <text x="45" y="442" fontFamily="system-ui, -apple-system, sans-serif" fontSize="13.5" fill="#C5EAFF">{t.detail}</text>
+        <g transform="translate(1075, 382)">
+          <text x="0" y="0" textAnchor="end" fontFamily="monospace" fontSize="11" fontWeight="bold" letterSpacing="1" fill={t.tint}>EVO LABS // {t.id}</text>
+          <text x="0" y="24" textAnchor="end" fontFamily="monospace" fontSize="9" fill="#75A8CA" letterSpacing="0.5">MODELO CONCEPTUAL KERNEL NT</text>
+        </g>
       </svg>
-      {variant !== 'background' && <figcaption className="evo-windows-art__caption">
-        {caption ?? t.label} · ILUSTRACIÓN VECTORIAL ORIGINAL · MODELO DIDÁCTICO, NO TELEMETRÍA DEL LECTOR
-      </figcaption>}
+      {variant !== 'background' && (
+        <figcaption className="evo-windows-art__caption flex items-center justify-between px-3.5 py-1.5 bg-[#020713] border-t border-[#00D2FF]/25 text-[8.5px] font-mono-tech text-[#8DE8FF]">
+          <span className="flex items-center gap-2 font-bold tracking-wider">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00D2FF] shadow-[0_0_8px_#00D2FF]" />
+            {caption ?? t.label}
+          </span>
+          <span className="text-[#6B9AB7] uppercase tracking-widest hidden sm:inline">
+            ILUSTRACIÓN VECTORIAL ORIGINAL · MODELO DIDÁCTICO, NO TELEMETRÍA DEL LECTOR
+          </span>
+        </figcaption>
+      )}
     </figure>
   );
 };

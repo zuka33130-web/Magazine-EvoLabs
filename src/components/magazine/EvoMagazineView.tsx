@@ -166,10 +166,10 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
 
   const pageComponents = [
     { num: 1, title: 'Portada // Edición Coleccionable 2026', comp: <Page01Cover key="p1" /> },
-    { num: 2, title: '0x01 // Manifiesto Underground & Pasaporte Basal', comp: <Page02Manifesto key="p2" /> },
+    { num: 2, title: 'Manifiesto EVO Labs // No adivines. Comprobalo.', comp: <Page02Manifesto key="p2" /> },
     { num: 3, title: 'Pacto con el Lector // Una ruta, dos velocidades', comp: <Page03PactoLector key="p3" /> },
     { num: 4, title: 'El Método EVO // Los 7 Pasos de la Verdad', comp: <Page04MetodoEvo key="p4" /> },
-    { num: 5, title: 'Prueba Cero EVO // Pasaporte Basal Inmutable', comp: <Page05PruebaCero key="p5" /> },
+    { num: 5, title: 'Prueba Cero EVO // Baseline Inmutable', comp: <Page05PruebaCero key="p5" /> },
     { num: 6, title: 'Cómo Leer Este Tomo // Archivo & Soberanía', comp: <Page06SistemaEvo key="p6" /> },
     {
       num: 7,
@@ -187,11 +187,11 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
         />
       ),
     },
-    { num: 8, title: '0x02 // Topología & Microondas (Daisy-Chain A2/B2)', comp: <Page04Topology key="p8" /> },
-    { num: 9, title: 'Expediente Mito-01 // Slots de RAM & Stubs', comp: <Page05Mito01Ram key="p9" /> },
+    { num: 8, title: 'Topología // Anatomía del Silicio', comp: <Page04Topology key="p8" /> },
+    { num: 9, title: 'Expediente Mito-01 // Slots de RAM', comp: <Page05Mito01Ram key="p9" /> },
     { num: 10, title: 'Capítulo 01 // ¿Qué PC tenés realmente?', comp: <Page06Chapter01Opener key="p10" /> },
-    { num: 11, title: '0x03 // Mitos vs. Realidad: Trampas de Marketing & Bus', comp: <Page07Chapter01Trampas key="p11" /> },
-    { num: 12, title: '0x07 // Laboratorio DIY: Auditoría Nativa PowerShell', comp: <Page08Chapter01PowerShell key="p12" /> },
+    { num: 11, title: 'Capítulo 01 // Las Trampas Comerciales', comp: <Page07Chapter01Trampas key="p11" /> },
+    { num: 12, title: 'Capítulo 01 // Probalo en tu PC: PowerShell', comp: <Page08Chapter01PowerShell key="p12" /> },
     { num: 13, title: 'Expediente Mito-02 // Núcleos en MSConfig', comp: <Page09Chapter01Mito02 key="p13" /> },
     { num: 14, title: 'Capítulo 01 // Ficha Forense EVO', comp: <Page10Chapter01FichaEvo key="p14" /> },
     { num: 15, title: 'Capítulo 02 // Cómo trabajan juntos', comp: <Page11Chapter02Opener key="p15" /> },
@@ -200,7 +200,7 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
     { num: 18, title: 'Capítulo 03 // Cuando los FPS mienten', comp: <Page14Chapter03Opener key="p18" /> },
     { num: 19, title: 'Capítulo 03 // La Cola de Renderizado al 99%', comp: <Page15Chapter03Frametime key="p19" /> },
     { num: 20, title: 'Expediente Mito-04 // V-Sync & FPS Ilimitados', comp: <Page16Chapter03Mito04 key="p20" /> },
-    { num: 21, title: '0x04 // Casos Forenses: Muros Térmicos y Cuello de Botella', comp: <Page17Chapter04Opener key="p21" /> },
+    { num: 21, title: 'Capítulo 04 // Encontrá el límite', comp: <Page17Chapter04Opener key="p21" /> },
     { num: 22, title: 'Capítulo 04 // Los Tres Muros del Silicio', comp: <Page18Chapter04MurosTermicos key="p22" /> },
     { num: 23, title: 'Expediente Mito-05 // Ventiladores al 100%', comp: <Page19Chapter04Mito05 key="p23" /> },
     { num: 24, title: 'Capítulo 05 // Windows también es hardware', comp: <Page20Chapter05Opener key="p24" /> },
@@ -216,38 +216,71 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
     { num: 34, title: 'Dossier 08 // Tareas Programadas', comp: <DossierP08TareasProgramadas key="p34" /> },
     { num: 35, title: 'Dossier 09 // Higiene de Temporales', comp: <DossierP09TemporalesLimpieza key="p35" /> },
     { num: 36, title: 'Dossier 10 // Limpieza Profunda: WinSxS', comp: <DossierP10LimpiezaProfunda key="p36" /> },
-    { num: 37, title: '0x05 // Trucos Reales: Micro-Tweaks Validados', comp: <DossierP11MicroTweaks key="p37" /> },
+    { num: 37, title: 'Dossier 11 // Micro-Tweaks Validados', comp: <DossierP11MicroTweaks key="p37" /> },
     { num: 38, title: 'Dossier 12 // Checkpoint Final B', comp: <DossierP12FinalCheckpoint key="p38" /> },
-    { num: 39, title: '0x06 // Caso EVO: Autopsia de un Gigante ($4.000 USD)', comp: <Page35Chapter06Opener key="p39" /> },
+    { num: 39, title: 'Capítulo 06 // El Método Deductivo', comp: <Page35Chapter06Opener key="p39" /> },
     { num: 40, title: 'Capítulo 06 // Árbol Forense de Aislamiento', comp: <Page36Chapter06ArbolForense key="p40" /> },
     { num: 41, title: 'Expediente Mito-07 // Pasar DDU de Rutina', comp: <Page37Chapter06Mito07 key="p41" /> },
     { num: 42, title: 'Capítulo 07 // El Método Científico en tu PC', comp: <Page38Chapter07Opener key="p42" /> },
     { num: 43, title: 'Capítulo 07 // Los Tres Mandamientos del Ensayo A/B', comp: <Page39Chapter07MatrizAB key="p43" /> },
     { num: 44, title: 'Expediente Mito-08 // Plan Máximo Rendimiento', comp: <Page40Chapter07Mito08 key="p44" /> },
     { num: 45, title: 'Fuentes & Documentación Técnica Oficial', comp: <Page45FuentesTecnicas key="p45" /> },
-    { num: 46, title: '0x08 // Bitácora Pericial & Expediente #004', comp: <Page46BackCover key="p46" /> },
+    { num: 46, title: 'Contratapa // Manifiesto Final', comp: <Page46BackCover key="p46" /> },
   ];
 
   /**
    * Primary action to generate & download native A4 PDF
    */
-  const handleDownloadPdf = () => {
+  const handleDownloadPdf = async () => {
     setIsPreparingPrint(true);
-    try {
-      const link = document.createElement('a');
-      link.href = '/api/pdf/tomo01';
-      link.setAttribute('download', 'EVO-LABS-TOMO-01-CONOCE-TU-PC.pdf');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (err) {
-      console.warn('Error al iniciar descarga directa:', err);
-      window.location.href = '/api/pdf/tomo01';
-    } finally {
-      setTimeout(() => {
-        setIsPreparingPrint(false);
-      }, 1000);
+    setViewMode('continuous');
+
+    const standaloneUrl = getStandalonePrintUrl();
+
+    // In an iframe (like AI Studio preview), window.print() is blocked by browser sandbox policy.
+    if (isInIframe) {
+      try {
+        const opened = window.open(standaloneUrl, '_blank');
+        if (opened) {
+          setIsPreparingPrint(false);
+          setShowExportModal(true);
+          return;
+        }
+      } catch (err) {
+        console.warn('window.open blocked:', err);
+      }
+
+      // If popup blocker intervened, show export modal with unblockable direct link
+      setIsPreparingPrint(false);
+      setShowExportModal(true);
+      return;
     }
+
+    // Top-level window (not in iframe):
+    const originalTitle = document.title;
+    document.title = 'EVO_LABS_MAGAZINE_TOMO_01_CONOCE_TU_PC_A4';
+
+    try {
+      if (document.fonts?.ready) {
+        await document.fonts.ready;
+      }
+    } catch {
+      // ignore
+    }
+
+    setTimeout(() => {
+      try {
+        window.print();
+      } catch (err) {
+        console.warn('Error al invocar window.print():', err);
+        setShowExportModal(true);
+      } finally {
+        setIsPreparingPrint(false);
+        setTimeout(() => {
+          document.title = originalTitle;
+        }, 2000);
+      }
+    }, 450);
   };
 
   /**
@@ -636,36 +669,24 @@ export const EvoMagazineView: React.FC<EvoMagazineViewProps> = ({
               </div>
             )}
 
-            {/* ACTION 1: DIRECT DOWNLOAD PDF (INSTANT & OFFICIAL) */}
+            {/* ACTION 1: OPEN IN CLEAN FULLSCREEN TAB (RECOMMENDED & UNBLOCKABLE) */}
             <div className="space-y-3 mb-5">
-              <button
-                type="button"
+              <a
+                href={getStandalonePrintUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => {
                   setShowExportModal(false);
                   setShowConfigHelper(false);
-                  handleDownloadPdf();
                 }}
                 className="w-full py-3.5 px-4 bg-yellow-400 hover:bg-yellow-300 active:scale-[0.99] text-black font-black text-xs sm:text-sm uppercase tracking-wider rounded-lg text-center transition-all cursor-pointer flex items-center justify-center gap-2.5 shadow-[0_0_20px_rgba(234,179,8,0.45)] border border-yellow-300"
               >
                 <Download className="w-4 h-4 stroke-[2.5]" />
-                <span>DESCARGAR ARCHIVO PDF A4 (16.5 MB)</span>
-              </button>
+                <span>ABRIR EN PESTAÑA COMPLETA Y GUARDAR PDF</span>
+                <ExternalLink className="w-4 h-4 opacity-80" />
+              </a>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {/* ACTION 2: OPEN IN TAB */}
-                <a
-                  href={getStandalonePrintUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => {
-                    setShowExportModal(false);
-                    setShowConfigHelper(false);
-                  }}
-                  className="py-2.5 px-3 bg-[#161a25] hover:bg-[#202738] text-zinc-200 hover:text-white border border-zinc-700/80 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-2 text-center"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 text-yellow-400" />
-                  <span>Abrir en Pestaña Completa</span>
-                </a>
                 {/* ACTION 2: FORCE PRINT IN CURRENT WINDOW */}
                 <button
                   type="button"

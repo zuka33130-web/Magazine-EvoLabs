@@ -77,7 +77,7 @@ export const ChapterHeroOpener: React.FC<ChapterHeroOpenerProps> = ({
         <div className="absolute bottom-0 inset-x-0 p-3 sm:p-4 flex items-end justify-between backdrop-blur-[2px] bg-black/40 border-t border-white/10">
           <div className="flex items-center gap-2">
             <span
-              className="w-1.5 h-1.5 shrink-0 rounded-full inline-block"
+              className="w-2 h-2 shrink-0 animate-pulse rounded-full"
               style={{ backgroundColor: accentColor }}
             />
             <span className="text-[10px] sm:text-[11px] font-mono-tech text-zinc-200 tracking-wide">
@@ -101,7 +101,7 @@ export const ChapterHeroOpener: React.FC<ChapterHeroOpenerProps> = ({
 
         {/* Provocative Question / Mystery Box */}
         <div className="md:col-span-5 space-y-3">
-          <div className="p-3.5 bg-gradient-to-br from-yellow-400/10 via-[#0e1118] to-[#080a0f] border border-yellow-400/30 rounded-lg shadow-md">
+          <div className="p-3.5 bg-[#0e1118] border-l-3 border-yellow-400 rounded-r shadow-lg">
             <div className="flex items-center gap-1.5 text-[10px] font-mono-tech text-yellow-400 font-bold uppercase tracking-wider mb-1">
               <Sparkles className="w-3 h-3" />
               <span>EL MISTERIO CENTRAL:</span>

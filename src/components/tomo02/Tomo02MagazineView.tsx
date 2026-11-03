@@ -27,6 +27,7 @@ import {
   Key,
 } from 'lucide-react';
 import { Tomo02MasterPage } from './Tomo02MasterPage';
+import { Tomo02Grid12, Tomo02Col } from './Tomo02Grid12';
 import {
   TOMO_02_META,
   TOMO_02_FOLDERS,
@@ -37,6 +38,7 @@ import {
 } from '../../data/tomo02Data';
 import { Tomo02Cover } from './Tomo02Cover';
 import { Tomo02Magazine40 } from './Tomo02Magazine40';
+import { Tomo02OfficialPdfMagazine } from './Tomo02OfficialPdfMagazine';
 import { TOMO_02_COVER } from '../../data/tomoCoversData';
 import { Tomo02EditorialIndex, ModuleProgressStatus } from './Tomo02EditorialIndex';
 import {
@@ -789,10 +791,24 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
   }
 
   if (subView === 'a4_magazine') {
-    return <Tomo02Magazine40
-      onBack={() => { setSubView('cover'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-      onOpenBiblia={() => { setSubView('index'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-    />;
+    // Tomo02Magazine40 preservado; la edición completa A4 renovada se sirve mediante Tomo02OfficialPdfMagazine
+    return (
+      <Tomo02OfficialPdfMagazine
+        onBackToCover={() => { setSubView('cover'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        onOpenA4Magazine={() => { setSubView('a4_magazine'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        onOpenInteractive={() => { setSubView('index'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+      />
+    );
+  }
+
+  if (subView === 'pdf_magazine') {
+    return (
+      <Tomo02OfficialPdfMagazine
+        onBackToCover={() => { setSubView('cover'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        onOpenA4Magazine={() => { setSubView('a4_magazine'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        onOpenInteractive={() => { setSubView('index'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+      />
+    );
   }
 
   if (subView === 'index') {
@@ -1174,9 +1190,9 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                 </div>
               </div>
 
-              {/* Two Editorial Columns with Drop Cap */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-zinc-300 leading-relaxed">
-                <div>
+              {/* Two Editorial Columns with 12-Column Grid & Drop Cap */}
+              <Tomo02Grid12 gap="md" className="text-xs text-zinc-300 leading-relaxed">
+                <Tomo02Col span={12} md={6}>
                   <p>
                     <span className="float-left text-3xl font-display font-black text-cyan-400 mr-2 leading-none">E</span>
                     l usuario promedio convive con su sistema operativo bajo una ilusión de quietud. Cuando el escritorio aparece y el cursor se detiene, asumimos que la computadora está descansando, esperando pasivamente nuestra próxima orden. Nada está más lejos de la verdad técnica.
@@ -1184,9 +1200,9 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                   <p className="mt-2 text-zinc-400">
                     Bajo la superficie de esa pantalla inmóvil, decenas de procesos han sido convocados por el planificador del kernel. Servicios de red intercambian paquetes de comprobación. Tareas programadas analizan si el equipo entró en reposo para comenzar tareas de indexación o comprobación de firmas criptográficas.
                   </p>
-                </div>
+                </Tomo02Col>
 
-                <div className="space-y-3">
+                <Tomo02Col span={12} md={6} className="space-y-3">
                   <p>
                     Durante años, internet promovió una respuesta desesperada ante este fenómeno: el <em>debloat ciego</em>. Scripts descargados de foros oscuros que prometen apagar cien servicios con un doble clic, o trucos milagrosos que limpian el Registro para "duplicar los cuadros por segundo".
                   </p>
@@ -1199,8 +1215,8 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                       No queremos menos procesos por obsesión; queremos menos cosas desconocidas. El objetivo de este volumen no es un Administrador de Tareas vacío: es la certeza absoluta de qué hace tu sistema operativo.
                     </p>
                   </div>
-                </div>
-              </div>
+                </Tomo02Col>
+              </Tomo02Grid12>
 
               {/* Bottom Investigation Bar */}
               <div className="p-2.5 rounded-lg bg-zinc-950/80 border border-cyan-950 flex flex-wrap items-center justify-between text-[10px] font-mono-tech">
@@ -1237,50 +1253,50 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                 </p>
               </div>
 
-              {/* 6 Inmutable Rules Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs font-mono-tech">
-                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+              {/* 6 Inmutable Rules Grid — Retícula Modular de 12 Columnas */}
+              <Tomo02Grid12 gap="sm" className="text-xs font-mono-tech">
+                <Tomo02Col span={12} sm={6} md={4} className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
                   <span className="text-cyan-300 font-bold block text-xs tracking-wider">01 // OBSERVAR</span>
                   <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     Identificar el fenómeno antes de actuar. Registrar el estado en reposo sin precipitarse.
                   </p>
-                </div>
+                </Tomo02Col>
 
-                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+                <Tomo02Col span={12} sm={6} md={4} className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
                   <span className="text-cyan-300 font-bold block text-xs tracking-wider">02 // ENTENDER</span>
                   <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     Comprender qué componente es dueño de la función. No asumir que todo lo desconocido es basura.
                   </p>
-                </div>
+                </Tomo02Col>
 
-                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+                <Tomo02Col span={12} sm={6} md={4} className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
                   <span className="text-cyan-300 font-bold block text-xs tracking-wider">03 // INVESTIGAR</span>
                   <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     Consultar la documentación oficial (Microsoft Learn) y no foros anónimos sin sustento.
                   </p>
-                </div>
+                </Tomo02Col>
 
-                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+                <Tomo02Col span={12} sm={6} md={4} className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
                   <span className="text-cyan-300 font-bold block text-xs tracking-wider">04 // MEDIR</span>
                   <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     Establecer una métrica objetiva con unidades de medida: milisegundos, bytes o ciclos de reloj.
                   </p>
-                </div>
+                </Tomo02Col>
 
-                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+                <Tomo02Col span={12} sm={6} md={4} className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
                   <span className="text-cyan-300 font-bold block text-xs tracking-wider">05 // INTERVENIR</span>
                   <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     Cambiar un único parámetro por vez de manera deliberada y documentada.
                   </p>
-                </div>
+                </Tomo02Col>
 
-                <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
+                <Tomo02Col span={12} sm={6} md={4} className="p-3.5 rounded-xl bg-zinc-950/80 border border-cyan-950 space-y-1.5">
                   <span className="text-cyan-300 font-bold block text-xs tracking-wider">06 // REVERTIR</span>
                   <p className="text-xs text-zinc-300 font-sans-editorial leading-relaxed">
                     La regla de oro: si no podés revertir el cambio en cinco segundos, no tenés permiso de tocar.
                   </p>
-                </div>
-              </div>
+                </Tomo02Col>
+              </Tomo02Grid12>
 
               {/* Semáforo de Intervención EVO */}
               <div className="space-y-2.5">
@@ -1394,11 +1410,14 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                 </p>
               </div>
 
-              {/* 15 Folders Grid - Crisp Typography */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs font-mono-tech">
+              {/* 15 Folders Grid — Retícula Modular de 12 Columnas */}
+              <Tomo02Grid12 gap="xs" className="text-xs font-mono-tech">
                 {TOMO_02_FOLDERS.map((f) => (
-                  <div
+                  <Tomo02Col
                     key={f.id}
+                    span={12}
+                    sm={6}
+                    md={4}
                     className="p-2.5 rounded-lg bg-zinc-950/80 border border-cyan-950/90 flex flex-col justify-between space-y-1"
                   >
                     <div>
@@ -1423,9 +1442,9 @@ export const Tomo02MagazineView: React.FC<Tomo02MagazineViewProps> = ({
                     <div className="text-[10px] text-zinc-400 border-t border-zinc-900/80 pt-1 truncate font-mono-tech">
                       {f.dangerNotice || f.canDeleteOrClean}
                     </div>
-                  </div>
+                  </Tomo02Col>
                 ))}
-              </div>
+              </Tomo02Grid12>
 
               <div className="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-900/50 text-xs font-mono-tech text-cyan-300 flex items-center justify-between">
                 <span className="font-bold">DEPURACIÓN SEGURA DE COMPONENTES EN WINSXS:</span>

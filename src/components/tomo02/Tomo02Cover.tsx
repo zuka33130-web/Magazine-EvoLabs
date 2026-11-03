@@ -182,7 +182,7 @@ export const Tomo02Cover: React.FC<Tomo02CoverProps> = ({
               >
                 <span className="relative z-10 flex flex-col gap-1">
                   <span className="text-[13px] font-black sm:text-sm">MAGAZINE A4 · 40 INVESTIGACIONES</span>
-                  <span className="text-[10px] font-semibold tracking-[0.12em] text-white/85">EDICIÓN EN DESARROLLO · VISTA PREVIA PDF</span>
+                  <span className="text-[10px] font-semibold tracking-[0.12em] text-white/85">EDICIÓN COMPLETA · 40 CAPÍTULOS PDF A4</span>
                 </span>
                 <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/40 bg-white/15 shadow-inner transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-white/25">
                   <ArrowRight className="h-5 w-5 text-white" />

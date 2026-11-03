@@ -1,7 +1,6 @@
 import React from 'react';
 import { MagazineMasterPage } from './MagazineMasterPage';
 import { ChapterHeroOpener } from './ChapterHeroOpener';
-import { MAGAZINE_IMAGES } from '../../data/magazineImages';
 
 export const Page35Chapter06Opener: React.FC = () => {
   return (
@@ -9,23 +8,23 @@ export const Page35Chapter06Opener: React.FC = () => {
       pageId="magazine-page-39"
       pageNumber={39}
       totalPages={46}
-      sectionTitle="0x06 CASO EVO"
-      subSlug="AUTOPSIA DE UN GIGANTE // ESTACIÓN DE $4.000 USD"
+      sectionTitle="CAPÍTULO 06"
+      subSlug="METODOLOGÍA FORENSE // DIAGNÓSTICO CIENTÍFICO"
       accentColor="#10B981"
     >
       <ChapterHeroOpener
-        chapterNumber="0x06 CASO EVO"
-        categoryTag="AUTOPSIA DE UN GIGANTE // PERITAJE DE BANCO"
-        title="Autopsia de un Gigante"
-        subtitle="EL FACTOR HUMANO QUE CASI DESTRUYE UN PROCESADOR EXTREMO"
-        leadParagraph="Un análisis exhaustivo del caso más emblemático que pasó por las bancas del laboratorio: una estación de trabajo de $4.000 USD equipada con silicio de máxima categoría que presentaba fallos catastróficos y throttling severo a 100°C bajo carga de renderizado. Tras descartar metódicamente la fuente de poder y el controlador de memoria, la autopsia física reveló el insólito hallazgo: el film plástico protector transparente original aún adherido en la base del bloque AIO con la pasta térmica aplicada encima. Una lección pericial imborrable sobre la prioridad de la inspección física táctil antes de cualquier diagnóstico por software."
-        keyQuestion="¿Por qué ningún software de diagnóstico puede advertirte que el disipador tiene un plástico separando el silicio del cobre?"
-        imageSrc={MAGAZINE_IMAGES.thermalPlasticPeel}
-        imageCaption="CASO FORENSE 0x06 // Base de cobre del bloque de refrigeración líquida retirada en banco: el film plástico de advertencia 'REMOVE PROTECTIVE FILM' permanecía sellado bajo la pasta térmica."
+        chapterNumber="CAPÍTULO 06"
+        categoryTag="DIAGNÓSTICO PERICIAL // EL MÉTODO DEDUCTIVO"
+        title="El Método Deductivo"
+        subtitle="CÓMO ENCONTRAR LA CAUSA RAÍZ ANTES DE TOCAR UN DESTORNILLADOR"
+        leadParagraph="Cuando una computadora falla, la reacción instintiva del usuario promedio es el pánico o el reemplazo aleatorio de piezas: formatear el sistema operativo, cambiar la pasta térmica sin medirla o comprar una fuente nueva 'por las dudas'. En el laboratorio EVO aplicamos un principio estrictamente opuesto: el silicio y el sistema operativo dejan un rastro pericial imborrable en cada anomalía. Nuestra tarea no es adivinar, sino recolectar evidencia y descartar variables."
+        keyQuestion="¿Por qué el 80% de los gastos en reparaciones son completamente innecesarios si la máquina ya registró la causa exacta en sus volcados de memoria?"
+        imageSrc="/src/assets/images/cap_06_workshop_1789531894578.jpg"
+        imageCaption="FIG 6.0 // Banco de diagnóstico metrológico EVO. Osciloscopio y multímetro digital midiendo el riel de +12V bajo carga transitoria."
         accentColor="#10B981"
         metricsPreview={[
-          { label: 'TEMP PRE-PERITAJE', value: '100°C TJMAX (COLAPSO)' },
-          { label: 'TEMP POST-RETIRO', value: '62°C SOSTENIDA' },
+          { label: 'REGLA DE ORO', value: '1 VARIABLE A LA VEZ' },
+          { label: 'HERRAMIENTA', value: 'WHOCRASHED / DUMP' },
         ]}
       />
     </MagazineMasterPage>

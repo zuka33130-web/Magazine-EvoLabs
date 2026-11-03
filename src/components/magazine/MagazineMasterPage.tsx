@@ -47,7 +47,7 @@ export const MagazineMasterPage: React.FC<MagazineMasterPageProps> = ({
       </div>
 
       {!hideHeaderFooter && (
-        <header className="relative z-20 shrink-0 px-[16mm] pt-[8mm] pb-[2.5mm] border-b border-zinc-800/70 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-zinc-400 select-none">
+        <header className="relative z-20 shrink-0 px-[14mm] pt-[10mm] pb-[2.5mm] border-b border-zinc-800/70 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-zinc-400 select-none">
           <div className="flex items-center gap-2.5">
             <span
               className="w-1.5 h-1.5 inline-block"
@@ -86,13 +86,13 @@ export const MagazineMasterPage: React.FC<MagazineMasterPageProps> = ({
           {children}
         </div>
       ) : (
-        <div className="relative z-10 w-full flex-1 min-h-0 px-[16mm] py-[3mm] flex flex-col">
+        <div className="relative z-10 w-full flex-1 min-h-0 px-[14mm] py-[3.5mm] flex flex-col">
           <div className="flex-1 w-full flex flex-col justify-between">{children}</div>
         </div>
       )}
 
       {!hideHeaderFooter && (
-        <footer className="relative z-20 shrink-0 px-[16mm] pt-[2.5mm] pb-[8mm] border-t border-zinc-800/70 flex items-center justify-between text-[10px] font-mono-tech text-zinc-500 select-none">
+        <footer className="relative z-20 shrink-0 px-[14mm] pt-[2.5mm] pb-[10mm] border-t border-zinc-800/70 flex items-center justify-between text-[10px] font-mono-tech text-zinc-500 select-none">
           <div className="flex items-center gap-3">
             <span className="font-bold text-zinc-200">
               PÁG. {String(pageNumber).padStart(2, '0')}

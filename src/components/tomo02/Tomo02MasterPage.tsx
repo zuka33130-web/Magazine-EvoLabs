@@ -28,15 +28,33 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
   pageId,
 }) => {
   const isLast = isBackCover || pageNumber === totalPages;
+  const isOdd = pageNumber % 2 !== 0;
+  const pageSide = isCover ? 'cover' : isOdd ? 'odd' : 'even';
+
+  // Margen interior de encuadernación (lomo / gutter):
+  // En pliego enfrentado: impar tiene lomo a la izquierda; par tiene lomo a la derecha.
+  const gutterPaddingClass = isCover
+    ? 'px-6 sm:px-8'
+    : isOdd
+    ? 'pl-8 sm:pl-10 pr-5 sm:pr-6'
+    : 'pl-5 sm:pl-6 pr-8 sm:pr-10';
 
   return (
     <article
       id={pageId}
       data-page-id={pageId}
+      data-page-side={pageSide}
+      data-page-number={pageNumber}
       data-last-page={isLast ? 'true' : undefined}
       data-is-back-cover={isBackCover ? 'true' : undefined}
-      className={`a4-magazine-page relative mx-auto bg-[#08090C] text-zinc-100 overflow-hidden shadow-2xl transition-all duration-200 border border-cyan-950/60 print:border-none print:shadow-none print:m-0 print:p-0 flex flex-col ${
+      className={`a4-magazine-page tomo02-master-sheet relative mx-auto bg-[#08090C] text-zinc-100 overflow-hidden shadow-2xl transition-all duration-200 border border-cyan-950/60 print:border-none print:shadow-none print:m-0 print:p-0 flex flex-col ${
         isCover ? 'bg-[#040608]' : isBackCover ? 'bg-[#030406]' : 'bg-[#07090D]'
+      } ${
+        isCover
+          ? 'page-cover'
+          : isOdd
+          ? 'page-recto binding-gutter-left'
+          : 'page-verso binding-gutter-right'
       }`}
       style={{
         boxSizing: 'border-box',
@@ -48,16 +66,30 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-tech-grid" />
       <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Alignment Marks */}
+      {/* Alignment Marks & 12-Column Grid / Gutter Metadata */}
       <div className="absolute top-2 left-2 text-[8px] font-mono-tech text-cyan-900 select-none pointer-events-none hidden sm:block print:hidden">
-        + 210×297mm // A4 TOMO 02 // DOMINÁ WINDOWS
+        + 210×297mm // RETÍCULA 12 COLUMNAS // GUTTER 26mm // {isOdd ? 'RECTO (LOMO IZQ)' : 'VERSO (LOMO DER)'} +
       </div>
       <div className="absolute top-2 right-2 text-[8px] font-mono-tech text-cyan-900 select-none pointer-events-none hidden sm:block print:hidden">
         EVO LABS FORENSIC EDITION // DESMONTAJE DEL KERNEL NT +
       </div>
 
+      {/* Indicador sutil de línea de encuadernación física */}
+      {!isCover && (
+        <div
+          aria-hidden="true"
+          className={`absolute top-0 bottom-0 pointer-events-none select-none hidden sm:flex items-center text-[7px] font-mono-tech text-cyan-900/40 tracking-widest [writing-mode:vertical-rl] print:hidden ${
+            isOdd ? 'left-1.5' : 'right-1.5'
+          }`}
+        >
+          <span>{isOdd ? '◀ LOMO / ENCUADERNACIÓN (GUTTER 26mm)' : 'ENCUADERNACIÓN (GUTTER 26mm) / LOMO ▶'}</span>
+        </div>
+      )}
+
       {!hideHeaderFooter && (
-        <header className="relative z-20 shrink-0 px-6 sm:px-8 pt-3.5 sm:pt-4 pb-2 border-b border-cyan-950/70 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-zinc-400 select-none">
+        <header
+          className={`relative z-20 shrink-0 pt-3.5 sm:pt-4 pb-2 border-b border-cyan-950/70 flex items-center justify-between text-[10px] font-mono-tech tracking-wider text-zinc-400 select-none ${gutterPaddingClass}`}
+        >
           <div className="flex items-center gap-2">
             <span
               className="w-2 h-2 inline-block shadow-[0_0_8px_#00D2FF]"
@@ -80,17 +112,25 @@ export const Tomo02MasterPage: React.FC<Tomo02MasterPageProps> = ({
 
       {/* Page Content Body */}
       {hideHeaderFooter ? (
-        <div className={`relative z-10 w-full flex flex-col min-h-0 ${isCover ? 'flex-1' : 'h-full'}`}>
+        <div
+          className={`tomo02-page-body relative z-10 w-full flex flex-col min-h-0 ${
+            isCover ? 'flex-1' : 'h-full'
+          }`}
+        >
           {children}
         </div>
       ) : (
-        <div className="relative z-10 w-full flex-1 min-h-0 px-6 sm:px-8 py-2.5 sm:py-3 flex flex-col">
+        <div
+          className={`tomo02-page-body relative z-10 w-full flex-1 min-h-0 py-2.5 sm:py-3 flex flex-col ${gutterPaddingClass}`}
+        >
           <div className="flex-1 w-full flex flex-col justify-between min-h-0">{children}</div>
         </div>
       )}
 
       {!hideHeaderFooter && (
-        <footer className="relative z-20 shrink-0 px-6 sm:px-8 pt-2 pb-2.5 sm:pb-3 border-t border-cyan-950/70 flex items-center justify-between text-[9.5px] font-mono-tech text-zinc-500 select-none">
+        <footer
+          className={`relative z-20 shrink-0 pt-2 pb-2.5 sm:pb-3 border-t border-cyan-950/70 flex items-center justify-between text-[9.5px] font-mono-tech text-zinc-500 select-none ${gutterPaddingClass}`}
+        >
           <div className="flex items-center gap-2">
             <span className="font-semibold text-zinc-400 uppercase tracking-wider">
               EVO LABS // {sectionTitle || 'COLECCIÓN PERICIAL'}

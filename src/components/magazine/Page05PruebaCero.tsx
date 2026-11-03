@@ -175,53 +175,30 @@ export const Page05PruebaCero: React.FC = () => {
 
         </div>
 
-        {/* Ficha de Identidad Táctica (Pasaporte Basal Inmutable) */}
-        <div className="p-3 bg-[#131722] border border-yellow-400/40 rounded-lg space-y-2">
-          <div className="flex items-center justify-between border-b border-zinc-800 pb-1">
+        {/* Nivel EVO+ de Profundización Forense */}
+        <div className="p-3 bg-[#131722] border border-yellow-400/30 rounded-lg space-y-2">
+          <div className="flex items-center justify-between">
             <span className="text-[10px] font-mono-tech font-bold text-yellow-400 uppercase tracking-wider flex items-center gap-1.5">
               <span className="w-2 h-2 bg-yellow-400 rounded-xs" />
-              FICHA DE IDENTIDAD TÁCTICA // PASAPORTE BASAL INMUTABLE
+              NIVEL EVO+ // AUDITORÍA BASAL AVANZADA (OPCIONAL)
             </span>
             <span className="text-[9px] font-mono-tech text-zinc-400">
-              VALOR BASAL VS. POST-AUDITORÍA
+              INSTRUMENTAL RECOMENDADO: HWiNFO64 & LatencyMon
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-[10px] font-mono-tech">
-            <div className="p-2 bg-black/60 border border-zinc-800 rounded flex flex-col justify-between">
-              <span className="text-zinc-400 block text-[8.5px] uppercase">FRECUENCIA BASE CPU:</span>
-              <div className="flex justify-between items-baseline mt-1 text-zinc-300">
-                <span className="text-[9px] text-zinc-500">INI:</span>
-                <span className="text-yellow-400 font-bold">--- GHz</span>
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[10px] font-mono-tech">
+            <div className="p-2 bg-black/50 border border-zinc-800 rounded">
+              <span className="text-zinc-400 block text-[9px]">DPC LATENCY BASAL:</span>
+              <span className="text-emerald-400 font-bold">Máximo pico en reposo (&lt;500 µs es óptimo)</span>
             </div>
-            <div className="p-2 bg-black/60 border border-zinc-800 rounded flex flex-col justify-between">
-              <span className="text-zinc-400 block text-[8.5px] uppercase">LATENCIA DPC REPOSO:</span>
-              <div className="flex justify-between items-baseline mt-1 text-zinc-300">
-                <span className="text-[9px] text-zinc-500">INI:</span>
-                <span className="text-emerald-400 font-bold">&lt; 500 μs</span>
-              </div>
+            <div className="p-2 bg-black/50 border border-zinc-800 rounded">
+              <span className="text-zinc-400 block text-[9px]">PROCESOS ACTIVOS EN REPOSO:</span>
+              <span className="text-zinc-200 font-bold">Cantidad de procesos en segundo plano (Típico: 120-180)</span>
             </div>
-            <div className="p-2 bg-black/60 border border-zinc-800 rounded flex flex-col justify-between">
-              <span className="text-zinc-400 block text-[8.5px] uppercase">1% LOW CRÍTICO:</span>
-              <div className="flex justify-between items-baseline mt-1 text-zinc-300">
-                <span className="text-[9px] text-zinc-500">INI:</span>
-                <span className="text-yellow-400 font-bold">--- FPS</span>
-              </div>
-            </div>
-            <div className="p-2 bg-black/60 border border-zinc-800 rounded flex flex-col justify-between">
-              <span className="text-zinc-400 block text-[8.5px] uppercase">TEMP SOSTENIDA:</span>
-              <div className="flex justify-between items-baseline mt-1 text-zinc-300">
-                <span className="text-[9px] text-zinc-500">INI:</span>
-                <span className="text-amber-400 font-bold">--- °C</span>
-              </div>
-            </div>
-            <div className="p-2 bg-black/60 border border-zinc-800 rounded flex flex-col justify-between col-span-2 sm:col-span-1">
-              <span className="text-zinc-400 block text-[8.5px] uppercase">ANCHO BANDA RAM:</span>
-              <div className="flex justify-between items-baseline mt-1 text-zinc-300">
-                <span className="text-[9px] text-zinc-500">INI:</span>
-                <span className="text-sky-400 font-bold">--- GB/s</span>
-              </div>
+            <div className="p-2 bg-black/50 border border-zinc-800 rounded">
+              <span className="text-zinc-400 block text-[9px]">TIEMPO DE ARRANQUE (BIOS):</span>
+              <span className="text-zinc-200 font-bold">Segundos registrados en Administrador de Tareas</span>
             </div>
           </div>
         </div>

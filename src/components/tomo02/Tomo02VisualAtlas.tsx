@@ -1,6 +1,5 @@
 import React from 'react';
 import { Tomo02WindowsEditorialArt, type WindowsArtKind } from './Tomo02WindowsEditorialArt';
-import { Tomo02WindowsAtlasImage } from './Tomo02WindowsAtlasImage';
 
 /**
  * Atlas visual de los cinco niveles de la Biblia Virtual.
@@ -87,8 +86,8 @@ export const Tomo02VisualAtlas: React.FC<Tomo02VisualAtlasProps> = ({
           const active = activeLevel === item.id;
           const tile = (
             <>
-              <Tomo02WindowsAtlasImage kind={item.art} />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#020814] via-[#041425]/35 to-[#0078D4]/5" />
+              <Tomo02WindowsEditorialArt kind={item.art} variant="background" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#020814] via-[#041425]/65 to-[#0078D4]/10" />
               <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#0078D4] via-[#00D2FF] to-[#60CDFF]" />
               <div className="relative z-10 flex h-full flex-col justify-between p-3.5 text-left">
                 <div className="flex items-start justify-between gap-1">
@@ -111,7 +110,7 @@ export const Tomo02VisualAtlas: React.FC<Tomo02VisualAtlasProps> = ({
             </>
           );
 
-          const className = `group relative block h-44 w-full overflow-hidden rounded-xl border text-left shadow-[0_8px_25px_rgba(0,0,0,0.4)] transition-all duration-300 sm:h-48 ${active ? 'border-[#60CDFF] ring-2 ring-[#00D2FF]/60 shadow-[0_0_28px_rgba(0,210,255,0.24)]' : 'border-[#60CDFF]/25 hover:border-[#60CDFF] hover:shadow-[0_0_25px_rgba(0,120,212,0.25)]'}`;
+          const className = `group relative block h-40 w-full overflow-hidden rounded-xl border text-left shadow-[0_8px_25px_rgba(0,0,0,0.4)] transition-all duration-300 sm:h-44 ${active ? 'border-[#60CDFF] ring-2 ring-[#00D2FF]/60 shadow-[0_0_28px_rgba(0,210,255,0.24)]' : 'border-[#60CDFF]/25 hover:border-[#60CDFF] hover:shadow-[0_0_25px_rgba(0,120,212,0.25)]'}`;
 
           return onSelectLevel ? (
             <button
