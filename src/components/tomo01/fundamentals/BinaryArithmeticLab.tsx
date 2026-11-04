@@ -1,291 +1,357 @@
-import React, { useState } from 'react';
-import { ToggleLeft, ToggleRight, ArrowRight, Plus, AlertTriangle, CheckCircle2, ShieldAlert } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Plus, Minus, ArrowRight, ShieldAlert, CheckCircle2, Cpu, RefreshCw, Hash, Sliders } from 'lucide-react';
 import { ProvenanceBadge } from '../../common/ProvenanceBadge';
 
+type BitWidth = 8 | 16 | 32;
+type OperationType = 'ADD' | 'SUB' | 'AND' | 'OR' | 'XOR' | 'NOT' | 'SHL' | 'SHR';
+
 export const BinaryArithmeticLab: React.FC = () => {
-  // 8-bit registers for interactive toggling
-  const [bitsA, setBitsA] = useState<number[]>([0, 0, 1, 0, 1, 0, 1, 0]); // 42 in dec
-  const [bitsB, setBitsB] = useState<number[]>([0, 0, 0, 1, 0, 1, 0, 1]); // 21 in dec
+  const [bitWidth, setBitWidth] = useState<BitWidth>(8);
+  const [valAInput, setValAInput] = useState<number>(42);
+  const [valBInput, setValBInput] = useState<number>(21);
+  const [operation, setOperation] = useState<OperationType>('ADD');
   const [isSigned, setIsSigned] = useState<boolean>(false);
 
-  // Helper to toggle a single bit in an array
-  const toggleBit = (setter: React.Dispatch<React.SetStateAction<number[]>>, index: number) => {
-    setter((prev) => {
-      const copy = [...prev];
-      copy[index] = copy[index] === 1 ? 0 : 1;
-      return copy;
-    });
-  };
+  // Mask for active bit width (e.g. 0xFF for 8-bit, 0xFFFF for 16-bit)
+  const maxUnsignedValue = useMemo(() => Math.pow(2, bitWidth) - 1, [bitWidth]);
+  const maxSignedValue = useMemo(() => Math.pow(2, bitWidth - 1) - 1, [bitWidth]);
+  const minSignedValue = useMemo(() => -Math.pow(2, bitWidth - 1), [bitWidth]);
 
-  // Convert bit array to unsigned decimal
-  const bitsToUnsigned = (bits: number[]) => {
-    return bits.reduce((acc, bit, idx) => acc + bit * Math.pow(2, 7 - idx), 0);
-  };
+  // Clean inputs within valid bit width limits
+  const sanitizedA = useMemo(() => {
+    let clean = valAInput & maxUnsignedValue;
+    return clean < 0 ? clean + Math.pow(2, bitWidth) : clean;
+  }, [valAInput, bitWidth, maxUnsignedValue]);
 
-  // Convert bit array to signed (Two's Complement)
-  const bitsToSigned = (bits: number[]) => {
-    const unsigned = bitsToUnsigned(bits);
-    if (bits[0] === 1) {
-      // Negative in two's complement: unsigned - 256
-      return unsigned - 256;
+  const sanitizedB = useMemo(() => {
+    let clean = valBInput & maxUnsignedValue;
+    return clean < 0 ? clean + Math.pow(2, bitWidth) : clean;
+  }, [valBInput, bitWidth, maxUnsignedValue]);
+
+  // Convert numbers to bit arrays
+  const numToBits = (num: number, width: BitWidth): number[] => {
+    const arr: number[] = [];
+    for (let i = width - 1; i >= 0; i--) {
+      arr.push((num >> i) & 1);
     }
-    return unsigned;
+    return arr;
   };
 
-  // Synchronized values
-  const valA = isSigned ? bitsToSigned(bitsA) : bitsToUnsigned(bitsA);
-  const valB = isSigned ? bitsToSigned(bitsB) : bitsToUnsigned(bitsB);
+  const bitsA = useMemo(() => numToBits(sanitizedA, bitWidth), [sanitizedA, bitWidth]);
+  const bitsB = useMemo(() => numToBits(sanitizedB, bitWidth), [sanitizedB, bitWidth]);
 
-  const hexA = bitsToUnsigned(bitsA).toString(16).toUpperCase().padStart(2, '0');
-  const hexB = bitsToUnsigned(bitsB).toString(16).toUpperCase().padStart(2, '0');
+  // Execute operation step-by-step
+  const calculationResult = useMemo(() => {
+    let rawResult = 0;
+    const carries: number[] = new Array(bitWidth + 1).fill(0);
+    const resultBits: number[] = new Array(bitWidth).fill(0);
+    let carryOut = 0;
 
-  // Binary Addition Simulation with Bitwise Carry
-  const sumBits: number[] = new Array(8).fill(0);
-  const carries: number[] = new Array(9).fill(0); // carries[0] is carry-out of MSB (bit 7)
+    if (operation === 'ADD') {
+      let c = 0;
+      for (let i = bitWidth - 1; i >= 0; i--) {
+        const bitSum = bitsA[i] + bitsB[i] + c;
+        resultBits[i] = bitSum % 2;
+        c = Math.floor(bitSum / 2);
+        carries[i] = c;
+      }
+      carryOut = c;
+      rawResult = sanitizedA + sanitizedB;
+    } else if (operation === 'SUB') {
+      // Subtraction as A + (~B + 1)
+      const bComp = (~sanitizedB + 1) & maxUnsignedValue;
+      const bCompBits = numToBits(bComp, bitWidth);
+      let c = 0;
+      for (let i = bitWidth - 1; i >= 0; i--) {
+        const bitSum = bitsA[i] + bCompBits[i] + c;
+        resultBits[i] = bitSum % 2;
+        c = Math.floor(bitSum / 2);
+        carries[i] = c;
+      }
+      carryOut = c;
+      rawResult = sanitizedA - sanitizedB;
+    } else if (operation === 'AND') {
+      for (let i = 0; i < bitWidth; i++) resultBits[i] = bitsA[i] & bitsB[i];
+      rawResult = sanitizedA & sanitizedB;
+    } else if (operation === 'OR') {
+      for (let i = 0; i < bitWidth; i++) resultBits[i] = bitsA[i] | bitsB[i];
+      rawResult = sanitizedA | sanitizedB;
+    } else if (operation === 'XOR') {
+      for (let i = 0; i < bitWidth; i++) resultBits[i] = bitsA[i] ^ bitsB[i];
+      rawResult = sanitizedA ^ sanitizedB;
+    } else if (operation === 'NOT') {
+      for (let i = 0; i < bitWidth; i++) resultBits[i] = bitsA[i] === 1 ? 0 : 1;
+      rawResult = (~sanitizedA) & maxUnsignedValue;
+    } else if (operation === 'SHL') {
+      const shift = 1;
+      rawResult = (sanitizedA << shift) & maxUnsignedValue;
+      for (let i = 0; i < bitWidth - 1; i++) resultBits[i] = bitsA[i + 1];
+      resultBits[bitWidth - 1] = 0;
+      carryOut = bitsA[0];
+    } else if (operation === 'SHR') {
+      const shift = 1;
+      rawResult = (sanitizedA >>> shift) & maxUnsignedValue;
+      for (let i = bitWidth - 1; i > 0; i--) resultBits[i] = bitsA[i - 1];
+      resultBits[0] = 0;
+      carryOut = bitsA[bitWidth - 1];
+    }
 
-  let carry = 0;
-  for (let i = 7; i >= 0; i--) {
-    const a = bitsA[i];
-    const b = bitsB[i];
-    const sum = a + b + carry;
-    sumBits[i] = sum % 2;
-    carry = Math.floor(sum / 2);
-    carries[i] = carry;
-  }
-  carries[8] = carry; // Final carry out
+    const maskedResult = rawResult & maxUnsignedValue;
 
-  const unsignedSum = bitsToUnsigned(sumBits);
-  const signedSum = bitsToSigned(sumBits);
-  const theoreticalSum = valA + valB;
+    // Two's complement signed evaluation
+    const msb = resultBits[0];
+    const signedValue = msb === 1 ? maskedResult - Math.pow(2, bitWidth) : maskedResult;
 
-  // Overflow Detection
-  // In Unsigned: Overflow occurs if final carry out == 1 (result exceeds 255)
-  // In Signed: Overflow occurs if sign of operands is same, but sign of result is different
-  const unsignedOverflow = carries[0] === 1;
-  const signedOverflow = (bitsA[0] === bitsB[0]) && (bitsA[0] !== sumBits[0]);
-  const hasOverflow = isSigned ? signedOverflow : unsignedOverflow;
+    // Overflow Flags
+    const unsignedOverflow = carryOut === 1 || rawResult > maxUnsignedValue || rawResult < 0;
+    const signedOverflow = (bitsA[0] === bitsB[0]) && (bitsA[0] !== resultBits[0]) && (operation === 'ADD');
+    const hasOverflow = isSigned ? signedOverflow : unsignedOverflow;
+
+    // Flags: Zero Flag (ZF), Sign Flag (SF), Carry Flag (CF), Overflow Flag (OF)
+    const zf = maskedResult === 0 ? 1 : 0;
+    const sf = msb;
+    const cf = carryOut;
+    const of = signedOverflow ? 1 : 0;
+
+    return {
+      resultBits,
+      carries,
+      maskedResult,
+      signedValue,
+      rawResult,
+      hasOverflow,
+      flags: { zf, sf, cf, of },
+    };
+  }, [sanitizedA, sanitizedB, bitsA, bitsB, operation, bitWidth, maxUnsignedValue, isSigned]);
+
+  const toggleSingleBitA = (index: number) => {
+    const copy = [...bitsA];
+    copy[index] = copy[index] === 1 ? 0 : 1;
+    const newUnsigned = copy.reduce((acc, bit, idx) => acc + bit * Math.pow(2, bitWidth - 1 - idx), 0);
+    setValAInput(newUnsigned);
+  };
 
   return (
-    <div className="space-y-8 text-zinc-100 font-sans-editorial">
-      {/* Header Banner */}
-      <div className="border border-zinc-800 bg-[#0C0F17] rounded-2xl p-6 relative overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="font-mono-tech text-xs uppercase px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                FUNDAMENTOS // PARTE I
+    <div className="space-y-8 text-zinc-100 font-sans select-none animate-in fade-in duration-200">
+      
+      {/* HEADER BANNER */}
+      <div className="p-6 rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-[#0a1813] via-[#080d0a] to-zinc-950 shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-mono text-xs font-bold uppercase tracking-wider">
+                TOMO 01 · FUNDAMENTOS 02
               </span>
-              <ProvenanceBadge provenance="CALCULADO" sourceOrFormula="Aritmética Binaria Booleana / Complemento a Dos" />
+              <ProvenanceBadge provenance="CALCULADO" sourceOrFormula="ALU Lógica Booleana / Complemento a 2" />
+              <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 font-mono text-[10px]">
+                8 / 16 / 32 BITS CONFIGURABLE
+              </span>
             </div>
-            <h2 className="text-2xl font-black tracking-tight text-white font-sans-editorial">
-              SISTEMAS BINARIOS, ARITMÉTICA Y DESBORDAMIENTO (OVERFLOW)
+            <h2 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight">
+              Laboratorio de Aritmética Binaria y Registros de ALU
             </h2>
-            <p className="text-zinc-400 text-sm max-w-3xl">
-              Un procesador no sabe restar ni multiplicar directamente: todo lo computa sumando voltajes y acarreando bits. Experimentá con registros de 8 bits y comprobá cómo se produce un fallo de desbordamiento en memoria.
+            <p className="text-zinc-300 text-sm mt-1 max-w-3xl leading-relaxed font-sans">
+              Un procesador no resta ni multiplica directamente: todo lo computa sumando voltajes y acarreando bits. Experimentá con registros de 8, 16 y 32 bits y observá el comportamiento de las banderas (OF, ZF, SF, CF).
             </p>
           </div>
-          <div className="flex items-center gap-3">
+
+          {/* Mode Controls */}
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <div className="bg-zinc-900 p-1 rounded-xl border border-zinc-800 flex items-center gap-1 font-mono text-xs">
+              {([8, 16, 32] as BitWidth[]).map((w) => (
+                <button
+                  key={w}
+                  type="button"
+                  onClick={() => setBitWidth(w)}
+                  className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
+                    bitWidth === w ? 'bg-emerald-400 text-black shadow' : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  {w} BITS
+                </button>
+              ))}
+            </div>
+
             <button
               type="button"
               onClick={() => setIsSigned(!isSigned)}
-              className={`px-3 py-1.5 rounded-lg border font-mono text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3.5 py-2 rounded-xl border font-mono text-xs font-bold transition-all cursor-pointer ${
                 isSigned
-                  ? 'bg-amber-500/20 border-amber-500 text-amber-300'
-                  : 'bg-zinc-800 border-zinc-700 text-zinc-300'
+                  ? 'bg-amber-400/20 border-amber-400 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.2)]'
+                  : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white'
               }`}
             >
-              Modo: {isSigned ? 'Con Signo (Complemento a 2)' : 'Sin Signo (Unsigned)'}
+              {isSigned ? 'CON SIGNO (COMPLEMENTO A 2)' : 'SIN SIGNO (UNSIGNED)'}
             </button>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Register A */}
-        <div className="border border-zinc-800 bg-zinc-900/60 rounded-xl p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-            <span className="font-mono-tech text-sm font-bold uppercase text-emerald-400">
-              REGISTRO A [8 BITS]
-            </span>
-            <div className="font-mono text-xs space-x-2 text-zinc-400">
-              <span>DEC: <strong className="text-white">{valA}</strong></span>
-              <span>HEX: <strong className="text-zinc-200">0x{hexA}</strong></span>
-            </div>
-          </div>
+      {/* CONTROLES Y REGISTROS */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 font-mono">
+        
+        {/* Left Inputs and Operation Selector */}
+        <div className="lg:col-span-4 p-5 rounded-2xl bg-[#0a0f16] border border-zinc-800 space-y-4">
+          <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block border-b border-zinc-800 pb-2">
+            CONFIGURACIÓN DE OPERANDOS Y ALU
+          </span>
 
-          <div className="grid grid-cols-8 gap-1.5 text-center">
-            {bitsA.map((bit, idx) => {
-              const weight = Math.pow(2, 7 - idx);
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => toggleBit(setBitsA, idx)}
-                  className={`flex flex-col items-center justify-center p-2 rounded-lg border font-mono transition-all cursor-pointer ${
-                    bit === 1
-                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-lg shadow-emerald-950/40'
-                      : 'bg-black/50 border-zinc-800 text-zinc-600 hover:border-zinc-700'
-                  }`}
-                >
-                  <span className="text-[10px] text-zinc-500">2^{7 - idx}</span>
-                  <span className="text-lg font-black">{bit}</span>
-                  <span className="text-[9px] text-zinc-400">{weight}</span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-[11px] font-mono text-zinc-500 text-center">
-            Hacé clic en cualquier bit para conmutar su estado eléctrico (0V = 0 / 1.2V = 1)
-          </p>
-        </div>
-
-        {/* Register B */}
-        <div className="border border-zinc-800 bg-zinc-900/60 rounded-xl p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-            <span className="font-mono-tech text-sm font-bold uppercase text-cyan-400">
-              REGISTRO B [8 BITS]
-            </span>
-            <div className="font-mono text-xs space-x-2 text-zinc-400">
-              <span>DEC: <strong className="text-white">{valB}</strong></span>
-              <span>HEX: <strong className="text-zinc-200">0x{hexB}</strong></span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-8 gap-1.5 text-center">
-            {bitsB.map((bit, idx) => {
-              const weight = Math.pow(2, 7 - idx);
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => toggleBit(setBitsB, idx)}
-                  className={`flex flex-col items-center justify-center p-2 rounded-lg border font-mono transition-all cursor-pointer ${
-                    bit === 1
-                      ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300 shadow-lg shadow-cyan-950/40'
-                      : 'bg-black/50 border-zinc-800 text-zinc-600 hover:border-zinc-700'
-                  }`}
-                >
-                  <span className="text-[10px] text-zinc-500">2^{7 - idx}</span>
-                  <span className="text-lg font-black">{bit}</span>
-                  <span className="text-[9px] text-zinc-400">{weight}</span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-[11px] font-mono text-zinc-500 text-center">
-            Hacé clic en cualquier bit para conmutar su estado eléctrico (0V = 0 / 1.2V = 1)
-          </p>
-        </div>
-      </div>
-
-      {/* Arithmetic Logic Unit (ALU) Sum Result */}
-      <div className="border border-zinc-800 bg-zinc-900/70 rounded-xl p-6 space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400">
-              <Plus className="w-5 h-5" />
-            </div>
+          <div className="space-y-3 text-xs">
             <div>
-              <h3 className="font-mono-tech text-base font-bold uppercase text-white">
-                SALIDA DE LA ALU: SUMADOR COMPLETO (FULL ADDER)
-              </h3>
-              <p className="text-zinc-400 text-xs font-mono">
-                A + B = {valA} + {valB} = {theoreticalSum}
-              </p>
+              <label className="text-zinc-400 block mb-1">OPERANDO A (Decimal):</label>
+              <input
+                type="number"
+                value={valAInput}
+                onChange={(e) => setValAInput(Number(e.target.value))}
+                className="w-full bg-black/80 border border-zinc-700 text-emerald-300 rounded-xl px-3.5 py-2 font-mono text-sm outline-none focus:border-emerald-400"
+              />
             </div>
-          </div>
 
-          {/* Overflow Status Pill */}
-          {hasOverflow ? (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-950/60 border border-red-500/60 text-red-400 font-mono text-xs font-bold animate-pulse">
-              <ShieldAlert className="w-4 h-4 text-red-400" />
-              <span>OVERFLOW FLAG (OF) ACTIVADO — DESBORDAMIENTO DE REGISTRO</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-emerald-400 font-mono text-xs font-bold">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>OPERACIÓN VÁLIDA (SIN DESBORDAMIENTO)</span>
-            </div>
-          )}
-        </div>
-
-        {/* Binary Sum Visualizer with Carry Row */}
-        <div className="space-y-2">
-          {/* Carries row */}
-          <div className="flex items-center justify-end gap-1.5 font-mono text-xs pr-4 text-amber-400">
-            <span className="text-[10px] text-zinc-500 mr-2 uppercase">Acarreos (Carry):</span>
-            {carries.slice(0, 8).map((c, i) => (
-              <span
-                key={i}
-                className={`w-8 text-center text-xs font-bold ${
-                  c === 1 ? 'text-amber-400 font-black' : 'text-zinc-700'
-                }`}
-              >
-                {c}
-              </span>
-            ))}
-          </div>
-
-          {/* Sum bits row */}
-          <div className="grid grid-cols-8 gap-2 text-center">
-            {sumBits.map((bit, idx) => (
-              <div
-                key={idx}
-                className={`flex flex-col items-center justify-center p-3 rounded-lg border font-mono ${
-                  bit === 1
-                    ? 'bg-amber-500/20 border-amber-500/60 text-amber-300'
-                    : 'bg-black/40 border-zinc-800 text-zinc-500'
-                }`}
-              >
-                <span className="text-[10px] text-zinc-500">Bit {7 - idx}</span>
-                <span className="text-xl font-black">{bit}</span>
+            {operation !== 'NOT' && operation !== 'SHL' && operation !== 'SHR' && (
+              <div>
+                <label className="text-zinc-400 block mb-1">OPERANDO B (Decimal):</label>
+                <input
+                  type="number"
+                  value={valBInput}
+                  onChange={(e) => setValBInput(Number(e.target.value))}
+                  className="w-full bg-black/80 border border-zinc-700 text-cyan-300 rounded-xl px-3.5 py-2 font-mono text-sm outline-none focus:border-cyan-400"
+                />
               </div>
-            ))}
-          </div>
-        </div>
+            )}
 
-        {/* Results Analysis */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-          <div className="bg-black/50 border border-zinc-800 rounded-lg p-3">
-            <span className="text-[10px] font-mono text-zinc-500 block uppercase">VALOR EN REGISTRO DE 8 BITS</span>
-            <span className="text-xl font-mono font-black text-white">
-              {isSigned ? signedSum : unsignedSum}
-            </span>
-            <span className="text-[10px] font-mono text-zinc-400 block">
-              HEX: 0x{unsignedSum.toString(16).toUpperCase().padStart(2, '0')}
-            </span>
-          </div>
-
-          <div className="bg-black/50 border border-zinc-800 rounded-lg p-3">
-            <span className="text-[10px] font-mono text-zinc-500 block uppercase">RESULTADO MATEMÁTICO REAL</span>
-            <span className="text-xl font-mono font-black text-zinc-300">
-              {theoreticalSum}
-            </span>
-            <span className="text-[10px] font-mono text-zinc-400 block">
-              Rango 8 bits: {isSigned ? '-128 a +127' : '0 a 255'}
-            </span>
-          </div>
-
-          <div className="bg-black/50 border border-zinc-800 rounded-lg p-3">
-            <span className="text-[10px] font-mono text-zinc-500 block uppercase">REGISTRO DE ESTADO (FLAGS)</span>
-            <div className="flex gap-2 mt-1 font-mono text-xs">
-              <span className={`px-2 py-0.5 rounded border ${hasOverflow ? 'bg-red-500/20 border-red-500 text-red-300 font-bold' : 'bg-zinc-800 border-zinc-700 text-zinc-500'}`}>
-                OF: {hasOverflow ? 1 : 0}
-              </span>
-              <span className={`px-2 py-0.5 rounded border ${unsignedSum === 0 ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300 font-bold' : 'bg-zinc-800 border-zinc-700 text-zinc-500'}`}>
-                ZF: {unsignedSum === 0 ? 1 : 0}
-              </span>
-              <span className={`px-2 py-0.5 rounded border ${sumBits[0] === 1 ? 'bg-amber-500/20 border-amber-500 text-amber-300 font-bold' : 'bg-zinc-800 border-zinc-700 text-zinc-500'}`}>
-                SF: {sumBits[0]}
-              </span>
+            <div>
+              <label className="text-zinc-400 block mb-1">OPERACIÓN BOOLEANA / ARITMÉTICA:</label>
+              <div className="grid grid-cols-4 gap-1.5 text-xs">
+                {(['ADD', 'SUB', 'AND', 'OR', 'XOR', 'NOT', 'SHL', 'SHR'] as OperationType[]).map((op) => (
+                  <button
+                    key={op}
+                    type="button"
+                    onClick={() => setOperation(op)}
+                    className={`py-2 rounded-lg font-bold border cursor-pointer transition-all ${
+                      operation === op
+                        ? 'bg-emerald-400 text-black border-emerald-400 font-black shadow'
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    {op}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
+
+          <div className="p-3.5 rounded-xl bg-black/60 border border-zinc-800 text-[11px] font-sans text-zinc-300 space-y-1">
+            <span className="text-emerald-400 font-mono font-bold uppercase text-[10px] block">
+              💡 RANGOS PERMITIDOS DE {bitWidth} BITS:
+            </span>
+            <p>Unsigned: <strong className="text-white">0 a {maxUnsignedValue.toLocaleString()}</strong></p>
+            <p>Signed: <strong className="text-white">{minSignedValue.toLocaleString()} a +{maxSignedValue.toLocaleString()}</strong></p>
+          </div>
         </div>
 
-        <div className="p-3 bg-zinc-950 border border-zinc-800 rounded-lg text-xs text-zinc-300 font-sans leading-relaxed">
-          <strong className="font-mono text-emerald-400">Lección de Hardware:</strong> Cuando la suma excede la capacidad del registro físico ({isSigned ? '127' : '255'}), el bit más significativo se pierde o cambia de signo abruptamente. Este es el origen de bugs históricos en videojuegos (como las 255 vidas que pasan a 0) y fallos críticos de desbordamiento de búfer en memoria.
+        {/* Right Register Display and Bitwise Visualization */}
+        <div className="lg:col-span-8 p-6 rounded-2xl bg-[#080b12] border border-zinc-800 space-y-6">
+          
+          {/* Register A Bits */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-bold text-emerald-400 uppercase">REGISTRO A [{bitWidth} BITS]:</span>
+              <span className="text-zinc-400">
+                DEC: <strong className="text-white">{sanitizedA}</strong> | HEX: <strong className="text-zinc-200">0x{sanitizedA.toString(16).toUpperCase()}</strong>
+              </span>
+            </div>
+            <div className="grid grid-cols-8 sm:grid-cols-16 gap-1 text-center">
+              {bitsA.map((bit, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => toggleSingleBitA(idx)}
+                  className={`p-1.5 rounded border text-xs font-mono transition-all cursor-pointer ${
+                    bit === 1
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold'
+                      : 'bg-black/50 border-zinc-800 text-zinc-600'
+                  }`}
+                  title={`Bit ${bitWidth - 1 - idx}`}
+                >
+                  {bit}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ALU Output Result */}
+          <div className="p-5 rounded-xl bg-black/80 border border-zinc-800 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-zinc-800">
+              <div className="flex items-center gap-2">
+                <Cpu className="w-5 h-5 text-emerald-400" />
+                <h4 className="font-bold text-white text-sm">
+                  SALIDA DE LA ALU ({operation})
+                </h4>
+              </div>
+
+              {calculationResult.hasOverflow ? (
+                <div className="px-2.5 py-1 rounded bg-rose-950/60 border border-rose-500/60 text-rose-300 text-xs font-bold flex items-center gap-1.5 animate-pulse">
+                  <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+                  <span>OVERFLOW DETECTADO (OF=1)</span>
+                </div>
+              ) : (
+                <div className="px-2.5 py-1 rounded bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>RESULTADO VÁLIDO</span>
+                </div>
+              )}
+            </div>
+
+            {/* Result Bits */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] text-zinc-500 block uppercase">BITS DE RESULTADO EN BUS EN SALIDA:</span>
+              <div className="grid grid-cols-8 sm:grid-cols-16 gap-1 text-center">
+                {calculationResult.resultBits.map((bit, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-1.5 rounded border text-xs font-bold ${
+                      bit === 1
+                        ? 'bg-emerald-400/20 border-emerald-400 text-emerald-300'
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-600'
+                    }`}
+                  >
+                    {bit}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Decimal & Hexadecimal Evaluation */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs">
+              <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 block uppercase">VALOR UNSIGNED</span>
+                <span className="text-lg font-bold text-white">{calculationResult.maskedResult.toLocaleString()}</span>
+              </div>
+              <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 block uppercase">VALOR SIGNED</span>
+                <span className="text-lg font-bold text-amber-300">{calculationResult.signedValue.toLocaleString()}</span>
+              </div>
+              <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 block uppercase">VALOR HEXADECIMAL</span>
+                <span className="text-lg font-bold text-cyan-300">0x{calculationResult.maskedResult.toString(16).toUpperCase()}</span>
+              </div>
+              <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 block uppercase">FLAGS (REGISTRO ESTADO)</span>
+                <div className="flex gap-1.5 font-bold text-[10px] mt-1">
+                  <span className={calculationResult.flags.zf ? 'text-cyan-400' : 'text-zinc-600'}>ZF={calculationResult.flags.zf}</span>
+                  <span className={calculationResult.flags.sf ? 'text-amber-400' : 'text-zinc-600'}>SF={calculationResult.flags.sf}</span>
+                  <span className={calculationResult.flags.cf ? 'text-emerald-400' : 'text-zinc-600'}>CF={calculationResult.flags.cf}</span>
+                  <span className={calculationResult.flags.of ? 'text-rose-400' : 'text-zinc-600'}>OF={calculationResult.flags.of}</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
         </div>
+
       </div>
+
     </div>
   );
 };

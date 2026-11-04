@@ -26,6 +26,7 @@ import {
   Network,
   Stethoscope,
   Maximize2,
+  Radio,
 } from 'lucide-react';
 import { UserHardwarePassport, Tome01DossierSummary } from '../../types';
 import { ProvenanceBadge } from '../common/ProvenanceBadge';
@@ -43,6 +44,7 @@ import { CpuMissionGame } from './games/CpuMissionGame';
 import { HardwareRescueGame } from './games/HardwareRescueGame';
 import { MemoryMatchGame } from './games/MemoryMatchGame';
 import { VrmStressGame } from './games/VrmStressGame';
+import { EvoHardwarePostDiagnosticsLab } from '../world/labs/EvoHardwarePostDiagnosticsLab';
 
 const EvoMotherboardCanvas = React.lazy(() => import('../world/EvoMotherboardCanvas'));
 const EvoLiveBenchSuite = React.lazy(() =>
@@ -89,7 +91,8 @@ type EmbeddedView =
   | 'game-cpu-mission'
   | 'game-hardware-rescue'
   | 'game-memory-match'
-  | 'game-vrm-stress';
+  | 'game-vrm-stress'
+  | 'post-diag';
 
 export const Tomo01LabsAndToolsView: React.FC<Tomo01LabsAndToolsViewProps> = ({
   onBackToCover,
@@ -226,6 +229,10 @@ export const Tomo01LabsAndToolsView: React.FC<Tomo01LabsAndToolsViewProps> = ({
       title: 'VRM THERMAL RUNAWAY // EQUILIBRIO DE FASES & PÉRDIDAS JOULE',
       component: <VrmStressGame />,
     },
+    'post-diag': {
+      title: 'DIAGNÓSTICO DE HARDWARE FÍSICO & CÓDIGOS POST EN TIEMPO REAL',
+      component: <EvoHardwarePostDiagnosticsLab onClose={() => setEmbeddedView('none')} />,
+    },
   };
 
   if (embeddedView !== 'none' && embeddedConfigs[embeddedView as keyof typeof embeddedConfigs]) {
@@ -356,7 +363,7 @@ export const Tomo01LabsAndToolsView: React.FC<Tomo01LabsAndToolsViewProps> = ({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 font-mono-tech">
               <div className="p-3 rounded-xl border border-zinc-800 bg-black/40">
                 <span className="text-[10px] text-zinc-500 uppercase block font-semibold">Total de Módulos</span>
-                <span className="text-xl font-black text-white">28 EXPERIENCIAS</span>
+                <span className="text-xl font-black text-white">29 EXPERIENCIAS</span>
               </div>
               <div className="p-3 rounded-xl border border-zinc-800 bg-black/40">
                 <span className="text-[10px] text-zinc-500 uppercase block font-semibold">Progresión Metrológica</span>
@@ -389,7 +396,7 @@ export const Tomo01LabsAndToolsView: React.FC<Tomo01LabsAndToolsViewProps> = ({
                 : 'bg-zinc-900/60 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
             }`}
           >
-            TODOS LOS ESCALONES (28)
+            TODOS LOS ESCALONES (29)
           </button>
 
           <button
@@ -461,7 +468,7 @@ export const Tomo01LabsAndToolsView: React.FC<Tomo01LabsAndToolsViewProps> = ({
                 : 'bg-zinc-900/60 border border-zinc-800 text-red-400/90 hover:text-red-300 hover:border-red-500/50'
             }`}
           >
-            <span>ESCALÓN 6 · TALLER & PERITAJE (7)</span>
+            <span>ESCALÓN 6 · TALLER & PERITAJE (8)</span>
           </button>
         </div>
       </section>
@@ -1216,7 +1223,7 @@ export const Tomo01LabsAndToolsView: React.FC<Tomo01LabsAndToolsViewProps> = ({
                 </div>
               </div>
               <span className="px-2.5 py-1 rounded bg-red-950/60 border border-red-800 font-mono-tech text-xs text-red-400 self-start sm:self-auto">
-                7 EXPERIENCIAS (6 LABS + 1 JUEGO)
+                8 EXPERIENCIAS (7 LABS + 1 JUEGO)
               </span>
             </div>
 
@@ -1377,6 +1384,32 @@ export const Tomo01LabsAndToolsView: React.FC<Tomo01LabsAndToolsViewProps> = ({
                   ],
                   formulaOrPhysics: 'Impedancia característica de pistas: Z_0 ≈ (87 / √(ε_r + 1.41)) · ln(5.98h / (0.8w + t)). Crítica para evitar reflexiones en altas frecuencias.',
                   benchVerdict: 'Enseña la importancia de la calidad de construcción del PCB en la estabilidad de memorias a altas velocidades.',
+                }}
+              />
+
+              {/* Lab C04: Diagnóstico Físico & Códigos POST en Tiempo Real */}
+              <LabCardWithUsageGuide
+                escalonNumber={6}
+                itemOrder="LAB 6.7"
+                id="lab-post-hardware-diag"
+                title="Diagnóstico Físico de Hardware y Códigos POST en Vivo"
+                icon={<Radio className="w-4 h-4 text-amber-400" />}
+                provenance="CALCULADO"
+                provenanceSource="ATX12V v3.0 & Bus eSPI/LPC UEFI AMI Aptio"
+                summary="Alterná en vivo entre el multímetro digital en rieles ATX, analizador de señales de control (PS_ON#, PWR_OK, RESET#) y display 7 segmentos de códigos POST."
+                accent="amber"
+                actionText="ABRIR BANCO DIAGNÓSTICO"
+                onAction={() => setEmbeddedView('post-diag')}
+                usageData={{
+                  objective: 'Alternar entre la inspección multimetrológica física y la lectura sincrónica de los códigos POST en el bus digital de arranque x86/UEFI.',
+                  steps: [
+                    'Seleccioná la pestaña deseada: "DIAGNÓSTICO DE HARDWARE FÍSICO", "CÓDIGOS POST EN TIEMPO REAL" o "BANCO DUAL INTEGRADO".',
+                    'Conectá el interruptor AC (alimenta +5VSB en pin 9) y pulsá POWER para observar la bajada de PS_ON# y elevación de rieles principales.',
+                    'Pausá o avanzá paso a paso para examinar el decodificador oficial del código hexadecimal activo y los Q-LEDs.',
+                    'Inyectá fallas de taller (corto en VRM EPS 12V, error 55 de RAM, o error 99 de GPU) para ver la respuesta del multímetro y el código POST de congelamiento.',
+                  ],
+                  formulaOrPhysics: 'Tolerancia ATX: Rieles principales dentro de ±5%. Código POST 0xAA = salida de UEFI Boot Services y handoff al Kernel NT de Windows.',
+                  benchVerdict: 'Permite aislar inequívocamente si una falla se origina en la entrega de energía física o en el software de firmware UEFI.',
                 }}
               />
 

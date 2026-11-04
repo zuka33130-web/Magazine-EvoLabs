@@ -1,4 +1,4 @@
-import { EVO_WORLD_ZONES } from './evoWorldData';
+import { EVO_WORLD_ZONES } from './evoWorldData.ts';
 
 /**
  * EVO LABS — Canonical Catalog Source of Truth
@@ -268,6 +268,7 @@ export type PracticeTarget =
   | { type: 'boot' }
   | { type: 'windows' | 'xray'; scenario: string }
   | { type: 'hotswap'; panel: 'hardware' | 'software' | 'sandbox' | 'telemetry' | 'gaming' | 'architecture' }
+  | { type: 'tomo01-labs'; panel: string }
   | { type: 'core'; phase: 'SELECT_PC' | 'BUILD_PC'; mission: 'IDLE' | 'REPAIR' | 'TEST' | 'BOTTLENECK' | 'OPTIMIZE' | 'UPGRADE' }
   | { type: 'modal'; modal: 'cases' | 'twin' | 'transfer' }
   | { type: 'chapter'; chapter: '02' | '03' | '04' | '05' | '06' | '07' }
@@ -282,7 +283,7 @@ export interface CanonicalPracticeLab {
   description: string;
   category: PracticeCategory;
   tomo: string | null;
-  kind: 'SIMULADOR' | 'GUIADO' | 'CASO' | 'CAMPUS';
+  kind: 'SIMULADOR' | 'GUIADO' | 'CASO' | 'CAMPUS' | 'BANCO';
   status: 'DISPONIBLE' | 'EN DESARROLLO';
   target: PracticeTarget | null;
   problem?: string;
@@ -683,6 +684,20 @@ const REGISTERED_PRACTICE_LABS: CanonicalPracticeLab[] = [
     experiment: "Ajustarás el número de fases, frecuencia PWM y ventilación durante una prueba de estrés de 20 segundos.",
     outcome: "Comprobarás por qué la Ley de Joule (I²·R) exige repartir la corriente entre múltiples etapas de poder.",
     evidence: "Temperatura máxima registrada en MOSFETs y margen térmico antes del corte por protección OTP.",
+  },
+  {
+    id: "lab-post-hardware-diag",
+    title: "Diagnóstico Físico & Códigos POST en Tiempo Real",
+    description: "Alternancia en vivo entre multímetro de rieles ATX12V, señales lógicas y visualización de códigos POST en bus eSPI.",
+    category: "Hardware y silicio",
+    tomo: "01",
+    kind: "BANCO",
+    status: "DISPONIBLE",
+    target: { type: "tomo01-labs", panel: "post-diag" },
+    problem: "Incertidumbre al diagnosticar si una máquina que no da video falla por falta de energía física o detención de firmware UEFI.",
+    experiment: "Alternarás entre el multímetro de rieles (+12V, +5V, +3.3V, VCore), analizador de señales (PS_ON#, PWR_OK, RESET#) y display 7 segmentos de códigos POST.",
+    outcome: "Aprenderás a correlacionar caídas de tensión con los códigos de error hexadecimales de arranque sin adivinanzas.",
+    evidence: "Registro cronológico de códigos POST con estampa de tiempo e informe de tolerancias de rieles.",
   },
   {
     id: "lab-transfer-challenge",

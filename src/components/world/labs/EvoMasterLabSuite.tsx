@@ -43,6 +43,7 @@ import { EvoWindowsMatrixLab } from './windowsMatrix/EvoWindowsMatrixLab';
 import { EvoUltimateSandbox } from './ultimateSandbox/EvoUltimateSandbox';
 import { EvoMasterLabPrintDossier, EvoMasterLabPrintData } from './EvoMasterLabPrintDossier';
 import { EvoMotherboardCanvas } from '../EvoMotherboardCanvas';
+import { EvoHardwarePostDiagnosticsLab } from './EvoHardwarePostDiagnosticsLab';
 import { useEvoOperatingMode } from '../../../hooks/useEvoOperatingMode';
 import { UserHardwarePassport } from '../../../types';
 import { EvoOperatingModeSelector } from '../../common/EvoOperatingModeSelector';
@@ -52,7 +53,7 @@ interface EvoMasterLabSuiteProps {
   onNavigateTomo?: (tomoId: string) => void;
   onNavigateHome?: () => void;
   passport?: UserHardwarePassport | null;
-  initialPanel?: 'sandbox' | 'gaming' | 'architecture' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all';
+  initialPanel?: 'sandbox' | 'gaming' | 'architecture' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'post-diag' | 'all';
   initialScenario?: string;
 }
 
@@ -65,7 +66,7 @@ export const EvoMasterLabSuite: React.FC<EvoMasterLabSuiteProps> = ({
   initialScenario,
 }) => {
   const { mode, isPericial } = useEvoOperatingMode();
-  const [activePanel, setActivePanel] = useState<'sandbox' | 'gaming' | 'architecture' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'all'>(initialPanel);
+  const [activePanel, setActivePanel] = useState<'sandbox' | 'gaming' | 'architecture' | 'hardware' | 'software' | 'telemetry' | 'matrix' | 'post-diag' | 'all'>(initialPanel);
 
   // Beginner (Principiante / Guiado) vs Technical (Técnico / Sysinternals) View Mode
   const [uiMode, setUiMode] = useState<'principiante' | 'tecnico'>(initialPanel === 'sandbox' ? 'principiante' : 'tecnico');
@@ -966,6 +967,39 @@ ESTADO HASH  : FIRMADO Y VERIFICADO CONTRA FIRMA DE SESIÓN
         {/* ========================================================================= */}
         <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 space-y-8">
           
+          {/* Panel Selector Bar (Clean Segmented Buttons) */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scroll-slim font-mono-tech text-xs bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-800">
+            {[
+              { id: 'sandbox', label: '🎮 SIMULADOR DEFINITIVO' },
+              { id: 'post-diag', label: '🔬 DIAGNÓSTICO FÍSICO & CÓDIGOS POST' },
+              { id: 'hardware', label: '⚡ PRUEBA DE COMPONENTES' },
+              { id: 'software', label: '🛠️ SOFTWARE & CONTROLADORES' },
+              { id: 'telemetry', label: '📊 PARSER TELEMETRÍA' },
+              { id: 'matrix', label: '⚙️ MATRIZ WINDOWS' },
+              { id: 'all', label: '📑 VER TODOS LOS PANELES' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActivePanel(tab.id as any)}
+                className={`px-3 py-1.5 rounded-lg font-bold whitespace-nowrap transition-all cursor-pointer ${
+                  activePanel === tab.id
+                    ? 'bg-amber-400 text-black shadow-[0_0_12px_rgba(245,158,11,0.35)]'
+                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* PANEL NUEVO: DIAGNÓSTICO DE HARDWARE FÍSICO & CÓDIGOS POST EN TIEMPO REAL */}
+          {(activePanel === 'post-diag' || activePanel === 'all') && (
+            <div className="space-y-4">
+              <EvoHardwarePostDiagnosticsLab />
+            </div>
+          )}
+
           {/* FEATURED: EL SIMULADOR DEFINITIVO EVO (ULTIMATE SANDBOX) */}
           {(activePanel === 'sandbox' || activePanel === 'gaming' || activePanel === 'all') && (
             <div className="space-y-4">

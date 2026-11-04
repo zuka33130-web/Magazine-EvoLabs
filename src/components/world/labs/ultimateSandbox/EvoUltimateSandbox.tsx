@@ -155,6 +155,34 @@ export const CPU_OPTIONS: CpuOption[] = [
     desc: 'Procesador móvil híbrido de 10 núcleos (2P + 8E, 28W TDP, TjMax 100°C) con gráficos Intel UHD integrados. Excelente para tareas cotidianas y eSports ligeros.',
   },
   {
+    id: 'cpu-i3-12100f',
+    name: 'Intel Core i3-12100F (4 Núcleos P // Rendimiento Quad)',
+    tier: 'baja',
+    tierLabel: 'GAMA ENTRADA DESKTOP (4 NÚCLEOS P)',
+    cores: '4C / 8T',
+    clockGhz: 4.3,
+    powerWatts: 58,
+    gamingPowerScore: 58,
+    multiTaskScore: 48,
+    priceUsd: 85,
+    priceEstimate: '$85 USD',
+    desc: '4 núcleos de rendimiento con excelente IPC por dólar (58W TDP). Rinde sorprendentemente bien en eSports competitivos 1080p.',
+  },
+  {
+    id: 'cpu-i5-12400f',
+    name: 'Intel Core i5-12400F (6 Núcleos P // Calidad / Precio)',
+    tier: 'media',
+    tierLabel: 'GAMA MEDIA POPULAR (6 NÚCLEOS P)',
+    cores: '6C / 12T',
+    clockGhz: 4.4,
+    powerWatts: 65,
+    gamingPowerScore: 68,
+    multiTaskScore: 65,
+    priceUsd: 135,
+    priceEstimate: '$135 USD',
+    desc: '6 núcleos P puros sin E-cores (65W TDP). Uno de los chips más recomendados para ensambles de gama media.',
+  },
+  {
     id: 'cpu-ryzen-5600g',
     name: 'AMD Ryzen 5 5600G (APU Vega 7)',
     tier: 'media',
@@ -169,6 +197,20 @@ export const CPU_OPTIONS: CpuOption[] = [
     desc: 'APU balanceada de 6 núcleos Zen 3 (65W TDP, TjMax 95°C) con gráfica integrada Radeon Vega 7. Capaz de mover eSports sin gráfica dedicada.',
   },
   {
+    id: 'cpu-ryzen-7600x',
+    name: 'AMD Ryzen 5 7600X (6 Núcleos Zen 4 // AM5)',
+    tier: 'media',
+    tierLabel: 'GAMA MEDIA AM5 (6 NÚCLEOS ZEN 4)',
+    cores: '6C / 12T',
+    clockGhz: 5.3,
+    powerWatts: 105,
+    gamingPowerScore: 82,
+    multiTaskScore: 78,
+    priceUsd: 195,
+    priceEstimate: '$195 USD',
+    desc: 'Arquitectura Zen 4 de alta frecuencia en socket AM5 con PCIe Gen 5 y DDR5 nativo.',
+  },
+  {
     id: 'cpu-i5-13400',
     name: 'Intel Core i5-13400 (Híbrido 10 Núcleos)',
     tier: 'media',
@@ -181,6 +223,20 @@ export const CPU_OPTIONS: CpuOption[] = [
     priceUsd: 210,
     priceEstimate: '$210 USD',
     desc: 'El balance ideal de precio/rendimiento (65W TDP, TjMax 100°C). 6 núcleos de alto rendimiento y 4 de eficiencia capaces de alimentar GPUs modernas.',
+  },
+  {
+    id: 'cpu-ryzen-5700x3d',
+    name: 'AMD Ryzen 7 5700X3D (AM4 3D V-Cache)',
+    tier: 'alta',
+    tierLabel: 'GAMA ALTA AM4 (8C // 3D V-CACHE)',
+    cores: '8C / 16T',
+    clockGhz: 4.1,
+    powerWatts: 105,
+    gamingPowerScore: 92,
+    multiTaskScore: 80,
+    priceUsd: 240,
+    priceEstimate: '$240 USD',
+    desc: 'Actualización suprema para plataformas AM4. 96MB de 3D V-Cache reducen la latencia L3 y mejoran dramáticamente los 1% Lows.',
   },
   {
     id: 'cpu-i7-13700k',
@@ -209,6 +265,34 @@ export const CPU_OPTIONS: CpuOption[] = [
     priceUsd: 390,
     priceEstimate: '$390 USD',
     desc: 'La CPU reina para videojuegos (120W TDP, TjMax 89°C). 96MB de 3D V-Cache eliminan los cuellos de botella de memoria y disparan el 1% Low.',
+  },
+  {
+    id: 'cpu-ryzen-9800x3d',
+    name: 'AMD Ryzen 7 9800X3D (Zen 5 // 2da Gen 3D V-Cache)',
+    tier: 'extrema',
+    tierLabel: 'GAMA EXTREMA REY DE eSPORTS (ZEN 5 X3D)',
+    cores: '8C / 16T',
+    clockGhz: 5.2,
+    powerWatts: 120,
+    gamingPowerScore: 100,
+    multiTaskScore: 92,
+    priceUsd: 479,
+    priceEstimate: '$479 USD',
+    desc: 'Arquitectura Zen 5 con 3D V-Cache invertido de 2da generación. Récord mundial de FPS y fluidez en Valorant, CS2 y eSports a 540Hz.',
+  },
+  {
+    id: 'cpu-i9-14900k',
+    name: 'Intel Core i9-14900K (24 Núcleos // 6.0 GHz Boost)',
+    tier: 'extrema',
+    tierLabel: 'GAMA EXTREMA INTEL (24 NÚCLEOS 8P+16E)',
+    cores: '24C / 32T',
+    clockGhz: 6.0,
+    powerWatts: 253,
+    gamingPowerScore: 98,
+    multiTaskScore: 100,
+    priceUsd: 580,
+    priceEstimate: '$580 USD',
+    desc: 'Máxima frecuencia de reloj de 6.0 GHz en núcleos P con 16 núcleos E para renderizado extremo.',
   },
   {
     id: 'cpu-ryzen-7950x3d',
@@ -266,6 +350,30 @@ export const GPU_OPTIONS: GpuOption[] = [
     desc: 'Diseñada para eSports (CS2, Valorant, LoL) en 1080p competitivo con 4GB dedicados (75W TDP). VRAM muy limitada para juegos AAA modernos.',
   },
   {
+    id: 'gpu-rx-6700xt',
+    name: 'AMD Radeon RX 6700 XT (12GB GDDR6)',
+    tier: 'media',
+    tierLabel: 'GAMA MEDIA RADEON (12GB GDDR6)',
+    vramGb: 12,
+    powerWatts: 230,
+    gamingPowerScore: 62,
+    priceUsd: 270,
+    priceEstimate: '$270 USD',
+    desc: 'Gran relación calidad/precio con 12GB VRAM dedicados para 1080p y 1440p sin desbordes.',
+  },
+  {
+    id: 'gpu-arc-a770',
+    name: 'Intel Arc A770 Limited Edition (16GB GDDR6)',
+    tier: 'media',
+    tierLabel: 'GAMA MEDIA INTEL ARC (16GB GDDR6)',
+    vramGb: 16,
+    powerWatts: 225,
+    gamingPowerScore: 64,
+    priceUsd: 290,
+    priceEstimate: '$290 USD',
+    desc: '16GB VRAM con codificador AV1 en hardware y excelente rendimiento en DirectX 12 / Vulkan.',
+  },
+  {
     id: 'gpu-rtx-3060',
     name: 'NVIDIA GeForce RTX 3060 (12GB GDDR6)',
     tier: 'media',
@@ -290,6 +398,42 @@ export const GPU_OPTIONS: GpuOption[] = [
     desc: 'Excelente balance y bajo consumo (115W TDP). Incluye DLSS 3 Frame Generation para 1080p y 1440p.',
   },
   {
+    id: 'gpu-rtx-4060ti-16gb',
+    name: 'NVIDIA GeForce RTX 4060 Ti (16GB GDDR6)',
+    tier: 'media',
+    tierLabel: 'GAMA MEDIA ALTA (16GB GDDR6)',
+    vramGb: 16,
+    powerWatts: 165,
+    gamingPowerScore: 72,
+    priceUsd: 449,
+    priceEstimate: '$449 USD',
+    desc: '16GB de VRAM para evitar desbordes en juegos con texturas pesadas a 1440p.',
+  },
+  {
+    id: 'gpu-rx-7800xt',
+    name: 'AMD Radeon RX 7800 XT (16GB GDDR6)',
+    tier: 'alta',
+    tierLabel: 'GAMA ALTA RADEON 1440p (16GB GDDR6)',
+    vramGb: 16,
+    powerWatts: 263,
+    gamingPowerScore: 82,
+    priceUsd: 499,
+    priceEstimate: '$499 USD',
+    desc: 'Excelente rendimiento nativo en 1440p con 16GB VRAM y 64MB Infinity Cache.',
+  },
+  {
+    id: 'gpu-rtx-4070-super',
+    name: 'NVIDIA GeForce RTX 4070 Super (12GB GDDR6X)',
+    tier: 'alta',
+    tierLabel: 'GAMA ALTA NVIDA 1440p (12GB GDDR6X)',
+    vramGb: 12,
+    powerWatts: 220,
+    gamingPowerScore: 84,
+    priceUsd: 589,
+    priceEstimate: '$589 USD',
+    desc: 'Punto dulce para 1440p con Ray Tracing, DLSS 3.5 y bajo consumo energético.',
+  },
+  {
     id: 'gpu-rtx-4070ti-super',
     name: 'NVIDIA GeForce RTX 4070 Ti Super (16GB GDDR6X)',
     tier: 'alta',
@@ -300,6 +444,30 @@ export const GPU_OPTIONS: GpuOption[] = [
     priceUsd: 799,
     priceEstimate: '$799 USD',
     desc: 'Potencia masiva para 1440p Ultra y 4K con texturas pesadas, Ray Tracing completo y bus de 256 bits (285W TDP).',
+  },
+  {
+    id: 'gpu-rtx-4080-super',
+    name: 'NVIDIA GeForce RTX 4080 Super (16GB GDDR6X)',
+    tier: '4k',
+    tierLabel: 'GAMA 4K PREMIUM (16GB GDDR6X)',
+    vramGb: 16,
+    powerWatts: 320,
+    gamingPowerScore: 94,
+    priceUsd: 980,
+    priceEstimate: '$980 USD',
+    desc: 'Renderizado 4K fluido con Ray Tracing Ultra y codificador NVENC de alta calidad.',
+  },
+  {
+    id: 'gpu-rx-7900xtx',
+    name: 'AMD Radeon RX 7900 XTX (24GB GDDR6)',
+    tier: '4k',
+    tierLabel: 'GAMA 4K RADEON TOP (24GB GDDR6)',
+    vramGb: 24,
+    powerWatts: 355,
+    gamingPowerScore: 95,
+    priceUsd: 949,
+    priceEstimate: '$949 USD',
+    desc: '24GB VRAM dedicados con arquitectura RDNA 3 y bus de 384 bits para 4K nativo.',
   },
   {
     id: 'gpu-rtx-4090',
@@ -326,13 +494,22 @@ export const RAM_OPTIONS: RamOption[] = [
     desc: 'Poco espacio y mitad de ancho de banda. Provoca paginación (swap) al disco y tirones severos.',
   },
   {
+    id: 'ram-16gb-single',
+    sizeGb: 16,
+    channels: 'single',
+    speedMhz: 3200,
+    priceUsd: 38,
+    label: '16 GB Single Channel (1x16GB 3200MHz)',
+    desc: 'Capacidad suficiente pero bus recortado a 64-bit. Origina bajones en percentil 1% Low en eSports.',
+  },
+  {
     id: 'ram-16gb-dual',
     sizeGb: 16,
     channels: 'dual',
     speedMhz: 3200,
     priceUsd: 45,
-    label: '16 GB Dual Channel (2x8GB 3200MHz)',
-    desc: 'El estándar recomendado para jugar fluido en cualquier juego actual.',
+    label: '16 GB Dual Channel (2x8GB 3200MHz DDR4)',
+    desc: 'El estándar recomendado para jugar fluido en cualquier juego actual con bus de 128-bit.',
   },
   {
     id: 'ram-32gb-dual',
@@ -340,8 +517,17 @@ export const RAM_OPTIONS: RamOption[] = [
     channels: 'dual',
     speedMhz: 6000,
     priceUsd: 95,
-    label: '32 GB Dual Channel (2x16GB 6000MHz)',
+    label: '32 GB Dual Channel (2x16GB 6000MHz DDR5 EXPO)',
     desc: 'Capacidad y velocidad óptimas para jugar con programas pesados de fondo sin desbordes.',
+  },
+  {
+    id: 'ram-64gb-dual-ddr5',
+    sizeGb: 64,
+    channels: 'dual',
+    speedMhz: 6400,
+    priceUsd: 190,
+    label: '64 GB Dual Channel (2x32GB 6400MHz DDR5)',
+    desc: 'Máxima amplitud de memoria para simulación, mods pesados y creación de contenido en 4K.',
   },
 ];
 
@@ -381,6 +567,15 @@ export const STORAGE_OPTIONS: StorageOption[] = [
     priceUsd: 85,
     label: 'SSD NVMe PCIe 4.0 (7000 MB/s)',
     desc: 'Ancho de banda ultra rápido (7 GB/s) optimizado para DirectStorage, streaming de texturas en tiempo real y renderizado 4K sin demoras.',
+  },
+  {
+    id: 'storage-nvme-gen5',
+    name: 'SSD NVMe M.2 PCIe 5.0 (12000 MB/s Extreme)',
+    type: 'nvme5',
+    speedMbS: 12000,
+    priceUsd: 160,
+    label: 'SSD NVMe PCIe 5.0 (12,000 MB/s Ultra)',
+    desc: 'Lo último en tecnología de almacenamiento con tasas de transferencia de hasta 12 GB/s para eliminación absoluta del tiempo de carga.',
   },
 ];
 
@@ -987,6 +1182,52 @@ export const EvoUltimateSandbox: React.FC<EvoUltimateSandboxProps> = ({
     initialHardware.isIgpu ? 'esports' : 'aaa'
   );
   const [gameResolution, setGameResolution] = useState<'1080p' | '1440p' | '4k'>('1080p');
+
+  // Gemini AI Game Probe State
+  const [aiGameTitle, setAiGameTitle] = useState<string>('Valorant');
+  const [customGameInput, setCustomGameInput] = useState<string>('Valorant');
+  const [isQueryingAi, setIsQueryingAi] = useState<boolean>(false);
+  const [aiBenchmarkResult, setAiBenchmarkResult] = useState<any | null>(null);
+  const [aiQueryError, setAiQueryError] = useState<string | null>(null);
+
+  const handleRunAiBenchmark = async (targetTitle?: string) => {
+    const titleToUse = targetTitle || customGameInput.trim() || aiGameTitle;
+    if (!titleToUse) return;
+
+    setIsQueryingAi(true);
+    setAiQueryError(null);
+
+    try {
+      const res = await fetch('/api/gemini/game-benchmark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gameTitle: titleToUse,
+          customGameDetails: 'Prueba pericial EVO LABS',
+          cpu: selectedCpu.name,
+          gpu: selectedGpu.name,
+          ramSizeGb: selectedRam.sizeGb,
+          ramSpeedMts: selectedRam.speedMhz,
+          ramChannels: selectedRam.channels === 'dual' ? 'Dual Channel (128-bit)' : 'Single Channel (64-bit)',
+          storageType: selectedStorage.name,
+          resolution: gameResolution,
+          graphicsQuality: 'Alta / Competitiva',
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Error al ejecutar el benchmark con IA');
+      }
+
+      setAiBenchmarkResult(json.benchmark);
+    } catch (err: any) {
+      setAiQueryError(err.message || 'Error de conexión con el motor IA');
+    } finally {
+      setIsQueryingAi(false);
+    }
+  };
+
 
   // =========================================================================
   // 1. HOOK DE SINCRONIZACIÓN INICIAL (useEffect) & BLOQUEO DE AUTO-ENGAÑO
@@ -3138,6 +3379,218 @@ export const EvoUltimateSandbox: React.FC<EvoUltimateSandboxProps> = ({
                     <span>PING: <strong className={telemetry.networkPingMs > 100 ? 'text-rose-400' : 'text-emerald-400'}>{telemetry.networkPingMs} ms</strong></span>
                   </div>
                 </div>
+              </div>
+
+              {/* AI GAME PROBE PANEL (GEMINI 3.8 FLASH METROLOGY ENGINE) */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-[#0c101a] via-[#080a0e] to-zinc-950 border border-amber-500/40 shadow-2xl space-y-4 font-mono-tech">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-amber-400/20 text-amber-400 border border-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.3)] shrink-0">
+                      <Bot className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-display font-black text-white text-base uppercase tracking-tight">
+                          PROBAR CUALQUIER JUEGO CON IA EVO (GEMINI 3.8 FLASH)
+                        </h3>
+                        <span className="px-2 py-0.5 rounded text-[9px] font-black bg-amber-400/20 text-amber-300 border border-amber-400/40 uppercase">
+                          MODELO METROLOGÍA
+                        </span>
+                      </div>
+                      <p className="text-xs text-zinc-400 font-sans leading-relaxed mt-0.5">
+                        Elegí un juego eSports/AAA destacado o escribí cualquier título personalizado. La IA evaluará tu CPU ({selectedCpu.name}), GPU ({selectedGpu.name}), RAM ({selectedRam.label}) y Disco ({selectedStorage.name}).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Popular Game Presets */}
+                <div className="space-y-2">
+                  <span className="text-[11px] font-mono-tech font-bold text-zinc-400 uppercase tracking-wider block">
+                    SELECCIONÁ UN TÍTULO DESTACADO O ESCRIBÍ CUALQUIER JUEGO:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { name: 'Valorant', badge: '1080p eSports 540Hz Target' },
+                      { name: 'Counter-Strike 2', badge: '1080p Comp' },
+                      { name: 'Black Myth: Wukong', badge: 'UE5 VRAM Heavy' },
+                      { name: 'Cyberpunk 2077', badge: 'Ray Tracing Ultra' },
+                      { name: 'Fortnite', badge: 'UE5 Nanite/Lumen' },
+                      { name: 'Apex Legends', badge: '240Hz Competitive' },
+                      { name: 'Elden Ring', badge: '60 FPS Cap' },
+                      { name: 'Minecraft (Shaders)', badge: 'Single Core & VRAM' },
+                    ].map((g) => (
+                      <button
+                        key={g.name}
+                        type="button"
+                        onClick={() => {
+                          setAiGameTitle(g.name);
+                          setCustomGameInput(g.name);
+                          handleRunAiBenchmark(g.name);
+                        }}
+                        className={`px-3 py-1.5 rounded-xl border text-xs font-mono-tech transition-all cursor-pointer flex items-center gap-1.5 ${
+                          customGameInput === g.name || aiGameTitle === g.name
+                            ? 'bg-amber-400 text-black font-black border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.3)]'
+                            : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:border-zinc-700 hover:text-white'
+                        }`}
+                      >
+                        <Gamepad2 className="w-3.5 h-3.5" />
+                        <span>{g.name}</span>
+                        <span className="text-[9px] opacity-75 font-normal">({g.badge})</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Game Input Box */}
+                <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={customGameInput}
+                      onChange={(e) => setCustomGameInput(e.target.value)}
+                      placeholder="Escribí cualquier juego (ej: Flight Simulator 2024, Monster Hunter Wilds, Assetto Corsa, GTA VI)..."
+                      className="w-full bg-zinc-950 border border-zinc-800 focus:border-amber-400 text-white rounded-xl px-4 py-2.5 text-xs font-mono placeholder:text-zinc-600 outline-none transition-all"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRunAiBenchmark()}
+                    disabled={isQueryingAi || (!customGameInput.trim() && !aiGameTitle)}
+                    className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-mono-tech font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0 shadow-[0_0_15px_rgba(251,191,36,0.35)]"
+                  >
+                    {isQueryingAi ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin text-black" />
+                        <span>EVALUANDO EN GEMINI...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 text-black" />
+                        <span>PROBAR CON IA EVO</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {aiQueryError && (
+                  <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800 text-rose-300 text-xs font-mono flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span>{aiQueryError}</span>
+                  </div>
+                )}
+
+                {/* AI BENCHMARK RESULTS DISPLAY */}
+                {aiBenchmarkResult && (
+                  <div className="p-5 rounded-xl bg-zinc-950/90 border border-amber-400/50 space-y-4 animate-in fade-in duration-300">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-zinc-800">
+                      <div>
+                        <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block">
+                          RESULTADO PERICIAL DE METROLOGÍA IA
+                        </span>
+                        <h4 className="font-display font-black text-lg text-white">
+                          BENCHMARK REAL PARA {customGameInput || aiGameTitle} ({gameResolution.toUpperCase()})
+                        </h4>
+                      </div>
+                      <span className="px-3 py-1 rounded-lg text-xs font-black bg-amber-400/20 text-amber-300 border border-amber-400/40 shrink-0">
+                        {aiBenchmarkResult.esportsRating || 'Apto eSports / Alta Tasa'}
+                      </span>
+                    </div>
+
+                    {/* Gauges Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
+                      <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                        <span className="text-[9px] text-zinc-500 block uppercase">FPS PROMEDIO</span>
+                        <span className="text-xl sm:text-2xl font-black text-emerald-400">
+                          {aiBenchmarkResult.avgFps} <span className="text-xs text-zinc-400">FPS</span>
+                        </span>
+                      </div>
+                      <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                        <span className="text-[9px] text-zinc-500 block uppercase">1% LOW (FLUIDEZ)</span>
+                        <span className="text-xl sm:text-2xl font-black text-amber-400">
+                          {aiBenchmarkResult.onePercentLow} <span className="text-xs text-zinc-400">FPS</span>
+                        </span>
+                      </div>
+                      <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                        <span className="text-[9px] text-zinc-500 block uppercase">0.1% LOW (STUTTER)</span>
+                        <span className="text-xl sm:text-2xl font-black text-cyan-400">
+                          {aiBenchmarkResult.zeroOnePercentLow} <span className="text-xs text-zinc-400">FPS</span>
+                        </span>
+                      </div>
+                      <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+                        <span className="text-[9px] text-zinc-500 block uppercase">IMPACTO TIRONES</span>
+                        <span className={`text-sm sm:text-base font-black uppercase ${
+                          aiBenchmarkResult.stutterImpact === 'CRÍTICO' ? 'text-red-400' :
+                          aiBenchmarkResult.stutterImpact === 'MODERADO' ? 'text-amber-400' : 'text-emerald-400'
+                        }`}>
+                          {aiBenchmarkResult.stutterImpact}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* CPU vs GPU Bottleneck Bars */}
+                    <div className="space-y-3 p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800 text-xs font-mono">
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-zinc-300">
+                          <span>CARGA / CUELLO DE BOTELLA EN CPU ({selectedCpu.name}):</span>
+                          <span className="text-amber-400 font-bold">{aiBenchmarkResult.cpuBottleneckPct}%</span>
+                        </div>
+                        <div className="h-2.5 bg-black rounded-full overflow-hidden border border-zinc-800">
+                          <div className="h-full bg-amber-400 rounded-full" style={{ width: `${aiBenchmarkResult.cpuBottleneckPct}%` }} />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-zinc-300">
+                          <span>CARGA / CUELLO DE BOTELLA EN GPU ({selectedGpu.name}):</span>
+                          <span className="text-cyan-400 font-bold">{aiBenchmarkResult.gpuBottleneckPct}%</span>
+                        </div>
+                        <div className="h-2.5 bg-black rounded-full overflow-hidden border border-zinc-800">
+                          <div className="h-full bg-cyan-400 rounded-full" style={{ width: `${aiBenchmarkResult.gpuBottleneckPct}%` }} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Verdict and Explanation */}
+                    <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-2 text-xs font-sans">
+                      <p className="text-zinc-200 font-bold leading-relaxed">
+                        🔍 <strong>Dictamen EVO:</strong> {aiBenchmarkResult.verdictEs}
+                      </p>
+                      <p className="text-zinc-400 leading-relaxed text-[11px]">
+                        🧠 <strong>Explicación de Microarquitectura:</strong> {aiBenchmarkResult.architecturalExplanationEs}
+                      </p>
+                    </div>
+
+                    {/* Recommendations & Upgrades */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-sans">
+                      {aiBenchmarkResult.recommendedSettingsEs?.length > 0 && (
+                        <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 space-y-1.5">
+                          <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block font-mono">
+                            ⚡ AJUSTES GRÁFICOS RECOMENDADOS:
+                          </span>
+                          <ul className="list-disc list-inside text-zinc-300 space-y-1 text-[11px]">
+                            {aiBenchmarkResult.recommendedSettingsEs.map((s: string, idx: number) => (
+                              <li key={idx}>{s}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {aiBenchmarkResult.recommendedUpgradesEs?.length > 0 && (
+                        <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-800 space-y-1.5">
+                          <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block font-mono">
+                            🛠️ MEJORAS DE HARDWARE SUGERIDAS:
+                          </span>
+                          <ul className="list-disc list-inside text-zinc-300 space-y-1 text-[11px]">
+                            {aiBenchmarkResult.recommendedUpgradesEs.map((u: string, idx: number) => (
+                              <li key={idx}>{u}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -2144,8 +2144,17 @@ function AppContent({
                 setCurrentView('bottleneck-simulator-view');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              onOpenLatencyCalculator={() => setIsLatencyCalculatorOpen(true)}
-              onOpenDigitalTwin={() => setIsDigitalTwinOpen(true)}
+              onOpenLatencyCalculator={() => {
+                setActiveLabPanel('hardware');
+                setCurrentView('hotswap-lab');
+              }}
+              onOpenDigitalTwin={() => {
+                setCurrentView('world-map');
+                setCampusSection('diagnosticar');
+                setTimeout(() => {
+                  window.dispatchEvent(new CustomEvent('evo_open_digital_twin'));
+                }, 150);
+              }}
               passport={userPassport}
               dossierSummary={dossierSummary}
             />

@@ -39,6 +39,13 @@ export function executeToolById(toolId: string | undefined | null, ctx: EvoToolR
       ctx.setCurrentView('boot-lab');
       return true;
 
+    case 'diag-post-hardware':
+      if (ctx.setActiveLabPanel) {
+        ctx.setActiveLabPanel('post-diag' as any);
+      }
+      ctx.setCurrentView('world-map');
+      return true;
+
     case 'diag-bsod-decoder':
       ctx.setCurrentView('bsod-repair-view');
       return true;

@@ -1,19 +1,30 @@
 /**
  * EVO LABS — Data Provenance & Epistemic Standard
  * 
- * Regla Canónica:
- * - MEDIDO: Dato obtenido de un sensor o fuente física real.
- * - CALCULADO: Resultado obtenido mediante una fórmula matemática verificable.
- * - SIMULADO: Resultado de un modelo numérico con supuestos declarados.
- * - DESCONOCIDO: Dato que no se pudo verificar (nunca se inventa).
- * 
- * "NO LO CREAS. COMPROBALO."
+ * Regla Canónica del Método EVO ("NO LO CREAS. COMPROBALO."):
+ * - SYSTEM_REPORTED: información comunicada por el sistema/OS o navegador.
+ * - MEASURED (MEDIDO): medición obtenida realmente mediante una fuente física o sensor real.
+ * - CALCULATED (CALCULADO): resultado obtenido mediante una fórmula matemática explícita.
+ * - ESTIMATED (ESTIMADO): estimación basada en supuestos declarados.
+ * - SIMULATED (SIMULADO): resultado generado por un modelo numérico o simulación.
+ * - UNKNOWN (DESCONOCIDO): procedencia no verificada (nunca se inventa).
+ * - USER_ENTERED: datos ingresados manualmente por el usuario (no es medición).
  */
+
+export type DetailedProvenance =
+  | 'SYSTEM_REPORTED'
+  | 'MEASURED'
+  | 'CALCULATED'
+  | 'ESTIMATED'
+  | 'SIMULATED'
+  | 'UNKNOWN'
+  | 'USER_ENTERED';
 
 export type MetricProvenance = 'MEDIDO' | 'CALCULADO' | 'SIMULADO' | 'DESCONOCIDO';
 
 export interface ProvenanceMetadata {
   type: MetricProvenance;
+  detailedType: DetailedProvenance;
   label: string;
   shortDesc: string;
   sourceOrFormula?: string;
@@ -40,7 +51,7 @@ export const PROVENANCE_DEFINITIONS: Record<
   MEDIDO: {
     code: 'MEDIDO',
     label: 'MEDIDO EN SILICIO',
-    description: 'Dato capturado directamente por sensor de hardware, API del navegador o telemetría de sistema real.',
+    description: 'Dato capturado directamente por sensor de hardware, API de sistema o instrumental físico real.',
     color: '#10B981', // Emerald 500
     bgColor: 'rgba(16, 185, 129, 0.12)',
     borderColor: 'rgba(16, 185, 129, 0.4)',
@@ -80,7 +91,7 @@ export const PROVENANCE_DEFINITIONS: Record<
 };
 
 /**
- * Normaliza cualquier procedencia heredada (legacy EpistemicProvenance) a los 4 pilares canónicos.
+ * Normaliza cualquier procedencia (incluidas detalladas y legacy) a la categoría canónica.
  */
 export function normalizeProvenance(legacyProvenance?: string): MetricProvenance {
   if (!legacyProvenance) return 'DESCONOCIDO';
@@ -89,21 +100,53 @@ export function normalizeProvenance(legacyProvenance?: string): MetricProvenance
   if (
     upper === 'MEDIDO' ||
     upper === 'MEASURED' ||
-    upper === 'DETECTED' ||
     upper === 'SYSTEM_REPORTED' ||
     upper === 'BROWSER_REPORTED' ||
-    upper === 'USER_ENTERED'
+    upper === 'DETECTED'
   ) {
     return 'MEDIDO';
   }
 
-  if (upper === 'CALCULADO' || upper === 'DERIVED' || upper === 'CALIBRATED') {
+  if (upper === 'CALCULADO' || upper === 'CALCULATED' || upper === 'DERIVED' || upper === 'CALIBRATED') {
     return 'CALCULADO';
   }
 
-  if (upper === 'SIMULADO' || upper === 'SIMULATED' || upper === 'ESTIMATED' || upper === 'AI_DISCOVERED') {
+  if (
+    upper === 'SIMULADO' ||
+    upper === 'SIMULATED' ||
+    upper === 'ESTIMATED' ||
+    upper === 'ESTIMADO' ||
+    upper === 'USER_ENTERED' ||
+    upper === 'AI_DISCOVERED'
+  ) {
     return 'SIMULADO';
   }
 
   return 'DESCONOCIDO';
 }
+
+/**
+ * Mapea una procedencia detallada a su tipo canónico y descripción pericial.
+ */
+export function getDetailedProvenanceInfo(detailed: DetailedProvenance): ProvenanceMetadata {
+  const type = normalizeProvenance(detailed);
+  const baseDef = PROVENANCE_DEFINITIONS[type];
+
+  const descriptions: Record<DetailedProvenance, string> = {
+    SYSTEM_REPORTED: 'Dato comunicado por la API del sistema operativo o navegador.',
+    MEASURED: 'Medición física capturada por sensor de hardware o multímetro en tiempo real.',
+    CALCULATED: 'Resultado derivado matemáticamente a partir de fórmulas físicas verificables.',
+    ESTIMATED: 'Estimación basada en modelos teóricos con supuestos declarados.',
+    SIMULATED: 'Resultado generado por el motor de simulación numérica de EVO LABS.',
+    USER_ENTERED: 'Dato introducido manualmente por el usuario. No constituye medición física.',
+    UNKNOWN: 'Procedencia de datos no verificada.',
+  };
+
+  return {
+    type,
+    detailedType: detailed,
+    label: baseDef.label,
+    shortDesc: descriptions[detailed] || baseDef.description,
+  };
+}
+

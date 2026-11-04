@@ -1,4 +1,4 @@
-import { EvoNarrativeProfile, EvoProfileDetail, EvoLabZone } from '../types';
+import { EvoNarrativeProfile, EvoProfileDetail, EvoLabZone } from '../types.ts';
 
 export const EVO_IDENTITY = {
   title: 'EVO LABS',

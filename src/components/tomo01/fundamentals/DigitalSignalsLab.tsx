@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Activity, Sliders, Waves, Play, Pause, Zap, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Activity, Sliders, Waves, Play, Pause, AlertTriangle, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { ProvenanceBadge } from '../../common/ProvenanceBadge';
 
 export const DigitalSignalsLab: React.FC = () => {
@@ -9,6 +9,7 @@ export const DigitalSignalsLab: React.FC = () => {
   const [logicStandard, setLogicStandard] = useState<'TTL_5V' | 'CMOS_3V3' | 'DDR5_1V1' | 'CORE_0V8'>('CORE_0V8');
   const [jitterPs, setJitterPs] = useState<number>(15); // Picoseconds jitter
   const [isOscilloscopeRunning, setIsOscilloscopeRunning] = useState<boolean>(true);
+  const [showGuide, setShowGuide] = useState<boolean>(true);
 
   // Derived physics
   // Period T = 1 / f
@@ -23,6 +24,7 @@ export const DigitalSignalsLab: React.FC = () => {
       vHighMin: 2.0,
       vLowMax: 0.8,
       vSupply: 5.0,
+      vNoiseMargin: 0.4,
       color: '#F59E0B',
     },
     CMOS_3V3: {
@@ -30,6 +32,7 @@ export const DigitalSignalsLab: React.FC = () => {
       vHighMin: 2.0,
       vLowMax: 0.8,
       vSupply: 3.3,
+      vNoiseMargin: 0.5,
       color: '#3B82F6',
     },
     DDR5_1V1: {
@@ -37,6 +40,7 @@ export const DigitalSignalsLab: React.FC = () => {
       vHighMin: 0.77,
       vLowMax: 0.33,
       vSupply: 1.1,
+      vNoiseMargin: 0.12,
       color: '#10B981',
     },
     CORE_0V8: {
@@ -44,11 +48,17 @@ export const DigitalSignalsLab: React.FC = () => {
       vHighMin: 0.55,
       vLowMax: 0.25,
       vSupply: 0.85,
+      vNoiseMargin: 0.08,
       color: '#8B5CF6',
     },
   };
 
   const currentProfile = logicProfiles[logicStandard];
+
+  // Rise / Fall time estimation (t_r ~ 10-20% of period for high speed silicon)
+  const riseTimePs = Math.round(parseFloat(periodPs) * 0.12);
+  const isDutyCycleUnstable = dutyCycle < 40 || dutyCycle > 60;
+  const isJitterHigh = jitterPs > 30;
 
   // Canvas Oscilloscope Animation
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -125,7 +135,7 @@ export const DigitalSignalsLab: React.FC = () => {
 
       for (let x = -wavePeriodPx; x < width + wavePeriodPx; x += wavePeriodPx) {
         const startX = x - offset;
-        const jitter = (Math.random() - 0.5) * (jitterPs / 10);
+        const jitter = (Math.random() - 0.5) * (jitterPs / 8);
 
         // Low segment
         ctx.lineTo(startX, lowY);
@@ -161,7 +171,7 @@ export const DigitalSignalsLab: React.FC = () => {
               <span className="font-mono-tech text-xs uppercase px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
                 FUNDAMENTOS // PARTE I
               </span>
-              <ProvenanceBadge provenance="CALCULADO" sourceOrFormula="Física Electromagnética / T = 1/f" />
+              <ProvenanceBadge provenance="CALCULADO" sourceOrFormula="Física Electromagnética / Período T = 1/f" />
             </div>
             <h2 className="text-2xl font-black tracking-tight text-white font-sans-editorial">
               SEÑALES DIGITALES, OSCILOSCOPIO Y FRECUENCIA DE RELOJ
@@ -170,8 +180,42 @@ export const DigitalSignalsLab: React.FC = () => {
               Un ciclo de reloj de 4.0 GHz dura tan solo 0.25 nanosegundos (250 picosegundos). La luz viaja apenas 7.5 centímetros en ese tiempo. Analizá niveles lógicos, tiempos de transición y márgenes de ruido con el osciloscopio de laboratorio.
             </p>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setShowGuide(!showGuide)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 font-mono text-xs font-bold hover:bg-cyan-500/20 transition-all cursor-pointer"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>{showGuide ? 'OCULTAR GUÍA' : 'GUÍA DE USO'}</span>
+            {showGuide ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
         </div>
       </div>
+
+      {/* Guía de Uso Paso a Paso */}
+      {showGuide && (
+        <div className="border border-cyan-500/30 bg-cyan-950/20 rounded-xl p-5 space-y-3 font-sans text-xs text-zinc-300">
+          <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase text-cyan-400">
+            <Activity className="w-4 h-4" />
+            <span>GUÍA DE USO METROLÓGICO // ANÁLISIS DE SEÑALES</span>
+          </div>
+          <ol className="list-decimal list-inside space-y-1.5 leading-relaxed text-zinc-300">
+            <li>
+              <strong className="text-white font-mono">Paso 1 (Ajustar Frecuencia):</strong> Subí la frecuencia de 0.5 GHz a 5.5 GHz. Fijate cómo el período ($T = 1/f$) disminuye drásticamente a picosegundos y la longitud de onda de la luz limita la distancia física entre núcleos.
+            </li>
+            <li>
+              <strong className="text-white font-mono">Paso 2 (Inyectar Jitter / Ruido):</strong> Aumentá el Jitter (fluctuación de reloj). El jitter deforma los flancos de subida y bajada, reduciendo la ventana de retención (Hold Time) de los transistores.
+            </li>
+            <li>
+              <strong className="text-white font-mono">Paso 3 (Ciclo de Trabajo / Duty Cycle):</strong> El valor ideal es 50%. Si cae por debajo de 40% o supera el 60%, el tiempo en estado alto no alcanza para cargar las puertas lógicas, provocando errores de sincronización.
+            </li>
+            <li>
+              <strong className="text-white font-mono">Paso 4 (Seleccionar Estándar de Silicio):</strong> Compará el estándar TTL antiguo (5V) con DDR5 (1.1V) o núcleos FinFET (0.85V). Observá cómo los márgenes de ruido se estrechan con la miniaturización.
+            </li>
+          </ol>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Controls Column */}
@@ -209,7 +253,7 @@ export const DigitalSignalsLab: React.FC = () => {
           <div className="space-y-2">
             <div className="flex justify-between text-xs font-mono">
               <span className="text-zinc-400">Ciclo de Trabajo (Duty Cycle):</span>
-              <span className="text-white font-bold">{dutyCycle}%</span>
+              <span className={`font-bold ${isDutyCycleUnstable ? 'text-amber-400' : 'text-white'}`}>{dutyCycle}%</span>
             </div>
             <input
               type="range"
@@ -226,7 +270,7 @@ export const DigitalSignalsLab: React.FC = () => {
           <div className="space-y-2">
             <div className="flex justify-between text-xs font-mono">
               <span className="text-zinc-400">Jitter de Reloj (Fluctuación):</span>
-              <span className="text-red-400 font-bold">{jitterPs} ps</span>
+              <span className={`font-bold ${isJitterHigh ? 'text-red-400' : 'text-cyan-400'}`}>{jitterPs} ps</span>
             </div>
             <input
               type="range"
@@ -262,9 +306,11 @@ export const DigitalSignalsLab: React.FC = () => {
           </div>
 
           <div className="p-3 bg-zinc-950 border border-zinc-800 rounded-lg text-xs font-mono space-y-1 text-zinc-400">
-            <div className="text-zinc-300 font-bold text-[10px] uppercase">Métricas de Silicio:</div>
+            <div className="text-zinc-300 font-bold text-[10px] uppercase">Métricas Físicas de Reloj:</div>
             <div>Período (T = 1/f): <strong className="text-cyan-300">{periodNs} ns ({periodPs} ps)</strong></div>
-            <div>Distancia límite de luz: <strong className="text-amber-300">{waveLengthLightMm} mm</strong></div>
+            <div>Tiempo de Subida (t_r est.): <strong className="text-amber-300">{riseTimePs} ps</strong></div>
+            <div>Margen de Ruido (V_NM): <strong className="text-emerald-300">{currentProfile.vNoiseMargin} V</strong></div>
+            <div>Distancia límite de luz: <strong className="text-purple-300">{waveLengthLightMm} mm</strong></div>
           </div>
         </div>
 
@@ -301,8 +347,19 @@ export const DigitalSignalsLab: React.FC = () => {
               </div>
             </div>
 
+            {/* Warnings Bar */}
+            {(isDutyCycleUnstable || isJitterHigh) && (
+              <div className="p-3 bg-amber-950/30 border border-amber-500/40 rounded-lg text-xs font-mono text-amber-300 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                <div>
+                  {isJitterHigh && <div>· Jitter excesivo (&gt;30ps): Riesgo de fallas de Setup & Hold Time en los registros.</div>}
+                  {isDutyCycleUnstable && <div>· Duty Cycle desbalanceado ({dutyCycle}%): Asimetría en la carga de transistores.</div>}
+                </div>
+              </div>
+            )}
+
             {/* Voltage Levels Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
               <div className="bg-black/50 border border-zinc-800 rounded-lg p-3">
                 <span className="text-[10px] font-mono text-zinc-500 uppercase block font-bold">1 LÓGICO (ALTO)</span>
                 <span className="text-lg font-mono font-black text-emerald-400">
@@ -333,10 +390,6 @@ export const DigitalSignalsLab: React.FC = () => {
                 </span>
               </div>
             </div>
-          </div>
-
-          <div className="p-3 bg-zinc-950 border border-zinc-800 rounded-lg text-xs text-zinc-300 font-sans leading-relaxed">
-            <strong className="font-mono text-cyan-400">¿Por qué bajan los voltajes en chips modernos?</strong> A medida que los nodos de fabricación reducen transistores a nanómetros (3nm / 4nm), las capas de óxido son tan finas que 5V destruirían el silicio por ruptura dieléctrica. Por eso la memoria DDR5 opera a 1.1V y los núcleos modernos a tan solo 0.8V. Menos voltaje reduce exponencialmente el consumo dinámico (P = C × V² × f).
           </div>
         </div>
       </div>
