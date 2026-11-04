@@ -10,10 +10,12 @@ import {
   FileText,
   MapPin,
   ChevronLeft,
+  FlaskConical,
 } from 'lucide-react';
 
 interface EvoArchiveEntranceProps {
   onEnterTome01: () => void;
+  onEnterLabs?: () => void;
   onEnterMagazine?: () => void;
   onEnterTome02?: () => void;
   onEnterTome03?: () => void;
@@ -26,6 +28,7 @@ interface EvoArchiveEntranceProps {
 
 export const EvoArchiveEntrance: React.FC<EvoArchiveEntranceProps> = ({
   onEnterTome01,
+  onEnterLabs,
   onEnterMagazine,
   onEnterTome02,
   onEnterTome03,
@@ -157,7 +160,7 @@ export const EvoArchiveEntrance: React.FC<EvoArchiveEntranceProps> = ({
               </div>
             </div>
 
-            {/* Launch CTA Button */}
+            {/* Launch CTA Buttons: 3 Accesos Principales */}
             <div className="flex flex-col gap-2.5 min-w-[240px]">
               <button
                 id="evo-btn-enter-tomo-01"
@@ -168,13 +171,24 @@ export const EvoArchiveEntrance: React.FC<EvoArchiveEntranceProps> = ({
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </button>
 
+              {onEnterLabs && (
+                <button
+                  id="evo-btn-enter-tomo01-labs"
+                  onClick={onEnterLabs}
+                  className="w-full py-2.5 px-4 rounded-lg bg-cyan-950/80 hover:bg-cyan-900/90 border border-cyan-500/50 hover:border-cyan-400 text-cyan-300 font-mono-tech text-xs uppercase font-bold tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-cyan-950/30"
+                >
+                  <FlaskConical className="w-4 h-4 text-cyan-400" />
+                  <span>LABORATORIOS Y HERRAMIENTAS</span>
+                </button>
+              )}
+
               {onEnterMagazine && (
                 <button
                   id="evo-btn-enter-magazine-a4"
                   onClick={onEnterMagazine}
-                  className="w-full py-2.5 px-4 rounded-lg bg-yellow-400/15 hover:bg-yellow-400/25 border border-yellow-400/50 text-yellow-300 font-mono-tech text-xs uppercase font-bold tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2 px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-500 text-zinc-300 font-mono-tech text-xs uppercase font-bold tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <BookOpen className="w-4 h-4 text-yellow-400" />
+                  <BookOpen className="w-4 h-4 text-amber-400" />
                   <span>REVISTA A4 (PDF READY)</span>
                 </button>
               )}

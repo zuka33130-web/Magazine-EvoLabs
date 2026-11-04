@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, ArrowLeft, Sparkles, HelpCircle, Compass } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Sparkles, HelpCircle, Compass, FlaskConical, BookOpen, FileText } from 'lucide-react';
 import { EditorialHeadline } from '../types';
 import { TOMO_01_COVER } from '../data/tomoCoversData';
 import { TutorTomo01TourModal } from './tutor/TutorTomo01TourModal';
@@ -10,6 +10,7 @@ interface MagazineCoverProps {
   headlines: EditorialHeadline[];
   onOpenEdition: () => void;
   onOpenA4Magazine?: () => void;
+  onOpenLabs?: () => void;
   onBackToWorldMap?: () => void;
 }
 
@@ -17,6 +18,7 @@ export const MagazineCover: React.FC<MagazineCoverProps> = ({
   headlines,
   onOpenEdition,
   onOpenA4Magazine,
+  onOpenLabs,
   onBackToWorldMap,
 }) => {
   const { openTutorWithTab, setMode } = useTutorEvo();
@@ -111,40 +113,60 @@ export const MagazineCover: React.FC<MagazineCoverProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons: Clear hierarchy (1 dominant + secondary) */}
-          <div className="pt-4 flex flex-wrap items-center gap-3">
-            {/* ACCIÓN PRINCIPAL DOMINANTE */}
+          {/* Action Buttons: 3 Accesos Principales Claramente Diferenciados */}
+          <div className="pt-4 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
+            {/* 1. TOMO 01 INTERACTIVO */}
             <button
               id="btn-abrir-edicion"
               type="button"
               onClick={onOpenEdition}
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-mono-tech font-black text-xs sm:text-sm tracking-wider uppercase bg-amber-400 text-black hover:bg-amber-300 transition-all duration-200 cursor-pointer shadow-xl shadow-amber-400/10 hover:shadow-amber-400/20 group"
+              className="inline-flex items-center justify-between sm:justify-center gap-3 px-6 py-4 rounded-xl font-mono-tech font-black text-xs sm:text-sm tracking-wider uppercase bg-amber-400 text-black hover:bg-amber-300 transition-all duration-200 cursor-pointer shadow-xl shadow-amber-400/10 hover:shadow-amber-400/25 group"
             >
-              <span>COMENZAR TOMO 01</span>
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-black shrink-0" />
+                <span>1. TOMO 01 INTERACTIVO</span>
+              </div>
               <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-1 transition-transform" />
             </button>
 
-            {/* ACCIÓN SECUNDARIA 1: GUÍA APRENDIZ CERO */}
-            <button
-              type="button"
-              onClick={() => setIsWelcomeOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900/40 hover:bg-zinc-800/80 text-zinc-400 hover:text-white border border-zinc-800/70 transition-all duration-200 cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>EMPEZAR DESDE CERO</span>
-            </button>
+            {/* 2. LABORATORIOS Y HERRAMIENTAS */}
+            {onOpenLabs && (
+              <button
+                id="btn-abrir-laboratorios"
+                type="button"
+                onClick={onOpenLabs}
+                className="inline-flex items-center justify-between sm:justify-center gap-2.5 px-6 py-4 rounded-xl font-mono-tech font-bold text-xs sm:text-sm tracking-wider uppercase bg-gradient-to-r from-cyan-950/80 to-blue-950/60 hover:from-cyan-900/90 hover:to-blue-900/70 text-cyan-300 hover:text-white border border-cyan-500/50 hover:border-cyan-400 transition-all duration-200 cursor-pointer shadow-lg shadow-cyan-950/40 group"
+              >
+                <div className="flex items-center gap-2">
+                  <FlaskConical className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform shrink-0" />
+                  <span>2. LABORATORIOS Y HERRAMIENTAS</span>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-cyan-400 group-hover:translate-x-1 transition-transform sm:hidden" />
+              </button>
+            )}
 
-            {/* ACCIÓN SECUNDARIA 2: REVISTA A4 */}
+            {/* 3. MAGAZINE EDITORIAL A4 */}
             {onOpenA4Magazine && (
               <button
                 id="btn-abrir-revista-a4"
                 type="button"
                 onClick={onOpenA4Magazine}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900/40 hover:bg-zinc-800/80 text-zinc-400 hover:text-zinc-200 border border-zinc-800/70 transition-all duration-200 cursor-pointer"
+                className="inline-flex items-center justify-between sm:justify-center gap-2 px-5 py-3.5 rounded-xl font-mono-tech font-bold text-xs tracking-wider uppercase bg-zinc-900/70 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700/80 hover:border-zinc-500 transition-all duration-200 cursor-pointer"
               >
-                <span>📖 REVISTA EDITORIAL A4</span>
+                <FileText className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>3. MAGAZINE EDITORIAL A4</span>
               </button>
             )}
+
+            {/* GUÍA APRENDIZ: EMPEZAR DESDE CERO */}
+            <button
+              type="button"
+              onClick={() => setIsWelcomeOpen(true)}
+              className="inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-mono-tech font-semibold text-xs tracking-wider uppercase bg-zinc-900/30 hover:bg-zinc-800/60 text-zinc-400 hover:text-zinc-200 border border-zinc-800/60 transition-all duration-200 cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>EMPEZAR DESDE CERO</span>
+            </button>
           </div>
 
         </div>

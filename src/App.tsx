@@ -28,6 +28,7 @@ import { EVO_MASTER_TOOLS_CATALOG } from './data/evoToolsData';
 import { EvoIntroExperience } from './components/world/EvoIntroExperience';
 import { EvoArchiveEntrance } from './components/world/EvoArchiveEntrance';
 import { EvoMagazineView } from './components/magazine/EvoMagazineView';
+const Tomo01LabsAndToolsView = React.lazy(() => import('./components/tomo01/Tomo01LabsAndToolsView').then(m => ({ default: m.Tomo01LabsAndToolsView })));
 const Tomo02MagazineView = React.lazy(() => import('./components/tomo02/Tomo02MagazineView').then(m => ({ default: m.Tomo02MagazineView })));
 const Tomo03MagazineView = React.lazy(() => import('./components/tomo03/Tomo03MagazineView').then(m => ({ default: m.Tomo03MagazineView })));
 const Tomo04MagazineView = React.lazy(() => import('./components/tomo04/Tomo04MagazineView').then(m => ({ default: m.Tomo04MagazineView })));
@@ -440,6 +441,7 @@ function AppContent({
     | 'lab-core'
     | 'tomo01-quiz'
     | 'tomo01-completion'
+    | 'tomo-01-labs'
     | 'bsod-repair-view'
   >(() => {
     if (initialPendingTarget) {
@@ -1498,6 +1500,11 @@ function AppContent({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleNavigateTomo01Labs = () => {
+    setCurrentView('tomo-01-labs');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleNavigateTomo02 = () => {
     setCurrentView('tomo-02');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2089,6 +2096,7 @@ function AppContent({
             <EvoArchiveEntrance
               dossierSummary={dossierSummary}
               onEnterTome01={handleExploreTomo01}
+              onEnterLabs={handleNavigateTomo01Labs}
               onEnterMagazine={() => setCurrentView('magazine')}
               onEnterTome02={handleNavigateTomo02}
               onEnterTome03={handleNavigateTomo03}
@@ -2104,10 +2112,43 @@ function AppContent({
               <MagazineCover
                 headlines={TOMO_01_HEADLINES}
                 onOpenEdition={handleOpenEdition}
+                onOpenLabs={handleNavigateTomo01Labs}
                 onOpenA4Magazine={() => setCurrentView('magazine')}
                 onBackToWorldMap={handleNavigateHome}
               />
             </div>
+          )}
+
+          {currentView === 'tomo-01-labs' && (
+            <Tomo01LabsAndToolsView
+              onBackToCover={handleNavigateTomo01}
+              onOpenInteractive={handleOpenEdition}
+              onOpenMagazine={() => {
+                setCurrentView('magazine');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onBackToHome={handleNavigateHome}
+              onOpenChapter={(ch) => {
+                if (ch === '01') handleStartChapter01();
+                else if (ch === '02') handleStartChapter02();
+                else if (ch === '03') handleStartChapter03();
+                else if (ch === '04') handleStartChapter04();
+                else if (ch === '05') handleStartChapter05();
+                else if (ch === '06') handleStartChapter06();
+                else if (ch === '07') handleStartChapter07();
+                else handleStartChapter01();
+              }}
+              onOpenHotSwap={handleNavigateHotSwapLab}
+              onOpenLabCore={handleNavigateLabCore}
+              onOpenBottleneckSimulator={() => {
+                setCurrentView('bottleneck-simulator-view');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onOpenLatencyCalculator={() => setIsLatencyCalculatorOpen(true)}
+              onOpenDigitalTwin={() => setIsDigitalTwinOpen(true)}
+              passport={userPassport}
+              dossierSummary={dossierSummary}
+            />
           )}
 
           {currentView === 'index' && (
@@ -2117,7 +2158,7 @@ function AppContent({
                 outcomes={TOMO_01_OUTCOMES}
                 onBackToCover={handleNavigateTomo01}
                 onOpenA4Magazine={() => setCurrentView('magazine')}
-                onOpenLab={handleNavigateHotSwapLab}
+                onOpenLab={handleNavigateTomo01Labs}
                 onBackToWorldMap={handleNavigateHome}
                 onStartResearch={handleStartChapter01}
                 onStartChapter02={handleStartChapter02}
