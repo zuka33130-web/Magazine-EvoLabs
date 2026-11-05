@@ -333,49 +333,43 @@ export const Tomo01LabsAndToolsView: React.FC<Tomo01LabsAndToolsViewProps> = ({
       {/* =========================================================================
           2. HERO SECTOR BANNER
       ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
-        <div className="relative rounded-2xl border border-amber-400/30 bg-gradient-to-b from-[#0F1424] to-[#0A0D18] p-6 sm:p-10 overflow-hidden shadow-2xl">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-4">
+        <div className="relative rounded-2xl border border-amber-400/30 bg-gradient-to-b from-[#0F1424] to-[#0A0D18] p-5 sm:p-6 overflow-hidden shadow-2xl">
           <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/5 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 space-y-4">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-400 font-mono-tech text-xs font-black uppercase tracking-wider flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#F59E0B]" />
-                CENTRAL METROLÓGICA ESCALONADA // TOMO 01
-              </span>
-              <span className="text-zinc-500 font-mono-tech text-xs">
-                ORDEN DIDÁCTICO RIGUROSO · 6 ESCALONES COGNITIVOS
+          <div className="relative z-10 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2 py-1 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-400 font-mono-tech text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#F59E0B]" />
+                CENTRAL METROLÓGICA // TOMO 01
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-display font-black text-white tracking-tight uppercase leading-tight">
-              LABORATORIOS, INSTRUMENTAL
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400">
-                Y JUEGOS TÉCNICOS ESCALONADOS
-              </span>
+            <h1 className="evo-hero-title">
+              LABORATORIOS & INSTRUMENTAL
             </h1>
 
-            <p className="text-zinc-300 text-sm sm:text-base leading-relaxed max-w-3xl font-sans-editorial">
-              Estructura didáctica escalonada desde los fundamentos atómicos del bit hasta el peritaje deductivo final en taller. Cada experiencia cuenta con su <strong className="text-amber-300">guía técnica desplegable paso a paso</strong>, indicando objetivo experimental, instrumental, fórmulas físicas exactas y veredicto de banco.
+            <p className="evo-body-primary max-w-3xl">
+              Estructura didáctica escalonada desde los fundamentos atómicos del bit hasta el peritaje deductivo final en taller. Cada experiencia cuenta con su <strong className="text-amber-300">guía técnica desplegable paso a paso</strong>, indicando objetivo experimental e instrumental.
             </p>
 
             {/* Quick Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 font-mono-tech">
-              <div className="p-3 rounded-xl border border-zinc-800 bg-black/40">
-                <span className="text-[10px] text-zinc-500 uppercase block font-semibold">Total de Módulos</span>
-                <span className="text-xl font-black text-white">29 EXPERIENCIAS</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 font-mono-tech">
+              <div className="p-2 rounded-xl border border-zinc-800 bg-black/40">
+                <span className="text-[9px] text-zinc-500 uppercase block font-semibold">Módulos</span>
+                <span className="text-lg font-black text-white">29 EXPERIENCIAS</span>
               </div>
-              <div className="p-3 rounded-xl border border-zinc-800 bg-black/40">
-                <span className="text-[10px] text-zinc-500 uppercase block font-semibold">Progresión Metrológica</span>
-                <span className="text-xl font-black text-amber-400">6 ESCALONES</span>
+              <div className="p-2 rounded-xl border border-zinc-800 bg-black/40">
+                <span className="text-[9px] text-zinc-500 uppercase block font-semibold">Progresión</span>
+                <span className="text-lg font-black text-amber-400">6 ESCALONES</span>
               </div>
-              <div className="p-3 rounded-xl border border-zinc-800 bg-black/40">
-                <span className="text-[10px] text-zinc-500 uppercase block font-semibold">Juegos & Retos Técnicos</span>
-                <span className="text-xl font-black text-cyan-400">6 RETOS</span>
+              <div className="p-2 rounded-xl border border-zinc-800 bg-black/40">
+                <span className="text-[9px] text-zinc-500 uppercase block font-semibold">Juegos</span>
+                <span className="text-lg font-black text-cyan-400">6 RETOS</span>
               </div>
-              <div className="p-3 rounded-xl border border-zinc-800 bg-black/40">
-                <span className="text-[10px] text-zinc-500 uppercase block font-semibold">Dossier Validado</span>
-                <span className="text-xl font-black text-emerald-400">{completedChaptersCount} / 7 CAPÍTULOS</span>
+              <div className="p-2 rounded-xl border border-zinc-800 bg-black/40">
+                <span className="text-[9px] text-zinc-500 uppercase block font-semibold">Dossier</span>
+                <span className="text-lg font-black text-emerald-400">{completedChaptersCount} / 7 CAPÍTULOS</span>
               </div>
             </div>
           </div>
@@ -385,7 +379,7 @@ export const Tomo01LabsAndToolsView: React.FC<Tomo01LabsAndToolsViewProps> = ({
       {/* =========================================================================
           3. SELECTOR ESCALONADO / FILTRO RÁPIDO POR NIVELES METROLÓGICOS
       ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scroll-slim font-mono-tech text-xs">
           <button
             type="button"

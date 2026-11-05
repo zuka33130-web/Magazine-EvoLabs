@@ -13,16 +13,16 @@ export const Page02Manifesto: React.FC = () => {
       accentColor="#EAB308"
     >
       {/* Top Banner / Section Header */}
-      <div className="mb-4 pb-2 border-b border-zinc-800/80 flex items-baseline justify-between">
+      <div className="mb-3 pb-1 border-b border-zinc-800/80 flex items-baseline justify-between">
         <div>
           <span className="text-[10px] font-mono-tech tracking-widest text-yellow-400 uppercase font-bold">
             MANIFIESTO EVO LABS // APERTURA DE LA COLECCIÓN
           </span>
-          <h2 className="font-display font-black text-3xl sm:text-4xl text-white uppercase tracking-tight mt-0.5">
+          <h2 className="evo-page-title mt-0.5">
             No adivines. Comprobalo.
           </h2>
         </div>
-        <span className="font-mono-tech text-[10px] text-zinc-500 uppercase tracking-wider hidden sm:inline">
+        <span className="evo-metadata-tech uppercase tracking-wider hidden sm:inline">
           REF: EVO-MANIFESTO-001
         </span>
       </div>
@@ -31,32 +31,29 @@ export const Page02Manifesto: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start">
         
         {/* Left 8 cols: Human Truth & Narrative Body */}
-        <div className="lg:col-span-8 space-y-4">
+        <div className="lg:col-span-8 space-y-3 editorial-prose">
           
           {/* Main Provocative Quote */}
-          <div className="p-4 sm:p-5 bg-gradient-to-r from-yellow-400/15 via-[#131620] to-transparent border-l-4 border-yellow-400 rounded-r-lg shadow-lg">
-            <span className="text-[9.5px] font-mono-tech text-yellow-400 uppercase tracking-widest font-black block mb-1">
+          <div className="p-4 bg-gradient-to-r from-yellow-400/15 via-[#131620] to-transparent border-l-4 border-yellow-400 rounded-r-lg shadow-lg">
+            <span className="evo-label-badge text-yellow-400 block mb-1">
               LA MÁXIMA DE LABORATORIO
             </span>
-            <p className="font-display font-black text-lg sm:text-xl text-white uppercase tracking-tight leading-snug">
+            <p className="evo-card-title text-white">
               “HACEMOS MILAGROS, PERO LOS MEDIMOS.”
             </p>
-            <p className="font-sans-editorial text-xs sm:text-[13px] text-zinc-300 mt-1.5 leading-relaxed">
+            <p className="evo-body-primary mt-1">
               La promesa suena a magia publicitaria, pero nuestra respuesta es exactamente la contraria: no existe el milagro si no puede demostrarse en un osciloscopio, en un sensor térmico o en una gráfica de frametimes.
             </p>
           </div>
 
           {/* 2 Narrative Columns */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs sm:text-[13px] text-zinc-300 font-sans-editorial leading-relaxed">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="evo-body-primary">
               <p className="magazine-dropcap text-zinc-200">
                 Muchísima gente utiliza una computadora todos los días sin saber realmente qué máquina tiene delante. Sabe que compró “16 GB”. Sabe que el microprocesador “es Intel o AMD”. Sabe que tiene “un SSD”. Y sabe, con frustración, que “Windows anda lento o los juegos pegan tirones”.
               </p>
-              <p className="mt-3 text-zinc-400">
+              <p className="text-zinc-400">
                 Pero todavía no sabe qué significan realmente esos datos en tiempo real, qué componente está saturado al 100%, qué cuello de botella está estrangulando al equipo, qué está funcionando en perfectas condiciones y qué <strong className="text-zinc-200 font-semibold">no debería tocar bajo ningún concepto</strong>.
-              </p>
-              <p className="mt-3 text-zinc-400">
-                Internet está lleno de promesas fáciles: scripts de desinstalación masiva, optimizadores mágicos que limpian supuestos registros y videos virales que prometen triplicar tus cuadros por segundo con un solo clic.
               </p>
             </div>
 
@@ -83,26 +80,26 @@ export const Page02Manifesto: React.FC = () => {
           </div>
 
           {/* Bottom Callout: Las 4 Pistas del Sistema */}
-          <div className="mt-4 pt-3.5 border-t border-zinc-800/80">
-            <span className="text-[10px] font-mono-tech font-bold uppercase tracking-widest text-zinc-400 block mb-2.5">
+          <div className="mt-3 pt-3 border-t border-zinc-800/80">
+            <span className="evo-label-badge text-zinc-400 block mb-2">
               QUÉ VAS A APRENDER A INTERPRETAR EN ESTE TOMO 01
             </span>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-[10px] font-mono-tech">
-              <div className="p-2.5 bg-[#12151c] border border-zinc-800 rounded">
-                <span className="text-yellow-400 font-bold block mb-1">01 // QUÉ TENÉS</span>
-                <span className="text-zinc-400">Desmonte comercial: hardware real vs etiquetas de marketing.</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="p-2 bg-[#12151c] border border-zinc-800 rounded">
+                <span className="evo-label-badge text-yellow-400 block mb-0.5">01 // QUÉ TENÉS</span>
+                <span className="evo-metadata-tech text-zinc-400">Desmonte comercial: hardware real vs etiquetas de marketing.</span>
               </div>
-              <div className="p-2.5 bg-[#12151c] border border-zinc-800 rounded">
-                <span className="text-yellow-400 font-bold block mb-1">02 // CÓMO TRABAJA</span>
-                <span className="text-zinc-400">Buses, jerarquía de nanosegundos y movimiento de datos.</span>
+              <div className="p-2 bg-[#12151c] border border-zinc-800 rounded">
+                <span className="evo-label-badge text-yellow-400 block mb-0.5">02 // CÓMO TRABAJA</span>
+                <span className="evo-metadata-tech text-zinc-400">Buses, jerarquía de nanosegundos y movimiento de datos.</span>
               </div>
-              <div className="p-2.5 bg-[#12151c] border border-zinc-800 rounded">
-                <span className="text-yellow-400 font-bold block mb-1">03 // CÓMO MEDIRLO</span>
-                <span className="text-zinc-400">Frametime, percentiles 1% Low, DPC Latency y sensores térmicos.</span>
+              <div className="p-2 bg-[#12151c] border border-zinc-800 rounded">
+                <span className="evo-label-badge text-yellow-400 block mb-0.5">03 // CÓMO MEDIRLO</span>
+                <span className="evo-metadata-tech text-zinc-400">Frametime, percentiles 1% Low, DPC Latency y sensores térmicos.</span>
               </div>
-              <div className="p-2.5 bg-[#12151c] border border-zinc-800 rounded">
-                <span className="text-yellow-400 font-bold block mb-1">04 // QUÉ TE LIMITA</span>
-                <span className="text-zinc-400">Identificación inequívoca del cuello de botella real de tu equipo.</span>
+              <div className="p-2 bg-[#12151c] border border-zinc-800 rounded">
+                <span className="evo-label-badge text-yellow-400 block mb-0.5">04 // QUÉ TE LIMITA</span>
+                <span className="evo-metadata-tech text-zinc-400">Identificación inequívoca del cuello de botella real de tu equipo.</span>
               </div>
             </div>
           </div>

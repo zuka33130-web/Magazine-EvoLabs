@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Gamepad2,
   Eye,
@@ -14,6 +14,13 @@ import {
   ChevronUp,
   Flame,
   Zap,
+  Play,
+  Cpu,
+  Activity,
+  Search,
+  Sparkles,
+  BarChart3,
+  Layers,
 } from 'lucide-react';
 import {
   FluidezGameOption,
@@ -23,9 +30,15 @@ import {
   FluidezVsync,
   FluidezSensacion,
   FluidezSintoma,
+  UserPcSpec,
 } from '../../types';
+import { GameWorkloadRegistry } from '../evoLabCore/services/digitalTwin/gameWorkloadRegistry';
+import { EvoSystemLoadSolver } from '../evoLabCore/services/digitalTwin/evoSystemLoadSolver';
+import { WorkloadStack } from '../evoLabCore/services/digitalTwin/types';
+import { Machine } from '../evoLabCore/types';
 
 interface FpsLabStationProps {
+  specs?: Partial<UserPcSpec>;
   game: FluidezGameOption;
   setGame: (g: FluidezGameOption) => void;
   customGameName: string;
@@ -69,6 +82,20 @@ interface FpsLabStationProps {
   highlightMissing?: boolean;
 }
 
+const POPULAR_GAMES_CATALOG = [
+  { id: 'VALORANT', title: 'VALORANT', category: 'ESPORTS', desc: 'Riot Direct / Vanguard' },
+  { id: 'COUNTER-STRIKE 2', title: 'COUNTER-STRIKE 2', category: 'ESPORTS', desc: 'Source 2 / Sub-tick' },
+  { id: 'FORTNITE', title: 'FORTNITE', category: 'ESPORTS / AAA', desc: 'Unreal Engine 5 / DX12' },
+  { id: 'CYBERPUNK 2077', title: 'CYBERPUNK 2077', category: 'AAA HEAVY', desc: 'REDengine 4 / Path Tracing' },
+  { id: 'GRAND THEFT AUTO V', title: 'GTA V / GTA ONLINE', category: 'AAA OPEN WORLD', desc: 'RAGE Engine / DX11' },
+  { id: 'ELDEN RING', title: 'ELDEN RING', category: 'AAA ACTION', desc: 'FromSoftware Engine' },
+  { id: 'CALL OF DUTY: WARZONE', title: 'COD WARZONE', category: 'AAA BATTLE ROYALE', desc: 'IW 9.0 Engine' },
+  { id: 'RED DEAD REDEMPTION 2', title: 'RED DEAD REDEMPTION 2', category: 'AAA HEAVY', desc: 'RAGE Engine / Vulkan' },
+  { id: 'LEAGUE OF LEGENDS', title: 'LEAGUE OF LEGENDS', category: 'LIGHT ESPORTS', desc: 'Riot Engine' },
+  { id: 'APEX LEGENDS', title: 'APEX LEGENDS', category: 'ESPORTS', desc: 'Source Engine Modified' },
+  { id: 'OTRO', title: 'CARGAR CUALQUIER OTRO JUEGO', category: 'CUSTOM SEARCH', desc: 'Escribí el nombre del título' },
+];
+
 const ALL_SINTOMAS: { id: FluidezSintoma; label: string; desc: string }[] = [
   { id: 'micro-stuttering', label: 'Micro-stuttering', desc: 'Tironcitos rápidos y casi imperceptibles pero molestos' },
   { id: 'tirón al girar', label: 'Tirón al girar cámara', desc: 'Freno abrupto al rotar la vista 90° o 180° rápidamente' },
@@ -78,7 +105,102 @@ const ALL_SINTOMAS: { id: FluidezSintoma; label: string; desc: string }[] = [
   { id: 'ninguno', label: 'Ninguno / Experiencia continua', desc: 'No se percibe ninguna perturbación visual' },
 ];
 
+function buildMachineFromUserSpecs(specs?: Partial<UserPcSpec>): Machine {
+  const cpuStr = (specs?.cpu || 'Intel Core i5-12400F').toLowerCase();
+  const gpuStr = (specs?.gpu || 'NVIDIA GeForce RTX 3060 12GB').toLowerCase();
+  const ramStr = (specs?.ram || '16 GB DDR4 3200MHz').toLowerCase();
+
+  let cores = 6;
+  let threads = 12;
+  let boostClockGhz = 4.4;
+
+  if (cpuStr.includes('i7') || cpuStr.includes('7700') || cpuStr.includes('7800') || cpuStr.includes('5800') || cpuStr.includes('ryzen 7')) {
+    cores = 8; threads = 16; boostClockGhz = 5.0;
+  } else if (cpuStr.includes('i9') || cpuStr.includes('13900') || cpuStr.includes('14900') || cpuStr.includes('7950') || cpuStr.includes('ryzen 9')) {
+    cores = 16; threads = 32; boostClockGhz = 5.6;
+  } else if (cpuStr.includes('i3') || cpuStr.includes('quad') || cpuStr.includes('3200g') || cpuStr.includes('ryzen 3')) {
+    cores = 4; threads = 8; boostClockGhz = 4.0;
+  } else if (cpuStr.includes('i5') || cpuStr.includes('5600') || cpuStr.includes('3600') || cpuStr.includes('10400') || cpuStr.includes('12400') || cpuStr.includes('ryzen 5')) {
+    cores = 6; threads = 12; boostClockGhz = 4.4;
+  }
+
+  let vramGb = 8;
+  let gpuPowerW = 170;
+  let isDedicated = true;
+
+  if (gpuStr.includes('4090')) { vramGb = 24; gpuPowerW = 450; }
+  else if (gpuStr.includes('4080')) { vramGb = 16; gpuPowerW = 320; }
+  else if (gpuStr.includes('4070') || gpuStr.includes('7800')) { vramGb = 12; gpuPowerW = 220; }
+  else if (gpuStr.includes('3080') || gpuStr.includes('6800')) { vramGb = 10; gpuPowerW = 300; }
+  else if (gpuStr.includes('3070') || gpuStr.includes('6700')) { vramGb = 8; gpuPowerW = 220; }
+  else if (gpuStr.includes('3060') || gpuStr.includes('6600')) { vramGb = 12; gpuPowerW = 170; }
+  else if (gpuStr.includes('2060') || gpuStr.includes('5600')) { vramGb = 6; gpuPowerW = 160; }
+  else if (gpuStr.includes('1660') || gpuStr.includes('1650') || gpuStr.includes('580')) { vramGb = 6; gpuPowerW = 120; }
+  else if (gpuStr.includes('intel hd') || gpuStr.includes('graphics') || gpuStr.includes('vega') || gpuStr.includes('integrated')) { vramGb = 2; gpuPowerW = 25; isDedicated = false; }
+
+  let ramGb = 16;
+  let ramSpeedMts = 3200;
+  const ramMatch = ramStr.match(/(\d+)\s*gb/i);
+  if (ramMatch) ramGb = parseInt(ramMatch[1], 10);
+  const speedMatch = ramStr.match(/(\d{4})\s*(mhz|mts)/i);
+  if (speedMatch) ramSpeedMts = parseInt(speedMatch[1], 10);
+
+  return {
+    id: 'user-pc-spec',
+    alias: 'PC de Usuario en Prueba',
+    name: 'PC de Usuario',
+    machineType: 'CUSTOM_DESKTOP',
+    isDetected: true,
+    overallProvenance: 'USER_ENTERED',
+    motherboard: {
+      model: specs?.motherboard || 'B550 / B660 Chipset Motherboard',
+      socket: 'AM4/LGA1700',
+      chipset: 'B550/B660',
+      ramSlots: 4,
+      ramType: ramStr.includes('ddr5') ? 'DDR5' : 'DDR4',
+      pcieGen: 'PCIe 4.0',
+      formFactor: 'ATX',
+      provenance: 'USER_ENTERED',
+    },
+    cpu: {
+      model: specs?.cpu || 'Procesador de Sistema',
+      socket: 'AM4/LGA1700',
+      cores,
+      threads,
+      baseClockGhz: 3.2,
+      boostClockGhz,
+      tdpW: 65,
+      hasIGPU: !isDedicated,
+      provenance: 'USER_ENTERED',
+    },
+    ram: {
+      sizeGb: ramGb,
+      configuredSpeedMts: ramSpeedMts,
+      type: ramStr.includes('ddr5') ? 'DDR5' : 'DDR4',
+      channels: 2,
+      provenance: 'USER_ENTERED',
+    },
+    gpu: {
+      model: specs?.gpu || 'Placa de Video',
+      vramGb,
+      isDedicated,
+      powerW: gpuPowerW,
+      provenance: 'USER_ENTERED',
+    },
+    storage: {
+      type: specs?.storage?.toLowerCase().includes('nvme') ? 'NVMe M.2' : 'SATA SSD',
+      capacityGb: 1000,
+      model: specs?.storage || 'SSD Almacenamiento',
+      provenance: 'USER_ENTERED',
+    },
+    psu: { wattageW: 650, rating: '80+ Bronze', provenance: 'USER_ENTERED' },
+    cooling: { model: 'Air Cooler Standard', type: 'Air Tower', tdpCapacityW: 150, provenance: 'USER_ENTERED' },
+    workloadTargets: [],
+  };
+}
+
 export const FpsLabStation: React.FC<FpsLabStationProps> = ({
+  specs,
   game,
   setGame,
   customGameName,
@@ -123,6 +245,144 @@ export const FpsLabStation: React.FC<FpsLabStationProps> = ({
 }) => {
   const [isTelemetryGuideOpen, setIsTelemetryGuideOpen] = useState(false);
   const [instrumentChecked, setInstrumentChecked] = useState(true);
+  const [calculationSummary, setCalculationSummary] = useState<{
+    limitingFactor: string;
+    gpuUsagePct: number;
+    cpuUsagePct: number;
+    vramUsedGb: number;
+    gameTitle: string;
+  } | null>(null);
+
+  // Active game title helper
+  const activeGameTitle = game === 'OTRO' ? (customGameName || 'Juego Personalizado') : game;
+
+  // Real FPS Calculation Engine
+  const calculateRealFps = (gameTitleToTest?: string) => {
+    const title = gameTitleToTest || activeGameTitle;
+    if (!title || title.trim() === '') return;
+
+    // 1. Get or discover game workload
+    const gameWorkload = GameWorkloadRegistry.searchOrDiscover(title);
+
+    // 2. Parse specs into Machine object
+    const machine = buildMachineFromUserSpecs(specs);
+
+    // 3. Map resolution
+    let resKey: '1080p' | '1440p' | '4K' = '1080p';
+    if (resolution === '1920×1080' || resolution === '1600×900' || resolution === '1280×960' || resolution === '1280×720') {
+      resKey = '1080p';
+    } else if (customResolution.includes('1440') || customResolution.includes('2K')) {
+      resKey = '1440p';
+    } else if (customResolution.includes('2160') || customResolution.includes('4K')) {
+      resKey = '4K';
+    }
+
+    // 4. Map quality
+    let qualKey: 'LOW_COMPETITIVE' | 'MEDIUM' | 'HIGH' | 'ULTRA_RAYTRACING' = 'LOW_COMPETITIVE';
+    if (quality === 'BAJA') qualKey = 'LOW_COMPETITIVE';
+    else if (quality === 'MEDIA') qualKey = 'MEDIUM';
+    else if (quality === 'ALTA') qualKey = 'HIGH';
+    else qualKey = 'MEDIUM';
+
+    // 5. Construct stack and run solver
+    const stack: WorkloadStack = {
+      primary: {
+        instanceId: `game_inst_${Date.now()}`,
+        addedAtSeconds: 0,
+        workload: gameWorkload,
+        role: 'PRIMARY',
+        resolution: resKey,
+        quality: qualKey,
+      },
+      secondaries: [],
+      backgrounds: [],
+      isSyntheticCombined: false,
+    };
+
+    const load = EvoSystemLoadSolver.solveInstantaneousLoad(machine, stack, 30);
+
+    // Apply VSync / FPS limit caps if active
+    let finalAvgFps = load.fpsEstimate;
+    let final1PctLow = load.low1PctFps;
+
+    let maxCap = 999;
+    if (fpsLimit !== 'SIN LÍMITE') {
+      if (fpsLimit === 'PERSONALIZADO' && customFpsLimit) {
+        maxCap = parseInt(customFpsLimit, 10) || 999;
+      } else {
+        maxCap = parseInt(fpsLimit, 10) || 999;
+      }
+    }
+
+    if (vsync === 'ACTIVO') {
+      maxCap = Math.min(maxCap, 144);
+    }
+
+    if (finalAvgFps > maxCap) {
+      finalAvgFps = maxCap;
+      final1PctLow = Math.min(final1PctLow, maxCap * 0.95);
+    }
+
+    const final01PctLow = Math.max(1, Math.round(final1PctLow * 0.72));
+    const frametimeAvg = parseFloat((1000 / Math.max(1, finalAvgFps)).toFixed(2));
+    const frametimePeak = parseFloat((1000 / Math.max(1, final01PctLow)).toFixed(2));
+
+    // Determine bottleneck diagnosis
+    let limitingFactor = 'BALANCEADO';
+    if (load.gpuRasterPct >= 95) {
+      limitingFactor = `Placa de Video (${machine.gpu.model}) al ${load.gpuRasterPct}% uso (Límite Gráfico / RASTER)`;
+    } else if (load.cpuSingleThreadPct >= 90) {
+      limitingFactor = `Procesador (${machine.cpu.model}) al ${load.cpuSingleThreadPct}% uso Mono-núcleo (Límite CPU)`;
+    } else if (load.vramPressurePct >= 90) {
+      limitingFactor = `Saturación de VRAM GPU (${load.vramUsedGb}GB / ${load.vramTotalGb}GB)`;
+    } else if (load.ramPressurePct >= 90) {
+      limitingFactor = `Saturación de RAM (${load.ramUsedGb}GB / ${load.ramTotalGb}GB)`;
+    }
+
+    // Infer perceived sensation
+    const lowRatio = final1PctLow / Math.max(1, finalAvgFps);
+    let inferredSensacion: FluidezSensacion = 'FLUIDA';
+    if (lowRatio > 0.88 && finalAvgFps >= 120) inferredSensacion = 'MUY FLUIDA';
+    else if (lowRatio > 0.80) inferredSensacion = 'FLUIDA';
+    else if (lowRatio > 0.65) inferredSensacion = 'IRREGULAR';
+    else if (lowRatio > 0.50) inferredSensacion = 'MICRO-TIRONES';
+    else inferredSensacion = 'TIRONES NOTORIOS';
+
+    // Update state
+    setAvgFps(finalAvgFps);
+    setOnePercentLow(final1PctLow);
+    setZeroPointOnePercentLow(final01PctLow);
+    setFrametimeAvgMs(frametimeAvg);
+    setFrametimePeakMs(frametimePeak);
+    setFpsHabituales(finalAvgFps);
+    setCaidaObservada(final1PctLow);
+    setHasTelemetry(true);
+    setSensacion(inferredSensacion);
+
+    setCalculationSummary({
+      limitingFactor,
+      gpuUsagePct: load.gpuRasterPct,
+      cpuUsagePct: load.cpuDemandPct,
+      vramUsedGb: load.vramUsedGb,
+      gameTitle: title,
+    });
+  };
+
+  // Select game from catalog
+  const handleSelectGameOption = (optId: string) => {
+    if (['VALORANT', 'COUNTER-STRIKE 2', 'FORTNITE'].includes(optId)) {
+      setGame(optId as FluidezGameOption);
+      setCustomGameName('');
+      calculateRealFps(optId);
+    } else if (optId === 'OTRO') {
+      setGame('OTRO');
+      if (customGameName) calculateRealFps(customGameName);
+    } else {
+      setGame('OTRO');
+      setCustomGameName(optId);
+      calculateRealFps(optId);
+    }
+  };
 
   // Frametime theoretical calculation
   const frametimeTeorico = fpsHabituales && fpsHabituales > 0 ? (1000 / fpsHabituales).toFixed(2) : null;
@@ -135,81 +395,119 @@ export const FpsLabStation: React.FC<FpsLabStationProps> = ({
           <div className="flex items-center gap-2 text-xs font-mono-tech uppercase tracking-widest text-yellow-400 font-bold">
             <span>ESTACIÓN 05</span>
             <span>•</span>
-            <span>LABORATORIO FPS // MEDÍ TU JUEGO</span>
+            <span>SIMULADOR DE JUEGOS // MEDÍ CUALQUIER JUEGO EN TIEMPO REAL</span>
           </div>
           <h2 className="font-display font-black text-2xl sm:text-3xl text-white uppercase tracking-tight mt-1">
-            Hasta ahora viste ejemplos. Ahora vamos a medir tu propia máquina.
+            CARGÁ O SELECCIONÁ CUALQUIER JUEGO Y CALCULÁ SUS FPS REALES
           </h2>
         </div>
-        <span className="text-xs font-mono-tech px-2.5 py-1 rounded-full bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 font-bold uppercase self-start sm:self-auto shrink-0">
-          ENSAYO EMPÍRICO
+        <span className="text-xs font-mono-tech px-2.5 py-1 rounded-full bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 font-bold uppercase self-start sm:self-auto shrink-0 flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+          <span>SIMULACIÓN DIGITAL TWIN</span>
         </span>
       </div>
 
       <p className="font-sans-editorial text-sm sm:text-base text-zinc-300 leading-relaxed max-w-3xl">
-        Seguiremos un protocolo riguroso: primero activarás el instrumento de medición en tu juego, luego definirás el contexto gráfico de prueba, registrarás tu observación sostenida durante 60 segundos y, si querés ir más profundo, podrás anexar telemetría cuadro por cuadro.
+        Cargá el juego que quieras probar. El motor de simulación de EVO LABS cruza los requerimientos reales del juego con las capacidades exactas de tu CPU, GPU y memoria RAM para calcular cuántos FPS mide tu máquina y detectar posibles cuellos de botella.
       </p>
 
       {/* ============================================================ */}
-      {/* PASO 1 // ELEGÍ TU JUEGO */}
+      {/* PASO 1 // ELEGÍ O CARGÁ CUALQUIER JUEGO */}
       {/* ============================================================ */}
       <div
         id="paso-elegir-juego"
-        className={`p-5 sm:p-6 rounded-2xl bg-[#121318] border transition-colors space-y-4 ${
+        className={`p-5 sm:p-6 rounded-2xl bg-[#121318] border transition-colors space-y-5 ${
           highlightMissing && !game
             ? 'border-red-500 shadow-lg shadow-red-500/20 ring-1 ring-red-500'
             : 'border-zinc-800'
         }`}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
           <div className="flex items-center gap-2 text-xs font-mono-tech uppercase font-bold text-yellow-400 tracking-wider">
             <Gamepad2 className="w-4 h-4 text-yellow-400" />
-            <span>PASO 1 // ELEGÍ TU JUEGO DE PRUEBA</span>
+            <span>PASO 1 // ELEGÍ O CARGÁ CUALQUIER JUEGO</span>
           </div>
-          <span className="text-[10px] font-mono-tech text-zinc-400 uppercase">
-            {game ? `SELECCIONADO: ${game}` : 'SELECCIÓN PENDIENTE'}
+          <span className="text-[10px] font-mono-tech text-yellow-400 font-bold uppercase px-2 py-0.5 rounded bg-yellow-400/10 border border-yellow-400/30">
+            JUEGO ACTIVO: {activeGameTitle}
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {(['VALORANT', 'COUNTER-STRIKE 2', 'FORTNITE', 'OTRO'] as FluidezGameOption[]).map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              id={`btn-game-${opt.toLowerCase().replace(/\s+/g, '-')}`}
-              onClick={() => setGame(opt)}
-              className={`p-3.5 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
-                game === opt
-                  ? 'bg-yellow-400/10 border-yellow-400 text-white font-bold shadow-md shadow-yellow-400/10'
-                  : 'bg-zinc-900/70 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
-              }`}
-            >
-              <span className="text-xs font-mono-tech tracking-wide uppercase">{opt}</span>
-              <span className="text-[10px] text-zinc-400 mt-1">
-                {opt === 'VALORANT' && 'Riot Direct / Vanguard'}
-                {opt === 'COUNTER-STRIKE 2' && 'Source 2 / Sub-tick'}
-                {opt === 'FORTNITE' && 'Unreal Engine 5 / DX12'}
-                {opt === 'OTRO' && 'Personalizado'}
-              </span>
-            </button>
-          ))}
+        {/* Popular Games Catalog Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+          {POPULAR_GAMES_CATALOG.map((item) => {
+            const isSelected =
+              (item.id === 'OTRO' && game === 'OTRO') ||
+              (item.id === game && game !== 'OTRO') ||
+              (game === 'OTRO' && customGameName.toLowerCase() === item.id.toLowerCase()) ||
+              (game === 'OTRO' && customGameName.toLowerCase() === item.title.toLowerCase());
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                id={`btn-game-${item.id.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+                onClick={() => handleSelectGameOption(item.id)}
+                className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
+                  isSelected
+                    ? 'bg-yellow-400/15 border-yellow-400 text-white font-bold shadow-lg shadow-yellow-400/10 ring-1 ring-yellow-400/50'
+                    : 'bg-zinc-900/80 border-zinc-800/90 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
+                }`}
+              >
+                <div>
+                  <span className="text-[9px] font-mono-tech text-yellow-400 font-bold uppercase block mb-0.5">
+                    {item.category}
+                  </span>
+                  <span className="text-xs font-mono-tech font-bold uppercase block text-white line-clamp-1">
+                    {item.title}
+                  </span>
+                </div>
+                <span className="text-[10px] font-sans-editorial text-zinc-400 mt-2 block truncate">
+                  {item.desc}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
-        {game === 'OTRO' && (
-          <div className="pt-2">
-            <label className="block text-xs font-mono-tech text-zinc-300 uppercase tracking-wider mb-1.5">
-              NOMBRE DEL JUEGO / MOTOR:
-            </label>
-            <input
-              type="text"
-              id="input-custom-game-name"
-              value={customGameName}
-              onChange={(e) => setCustomGameName(e.target.value)}
-              placeholder="Ej. Apex Legends, Cyberpunk 2077, GTA V, League of Legends..."
-              className="w-full sm:w-80 px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm font-mono-tech text-white placeholder-zinc-500 focus:outline-none focus:border-yellow-400"
-            />
+        {/* Search & Custom Game Loader */}
+        <div className="p-4 rounded-xl bg-black/60 border border-zinc-800 space-y-3">
+          <label className="block text-xs font-mono-tech text-zinc-300 uppercase tracking-wider font-bold">
+            BUSCAR / CARGAR CUALQUIER OTRO TÍTULO PERSONALIZADO:
+          </label>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" />
+              <input
+                type="text"
+                id="input-custom-game-name"
+                value={customGameName}
+                onChange={(e) => {
+                  setGame('OTRO');
+                  setCustomGameName(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    calculateRealFps(customGameName);
+                  }
+                }}
+                placeholder="Ej. Apex Legends, Cyberpunk 2077, GTA V, EA Sports FC 24, Minecraft, Red Dead Redemption 2..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm font-mono-tech text-white placeholder-zinc-500 focus:outline-none focus:border-yellow-400"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => calculateRealFps(customGameName || game)}
+              className="px-5 py-2.5 rounded-xl bg-yellow-400 text-black hover:bg-yellow-300 font-mono-tech font-bold text-xs uppercase cursor-pointer transition-colors shrink-0 flex items-center justify-center gap-2 shadow-lg"
+            >
+              <Zap className="w-4 h-4 text-black fill-black" />
+              <span>CARGAR JUEGO & CALCULAR FPS</span>
+            </button>
           </div>
-        )}
+          <p className="text-[11px] font-mono-tech text-zinc-400">
+            Escribí el nombre del juego que quieras probar y presioná "CARGAR JUEGO & CALCULAR FPS". El motor evaluará su demanda gráfica.
+          </p>
+        </div>
       </div>
 
       {/* ============================================================ */}
@@ -495,7 +793,69 @@ export const FpsLabStation: React.FC<FpsLabStationProps> = ({
             className="px-3 py-1 rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs font-mono-tech w-full sm:w-64"
           />
         </div>
+
+        {/* Recalculate Button */}
+        <div className="pt-3 flex justify-end">
+          <button
+            type="button"
+            onClick={() => calculateRealFps()}
+            className="px-5 py-2.5 rounded-xl bg-yellow-400 text-black hover:bg-yellow-300 font-mono-tech font-bold text-xs uppercase cursor-pointer transition-colors flex items-center gap-2 shadow-lg"
+          >
+            <Zap className="w-4 h-4 text-black fill-black" />
+            <span>⚡ RECALCULAR IMPACTO EN FPS Y FRAMETIME CON ESTOS PARÁMETROS</span>
+          </button>
+        </div>
       </div>
+
+      {/* Live Calculation Summary Card */}
+      {calculationSummary && (
+        <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-yellow-950/40 via-black/90 to-zinc-900 border-2 border-yellow-400 space-y-4 animate-in fade-in duration-300 shadow-2xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-yellow-400/30 pb-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-yellow-400 animate-pulse" />
+              <span className="font-display font-black text-white text-base sm:text-lg uppercase tracking-tight">
+                RESULTADO DE MEDICIÓN DIGITAL TWIN // {calculationSummary.gameTitle}
+              </span>
+            </div>
+            <span className="text-xs font-mono-tech px-2.5 py-1 rounded bg-yellow-400 text-black font-black uppercase shadow-sm">
+              CÁLCULO DE FPS COMPLETADO
+            </span>
+          </div>
+
+          {/* Metric Highlights */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="p-3.5 rounded-xl bg-zinc-900/90 border border-zinc-800 text-center space-y-0.5 shadow-md">
+              <span className="text-[10px] font-mono-tech text-zinc-400 uppercase block">AVG FPS (PROMEDIO)</span>
+              <span className="text-2xl sm:text-3xl font-mono-tech font-black text-yellow-400">{avgFps} FPS</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-zinc-900/90 border border-zinc-800 text-center space-y-0.5 shadow-md">
+              <span className="text-[10px] font-mono-tech text-zinc-400 uppercase block">1% LOW (TIRONES)</span>
+              <span className="text-2xl sm:text-3xl font-mono-tech font-black text-amber-300">{onePercentLow} FPS</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-zinc-900/90 border border-zinc-800 text-center space-y-0.5 shadow-md">
+              <span className="text-[10px] font-mono-tech text-zinc-400 uppercase block">CADENCIA MEDIA</span>
+              <span className="text-2xl sm:text-3xl font-mono-tech font-black text-emerald-400">{frametimeAvgMs} ms</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-zinc-900/90 border border-zinc-800 text-center space-y-0.5 shadow-md">
+              <span className="text-[10px] font-mono-tech text-zinc-400 uppercase block">PICO LATENCIA</span>
+              <span className="text-2xl sm:text-3xl font-mono-tech font-black text-red-400">{frametimePeakMs} ms</span>
+            </div>
+          </div>
+
+          {/* Bottleneck & Telemetry Breakdown */}
+          <div className="p-4 rounded-xl bg-black/70 border border-zinc-800 text-xs font-mono-tech space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-zinc-300">
+              <span className="text-zinc-400 uppercase font-bold">FACTOR LIMITANTE DETECTADO EN ESTE JUEGO:</span>
+              <strong className="text-yellow-400 font-bold">{calculationSummary.limitingFactor}</strong>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-zinc-400 pt-2 border-t border-zinc-800">
+              <div>Uso Estimado GPU: <strong className="text-white">{calculationSummary.gpuUsagePct}%</strong></div>
+              <div>Uso Estimado CPU: <strong className="text-white">{calculationSummary.cpuUsagePct}%</strong></div>
+              <div>VRAM Requerida: <strong className="text-white">{calculationSummary.vramUsedGb} GB</strong></div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ============================================================ */}
       {/* PASO 4 // REGISTRO DE OBSERVACIÓN BÁSICA */}

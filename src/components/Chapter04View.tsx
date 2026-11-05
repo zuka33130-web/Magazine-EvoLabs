@@ -178,11 +178,11 @@ export const Chapter04View: React.FC<Chapter04ViewProps> = ({
   };
 
   return (
-    <div id="pantalla-capitulo-04" className="w-full min-h-screen py-6 sm:py-10 text-[#f4f4f6]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-10">
+    <div id="pantalla-capitulo-04" className="w-full min-h-screen py-4 sm:py-6 text-[#f4f4f6]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-6">
         
         {/* Navigation Top Bar */}
-        <nav className="flex items-center justify-between pb-5 border-b border-zinc-800/60">
+        <nav className="flex items-center justify-between pb-3 border-b border-zinc-800/60">
           <button
             type="button"
             onClick={onBackToIndex}
@@ -236,18 +236,18 @@ export const Chapter04View: React.FC<Chapter04ViewProps> = ({
         />
 
         {/* Chapter Header */}
-        <header className="space-y-4 pt-2">
-          <div className="flex items-center gap-2 text-xs font-mono-tech uppercase tracking-widest text-zinc-400">
+        <header className="space-y-3 pt-1">
+          <div className="flex items-center gap-2 text-[10px] font-mono-tech uppercase tracking-widest text-zinc-400">
             <span>TOMO 01 // CONOCÉ TU PC</span>
             <span>•</span>
-            <span className="text-yellow-400 font-bold">CAPÍTULO 04 // INVESTIGACIÓN PERICIAL</span>
+            <span className="text-yellow-400 font-bold">CAPÍTULO 04</span>
           </div>
 
-          <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight uppercase leading-none">
+          <h1 className="evo-hero-title">
             ENCONTRÁ EL LÍMITE
           </h1>
 
-          <div className="p-5 sm:p-6 rounded-2xl bg-[#121318] border-l-4 border-yellow-400 space-y-3">
+          <div className="p-4 rounded-2xl bg-[#121318] border-l-4 border-yellow-400 space-y-2">
             <p className="font-sans-editorial text-lg sm:text-xl text-white font-medium italic leading-relaxed">
               “Un cuello de botella no es una etiqueta permanente de una computadora.
               <br />

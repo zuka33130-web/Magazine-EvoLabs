@@ -13,16 +13,16 @@ export const Page03PactoLector: React.FC = () => {
       accentColor="#EAB308"
     >
       {/* Top Banner / Section Header */}
-      <div className="mb-4 pb-2 border-b border-zinc-800/80 flex items-baseline justify-between">
+      <div className="mb-3 pb-1 border-b border-zinc-800/80 flex items-baseline justify-between">
         <div>
-          <span className="text-[10px] font-mono-tech tracking-widest text-yellow-400 uppercase font-bold">
+          <span className="evo-label-badge text-yellow-400 block mb-0.5">
             PRINCIPIO FUNDACIONAL // COMPROMISO PEDAGÓGICO
           </span>
-          <h2 className="font-display font-black text-3xl sm:text-4xl text-white uppercase tracking-tight mt-0.5">
+          <h2 className="evo-page-title mt-0.5">
             Pacto con el Lector
           </h2>
         </div>
-        <span className="font-mono-tech text-[10px] text-zinc-500 uppercase tracking-wider hidden sm:inline">
+        <span className="evo-metadata-tech uppercase tracking-wider hidden sm:inline">
           REF: EVO-PACT-001
         </span>
       </div>
@@ -31,29 +31,29 @@ export const Page03PactoLector: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start">
         
         {/* Left 8 cols: El Pacto Editorial */}
-        <div className="lg:col-span-8 space-y-4">
+        <div className="lg:col-span-8 space-y-3 editorial-prose">
           
           {/* Main Statement Banner */}
-          <div className="p-4 sm:p-5 bg-gradient-to-r from-yellow-400/10 via-[#10131b] to-transparent border-l-4 border-yellow-400 rounded-r-lg">
+          <div className="p-4 bg-gradient-to-r from-yellow-400/10 via-[#10131b] to-transparent border-l-4 border-yellow-400 rounded-r-lg">
             <div className="flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 rounded-full bg-yellow-400" />
-              <span className="font-mono-tech text-[10px] text-yellow-400 font-bold uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+              <span className="evo-label-badge text-yellow-400 block">
                 DECLARACIÓN PRINCIPAL
               </span>
             </div>
-            <h3 className="font-display font-black text-xl sm:text-2xl text-white uppercase tracking-tight">
+            <h3 className="evo-card-title text-white">
               NO ESTÁS SOLO.
             </h3>
-            <p className="font-sans-editorial text-xs sm:text-[13px] text-zinc-300 mt-1.5 leading-relaxed">
+            <p className="evo-body-primary mt-1">
               La informática moderna ha creado una barrera innecesaria de jerga incomprensible, foros hostiles y tutoriales veloces que asumen que ya sabés todo. Nuestro compromiso es derribar esa barrera con rigor, respeto y claridad absoluta.
             </p>
           </div>
 
           {/* El Método de Construcción */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-[13px] text-zinc-300 font-sans-editorial leading-relaxed">
-            <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2 evo-body-primary">
               <div className="p-3 bg-[#0d1017] border border-zinc-800 rounded-md">
-                <span className="text-[9.5px] font-mono-tech text-yellow-400 uppercase font-black block tracking-wider mb-1">
+                <span className="evo-label-badge text-yellow-400 block mb-1">
                   MANDAMIENTO 01
                 </span>
                 <p className="text-white font-semibold text-xs leading-snug">
@@ -67,14 +67,11 @@ export const Page03PactoLector: React.FC = () => {
               <p>
                 Ningún paso es considerado “obvio”. El error más común de los manuales técnicos es omitir el clic intermedio que para el experto es reflejo inconsciente, pero para el principiante representa un abismo insalvable.
               </p>
-              <p className="text-zinc-400">
-                Aquí nadie tiene que fingir que entiende. Si un concepto requiere descomponerse en una analogía visual, lo descomponemos sin temor a perder seriedad: la pedagogía no compite con la exactitud técnica.
-              </p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2 evo-body-primary">
               <div className="p-3 bg-[#0d1017] border border-zinc-800 rounded-md">
-                <span className="text-[9.5px] font-mono-tech text-yellow-400 uppercase font-black block tracking-wider mb-1">
+                <span className="evo-label-badge text-yellow-400 block mb-1">
                   MANDAMIENTO 02
                 </span>
                 <p className="text-white font-semibold text-xs leading-snug">
@@ -88,37 +85,34 @@ export const Page03PactoLector: React.FC = () => {
               <p>
                 Nunca eliminamos información necesaria simplemente porque a un técnico le parezca elemental. Diseñamos páginas modulares donde los fundamentos y la telemetría profunda conviven armónicamente.
               </p>
-              <p className="text-zinc-400">
-                El usuario avanzado encontrará datos exactos: tiempos de acceso en nanosegundos, registros de memoria, estructuras del kernel de Windows y metodologías científicas A/B para corroborar cada afirmación.
-              </p>
             </div>
           </div>
 
           {/* Los 5 Compromisos Inviolables */}
-          <div className="p-3.5 bg-[#0e1119] border border-zinc-800 rounded-lg">
-            <span className="text-[10px] font-mono-tech font-bold text-yellow-400 uppercase tracking-widest block mb-2">
+          <div className="p-3 bg-[#0e1119] border border-zinc-800 rounded-lg">
+            <span className="evo-label-badge text-yellow-400 block mb-2">
               LOS 5 COMPROMISOS INVIOLABLES DE EVO LABS
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 text-[10.5px] font-sans-editorial">
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
               <div className="p-2 bg-black/40 border border-zinc-800/80 rounded">
-                <span className="font-mono-tech text-yellow-400 font-bold block text-[9.5px]">01 // CERO PLACEBO</span>
-                <p className="text-zinc-400 text-[10px] mt-0.5">Si un ajuste no produce un cambio medible, no existe.</p>
+                <span className="evo-label-badge text-yellow-400 block mb-0.5">01 // CERO PLACEBO</span>
+                <p className="evo-metadata-tech text-zinc-400">Si un ajuste no produce un cambio medible, no existe.</p>
               </div>
               <div className="p-2 bg-black/40 border border-zinc-800/80 rounded">
-                <span className="font-mono-tech text-yellow-400 font-bold block text-[9.5px]">02 // CERO RIESGO CIEGO</span>
-                <p className="text-zinc-400 text-[10px] mt-0.5">Siempre enseñamos a crear un punto de retorno antes de tocar.</p>
+                <span className="evo-label-badge text-yellow-400 block mb-0.5">02 // CERO RIESGO CIEGO</span>
+                <p className="evo-metadata-tech text-zinc-400">Siempre enseñamos a crear un punto de retorno antes de tocar.</p>
               </div>
               <div className="p-2 bg-black/40 border border-zinc-800/80 rounded">
-                <span className="font-mono-tech text-yellow-400 font-bold block text-[9.5px]">03 // SIN MAGIA</span>
-                <p className="text-zinc-400 text-[10px] mt-0.5">No usamos scripts oscuros de un clic que rompen dependencias.</p>
+                <span className="evo-label-badge text-yellow-400 block mb-0.5">03 // SIN MAGIA</span>
+                <p className="evo-metadata-tech text-zinc-400">No usamos scripts oscuros de un clic que rompen dependencias.</p>
               </div>
               <div className="p-2 bg-black/40 border border-zinc-800/80 rounded">
-                <span className="font-mono-tech text-yellow-400 font-bold block text-[9.5px]">04 // RIGOR OFICIAL</span>
-                <p className="text-zinc-400 text-[10px] mt-0.5">Documentación directa de Intel, AMD, NVIDIA y Microsoft.</p>
+                <span className="evo-label-badge text-yellow-400 block mb-0.5">04 // RIGOR OFICIAL</span>
+                <p className="evo-metadata-tech text-zinc-400">Documentación directa de Intel, AMD, NVIDIA y Microsoft.</p>
               </div>
               <div className="p-2 bg-black/40 border border-zinc-800/80 rounded">
-                <span className="font-mono-tech text-yellow-400 font-bold block text-[9.5px]">05 // TU EXPEDIENTE</span>
-                <p className="text-zinc-400 text-[10px] mt-0.5">Toda la evidencia y registros quedan en tu poder, en tu máquina.</p>
+                <span className="evo-label-badge text-yellow-400 block mb-0.5">05 // TU EXPEDIENTE</span>
+                <p className="evo-metadata-tech text-zinc-400">Toda la evidencia y registros quedan en tu poder, en tu máquina.</p>
               </div>
             </div>
           </div>

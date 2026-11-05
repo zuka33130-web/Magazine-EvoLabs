@@ -716,20 +716,20 @@ export const Chapter07View: React.FC<Chapter07ViewProps> = ({
   return (
     <div
       id="capitulo-07-laboratorio-final"
-      className="w-full min-h-screen py-6 sm:py-10 px-4 sm:px-6 lg:px-8 space-y-10"
+      className="w-full min-h-screen py-4 sm:py-6 px-4 sm:px-6 lg:px-8 space-y-6"
     >
       {/* Top Editorial Bar */}
-      <nav className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-zinc-800">
+      <nav className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
         <button
           type="button"
           onClick={onBackToIndex}
-          className="inline-flex items-center gap-2 text-xs font-mono-tech tracking-widest uppercase text-zinc-400 hover:text-yellow-400 transition-colors cursor-pointer group"
+          className="inline-flex items-center gap-2 text-[10px] font-mono-tech tracking-widest uppercase text-zinc-400 hover:text-yellow-400 transition-colors cursor-pointer group"
         >
           <ArrowLeft className="w-4 h-4 text-zinc-400 group-hover:text-yellow-400 group-hover:-translate-x-1 transition-transform" />
-          <span>← VOLVER AL ÍNDICE EDITORIAL</span>
+          <span>← VOLVER AL ÍNDICE</span>
         </button>
 
-        <div className="flex items-center gap-3 font-mono-tech text-xs">
+        <div className="flex items-center gap-2 font-mono-tech text-[10px]">
           {summary.labReport && (
             <button
               type="button"
@@ -743,10 +743,10 @@ export const Chapter07View: React.FC<Chapter07ViewProps> = ({
 
           <span className="w-2 h-2 bg-yellow-400 inline-block" />
           <span className="tracking-widest uppercase text-white font-bold">
-            CAPÍTULO 07 // FINAL
+            CAPÍTULO 07
           </span>
           <span className="text-zinc-600">/</span>
-          <span className="text-yellow-400 font-bold tracking-wider">LABORATORIO A/B</span>
+          <span className="text-yellow-400 font-bold tracking-wider uppercase">LABORATORIO A/B</span>
         </div>
       </nav>
 
@@ -780,27 +780,27 @@ export const Chapter07View: React.FC<Chapter07ViewProps> = ({
           onGoToFinalExam={onGoToFinalExam}
         />
       ) : (
-        <div className="max-w-5xl mx-auto space-y-10">
+        <div className="max-w-5xl mx-auto space-y-6">
           {/* Opening Editorial Header */}
-          <header className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-mono-tech text-yellow-400 tracking-widest uppercase font-semibold">
-              <FlaskConical className="w-4 h-4 text-yellow-400" />
+          <header className="space-y-3 pt-1">
+            <div className="flex items-center gap-2 text-[10px] font-mono-tech text-yellow-400 tracking-widest uppercase font-semibold">
+              <FlaskConical className="w-3.5 h-3.5 text-yellow-400" />
               <span>CAPÍTULO 07 // LABORATORIO FINAL</span>
             </div>
 
-            <h1 className="font-display font-black text-3xl sm:text-5xl md:text-6xl text-white tracking-tight uppercase leading-[0.95]">
-              NO ME DIGAS QUE MEJORÓ. DEMOSTRALO.
+            <h1 className="evo-hero-title">
+              NO ME DIGAS QUE MEJORÓ.
             </h1>
 
-            <div className="space-y-3 font-sans-editorial text-base sm:text-lg text-zinc-300 max-w-3xl leading-relaxed">
+            <div className="space-y-2 evo-body-primary text-base max-w-3xl">
               <p>
                 Llegaste al último laboratorio del Tomo 01. Hasta ahora investigaste tu máquina, entendiste cómo viajan los datos, mediste la consistencia de cuadros y aprendiste a aislar fallas.
               </p>
-              <p className="font-bold text-white text-lg sm:text-xl">
+              <p className="font-bold text-white">
                 ¿PODEMOS DEMOSTRAR QUE UNA OPTIMIZACIÓN REALMENTE FUNCIONÓ?
               </p>
-              <div className="p-3.5 rounded-xl bg-black/40 border border-zinc-800 font-mono-tech text-xs text-yellow-400 font-bold tracking-wide">
-                OBSERVAR → PLANTEAR HIPÓTESIS → MEDIR → CAMBIAR UNA SOLA VARIABLE → VOLVER A MEDIR → COMPARAR → CONCLUIR
+              <div className="p-3 rounded-xl bg-black/40 border border-zinc-800 font-mono-tech text-[10px] text-yellow-400 font-bold tracking-wide uppercase">
+                OBSERVAR → PLANTEAR HIPÓTESIS → MEDIR → CAMBIAR → VOLVER A MEDIR → COMPARAR
               </div>
             </div>
           </header>

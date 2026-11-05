@@ -247,10 +247,10 @@ export const Chapter02View: React.FC<Chapter02ViewProps> = ({
   };
 
   return (
-    <div className="w-full min-h-screen py-6 sm:py-10 text-[#f4f4f6]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8">
+    <div className="w-full min-h-screen py-4 sm:py-6 text-[#f4f4f6]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-6">
         {/* Top Breadcrumbs & Back Navigation */}
-        <nav className="flex items-center justify-between pb-5 border-b border-zinc-800/60">
+        <nav className="flex items-center justify-between pb-3 border-b border-zinc-800/60">
           <button
             type="button"
             onClick={onBackToIndex}
@@ -302,33 +302,33 @@ export const Chapter02View: React.FC<Chapter02ViewProps> = ({
         <InheritedPassportBanner specs={specs} evidenceMap={evidenceMap} />
 
         {/* Chapter 02 Title & Editorial Framing */}
-        <div className="space-y-4 pt-2">
-          <div className="flex items-center gap-2 text-xs font-mono-tech uppercase tracking-widest text-zinc-400">
+        <div className="space-y-3 pt-1">
+          <div className="flex items-center gap-2 text-[10px] font-mono-tech uppercase tracking-widest text-zinc-400">
             <span>TOMO 01 // CONOCÉ TU PC</span>
             <span>•</span>
             <span className="text-yellow-400 font-bold">CAPÍTULO 02</span>
           </div>
 
-          <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight uppercase leading-none">
+          <h1 className="evo-hero-title">
             CÓMO TRABAJAN JUNTOS
           </h1>
 
-          <div className="p-5 rounded-2xl bg-[#121318] border-l-4 border-yellow-400 space-y-2">
-            <p className="font-sans-editorial text-lg text-white font-medium italic">
+          <div className="p-4 rounded-2xl bg-[#121318] border-l-4 border-yellow-400 space-y-2">
+            <p className="evo-body-primary text-lg font-medium italic">
               “Una PC no es una colección de piezas aisladas.
               <br />
               <span className="text-yellow-400 font-bold not-italic">
                 Es un sistema de datos que se mueven, esperan, se transforman y se entregan.”
               </span>
             </p>
-            <p className="text-xs font-mono-tech text-zinc-400">
+            <p className="evo-metadata-tech uppercase">
               El Capítulo 01 respondió: <em>¿Qué componentes tiene mi PC?</em> El Capítulo 02 investiga: <em>¿Cómo colaboran esos componentes entre sí?</em>
             </p>
           </div>
         </div>
 
         {/* Five-Station Navigation Bar */}
-        <div className="p-3 sm:p-4 rounded-2xl bg-[#101115] border border-zinc-800/80 shadow-xl overflow-x-auto scrollbar-none">
+        <div className="p-2 sm:p-3 rounded-2xl bg-[#101115] border border-zinc-800/80 shadow-xl overflow-x-auto scrollbar-none">
           <div className="flex items-center justify-between min-w-[720px] gap-2">
             {STATIONS.map((station) => {
               const isCurrent = activeStation === station.id;

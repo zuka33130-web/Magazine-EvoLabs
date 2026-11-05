@@ -669,9 +669,9 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
 
 
   return (
-    <div className="w-full min-h-screen py-6 sm:py-10 text-[#f4f4f6]">
+    <div className="w-full min-h-screen py-4 sm:py-6 text-[#f4f4f6]">
       {/* Top Breadcrumbs & Back */}
-      <nav className="flex items-center justify-between pb-5 mb-8 border-b border-zinc-800/60">
+      <nav className="flex items-center justify-between pb-3 mb-6 border-b border-zinc-800/60">
         <button
           type="button"
           onClick={onBackToIndex}
@@ -714,7 +714,7 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
       />
 
       {/* Persistent Visual Navigation Bar: 01 CPU ... 08 TU PC */}
-      <div className="mb-10 p-3 sm:p-4 rounded-2xl bg-[#101115] border border-zinc-800/80 shadow-xl overflow-x-auto scrollbar-none">
+      <div className="mb-6 p-2 sm:p-3 rounded-2xl bg-[#101115] border border-zinc-800/80 shadow-xl overflow-x-auto scrollbar-none">
         <div className="flex items-center justify-between min-w-[700px] gap-2">
           {SECTIONS_MAP.map((sec) => {
             const isCompleted = completedSections.has(sec.id);
@@ -764,30 +764,30 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
         {/* PORTADA DEL CAPÍTULO 01 (SI activeSection === 'cover')  */}
         {/* ======================================================== */}
         {activeSection === 'cover' && (
-          <div className="space-y-10 animate-in fade-in duration-300">
+          <div className="space-y-6 animate-in fade-in duration-300">
             {/* Header */}
-            <div className="space-y-4 pb-6 border-b border-zinc-800/80">
-              <div className="flex items-center gap-2 text-xs font-mono-tech text-yellow-400 tracking-widest uppercase font-bold">
+            <div className="space-y-3 pb-4 border-b border-zinc-800/80">
+              <div className="flex items-center gap-2 font-mono-tech text-yellow-400 tracking-widest uppercase font-bold text-[10px]">
                 <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
                 <span>CAPÍTULO 01 // INVESTIGACIÓN DE SILICIO</span>
               </div>
 
-              <h1 className="font-display font-black text-4xl sm:text-6xl text-white tracking-tight uppercase leading-[0.94]">
+              <h1 className="evo-hero-title">
                 ¿QUÉ PC TENÉS REALMENTE?
               </h1>
 
-              <p className="font-sans-editorial text-lg sm:text-xl text-zinc-300 max-w-2xl leading-relaxed italic">
+              <p className="evo-body-primary text-lg italic">
                 “Antes de mejorar una computadora, hay que saber exactamente qué tenemos delante.”
               </p>
             </div>
 
             {/* In this chapter you will do... */}
-            <div className="p-6 sm:p-8 rounded-2xl bg-[#121318] border border-zinc-800/90 space-y-5">
-              <span className="font-mono-tech text-xs uppercase tracking-widest text-yellow-400 font-bold block">
+            <div className="p-5 sm:p-6 rounded-2xl bg-[#121318] border border-zinc-800/90 space-y-4">
+              <span className="evo-label-badge text-yellow-400 block">
                 EN ESTE CAPÍTULO VAS A:
               </span>
 
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-sm font-sans-editorial text-zinc-200">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 evo-body-primary">
                 <li className="flex items-center gap-2.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 shrink-0" />
                   <span>Identificar tu hardware real sin mitos comerciales</span>
@@ -893,10 +893,10 @@ Próximo Tomo 01 // Cap 02: "¿Quién espera a quién?"
 
             {/* Title & Concept */}
             <div className="space-y-2">
-              <h2 className="font-display font-black text-3xl sm:text-4xl text-white uppercase tracking-tight">
+              <h2 className="evo-page-title">
                 CPU // EL QUE EJECUTA LAS INSTRUCCIONES
               </h2>
-              <p className="font-sans-editorial text-base text-zinc-300 leading-relaxed max-w-2xl">
+              <p className="evo-body-primary max-w-2xl">
                 La Unidad Central de Procesamiento es el motor aritmético y de control. Cada clic, física de juego o cálculo de programa pasa por sus núcleos e hilos de procesamiento. Su nombre exacto nos dice generación, arquitectura y cuántas instrucciones puede procesar en paralelo.
               </p>
             </div>

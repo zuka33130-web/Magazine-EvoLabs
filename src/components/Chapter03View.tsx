@@ -292,11 +292,11 @@ export const Chapter03View: React.FC<Chapter03ViewProps> = ({
   };
 
   return (
-    <div id="pantalla-capitulo-03" className="w-full min-h-screen py-6 sm:py-10 text-[#f4f4f6]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-10">
+    <div id="pantalla-capitulo-03" className="w-full min-h-screen py-4 sm:py-6 text-[#f4f4f6]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-6">
         
         {/* Navigation Top Bar */}
-        <nav className="flex items-center justify-between pb-5 border-b border-zinc-800/60">
+        <nav className="flex items-center justify-between pb-3 border-b border-zinc-800/60">
           <button
             type="button"
             onClick={onBackToIndex}
@@ -365,26 +365,26 @@ export const Chapter03View: React.FC<Chapter03ViewProps> = ({
         </div>
 
         {/* Chapter Header */}
-        <header className="space-y-4 pt-2">
-          <div className="flex items-center gap-2 text-xs font-mono-tech uppercase tracking-widest text-zinc-400">
+        <header className="space-y-3 pt-1">
+          <div className="flex items-center gap-2 text-[10px] font-mono-tech uppercase tracking-widest text-zinc-400">
             <span>TOMO 01 // CONOCÉ TU PC</span>
             <span>•</span>
-            <span className="text-yellow-400 font-bold">CAPÍTULO 03 // INVESTIGACIÓN COMPLETA</span>
+            <span className="text-yellow-400 font-bold">CAPÍTULO 03</span>
           </div>
 
-          <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight uppercase leading-none">
+          <h1 className="evo-hero-title">
             CUANDO LOS FPS MIENTEN
           </h1>
 
-          <div className="p-5 rounded-2xl bg-[#121318] border-l-4 border-yellow-400 space-y-2">
-            <p className="font-sans-editorial text-lg text-white font-medium italic">
+          <div className="p-4 rounded-2xl bg-[#121318] border-l-4 border-yellow-400 space-y-2">
+            <p className="evo-body-primary text-lg font-medium italic">
               “Una tarjeta gráfica puede reportar 120 fotogramas por segundo mientras tus ojos sienten tirones continuos.
               <br />
               <span className="text-yellow-400 font-bold not-italic">
                 El ojo humano no percibe promedios aritméticos; sufre la dispersión temporal entre cuadros.”
               </span>
             </p>
-            <p className="text-xs font-mono-tech text-zinc-400">
+            <p className="evo-metadata-tech uppercase">
               En el Capítulo 02 entendiste cómo se comunican las piezas. En el Capítulo 03 investigamos la regularidad con la que entregan cada imagen.
             </p>
           </div>
@@ -551,6 +551,7 @@ export const Chapter03View: React.FC<Chapter03ViewProps> = ({
         {/* ESTACIÓN 05 // LABORATORIO FPS // MEDÍ TU JUEGO */}
         {/* ============================================================ */}
         <FpsLabStation
+          specs={specs}
           game={game}
           setGame={setGame}
           customGameName={customGameName}

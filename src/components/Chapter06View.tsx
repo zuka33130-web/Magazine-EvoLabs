@@ -555,7 +555,7 @@ export const Chapter06View: React.FC<Chapter06ViewProps> = ({
     activeCase.currentTestIndex >= activeCase.tests.length;
 
   return (
-    <div id="pantalla-capitulo-06" className="w-full min-h-screen py-6 sm:py-10 text-[#f4f4f6]">
+    <div id="pantalla-capitulo-06" className="w-full min-h-screen py-4 sm:py-6 text-[#f4f4f6]">
       {/* Safety Halt Modal */}
       {safetyHaltReason && (
         <SafetyHaltModal
@@ -585,9 +585,9 @@ export const Chapter06View: React.FC<Chapter06ViewProps> = ({
         />
       )}
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-6">
         {/* Navigation Top Bar */}
-        <nav className="flex items-center justify-between pb-5 border-b border-zinc-800/60">
+        <nav className="flex items-center justify-between pb-3 border-b border-zinc-800/60">
           <button
             type="button"
             onClick={onBackToIndex}
@@ -647,11 +647,9 @@ export const Chapter06View: React.FC<Chapter06ViewProps> = ({
         )}
 
         {/* Chapter Header & Manifesto */}
-        <header className="space-y-4 text-left">
-          <div className="flex flex-wrap items-center gap-2 font-mono-tech text-xs uppercase tracking-widest text-zinc-400">
+        <header className="space-y-3 text-left">
+          <div className="flex flex-wrap items-center gap-2 font-mono-tech text-[10px] uppercase tracking-widest text-zinc-400">
             <span className="text-yellow-400 font-bold">TALLER EVO</span>
-            <span>•</span>
-            <span>SISTEMA CENTRAL: EVO DIAGNOSTIC</span>
             <span>•</span>
             <span
               className={
@@ -664,32 +662,13 @@ export const Chapter06View: React.FC<Chapter06ViewProps> = ({
                 ? 'CAPÍTULO 06 COMPLETADO'
                 : 'CAPÍTULO 06 EN PROGRESO'}
             </span>
-            {activeCase && (
-              <>
-                <span>•</span>
-                <span className="text-zinc-300">
-                  CASO {activeCase.id}:{' '}
-                  <strong
-                    className={
-                      activeCase.completed
-                        ? 'text-emerald-400'
-                        : 'text-amber-400'
-                    }
-                  >
-                    {activeCase.completed
-                      ? activeCase.status || activeCase.finalOutcome
-                      : 'INVESTIGANDO'}
-                  </strong>
-                </span>
-              </>
-            )}
           </div>
 
-          <h1 className="font-display font-black text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight uppercase">
-            ENCONTRÁ LA FALLA
+          <h1 className="evo-hero-title">
+            EL MÉTODO DEDUCTIVO
           </h1>
 
-          <p className="font-sans-editorial text-lg sm:text-2xl text-yellow-400/90 italic max-w-3xl">
+          <p className="evo-body-primary text-lg italic max-w-3xl">
             “No adivines qué está fallando. Hagamos que la PC nos lo muestre.”
           </p>
         </header>

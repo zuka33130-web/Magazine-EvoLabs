@@ -488,10 +488,10 @@ export const Chapter05View: React.FC<Chapter05ViewProps> = ({
   ];
 
   return (
-    <div id="pantalla-capitulo-05" className="w-full min-h-screen py-6 sm:py-10 text-[#f4f4f6]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-10">
+    <div id="pantalla-capitulo-05" className="w-full min-h-screen py-4 sm:py-6 text-[#f4f4f6]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-6">
         {/* Navigation Top Bar */}
-        <nav className="flex items-center justify-between pb-5 border-b border-zinc-800/60">
+        <nav className="flex items-center justify-between pb-3 border-b border-zinc-800/60">
           <button
             type="button"
             onClick={onBackToIndex}
@@ -542,39 +542,21 @@ export const Chapter05View: React.FC<Chapter05ViewProps> = ({
         />
 
         {/* Chapter Header */}
-        <header className="space-y-4 pt-2">
-          <div className="flex items-center gap-2 text-xs font-mono-tech uppercase tracking-widest text-zinc-400">
+        <header className="space-y-3 pt-1">
+          <div className="flex items-center gap-2 text-[10px] font-mono-tech uppercase tracking-widest text-zinc-400">
             <span>TOMO 01 // CONOCÉ TU PC</span>
             <span>•</span>
-            <span className="text-yellow-400 font-bold">
-              CAPÍTULO 05 // LABORATORIO EXPERIMENTAL
-            </span>
+            <span className="text-yellow-400 font-bold">CAPÍTULO 05</span>
           </div>
 
-          <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight uppercase leading-none">
-            WINDOWS TAMBIÉN ES HARDWARE EN MOVIMIENTO
+          <h1 className="evo-hero-title">
+            WINDOWS TAMBIÉN ES HARDWARE
           </h1>
 
-          <div className="p-5 sm:p-6 rounded-2xl bg-[#121318] border-l-4 border-yellow-400 space-y-3">
-            <p className="font-sans-editorial text-lg sm:text-xl text-white font-medium italic leading-relaxed">
+          <div className="p-4 rounded-2xl bg-[#121318] border-l-4 border-yellow-400 space-y-2">
+            <p className="evo-body-primary text-lg font-medium italic">
               “Optimizar no es desactivar más cosas. Optimizar es eliminar trabajo innecesario sin romper el trabajo necesario.”
             </p>
-            <div className="flex flex-wrap items-center gap-2 font-mono-tech text-xs text-zinc-400">
-              <span className="text-yellow-400 font-bold">MÉTODO EVO:</span>
-              <span>OBSERVAR</span>
-              <span>→</span>
-              <span>DESCUBRIR</span>
-              <span>→</span>
-              <span>AISLAR</span>
-              <span>→</span>
-              <span>INTERVENIR</span>
-              <span>→</span>
-              <span>MEDIR</span>
-              <span>→</span>
-              <span>COMPARAR</span>
-              <span>→</span>
-              <span>CONSERVAR O REVERTIR</span>
-            </div>
           </div>
         </header>
 
